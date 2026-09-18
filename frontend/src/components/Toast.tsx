@@ -20,8 +20,8 @@ export default function Toast({ message, type, onClose, duration = 4000 }: Toast
   }, [duration, onClose])
 
   const bgColor = type === 'success'
-    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-    : 'bg-red-500/10 border-red-500/30 text-red-400'
+    ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+    : 'bg-red-50 dark:bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400'
 
   const icon = type === 'success' ? (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
