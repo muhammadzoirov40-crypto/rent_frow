@@ -1,13 +1,19 @@
 import os
 import uuid
-import boto3
-from botocore.config import Config
+import base64
+from pathlib import Path
+from botocore.exceptions import EndpointConnectionError
 from app.core.config import get_settings
 
 settings = get_settings()
 
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
 
-def get_s3_client():
+
+def _get_s3_client():
+    import boto3
+    from botocore.config import Config
     return boto3.client(
         "s3",
         endpoint_url=settings.S3_ENDPOINT,
@@ -18,41 +24,88 @@ def get_s3_client():
     )
 
 
+def _s3_available() -> bool:
+    try:
+        s3 = _get_s3_client()
+        s3.head_bucket(Bucket=settings.S3_BUCKET_NAME)
+        return True
+    except Exception:
+        return False
+
+
+S3_OK = None
+
+
 def upload_file(file_bytes: bytes, folder: str, filename: str, content_type: str = "image/jpeg") -> str:
-    s3 = get_s3_client()
+    global S3_OK
+    if S3_OK is None:
+        S3_OK = _s3_available()
+
     ext = filename.rsplit(".", 1)[-1] if "." in filename else "jpg"
     unique_name = f"{folder}/{uuid.uuid4().hex}.{ext}"
 
-    s3.put_object(
-        Bucket=settings.S3_BUCKET_NAME,
-        Key=unique_name,
-        Body=file_bytes,
-        ContentType=content_type,
-    )
+    if S3_OK:
+        try:
+            s3 = _get_s3_client()
+            s3.put_object(
+                Bucket=settings.S3_BUCKET_NAME,
+                Key=unique_name,
+                Body=file_bytes,
+                ContentType=content_type,
+            )
+            return unique_name
+        except Exception:
+            pass
 
-    return unique_name
+    local_path = UPLOAD_DIR / unique_name
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    local_path.write_bytes(file_bytes)
+    return f"local:{unique_name}"
 
 
 def get_presigned_url(key: str, expires_in: int = 3600) -> str:
-    s3 = get_s3_client()
-    return s3.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": settings.S3_BUCKET_NAME, "Key": key},
-        ExpiresIn=expires_in,
-    )
+    if key.startswith("local:"):
+        return f"/uploads/{key[6:]}"
+
+    if S3_OK:
+        try:
+            s3 = _get_s3_client()
+            return s3.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": settings.S3_BUCKET_NAME, "Key": key},
+                ExpiresIn=expires_in,
+            )
+        except Exception:
+            pass
+
+    return f"/uploads/{key.split('/')[-1]}"
 
 
 def delete_file(key: str) -> None:
-    s3 = get_s3_client()
-    s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=key)
+    if key.startswith("local:"):
+        local_path = UPLOAD_DIR / key[6:]
+        if local_path.exists():
+            local_path.unlink()
+        return
+
+    if S3_OK:
+        try:
+            s3 = _get_s3_client()
+            s3.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=key)
+        except Exception:
+            pass
 
 
 def ensure_bucket_exists() -> None:
-    s3 = get_s3_client()
-    try:
-        s3.head_bucket(Bucket=settings.S3_BUCKET_NAME)
-    except Exception:
-        s3.create_bucket(
-            Bucket=settings.S3_BUCKET_NAME,
-            CreateBucketConfiguration={"LocationConstraint": settings.S3_REGION},
-        )
+    if S3_OK:
+        try:
+            s3 = _get_s3_client()
+            s3.head_bucket(Bucket=settings.S3_BUCKET_NAME)
+        except Exception:
+            try:
+                s3.create_bucket(
+                    Bucket=settings.S3_BUCKET_NAME,
+                    CreateBucketConfiguration={"LocationConstraint": settings.S3_REGION},
+                )
+            except Exception:
+                pass

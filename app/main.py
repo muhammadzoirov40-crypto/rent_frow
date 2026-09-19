@@ -1,17 +1,22 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.core.config import get_settings
 from app.core.database import engine, Base
 from app.api.router import api_router
 
 settings = get_settings()
 
+UPLOAD_DIR = Path("uploads")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    UPLOAD_DIR.mkdir(exist_ok=True)
     yield
     await engine.dispose()
 
@@ -34,6 +39,9 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
+
+if UPLOAD_DIR.exists():
+    app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 
 
 @app.get("/health")
