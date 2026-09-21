@@ -37,6 +37,10 @@ export interface UserProfile {
   updated_at: string
 }
 
+export interface GoogleAuthData {
+  token: string
+}
+
 export const authApi = {
   sendOtp: (data: SendOtpData) => api.post<{ data: { email: string; sent_via_email: boolean; is_registered: boolean } }>('/auth/send-otp', data),
   verifyOtp: (data: VerifyOtpData) => api.post<{ data: { valid: boolean } }>('/auth/verify-otp', data),
@@ -52,4 +56,6 @@ export const authApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
+  googleAuth: (data: GoogleAuthData) =>
+    api.post<{ data: TokenResponse }>('/auth/google', data),
 }

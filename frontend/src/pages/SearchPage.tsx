@@ -23,6 +23,7 @@ import {
   type District,
 } from '../api/index';
 import ListingGrid from '../components/listings/ListingGrid';
+import CustomSelect from '../components/ui/CustomSelect';
 
 const SORT_OPTIONS = [
   { value: 'relevance', labelKey: 'search.sortRelevance' },
@@ -68,46 +69,47 @@ function FilterSidebar({
 }) {
   const { t } = useTranslation();
 
+  const cityOptions = [
+    { value: '', label: t('search.allCities') },
+    ...citiesList.map((c) => ({ value: String(c.id), label: c.name })),
+  ];
+
+  const districtOptions = [
+    { value: '', label: t('search.allDistricts') },
+    ...districts.map((d) => ({ value: String(d.id), label: d.name })),
+  ];
+
+  const categoryOptions = [
+    { value: '', label: t('search.allCategories') },
+    ...categoriesList.map((c) => ({ value: String(c.id), label: c.name })),
+  ];
+
   return (
     <div className="space-y-5">
       <div>
         <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
           {t('search.city')}
         </label>
-        <select
+        <CustomSelect
+          options={cityOptions}
           value={filters.city_id || ''}
-          onChange={(e) => {
-            onFilterChange('city_id', e.target.value);
+          onChange={(val) => {
+            onFilterChange('city_id', val);
             onFilterChange('district_id', '');
           }}
-          className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
-        >
-          <option value="">{t('search.allCities')}</option>
-          {citiesList.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       <div>
         <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
           {t('search.district')}
         </label>
-        <select
+        <CustomSelect
+          options={districtOptions}
           value={filters.district_id || ''}
-          onChange={(e) => onFilterChange('district_id', e.target.value)}
+          onChange={(val) => onFilterChange('district_id', val)}
           disabled={!filters.city_id || loadingDistricts}
-          className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none disabled:opacity-50"
-        >
-          <option value="">{t('search.allDistricts')}</option>
-          {districts.map((d) => (
-            <option key={d.id} value={d.id}>
-              {d.name}
-            </option>
-          ))}
-        </select>
+        />
       </div>
 
       <div>
@@ -153,18 +155,11 @@ function FilterSidebar({
         <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
           {t('search.category')}
         </label>
-        <select
+        <CustomSelect
+          options={categoryOptions}
           value={filters.category_id || ''}
-          onChange={(e) => onFilterChange('category_id', e.target.value)}
-          className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
-        >
-          <option value="">{t('search.allCategories')}</option>
-          {categoriesList.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
+          onChange={(val) => onFilterChange('category_id', val)}
+        />
       </div>
 
       <div>

@@ -18,7 +18,10 @@ class Listing(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
-    price_unit: Mapped[PriceUnit] = mapped_column(SAEnum(PriceUnit), default=PriceUnit.PER_DAY, nullable=False)
+    price_unit: Mapped[PriceUnit] = mapped_column(
+        SAEnum(PriceUnit, values_callable=lambda e: [x.value for x in e]),
+        default=PriceUnit.PER_DAY, nullable=False,
+    )
     deposit: Mapped[float] = mapped_column(Numeric(10, 2), default=0, nullable=False)
     address: Mapped[str | None] = mapped_column(String(500), nullable=True)
 

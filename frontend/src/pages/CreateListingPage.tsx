@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listings, categories, cities, upload } from '../api';
+import CustomSelect from '../components/ui/CustomSelect';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import {
@@ -118,8 +119,17 @@ export default function CreateListingPage() {
       queryClient.invalidateQueries({ queryKey: ['listings'] });
       navigate(`/listing/${data.id}`);
     },
-    onError: () => {
-      toast.error(t('createListing.failedToPublish'));
+    onError: (error: any) => {
+      const detail = error?.response?.data?.detail;
+      let message = t('createListing.failedToPublish');
+      if (typeof detail === 'string') {
+        message = detail;
+      } else if (Array.isArray(detail)) {
+        message = detail.map((e: any) => e.msg).join(', ');
+      } else if (error?.message) {
+        message = error.message;
+      }
+      toast.error(message);
     },
   });
 
@@ -166,7 +176,7 @@ export default function CreateListingPage() {
       case 1: return form.title.trim().length > 0;
       case 2: return form.image_urls.length > 0;
       case 3: return form.price !== '' && Number(form.price) > 0;
-      case 4: return true;
+      case 4: return form.city_id !== null;
       case 5: return true;
       default: return true;
     }
@@ -350,15 +360,11 @@ export default function CreateListingPage() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.period')}</label>
-                  <select
+                  <CustomSelect
+                    options={PRICE_UNITS}
                     value={form.price_unit}
-                    onChange={(e) => updateForm({ price_unit: e.target.value })}
-                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition bg-white dark:bg-white/5"
-                  >
-                    {PRICE_UNITS.map((u) => (
-                      <option key={u.value} value={u.value}>{u.label}</option>
-                    ))}
-                  </select>
+                    onChange={(val) => updateForm({ price_unit: val })}
+                  />
                 </div>
               </div>
               <div>
@@ -384,33 +390,29 @@ export default function CreateListingPage() {
               </h2>
               <div>
                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.city')} *</label>
-                <select
-                  value={form.city_id ?? ''}
-                  onChange={(e) => {
-                    const id = Number(e.target.value) || null;
+                <CustomSelect
+                  options={[
+                    { value: '', label: t('createListing.selectCity') },
+                    ...cityList.map((c) => ({ value: String(c.id), label: c.name })),
+                  ]}
+                  value={form.city_id ? String(form.city_id) : ''}
+                  onChange={(val) => {
+                    const id = Number(val) || null;
                     updateForm({ city_id: id, district_id: null });
                   }}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition bg-white dark:bg-white/5"
-                >
-                  <option value="">{t('createListing.selectCity')}</option>
-                  {cityList.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                />
               </div>
               {form.city_id && districtList.length > 0 && (
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.district')}</label>
-                  <select
-                    value={form.district_id ?? ''}
-                    onChange={(e) => updateForm({ district_id: Number(e.target.value) || null })}
-                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition bg-white dark:bg-white/5"
-                  >
-                    <option value="">{t('createListing.selectDistrict')}</option>
-                    {districtList.map((d) => (
-                      <option key={d.id} value={d.id}>{d.name}</option>
-                    ))}
-                  </select>
+                  <CustomSelect
+                    options={[
+                      { value: '', label: t('createListing.selectDistrict') },
+                      ...districtList.map((d) => ({ value: String(d.id), label: d.name })),
+                    ]}
+                    value={form.district_id ? String(form.district_id) : ''}
+                    onChange={(val) => updateForm({ district_id: Number(val) || null })}
+                  />
                 </div>
               )}
               <div>

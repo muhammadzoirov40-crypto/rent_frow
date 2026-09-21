@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -57,6 +57,12 @@ export default function ListingPage() {
     queryFn: () => listings.getOne(Number(id)),
     enabled: !!id,
   });
+
+  useEffect(() => {
+    if (listing) {
+      setIsFavorited(listing.is_favorited);
+    }
+  }, [listing]);
 
   const { data: listingReviews = [] } = useQuery({
     queryKey: ['reviews', id],

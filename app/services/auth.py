@@ -6,7 +6,7 @@ from jose import jwt
 from app.core.config import get_settings
 from app.models.user import User
 from app.repositories.user import UserRepository
-from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserBrief
+from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserBrief, GoogleAuthRequest
 from app.schemas.user import UserResponse
 from app.services.otp import verify_otp
 from app.utils.s3 import upload_file, get_presigned_url, delete_file
@@ -49,6 +49,7 @@ class AuthService:
             hashed_password="",
             external_user_id=external_id,
             role=role,
+            display_name=data.display_name or "",
         )
 
         token = self._create_token(external_id, user.role.value)
@@ -71,6 +72,55 @@ class AuthService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid or expired verification code. Please request a new one.",
             )
+
+        token = self._create_token(user.external_user_id, user.role.value)
+
+        return TokenResponse(
+            access_token=token,
+            user=UserBrief(id=user.id, email=user.email, role=user.role),
+        )
+
+    async def google_auth(self, data: GoogleAuthRequest) -> TokenResponse:
+        import httpx
+
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.get(
+                    "https://www.googleapis.com/oauth2/v3/userinfo",
+                    headers={"Authorization": f"Bearer {data.token}"},
+                )
+                if resp.status_code != 200:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid Google token.",
+                    )
+                idinfo = resp.json()
+        except HTTPException:
+            raise
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Failed to verify Google token.",
+            )
+
+        google_id = idinfo.get("sub", "")
+        email = idinfo.get("email", "")
+        name = idinfo.get("name", "")
+
+        user = await self.user_repo.get_by_email(email)
+
+        if not user:
+            external_id = google_id
+            user = await self.user_repo.create(
+                email=email,
+                hashed_password="",
+                external_user_id=external_id,
+                role="CUSTOMER",
+                display_name=name,
+                is_verified=True,
+            )
+        else:
+            user = await self.user_repo.update(user, external_user_id=google_id, is_verified=True)
 
         token = self._create_token(user.external_user_id, user.role.value)
 

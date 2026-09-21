@@ -41,14 +41,8 @@ function RequestCard({
   return (
     <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-5 sm:p-6 shadow-sm hover:shadow-md transition">
       <div className="flex items-start gap-4">
-        <div className="w-14 h-14 rounded-xl bg-gray-100 dark:bg-white/5 overflow-hidden flex-shrink-0">
-          {req.listing?.images?.[0] ? (
-            <img src={req.listing.images[0]} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-gray-300 dark:text-gray-600">
-              <Package className="w-6 h-6" />
-            </div>
-          )}
+        <div className="w-14 h-14 rounded-xl bg-gray-100 dark:bg-white/5 overflow-hidden flex-shrink-0 flex items-center justify-center">
+          <Package className="w-6 h-6 text-gray-300 dark:text-gray-600" />
         </div>
 
         <div className="flex-1 min-w-0">
@@ -58,18 +52,18 @@ function RequestCard({
                 to={`/listing/${req.listing_id}`}
                 className="font-bold text-[#1A1A2E] dark:text-white hover:text-[#FF6B35] transition block truncate text-base"
               >
-                {req.listing?.title || `#${req.listing_id}`}
+                {req.listing_title || `#${req.listing_id}`}
               </Link>
-              {type === 'owner' && req.requester && (
+              {type === 'owner' && req.renter_name && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" />
-                  {req.requester.display_name || req.requester.email}
+                  {req.renter_name}
                 </p>
               )}
-              {type === 'renter' && req.owner && (
+              {type === 'renter' && req.owner_name && (
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5">
                   <User className="w-3.5 h-3.5" />
-                  {t('rentalRequests.owner')} {req.owner.display_name || req.owner.email}
+                  {t('rentalRequests.owner')} {req.owner_name}
                 </p>
               )}
             </div>
@@ -84,9 +78,9 @@ function RequestCard({
               <Calendar className="w-3.5 h-3.5" />
               {new Date(req.start_date).toLocaleDateString('ru-RU')} — {new Date(req.end_date).toLocaleDateString('ru-RU')}
             </span>
-            {req.listing?.price != null && (
+            {req.total_price > 0 && (
               <span className="font-bold text-[#FF6B35]">
-                {req.listing.price.toLocaleString()} {req.listing.currency || 'сомони'}/день
+                {req.total_price.toLocaleString()} сом / {req.total_days} {t('common.days')}
               </span>
             )}
             <span className="flex items-center gap-1.5 text-gray-400">
@@ -158,7 +152,7 @@ export default function RentalRequestsPage() {
   });
 
   const cancelMutation = useMutation({
-    mutationFn: rentalRequests.cancelRequest,
+    mutationFn: rentalRequests.cancel,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-requests'] });
       toast.success(t('rentalRequests.requestCancelled'));
@@ -167,7 +161,7 @@ export default function RentalRequestsPage() {
   });
 
   const acceptMutation = useMutation({
-    mutationFn: rentalRequests.acceptRequest,
+    mutationFn: rentalRequests.accept,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
       toast.success(t('rentalRequests.requestAccepted'));
@@ -176,7 +170,7 @@ export default function RentalRequestsPage() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: rentalRequests.rejectRequest,
+    mutationFn: rentalRequests.reject,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
       toast.success(t('rentalRequests.requestRejected'));

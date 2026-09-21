@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     S3_BUCKET_NAME: str = "rentflow"
     S3_REGION: str = "us-east-1"
 
+    GOOGLE_CLIENT_ID: str = ""
+
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
 

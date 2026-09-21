@@ -15,11 +15,16 @@ class RegisterRequest(BaseModel):
     email: EmailStr
     role: UserRole = UserRole.CUSTOMER
     otp_code: str = Field(..., min_length=6, max_length=6)
+    display_name: str | None = None
 
 
 class LoginRequest(BaseModel):
     email: EmailStr
     otp_code: str = Field(..., min_length=6, max_length=6)
+
+
+class GoogleAuthRequest(BaseModel):
+    token: str
 
 
 class TokenResponse(BaseModel):

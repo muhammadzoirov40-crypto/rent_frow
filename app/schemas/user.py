@@ -15,6 +15,7 @@ class UserResponse(BaseModel):
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
     is_verified: bool = False
+    is_active: bool = True
     rating_sum: float = 0
     rating_count: int = 0
     listing_count: int = 0

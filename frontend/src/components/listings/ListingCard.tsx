@@ -110,8 +110,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
             alt={listing.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
-        ) : (
+        ) : null}
+        {!imageUrl && (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
             <User className="w-12 h-12 text-gray-300" />
           </div>

@@ -571,7 +571,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
                 <div>
                   <p className="font-medium text-[#1A1A2E] dark:text-white">{t('profile.roleLabel')}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{meUser?.role === 'admin' ? t('profile.admin') : t('profile.user')}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{meUser?.role === 'ADMIN' ? t('profile.admin') : t('profile.user')}</p>
                 </div>
               </div>
             </div>

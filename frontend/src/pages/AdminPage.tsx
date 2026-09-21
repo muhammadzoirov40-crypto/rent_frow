@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard, Users, FileText, ClipboardList, FolderTree,
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
-  ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle,
+  ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import client from '../api/client';
@@ -29,8 +29,8 @@ const adminApi = {
   deleteListing: (id: number) => client.delete(`/admin/listings/${id}`).then((r) => r.data),
   getRequests: () => client.get<{ data: { data: RentalRequest[] } }>('/admin/requests').then((r) => r.data.data),
   getCategories: () => client.get<{ data: { data: Category[] } }>('/categories').then((r) => r.data.data),
-  createCategory: (data: { name: string; slug: string }) => client.post('/categories', data).then((r) => r.data),
-  updateCategory: (id: number, data: { name: string; slug: string }) => client.put(`/categories/${id}`, data).then((r) => r.data),
+  createCategory: (data: { name: string }) => client.post('/categories', data).then((r) => r.data),
+  updateCategory: (id: number, data: { name: string }) => client.put(`/categories/${id}`, data).then((r) => r.data),
   deleteCategory: (id: number) => client.delete(`/categories/${id}`).then((r) => r.data),
 };
 
@@ -50,24 +50,24 @@ const fallbackUsers: User[] = [
 ];
 
 const fallbackListings: Listing[] = [
-  { id: 1, title: 'Квартира в центре Душанбе', description: '', price: 800, currency: 'TJS', category_id: 1, city_id: 1, district_id: 1, owner_id: 2, images: [], is_available: true, created_at: '2025-08-10T10:00:00Z', updated_at: '2025-08-10T10:00:00Z' },
-  { id: 2, title: 'Toyota Camry 2023', description: '', price: 150, currency: 'TJS', category_id: 2, city_id: 1, district_id: 2, owner_id: 3, images: [], is_available: true, created_at: '2025-08-12T14:30:00Z', updated_at: '2025-08-12T14:30:00Z' },
-  { id: 3, title: 'Перфоратор Makita', description: '', price: 80, currency: 'TJS', category_id: 3, city_id: 2, district_id: 1, owner_id: 4, images: [], is_available: false, created_at: '2025-08-15T08:00:00Z', updated_at: '2025-08-15T08:00:00Z' },
-  { id: 4, title: 'Зал для мероприятий', description: '', price: 500, currency: 'TJS', category_id: 4, city_id: 1, district_id: 3, owner_id: 5, images: [], is_available: true, created_at: '2025-08-20T16:00:00Z', updated_at: '2025-08-20T16:00:00Z' },
+  { id: 1, title: 'Квартира в центре Душанбе', description: '', price: 800, price_unit: 'per_day', category_id: 1, city_id: 1, district_id: 1, owner_id: 2, images: [], status: 'ACTIVE', is_verified: true, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-10T10:00:00Z', updated_at: '2025-08-10T10:00:00Z' } as any,
+  { id: 2, title: 'Toyota Camry 2023', description: '', price: 150, price_unit: 'per_day', category_id: 2, city_id: 1, district_id: 2, owner_id: 3, images: [], status: 'ACTIVE', is_verified: true, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-12T14:30:00Z', updated_at: '2025-08-12T14:30:00Z' } as any,
+  { id: 3, title: 'Перфоратор Makita', description: '', price: 80, price_unit: 'per_day', category_id: 3, city_id: 2, district_id: 1, owner_id: 4, images: [], status: 'PAUSED', is_verified: false, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-15T08:00:00Z', updated_at: '2025-08-15T08:00:00Z' } as any,
+  { id: 4, title: 'Зал для мероприятий', description: '', price: 500, price_unit: 'per_day', category_id: 4, city_id: 1, district_id: 3, owner_id: 5, images: [], status: 'ACTIVE', is_verified: true, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-20T16:00:00Z', updated_at: '2025-08-20T16:00:00Z' } as any,
 ];
 
 const fallbackRequests: RentalRequest[] = [
-  { id: 1, listing_id: 1, requester_id: 3, owner_id: 2, status: 'pending', start_date: '2025-09-01', end_date: '2025-09-30', created_at: '2025-08-25T10:00:00Z' },
-  { id: 2, listing_id: 2, requester_id: 4, owner_id: 3, status: 'accepted', start_date: '2025-09-05', end_date: '2025-09-12', created_at: '2025-08-22T14:00:00Z' },
-  { id: 3, listing_id: 3, requester_id: 5, owner_id: 4, status: 'rejected', start_date: '2025-09-10', end_date: '2025-09-15', created_at: '2025-08-20T09:00:00Z' },
+  { id: 1, listing_id: 1, renter_id: 3, owner_id: 2, status: 'PENDING', start_date: '2025-09-01', end_date: '2025-09-30', total_days: 29, total_price: 23200, deposit_amount: 0, message: null, owner_response: null, created_at: '2025-08-25T10:00:00Z', updated_at: '2025-08-25T10:00:00Z', listing_title: null, renter_name: null, owner_name: null },
+  { id: 2, listing_id: 2, renter_id: 4, owner_id: 3, status: 'ACCEPTED', start_date: '2025-09-05', end_date: '2025-09-12', total_days: 7, total_price: 1050, deposit_amount: 0, message: null, owner_response: null, created_at: '2025-08-22T14:00:00Z', updated_at: '2025-08-22T14:00:00Z', listing_title: null, renter_name: null, owner_name: null },
+  { id: 3, listing_id: 3, renter_id: 5, owner_id: 4, status: 'REJECTED', start_date: '2025-09-10', end_date: '2025-09-15', total_days: 5, total_price: 400, deposit_amount: 0, message: null, owner_response: null, created_at: '2025-08-20T09:00:00Z', updated_at: '2025-08-20T09:00:00Z', listing_title: null, renter_name: null, owner_name: null },
 ];
 
 const fallbackCategories: Category[] = [
-  { id: 1, name: 'Недвижимость', slug: 'real-estate' },
-  { id: 2, name: 'Транспорт', slug: 'transport' },
-  { id: 3, name: 'Инструменты', slug: 'tools' },
-  { id: 4, name: 'Мероприятия', slug: 'events' },
-  { id: 5, name: 'Электроника', slug: 'electronics' },
+  { id: 1, name: 'Недвижимость', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
+  { id: 2, name: 'Транспорт', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
+  { id: 3, name: 'Инструменты', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
+  { id: 4, name: 'Мероприятия', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
+  { id: 5, name: 'Электроника', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
 ];
 
 type TabKey = 'dashboard' | 'users' | 'listings' | 'requests' | 'categories';
@@ -105,7 +105,6 @@ export default function AdminPage() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryName, setCategoryName] = useState('');
-  const [categorySlug, setCategorySlug] = useState('');
   const queryClient = useQueryClient();
 
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
@@ -176,7 +175,7 @@ export default function AdminPage() {
   });
 
   const saveCategoryMutation = useMutation({
-    mutationFn: ({ id, data }: { id?: number; data: { name: string; slug: string } }) =>
+    mutationFn: ({ id, data }: { id?: number; data: { name: string } }) =>
       id ? adminApi.updateCategory(id, data) : adminApi.createCategory(data),
     onSuccess: () => {
       toast.success(t('admin.categorySaved'));
@@ -196,24 +195,22 @@ export default function AdminPage() {
     setShowCategoryModal(false);
     setEditingCategory(null);
     setCategoryName('');
-    setCategorySlug('');
   };
 
   const openEditCategory = (cat: Category) => {
     setEditingCategory(cat);
     setCategoryName(cat.name);
-    setCategorySlug(cat.slug);
     setShowCategoryModal(true);
   };
 
   const handleSaveCategory = () => {
-    if (!categoryName.trim() || !categorySlug.trim()) {
+    if (!categoryName.trim()) {
       toast.error(t('admin.fillAllFields'));
       return;
     }
     saveCategoryMutation.mutate({
       id: editingCategory?.id,
-      data: { name: categoryName.trim(), slug: categorySlug.trim() },
+      data: { name: categoryName.trim() },
     });
   };
 
@@ -470,14 +467,14 @@ export default function AdminPage() {
                               </div>
                             </td>
                             <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
-                              {l.price} {l.currency}
+                              {l.price} сом
                             </td>
                             <td className="px-6 py-4">
-                              <StatusBadge status={l.is_available ? 'active' : 'inactive'} t={t} />
+                              <StatusBadge status={l.status === 'ACTIVE' ? 'active' : l.status === 'PAUSED' ? 'inactive' : 'pending'} t={t} />
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex items-center justify-end gap-1">
-                                {!l.is_available && (
+                                {!l.is_verified && (
                                   <button
                                     onClick={() => approveMutation.mutate(l.id)}
                                     className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50 transition"
@@ -592,7 +589,7 @@ export default function AdminPage() {
                   <p className="text-sm text-gray-500 mt-0.5">{t('admin.platformManagement')}</p>
                 </div>
                 <button
-                  onClick={() => { setEditingCategory(null); setCategoryName(''); setCategorySlug(''); setShowCategoryModal(true); }}
+                  onClick={() => { setEditingCategory(null); setCategoryName(''); setShowCategoryModal(true); }}
                   className="flex items-center gap-2 bg-[#FF6B35] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e55a2b] transition shadow-lg shadow-[#FF6B35]/20"
                 >
                   <Plus className="w-4 h-4" />
@@ -611,7 +608,6 @@ export default function AdminPage() {
                       <thead>
                         <tr className="border-b border-gray-200 dark:border-white/10">
                           <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.name')}</th>
-                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.slug')}</th>
                           <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
                         </tr>
                       </thead>
@@ -619,7 +615,6 @@ export default function AdminPage() {
                         {categories.map((cat) => (
                           <tr key={cat.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
                             <td className="px-6 py-4 font-medium text-sm text-gray-900 dark:text-white">{cat.name}</td>
-                            <td className="px-6 py-4 text-sm text-gray-500 font-mono">{cat.slug}</td>
                             <td className="px-6 py-4">
                               <div className="flex items-center justify-end gap-1">
                                 <button

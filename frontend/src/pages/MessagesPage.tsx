@@ -74,10 +74,9 @@ export default function MessagesPage() {
   const filteredConversations = useMemo(() => {
     if (!search.trim()) return conversations;
     return conversations.filter((conv) => {
-      const other = conv.participants.find((p) => p.id !== user?.id);
-      return other?.display_name.toLowerCase().includes(search.toLowerCase());
+      return conv.other_user_name?.toLowerCase().includes(search.toLowerCase());
     });
-  }, [conversations, search, user?.id]);
+  }, [conversations, search]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -101,8 +100,11 @@ export default function MessagesPage() {
     }
   };
 
-  const getOtherUser = (conv: Conversation): User | undefined => {
-    return conv.participants.find((p) => p.id !== user?.id);
+  const getOtherUser = (conv: Conversation) => {
+    return {
+      display_name: conv.other_user_name,
+      avatar_url: conv.other_user_avatar,
+    };
   };
 
   const selectedConversation = conversations.find((c) => c.id === selectedId);
@@ -144,9 +146,8 @@ export default function MessagesPage() {
           ) : (
             filteredConversations.map((conv) => {
               const other = getOtherUser(conv);
-              const lastMsg = conv.last_message;
               const isActive = conv.id === selectedId;
-              const unreadCount = lastMsg && !lastMsg.is_read && lastMsg.sender_id !== user?.id ? 1 : 0;
+              const unreadCount = conv.unread_count;
 
               return (
                 <button
@@ -176,14 +177,14 @@ export default function MessagesPage() {
                         <span className="font-semibold text-sm text-gray-900 dark:text-white truncate">
                           {other?.display_name || t('messages.user')}
                         </span>
-                        {lastMsg && (
+                        {conv.last_message_at && (
                           <span className="text-[11px] text-gray-400 flex-shrink-0 ml-2">
-                            {timeAgo(lastMsg.created_at)}
+                            {timeAgo(conv.last_message_at)}
                           </span>
                         )}
                       </div>
-                      {lastMsg && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{lastMsg.content}</p>
+                      {conv.last_message_content && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{conv.last_message_content}</p>
                       )}
                     </div>
                   </div>

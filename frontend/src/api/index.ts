@@ -225,6 +225,9 @@ export const auth = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then(unwrap);
   },
+
+  googleAuth: (data: { token: string }) =>
+    client.post<APIResponse<{ access_token: string; token_type: string; user: { id: number; email: string; role: string } }>>('/auth/google', data).then(unwrap),
 };
 
 export const listings = {
@@ -248,6 +251,9 @@ export const listings = {
 
   getMyListings: (page = 1, page_size = 20) =>
     client.get<PaginatedResponse<Listing>>('/listings/owner/my', { params: { page, page_size } }).then(unwrapPaginated),
+
+  getOwnerListings: (page = 1, page_size = 20) =>
+    client.get<PaginatedResponse<Listing>>('/listings/owner/my', { params: { page, page_size } }).then((r) => r.data.data || []),
 };
 
 export interface ListingCreateData {

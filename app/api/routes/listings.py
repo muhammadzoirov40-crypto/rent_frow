@@ -14,15 +14,25 @@ from app.utils.s3 import get_presigned_url
 router = APIRouter(prefix="/listings", tags=["Listings"])
 
 
+def _resolve_image_url(img_url: str | None) -> str | None:
+    if not img_url or 'placeholder' in img_url:
+        return None
+    try:
+        return get_presigned_url(img_url, expires_in=86400)
+    except Exception:
+        return img_url if not img_url.startswith('local:') else None
+
+
 def _listing_to_response(listing, is_favorited: bool = False) -> ListingResponse:
     images = [
         ListingImageResponse(
             id=img.id,
-            image_url=img.image_url,
+            image_url=_resolve_image_url(img.image_url),
             is_primary=img.is_primary,
             sort_order=img.sort_order,
         )
         for img in listing.images
+        if img.image_url and 'placeholder' not in img.image_url
     ]
 
     owner = None
@@ -81,13 +91,21 @@ def _listing_to_response(listing, is_favorited: bool = False) -> ListingResponse
 
 
 def _listing_to_list_response(listing, is_favorited: bool = False) -> ListingListResponse:
+    primary = listing.primary_image
+    if primary and 'placeholder' in primary:
+        primary = None
+    elif primary:
+        try:
+            primary = get_presigned_url(primary, expires_in=86400)
+        except Exception:
+            primary = None
     return ListingListResponse(
         id=listing.id,
         title=listing.title,
         price=float(listing.price),
         price_unit=listing.price_unit,
         city_name=listing.city_rel.name if listing.city_rel else None,
-        primary_image=listing.primary_image,
+        primary_image=primary,
         views_count=listing.views_count,
         average_rating=listing.average_rating,
         created_at=listing.created_at,
