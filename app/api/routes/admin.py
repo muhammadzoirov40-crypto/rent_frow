@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import require_admin, CurrentUser
+from app.core.enums import UserRole
 from app.schemas.statistics import StatisticsResponse, AuditLogResponse
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.statistics import StatisticsService
@@ -58,3 +60,35 @@ async def list_users(
     repo = UserRepository(db)
     users = await repo.get_all(skip, limit)
     return APIResponse(data=users)
+
+
+class UpdateRoleRequest(BaseModel):
+    role: UserRole
+
+
+@router.patch("/users/{user_id}/role", response_model=APIResponse[UserResponse])
+async def update_user_role(
+    user_id: int,
+    data: UpdateRoleRequest,
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = UserRepository(db)
+    user = await repo.get_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user = await repo.update(user, role=data.role)
+    return APIResponse(data=UserResponse.model_validate(user))
+
+
+@router.get("/users/by-email/{email}", response_model=APIResponse[UserResponse])
+async def get_user_by_email(
+    email: str,
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = UserRepository(db)
+    user = await repo.get_by_email(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return APIResponse(data=UserResponse.model_validate(user))

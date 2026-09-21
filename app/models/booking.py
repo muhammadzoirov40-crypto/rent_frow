@@ -26,6 +26,7 @@ class Booking(Base):
     equipment = relationship("Equipment", back_populates="bookings", lazy="selectin")
     payments = relationship("Payment", back_populates="booking", lazy="selectin")
     rental = relationship("Rental", back_populates="booking", uselist=False, lazy="selectin")
+    review = relationship("Review", back_populates="booking", uselist=False, lazy="selectin")
 
     __table_args__ = (
         Index("idx_booking_dates", "start_date", "end_date"),

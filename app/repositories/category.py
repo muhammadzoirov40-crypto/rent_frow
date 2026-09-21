@@ -14,3 +14,9 @@ class CategoryRepository(BaseRepository[Category]):
             select(Category).where(Category.name == name)
         )
         return result.scalar_one_or_none()
+
+    async def get_all_active(self) -> list[Category]:
+        result = await self.db.execute(
+            select(Category).where(Category.is_active == True).order_by(Category.sort_order)
+        )
+        return list(result.scalars().all())

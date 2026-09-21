@@ -14,6 +14,15 @@ class Settings(BaseSettings):
 
     JWT_SECRET_KEY: str = "change-me-to-a-random-secret-min-32-chars"
 
+    def model_post_init(self, __context) -> None:
+        if self.JWT_SECRET_KEY == "change-me-to-a-random-secret-min-32-chars":
+            import warnings
+            warnings.warn(
+                "JWT_SECRET_KEY is using the default value! "
+                "Set a secure random secret in .env or environment variable.",
+                stacklevel=2,
+            )
+
     SMTP_HOST: str = "smtp.gmail.com"
     SMTP_PORT: int = 587
     SMTP_USERNAME: str = ""

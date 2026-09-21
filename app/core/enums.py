@@ -4,6 +4,30 @@ import enum
 class UserRole(str, enum.Enum):
     CUSTOMER = "CUSTOMER"
     ADMIN = "ADMIN"
+    OWNER = "OWNER"
+
+
+class ListingStatus(str, enum.Enum):
+    ACTIVE = "ACTIVE"
+    PAUSED = "PAUSED"
+    RENTED = "RENTED"
+    EXPIRED = "EXPIRED"
+    REMOVED = "REMOVED"
+
+
+class PriceUnit(str, enum.Enum):
+    PER_HOUR = "per_hour"
+    PER_DAY = "per_day"
+    PER_WEEK = "per_week"
+    PER_MONTH = "per_month"
+
+
+class RentalRequestStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    REJECTED = "REJECTED"
+    CANCELLED = "CANCELLED"
+    COMPLETED = "COMPLETED"
 
 
 class EquipmentStatus(str, enum.Enum):
@@ -64,3 +88,14 @@ class PenaltyStatus(str, enum.Enum):
     PENDING = "PENDING"
     PAID = "PAID"
     WAIVED = "WAIVED"
+
+
+class NotificationType(str, enum.Enum):
+    RENTAL_REQUEST = "rental_request"
+    RENTAL_ACCEPTED = "rental_accepted"
+    RENTAL_REJECTED = "rental_rejected"
+    NEW_MESSAGE = "new_message"
+    NEW_REVIEW = "new_review"
+    LISTING_APPROVED = "listing_approved"
+    LISTING_REJECTED = "listing_rejected"
+    RENTAL_ENDING = "rental_ending"

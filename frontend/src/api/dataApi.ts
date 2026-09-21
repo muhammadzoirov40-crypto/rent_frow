@@ -21,6 +21,8 @@ export interface Category {
   id: number
   name: string
   description: string | null
+  start_date: string | null
+  equipment_count: number
   created_at: string
 }
 
@@ -75,6 +77,9 @@ export const equipmentApi = {
 
 export const categoryApi = {
   list: () => api.get<{ data: PaginatedResponse<Category> }>('/categories'),
+  create: (data: { name: string; description?: string; start_date?: string }) => api.post<{ data: Category }>('/categories', data),
+  update: (id: number, data: { name?: string; description?: string; start_date?: string }) => api.put<{ data: Category }>(`/categories/${id}`, data),
+  delete: (id: number) => api.delete(`/categories/${id}`),
 }
 
 export const bookingApi = {
@@ -94,4 +99,20 @@ export const paymentApi = {
     api.post<{ data: Payment }>('/payments', data),
   listMy: (params?: Record<string, any>) => api.get<{ data: PaginatedResponse<Payment> }>('/payments', { params }),
   getByBooking: (bookingId: number) => api.get<{ data: Payment[] }>(`/payments/booking/${bookingId}`),
+}
+
+export interface AdminUser {
+  id: number
+  email: string
+  external_user_id: string
+  role: string
+  display_name: string | null
+  avatar_url: string | null
+  created_at: string
+  updated_at: string
+}
+
+export const adminUserApi = {
+  list: (params?: { skip?: number; limit?: number }) => api.get<{ data: AdminUser[] }>('/admin/users', { params }),
+  update: (id: number, data: { display_name?: string; role?: string }) => api.patch<{ data: AdminUser }>(`/admin/users/${id}`, data),
 }

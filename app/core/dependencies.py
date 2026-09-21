@@ -6,7 +6,7 @@ from sqlalchemy import select
 from app.core.database import get_db
 from app.core.enums import UserRole
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login", auto_error=False)
 
 
 class CurrentUser:
@@ -20,14 +20,21 @@ class CurrentUser:
         return self.role == UserRole.ADMIN
 
     @property
+    def is_owner(self) -> bool:
+        return self.role == UserRole.OWNER
+
+    @property
     def is_customer(self) -> bool:
         return self.role == UserRole.CUSTOMER
 
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    token: str | None = Depends(oauth2_scheme),
     db: AsyncSession = Depends(get_db),
-) -> CurrentUser:
+) -> CurrentUser | None:
+    if token is None:
+        return None
+
     from app.models.user import User
 
     try:
@@ -38,16 +45,9 @@ async def get_current_user(
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         external_user_id: str = payload.get("sub")
         if external_user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token",
-            )
+            return None
     except JWTError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or expired token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+        return None
 
     result = await db.execute(
         select(User).where(User.external_user_id == external_user_id)
@@ -55,10 +55,7 @@ async def get_current_user(
     user = result.scalar_one_or_none()
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
-        )
+        return None
 
     return CurrentUser(
         user_id=user.id,
@@ -67,7 +64,19 @@ async def get_current_user(
     )
 
 
-async def require_admin(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+async def require_auth(
+    current_user: CurrentUser | None = Depends(get_current_user),
+) -> CurrentUser:
+    if current_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return current_user
+
+
+async def require_admin(current_user: CurrentUser = Depends(require_auth)) -> CurrentUser:
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -76,10 +85,19 @@ async def require_admin(current_user: CurrentUser = Depends(get_current_user)) -
     return current_user
 
 
-async def require_customer(current_user: CurrentUser = Depends(get_current_user)) -> CurrentUser:
+async def require_customer(current_user: CurrentUser = Depends(require_auth)) -> CurrentUser:
     if not current_user.is_customer:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Customer access required",
+        )
+    return current_user
+
+
+async def require_owner(current_user: CurrentUser = Depends(require_auth)) -> CurrentUser:
+    if not (current_user.is_admin or current_user.is_owner):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Owner access required",
         )
     return current_user

@@ -32,6 +32,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
   const { theme, toggleTheme } = useTheme()
   const initials = getInitials(user?.display_name || user?.email || '')
   const [langOpen, setLangOpen] = useState(false)
+  const [imgError, setImgError] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
   const isCustomer = user?.role === 'CUSTOMER'
 
@@ -140,11 +141,12 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
               {user?.role}
             </span>
           </div>
-          {user?.avatar_url ? (
+          {user?.avatar_url && !imgError ? (
             <img
               src={cacheBust(user.avatar_url)}
               alt={user.display_name || user.email}
               className="w-9 h-9 rounded-lg object-cover border border-gray-300 dark:border-white/10"
+              onError={() => setImgError(true)}
             />
           ) : (
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-md shadow-brand-500/20">

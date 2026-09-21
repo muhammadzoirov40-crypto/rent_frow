@@ -1,9 +1,11 @@
+import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { UserProfile } from '../api/authApi'
 
 interface SidebarProps {
   user: UserProfile
+  onLogout?: () => void
   collapsed?: boolean
 }
 
@@ -19,12 +21,15 @@ function cacheBust(url: string): string {
   return `${url}${separator}t=${Date.now()}`
 }
 
-export default function Sidebar({ user, collapsed = false }: SidebarProps) {
+export default function Sidebar({ user, onLogout, collapsed = false }: SidebarProps) {
   const location = useLocation()
   const { t } = useTranslation()
   const initials = getInitials(user?.display_name || user?.email || '')
   const isCustomer = user?.role === 'CUSTOMER'
+  const isOwner = user?.role === 'OWNER'
+  const isAdmin = user?.role === 'ADMIN'
   const profilePath = isCustomer ? '/profile' : '/admin/profile'
+  const [imgError, setImgError] = useState(false)
 
   const navLinks = [
     {
@@ -151,11 +156,12 @@ export default function Sidebar({ user, collapsed = false }: SidebarProps) {
           to={profilePath}
           className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/8 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200 group"
         >
-          {user?.avatar_url ? (
+          {user?.avatar_url && !imgError ? (
             <img
               src={cacheBust(user.avatar_url)}
               alt={user.display_name || user.email}
               className="w-9 h-9 rounded-lg object-cover border border-gray-300 dark:border-white/10"
+              onError={() => setImgError(true)}
             />
           ) : (
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-md shadow-brand-500/20">

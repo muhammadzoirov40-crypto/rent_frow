@@ -9,6 +9,7 @@ class Equipment(Base):
     __tablename__ = "equipment"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    owner_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"), nullable=True, index=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -26,6 +27,7 @@ class Equipment(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
+    owner = relationship("User", back_populates="owned_equipment", lazy="selectin")
     category = relationship("Category", back_populates="equipment", lazy="selectin")
     bookings = relationship("Booking", back_populates="equipment", lazy="selectin")
     rentals = relationship("Rental", back_populates="equipment", lazy="selectin")

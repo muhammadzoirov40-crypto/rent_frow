@@ -27,7 +27,6 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
   const [loading, setLoading] = useState(false)
   const [resendTimer, setResendTimer] = useState(0)
   const [shakeOtp, setShakeOtp] = useState(false)
-  const [devCode, setDevCode] = useState('')
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
@@ -45,7 +44,6 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
   const goBackToEmail = () => {
     resetOtp()
     setResendTimer(0)
-    setDevCode('')
     if (viewRef.current === 'login-verification') setView('login-email')
     else if (viewRef.current === 'register-verification') setView('register-email')
   }
@@ -69,7 +67,7 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
     setLoading(true)
     try {
       const res = await authApi.sendOtp({ email: email.trim() })
-      const { is_registered, sent_via_email, dev_code } = res.data.data as any
+      const { is_registered } = res.data.data as any
 
       if (isLogin && !is_registered) {
         setError('Email not found. Please register first.')
@@ -80,10 +78,6 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
         setError('Email already registered. Please sign in instead.')
         setLoading(false)
         return
-      }
-
-      if (!sent_via_email && dev_code) {
-        setDevCode(dev_code)
       }
 
       resetOtp()
@@ -185,14 +179,9 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
   const handleResend = async () => {
     if (resendTimer > 0) return
     resetOtp()
-    setDevCode('')
     setLoading(true)
     try {
-      const res = await authApi.sendOtp({ email: emailRef.current })
-      const { sent_via_email, dev_code } = res.data.data as any
-      if (!sent_via_email && dev_code) {
-        setDevCode(dev_code)
-      }
+      await authApi.sendOtp({ email: emailRef.current })
       setResendTimer(45)
       otpRefs.current[0]?.focus()
     } catch (err: any) {
@@ -302,13 +291,6 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
                 <p className="text-white/70 text-sm">We sent a verification code to</p>
                 <p className="text-white font-semibold text-sm mt-1">{email}</p>
               </div>
-
-              {devCode && (
-                <div className="mb-5 px-4 py-3 rounded-xl text-sm font-medium text-center"
-                  style={{ background: 'rgba(255, 179, 0, 0.2)', border: '1px solid rgba(255, 179, 0, 0.3)', color: '#fde68a' }}>
-                  <strong>Dev mode:</strong> Your OTP code is <span className="font-mono font-bold text-lg">{devCode}</span>
-                </div>
-              )}
 
               {error && (
                 <div className="mb-5 px-4 py-3 rounded-xl text-sm font-medium text-center"

@@ -3,7 +3,7 @@ from fastapi import HTTPException, status as http_status
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.core.dependencies import get_current_user, CurrentUser
+from app.core.dependencies import get_current_user, require_auth, CurrentUser
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, SendOtpRequest, VerifyOtpRequest
 from app.schemas.user import UserResponse, UpdateProfileRequest
 from app.schemas.base import APIResponse
@@ -26,8 +26,6 @@ async def send_otp(data: SendOtpRequest, db: AsyncSession = Depends(get_db)):
     await save_otp(db, data.email, code)
     sent_via_email = await asyncio.to_thread(send_otp_email, data.email, code)
     response_data = {"email": data.email, "sent_via_email": sent_via_email, "is_registered": existing is not None}
-    if not sent_via_email:
-        response_data["dev_code"] = code
     return APIResponse(
         message="OTP sent successfully",
         data=response_data
@@ -35,9 +33,9 @@ async def send_otp(data: SendOtpRequest, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/verify-otp", response_model=APIResponse[dict])
-async def verify_otp_code(data: VerifyOtpRequest):
+async def verify_otp_code(data: VerifyOtpRequest, db: AsyncSession = Depends(get_db)):
     """Verify OTP code (optional pre-check)."""
-    if not verify_otp(data.email, data.code):
+    if not await verify_otp(db, data.email, data.code):
         raise HTTPException(
             status_code=http_status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired OTP code.",
@@ -63,7 +61,7 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
 
 @router.get("/me", response_model=APIResponse[UserResponse])
 async def get_me(
-    current_user: CurrentUser = Depends(get_current_user),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = AuthService(db)

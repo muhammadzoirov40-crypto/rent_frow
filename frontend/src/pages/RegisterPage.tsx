@@ -15,7 +15,6 @@ export default function RegisterPage({ onLogin }: RegisterPageProps) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
-  const [devCode, setDevCode] = useState('')
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -23,14 +22,11 @@ export default function RegisterPage({ onLogin }: RegisterPageProps) {
     setLoading(true)
     try {
       const res = await authApi.sendOtp({ email })
-      const { is_registered, sent_via_email, dev_code } = res.data.data as any
+      const { is_registered } = res.data.data as any
       if (is_registered) {
         setError(t('auth.emailExists'))
         setLoading(false)
         return
-      }
-      if (!sent_via_email && dev_code) {
-        setDevCode(dev_code)
       }
       setOtpSent(true)
       setStep('otp')
@@ -97,11 +93,6 @@ export default function RegisterPage({ onLogin }: RegisterPageProps) {
               <div className="bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-sm rounded-lg p-3">
                 {t('auth.otpSentTo')} <strong>{email}</strong>
               </div>
-              {devCode && (
-                <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 text-yellow-800 dark:text-yellow-400 text-sm rounded-lg p-3">
-                  <strong>{t('auth.devMode')}</strong> {t('auth.yourOtpCode')} <span className="font-mono font-bold text-lg">{devCode}</span>
-                </div>
-              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('auth.otpCode')}</label>
                 <input

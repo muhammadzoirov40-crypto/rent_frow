@@ -17,6 +17,11 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     UPLOAD_DIR.mkdir(exist_ok=True)
+    try:
+        from app.seed_data import seed_database
+        await seed_database()
+    except Exception as e:
+        print(f"Seed skipped: {e}")
     yield
     await engine.dispose()
 

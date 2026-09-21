@@ -5,7 +5,8 @@ from app.core.enums import UserRole, EquipmentStatus, BookingStatus, RentalStatu
 def test_user_roles():
     assert UserRole.CUSTOMER.value == "CUSTOMER"
     assert UserRole.ADMIN.value == "ADMIN"
-    assert len(UserRole) == 2
+    assert UserRole.OWNER.value == "OWNER"
+    assert len(UserRole) == 3
 
 
 def test_equipment_statuses():

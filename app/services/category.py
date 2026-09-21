@@ -1,7 +1,8 @@
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 from app.repositories.category import CategoryRepository
-from app.schemas.category import CategoryCreate, CategoryUpdate
+from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from app.models.category import Category
 
 
@@ -22,6 +23,13 @@ class CategoryService:
 
     async def get_all(self, skip: int = 0, limit: int = 20) -> list[Category]:
         return await self.repo.get_all(skip, limit)
+
+    async def get_all_with_subcategories(self, skip: int = 0, limit: int = 20) -> list[CategoryResponse]:
+        result = await self.db.execute(
+            select(Category).where(Category.is_active == True).order_by(Category.sort_order).offset(skip).limit(limit)
+        )
+        categories = list(result.scalars().all())
+        return [CategoryResponse.model_validate(c) for c in categories]
 
     async def count(self) -> int:
         return await self.repo.count()

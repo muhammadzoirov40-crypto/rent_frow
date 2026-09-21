@@ -4,7 +4,6 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
 from app.core.config import get_settings
-from app.core.enums import UserRole
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserBrief
@@ -44,11 +43,12 @@ class AuthService:
             )
 
         external_id = str(uuid.uuid4())
+        role = data.role
         user = await self.user_repo.create(
             email=data.email,
             hashed_password="",
             external_user_id=external_id,
-            role=data.role,
+            role=role,
         )
 
         token = self._create_token(external_id, user.role.value)
@@ -79,11 +79,32 @@ class AuthService:
             user=UserBrief(id=user.id, email=user.email, role=user.role),
         )
 
-    async def get_me(self, user_id: int) -> User:
+    async def get_me(self, user_id: int) -> UserResponse:
         user = await self.user_repo.get_by_id(user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        return user
+
+        avatar_url = None
+        if user.avatar_url:
+            try:
+                avatar_url = get_presigned_url(user.avatar_url, expires_in=86400)
+            except Exception:
+                avatar_url = user.avatar_url
+
+        return UserResponse(
+            id=user.id,
+            email=user.email,
+            external_user_id=user.external_user_id,
+            role=user.role,
+            display_name=user.display_name,
+            avatar_url=avatar_url,
+            phone=user.phone,
+            is_verified=user.is_verified,
+            rating_sum=user.rating_sum,
+            rating_count=user.rating_count,
+            created_at=user.created_at,
+            updated_at=user.updated_at,
+        )
 
     async def update_profile(self, user_id: int, display_name: str) -> UserResponse:
         user = await self.user_repo.get_by_id(user_id)

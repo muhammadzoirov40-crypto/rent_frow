@@ -13,6 +13,11 @@ class UserResponse(BaseModel):
     role: UserRole
     display_name: Optional[str] = None
     avatar_url: Optional[str] = None
+    phone: Optional[str] = None
+    is_verified: bool = False
+    rating_sum: float = 0
+    rating_count: int = 0
+    listing_count: int = 0
     created_at: datetime
     updated_at: datetime
 
