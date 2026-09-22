@@ -511,8 +511,9 @@ export default function ListingPage() {
                 >
                   <div className="h-40 bg-gray-100 dark:bg-white/5 overflow-hidden">
                     {item.primary_image ? (
-                      <img src={item.primary_image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
+                      <img src={item.primary_image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    ) : null}
+                    {!item.primary_image && (
                       <div className="w-full h-full flex items-center justify-center">
                         <Home size={32} className="text-gray-300" />
                       </div>

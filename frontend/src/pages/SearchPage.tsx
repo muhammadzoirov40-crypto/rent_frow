@@ -371,8 +371,10 @@ export default function SearchPage() {
                             alt={listing.title}
                             className="w-full h-full object-cover"
                             loading="lazy"
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                           />
-                        ) : (
+                        ) : null}
+                        {!listing.primary_image && (
                           <div className="w-full h-full flex items-center justify-center bg-gray-100">
                             <span className="text-gray-300">{t('search.noPhoto')}</span>
                           </div>

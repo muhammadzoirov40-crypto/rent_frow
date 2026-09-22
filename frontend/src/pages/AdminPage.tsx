@@ -42,11 +42,11 @@ const fallbackStats: AdminStats = {
 };
 
 const fallbackUsers: User[] = [
-  { id: 1, email: 'ali@example.com', role: 'admin', display_name: 'Алишер Сатторов', avatar_url: '', created_at: '2025-01-15T10:00:00Z' },
-  { id: 2, email: 'farhod@example.com', role: 'user', display_name: 'Фарход Назаров', avatar_url: '', created_at: '2025-03-20T14:30:00Z' },
-  { id: 3, email: 'dilshod@example.com', role: 'user', display_name: 'Дилшод Раҳимов', avatar_url: '', created_at: '2025-06-10T08:15:00Z' },
-  { id: 4, email: 'nikolay@example.com', role: 'user', display_name: 'Николай Петров', avatar_url: '', created_at: '2025-07-05T11:45:00Z' },
-  { id: 5, email: 'maria@example.com', role: 'user', display_name: 'Мария Иванова', avatar_url: '', created_at: '2025-08-01T09:20:00Z' },
+  { id: 1, email: 'ali@example.com', role: 'ADMIN', display_name: 'Алишер Сатторов', avatar_url: '', created_at: '2025-01-15T10:00:00Z' } as any,
+  { id: 2, email: 'farhod@example.com', role: 'CUSTOMER', display_name: 'Фарход Назаров', avatar_url: '', created_at: '2025-03-20T14:30:00Z' } as any,
+  { id: 3, email: 'dilshod@example.com', role: 'CUSTOMER', display_name: 'Дилшод Раҳимов', avatar_url: '', created_at: '2025-06-10T08:15:00Z' } as any,
+  { id: 4, email: 'nikolay@example.com', role: 'CUSTOMER', display_name: 'Николай Петров', avatar_url: '', created_at: '2025-07-05T11:45:00Z' } as any,
+  { id: 5, email: 'maria@example.com', role: 'CUSTOMER', display_name: 'Мария Иванова', avatar_url: '', created_at: '2025-08-01T09:20:00Z' } as any,
 ];
 
 const fallbackListings: Listing[] = [
@@ -375,8 +375,8 @@ export default function AdminPage() {
                             </td>
                             <td className="px-6 py-4 text-sm text-gray-500">{u.email}</td>
                             <td className="px-6 py-4">
-                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}>
-                                {u.role === 'admin' ? t('admin.admin') : t('admin.customer')}
+                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}>
+                                {u.role === 'ADMIN' ? t('admin.admin') : t('admin.customer')}
                               </span>
                             </td>
                             <td className="px-6 py-4">
@@ -453,8 +453,8 @@ export default function AdminPage() {
                           <tr key={l.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
-                                {l.images?.[0] ? (
-                                  <img src={l.images[0]} alt="" className="w-12 h-12 rounded-xl object-cover" />
+                                {(l as any).primary_image ? (
+                                  <img src={(l as any).primary_image} alt="" className="w-12 h-12 rounded-xl object-cover" />
                                 ) : (
                                   <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center">
                                     <ImageIcon className="w-5 h-5 text-gray-400" />
@@ -672,16 +672,6 @@ export default function AdminPage() {
                   onChange={(e) => setCategoryName(e.target.value)}
                   placeholder={t('admin.namePlaceholder')}
                   className="w-full px-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('admin.slug')}</label>
-                <input
-                  type="text"
-                  value={categorySlug}
-                  onChange={(e) => setCategorySlug(e.target.value)}
-                  placeholder={t('admin.slugPlaceholder')}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] font-mono transition"
                 />
               </div>
               <div className="flex gap-3 pt-2">
