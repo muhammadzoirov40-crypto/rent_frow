@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.audit_log import AuditLog
 from app.repositories.base import BaseRepository
@@ -8,6 +8,18 @@ from app.repositories.base import BaseRepository
 class AuditLogRepository(BaseRepository[AuditLog]):
     def __init__(self, db: AsyncSession):
         super().__init__(AuditLog, db)
+
+    async def count_all(self) -> int:
+        result = await self.db.execute(select(func.count()).select_from(AuditLog))
+        return result.scalar_one()
+
+    async def count_by_entity(self, entity_type: str, entity_id: int) -> int:
+        result = await self.db.execute(
+            select(func.count())
+            .select_from(AuditLog)
+            .where(AuditLog.entity_type == entity_type, AuditLog.entity_id == entity_id)
+        )
+        return result.scalar_one()
 
     async def get_by_entity(self, entity_type: str, entity_id: int) -> list[AuditLog]:
         result = await self.db.execute(

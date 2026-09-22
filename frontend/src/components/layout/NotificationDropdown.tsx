@@ -62,13 +62,13 @@ function getIcon(type: Notification['type']) {
 function getIconBg(type: Notification['type']) {
   switch (type) {
     case 'message':
-      return 'bg-blue-100 text-blue-600'
+      return 'bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-400'
     case 'success':
-      return 'bg-emerald-100 text-emerald-600'
+      return 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400'
     case 'warning':
-      return 'bg-amber-100 text-amber-600'
+      return 'bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400'
     case 'info':
-      return 'bg-gray-100 text-gray-600'
+      return 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-slate-400'
   }
 }
 
@@ -92,11 +92,11 @@ export default function NotificationDropdown({ isOpen, onClose }: NotificationDr
   if (!isOpen) return null
 
   return (
-    <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+    <div className="absolute right-0 mt-2 w-96 max-w-[calc(100vw-2rem)] bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-white/10">
         <div className="flex items-center gap-2">
-          <Bell className="w-4 h-4 text-gray-400" />
+          <Bell className="w-4 h-4 text-gray-400 dark:text-slate-400" />
           <h3 className="text-sm font-semibold text-gray-900">Уведомления</h3>
           {unreadCount > 0 && (
             <span className="px-1.5 py-0.5 bg-brand-500 text-white text-[10px] font-bold rounded-full">
@@ -115,13 +115,13 @@ export default function NotificationDropdown({ isOpen, onClose }: NotificationDr
       </div>
 
       {/* List */}
-      <div className="max-h-80 overflow-y-auto divide-y divide-gray-50">
+      <div className="max-h-80 overflow-y-auto divide-y divide-gray-50 dark:divide-white/5">
         {notifications.map((n) => (
           <button
             key={n.id}
             onClick={() => markRead(n.id)}
-            className={`w-full text-left px-5 py-3.5 hover:bg-gray-50 transition ${
-              !n.read ? 'bg-brand-50/20' : ''
+            className={`w-full text-left px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-white/5 transition ${
+              !n.read ? 'bg-brand-50/20 dark:bg-brand-500/10' : ''
             }`}
           >
             <div className="flex items-start gap-3">
@@ -130,11 +130,11 @@ export default function NotificationDropdown({ isOpen, onClose }: NotificationDr
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium text-gray-900 truncate">{n.title}</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{n.title}</p>
                   {!n.read && <div className="w-1.5 h-1.5 bg-brand-500 rounded-full shrink-0" />}
                 </div>
-                <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{n.message}</p>
-                <p className="text-[11px] text-gray-400 mt-1">{n.time}</p>
+                <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5 line-clamp-2">{n.message}</p>
+                <p className="text-[11px] text-gray-400 dark:text-slate-500 mt-1">{n.time}</p>
               </div>
             </div>
           </button>
@@ -145,7 +145,7 @@ export default function NotificationDropdown({ isOpen, onClose }: NotificationDr
       <Link
         to="/notifications"
         onClick={onClose}
-        className="block px-5 py-3 text-center text-sm font-medium text-brand-500 hover:bg-brand-50 transition border-t border-gray-100"
+        className="block px-5 py-3 text-center text-sm font-medium text-brand-500 hover:bg-brand-50 dark:hover:bg-white/5 transition border-t border-gray-100 dark:border-white/10"
       >
         Смотреть все уведомления
       </Link>

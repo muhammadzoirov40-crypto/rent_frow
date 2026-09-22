@@ -19,6 +19,7 @@ import {
   Moon,
   Globe,
   Settings,
+  Shield,
 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -127,8 +128,7 @@ export default function Header() {
                 className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition text-sm font-medium"
               >
                 <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">{currentLang.flag} {currentLang.code.toUpperCase()}</span>
-                <span className="sm:hidden">{currentLang.flag}</span>
+                <span>{currentLang.code.toUpperCase()}</span>
               </button>
               {langOpen && (
                 <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-[#1A1A2E] rounded-xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
@@ -244,6 +244,12 @@ export default function Header() {
                           <Settings className="w-4 h-4 text-gray-400" />
                           {t('header.settings')}
                         </Link>
+                        {user?.role === 'ADMIN' && (
+                          <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#FF6B35] font-semibold hover:bg-orange-50 dark:hover:bg-[#FF6B35]/10 transition">
+                            <Shield className="w-4 h-4" />
+                            {t('nav.adminDashboard')}
+                          </Link>
+                        )}
                       </div>
                       <div className="border-t border-gray-100 dark:border-white/10 py-1">
                         <button

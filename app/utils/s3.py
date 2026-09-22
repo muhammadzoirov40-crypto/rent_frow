@@ -67,6 +67,9 @@ def get_presigned_url(key: str, expires_in: int = 3600) -> str:
     if key.startswith("local:"):
         return f"/uploads/{key[6:]}"
 
+    if key.startswith("/uploads/"):
+        return key
+
     if S3_OK:
         try:
             s3 = _get_s3_client()
@@ -78,7 +81,7 @@ def get_presigned_url(key: str, expires_in: int = 3600) -> str:
         except Exception:
             pass
 
-    return f"/uploads/{key.split('/')[-1]}"
+    return f"/uploads/{key.lstrip('/')}"
 
 
 def delete_file(key: str) -> None:

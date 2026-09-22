@@ -77,6 +77,7 @@ export interface Listing {
   district_name: string | null;
   is_favorited: boolean;
   average_rating: number;
+  available?: boolean;
 }
 
 export interface ListingListItem {
@@ -163,12 +164,13 @@ export interface Notification {
 
 export interface Review {
   id: number;
+  customer_id: number;
   listing_id: number;
-  reviewer_id: number;
+  rental_request_id?: number | null;
   rating: number;
-  comment: string;
+  comment?: string | null;
   created_at: string;
-  reviewer?: User;
+  customer_name?: string | null;
 }
 
 export interface RentalRequest {
@@ -246,6 +248,9 @@ export const listings = {
   delete: (id: number) =>
     client.delete(`/listings/${id}`),
 
+  deleteListing: (id: number) =>
+    client.delete(`/listings/${id}`),
+
   toggleFavorite: (id: number) =>
     client.post<APIResponse<{ is_favorited: boolean }>>(`/listings/${id}/favorite`).then(unwrap),
 
@@ -292,6 +297,9 @@ export const cities = {
 export const favorites = {
   getAll: (page = 1, page_size = 20) =>
     client.get<PaginatedResponse<ListingListItem>>('/favorites', { params: { page, page_size } }).then(unwrapPaginated),
+
+  getFavorites: (page = 1, page_size = 20) =>
+    client.get<PaginatedResponse<ListingListItem>>('/favorites', { params: { page, page_size } }).then((r) => r.data.data || []),
 };
 
 export const rentalRequests = {
@@ -307,10 +315,19 @@ export const rentalRequests = {
   accept: (id: number) =>
     client.patch<APIResponse<RentalRequest>>(`/rental-requests/${id}/accept`).then(unwrap),
 
+  acceptRequest: (id: number) =>
+    client.patch<APIResponse<RentalRequest>>(`/rental-requests/${id}/accept`).then(unwrap),
+
   reject: (id: number) =>
     client.patch<APIResponse<RentalRequest>>(`/rental-requests/${id}/reject`).then(unwrap),
 
+  rejectRequest: (id: number) =>
+    client.patch<APIResponse<RentalRequest>>(`/rental-requests/${id}/reject`).then(unwrap),
+
   cancel: (id: number) =>
+    client.patch<APIResponse<RentalRequest>>(`/rental-requests/${id}/cancel`).then(unwrap),
+
+  cancelRequest: (id: number) =>
     client.patch<APIResponse<RentalRequest>>(`/rental-requests/${id}/cancel`).then(unwrap),
 };
 
@@ -351,6 +368,9 @@ export const reviews = {
 
   createReview: (listingId: number, data: { rating: number; comment: string }) =>
     client.post<APIResponse<Review>>(`/listings/${listingId}/reviews`, data).then(unwrap),
+
+  deleteReview: (reviewId: number) =>
+    client.delete<APIResponse<null>>(`/reviews/${reviewId}`).then(unwrap),
 };
 
 export const upload = {

@@ -76,7 +76,21 @@ const useAuthStore = create<AuthState>((set, get) => ({
         return;
       }
 
-      set({ token, isAuthenticated: true });
+      const jwtRole = (decoded.role === 'ADMIN' || decoded.role === 'OWNER'
+        ? decoded.role
+        : 'CUSTOMER') as AuthUser['role'];
+
+      set({
+        token,
+        isAuthenticated: true,
+        user: {
+          id: 0,
+          email: '',
+          role: jwtRole,
+          display_name: null,
+          created_at: new Date().toISOString(),
+        },
+      });
 
       const res = await fetch('/api/v1/auth/me', {
         headers: { Authorization: `Bearer ${token}` },
@@ -99,7 +113,7 @@ const useAuthStore = create<AuthState>((set, get) => ({
         }
       } else {
         localStorage.removeItem('rentflow_token');
-        set({ token: null, isAuthenticated: false });
+        set({ token: null, user: null, isAuthenticated: false });
       }
     } catch {
       set({ token, isAuthenticated: true });

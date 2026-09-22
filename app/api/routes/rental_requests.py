@@ -101,3 +101,14 @@ async def cancel_rental_request(
     service = RentalRequestService(db)
     req = await service.cancel(request_id, current_user.user_id)
     return APIResponse(message="Rental request cancelled", data=_to_response(req))
+
+
+@router.patch("/{request_id}/complete", response_model=APIResponse[RentalRequestResponse])
+async def complete_rental_request(
+    request_id: int,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    service = RentalRequestService(db)
+    req = await service.complete(request_id, current_user.user_id)
+    return APIResponse(message="Rental request completed", data=_to_response(req))

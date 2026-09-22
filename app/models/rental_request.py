@@ -28,6 +28,7 @@ class RentalRequest(Base):
     listing = relationship("Listing", back_populates="rental_requests", lazy="selectin")
     renter = relationship("User", foreign_keys=[renter_id], back_populates="rental_requests_as_renter", lazy="selectin")
     owner = relationship("User", foreign_keys=[owner_id], back_populates="rental_requests_as_owner", lazy="selectin")
+    review = relationship("Review", back_populates="rental_request", uselist=False, lazy="selectin")
 
     __table_args__ = (
         Index("idx_rental_request_renter_status", "renter_id", "status"),

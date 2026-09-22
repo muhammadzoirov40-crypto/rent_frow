@@ -15,6 +15,22 @@ class ListingStatus(str, enum.Enum):
     REMOVED = "REMOVED"
 
 
+class PropertyType(str, enum.Enum):
+    APARTMENT = "apartment"
+    HOUSE = "house"
+    OFFICE = "office"
+    ROOM = "room"
+    COMMERCIAL = "commercial"
+    OTHER = "other"
+
+
+class VerificationStatus(str, enum.Enum):
+    PENDING = "pending"
+    VERIFIED = "verified"
+    REJECTED = "rejected"
+    REQUEST_INFO = "request_info"
+
+
 class PriceUnit(str, enum.Enum):
     PER_HOUR = "per_hour"
     PER_DAY = "per_day"
@@ -94,8 +110,11 @@ class NotificationType(str, enum.Enum):
     RENTAL_REQUEST = "rental_request"
     RENTAL_ACCEPTED = "rental_accepted"
     RENTAL_REJECTED = "rental_rejected"
+    RENTAL_CANCELLED = "rental_cancelled"
+    RENTAL_COMPLETED = "rental_completed"
     NEW_MESSAGE = "new_message"
     NEW_REVIEW = "new_review"
     LISTING_APPROVED = "listing_approved"
     LISTING_REJECTED = "listing_rejected"
+    LISTING_REQUEST_INFO = "listing_request_info"
     RENTAL_ENDING = "rental_ending"

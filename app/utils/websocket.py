@@ -1,9 +1,8 @@
 import json
-from typing import Dict, Set
-from fastapi import WebSocket, WebSocketDisconnect, Query
+from typing import Dict, Set, Optional
+from fastapi import WebSocket, WebSocketDisconnect
 from jose import jwt, JWTError
 from app.core.config import get_settings
-from app.core.enums import UserRole
 from app.core.database import async_session_factory
 from app.repositories.user import UserRepository
 
@@ -28,21 +27,21 @@ class ConnectionManager:
 
     async def send_personal_message(self, message: dict, user_id: int):
         if user_id in self.active_connections:
-            for connection in self.active_connections[user_id]:
+            for connection in list(self.active_connections[user_id]):
                 try:
                     await connection.send_json(message)
                 except Exception:
                     pass
 
-    async def broadcast_to_admins(self, message: dict, admin_user_ids: list[int]):
-        for admin_id in admin_user_ids:
-            await self.send_personal_message(message, admin_id)
+    async def send_to_users(self, message: dict, user_ids: list[int]):
+        for user_id in user_ids:
+            await self.send_personal_message(message, user_id)
 
 
 manager = ConnectionManager()
 
 
-async def _authenticate_ws_token(token: str) -> int | None:
+async def _authenticate_ws_token(token: str) -> Optional[int]:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         external_user_id = payload.get("sub")
@@ -58,7 +57,32 @@ async def _authenticate_ws_token(token: str) -> int | None:
     return None
 
 
-async def websocket_endpoint(websocket: WebSocket, user_id: int, token: str | None = Query(default=None)):
+async def _handle_message(websocket: WebSocket, user_id: int, payload: dict):
+    from app.services.message import MessageService
+
+    conversation_id = payload.get("conversation_id")
+    content = payload.get("content")
+    if not conversation_id or not content or not str(content).strip():
+        await websocket.send_json(
+            {"type": "error", "event": "message", "message": "conversation_id and content are required"}
+        )
+        return
+
+    async with async_session_factory() as db:
+        try:
+            message_service = MessageService(db)
+            await message_service.send(
+                conversation_id=int(conversation_id),
+                sender_id=user_id,
+                content=str(content).strip(),
+            )
+        except Exception as exc:
+            await websocket.send_json(
+                {"type": "error", "event": "message", "message": str(exc)}
+            )
+
+
+async def websocket_endpoint(websocket: WebSocket, user_id: int, token: Optional[str] = None):
     if token:
         authenticated_user_id = await _authenticate_ws_token(token)
         if authenticated_user_id is None or authenticated_user_id != user_id:
@@ -74,8 +98,11 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int, token: str | No
             data = await websocket.receive_text()
             try:
                 parsed = json.loads(data)
-                if parsed.get("type") == "ping":
+                msg_type = parsed.get("type")
+                if msg_type == "ping":
                     await websocket.send_json({"type": "pong"})
+                elif msg_type == "message":
+                    await _handle_message(websocket, user_id, parsed)
             except json.JSONDecodeError:
                 pass
     except WebSocketDisconnect:

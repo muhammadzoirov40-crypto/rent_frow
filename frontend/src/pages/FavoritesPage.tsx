@@ -3,15 +3,22 @@ import { Link } from 'react-router-dom';
 import { Heart, MapPin, Package, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { favorites, listings } from '../api';
+import { favorites, listings, type ListingListItem } from '../api';
+
+const PRICE_UNIT_LABELS: Record<string, string> = {
+  per_hour: '/час',
+  per_day: '/день',
+  per_week: '/неделю',
+  per_month: '/месяц',
+};
 
 export default function FavoritesPage() {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
 
-  const { data: favs = [], isLoading } = useQuery({
+  const { data: favs = [], isLoading } = useQuery<ListingListItem[]>({
     queryKey: ['favorites'],
-    queryFn: favorites.getFavorites,
+    queryFn: () => favorites.getFavorites(),
   });
 
   const toggleFavMutation = useMutation({
@@ -55,11 +62,12 @@ export default function FavoritesPage() {
             {favs.map((listing) => (
               <div key={listing.id} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group">
                 <div className="relative h-48 bg-gray-100">
-                  {listing.images?.[0] ? (
+                  {listing.primary_image ? (
                     <img
-                      src={listing.images[0]}
+                      src={listing.primary_image}
                       alt={listing.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">
@@ -82,22 +90,16 @@ export default function FavoritesPage() {
                     {listing.title}
                   </Link>
                   <div className="flex items-center gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    {listing.city && (
+                    {listing.city_name && (
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5" />
-                        {listing.city.name}
+                        {listing.city_name}
                       </span>
-                    )}
-                    {listing.category && (
-                      <span className="text-gray-300 dark:text-gray-600">|</span>
-                    )}
-                    {listing.category && (
-                      <span>{listing.category.name}</span>
                     )}
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
                     <span className="text-xl font-bold text-[#FF6B35]">
-                      {listing.price.toLocaleString()} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">{listing.currency || 'сомони'}/день</span>
+                      {listing.price.toLocaleString()} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}</span>
                     </span>
                   </div>
                 </div>

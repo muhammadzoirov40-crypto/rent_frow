@@ -20,6 +20,7 @@ import {
   FileText,
   AlertTriangle,
   BadgeCheck,
+  Trash2,
 } from 'lucide-react';
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
@@ -85,6 +86,7 @@ export default function ListingPage() {
     onSuccess: (data) => {
       setIsFavorited(data.is_favorited);
       queryClient.invalidateQueries({ queryKey: ['listing', id] });
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
       toast.success(data.is_favorited ? t('listing.addedToFavorites') : t('listing.removedFromFavorites'));
     },
   });
@@ -100,9 +102,26 @@ export default function ListingPage() {
       toast.success(t('listing.rentalRequestSent'));
       setStartDate('');
       setEndDate('');
+      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
     },
-    onError: () => {
-      toast.error(t('listing.failedToSend'));
+    onError: (error: any) => {
+      const detail = error?.response?.data?.detail;
+      const messages: Record<string, string> = {
+        'Cannot rent your own listing': t('listing.ownListing'),
+        'Listing is not available for the selected dates': t('listing.datesTaken'),
+        'End date must be after start date': t('listing.endAfterStart'),
+        'Listing not found': t('listing.listingNotFound'),
+      };
+      if (typeof detail === 'string' && messages[detail]) {
+        toast.error(messages[detail]);
+      } else if (typeof detail === 'string') {
+        toast.error(detail);
+      } else if (Array.isArray(detail)) {
+        toast.error(detail.map((e: any) => e.msg).join(', '));
+      } else {
+        toast.error(t('listing.failedToSend'));
+      }
     },
   });
 
@@ -116,8 +135,32 @@ export default function ListingPage() {
       setReviewRating(5);
       queryClient.invalidateQueries({ queryKey: ['reviews', id] });
     },
-    onError: () => {
-      toast.error(t('listing.failedToPublish'));
+    onError: (error: any) => {
+      const detail = error?.response?.data?.detail;
+      if (typeof detail === 'string') {
+        toast.error(detail);
+      } else if (Array.isArray(detail)) {
+        toast.error(detail.map((e: any) => e.msg).join(', '));
+      } else {
+        toast.error(t('listing.failedToPublish'));
+      }
+    },
+  });
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: (reviewId: number) => reviews.deleteReview(reviewId),
+    onSuccess: () => {
+      toast.success(t('listing.reviewDeleted'));
+      queryClient.invalidateQueries({ queryKey: ['reviews', id] });
+      queryClient.invalidateQueries({ queryKey: ['listing', id] });
+    },
+    onError: (error: any) => {
+      const detail = error?.response?.data?.detail;
+      if (typeof detail === 'string') {
+        toast.error(detail);
+      } else {
+        toast.error(t('listing.failedToDeleteReview'));
+      }
     },
   });
 
@@ -162,6 +205,7 @@ export default function ListingPage() {
     : [];
   const days = startDate && endDate ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000)) : 1;
   const total = days * listing.price;
+  const isOwner = isAuthenticated && user?.id === listing.owner_id;
   const avgRating = listingReviews.length > 0 ? Math.round(listingReviews.reduce((s, r) => s + r.rating, 0) / listingReviews.length) : 0;
 
   return (
@@ -301,40 +345,48 @@ export default function ListingPage() {
                   </div>
                 )}
 
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      toast.error(t('listing.loginRequired'));
-                      navigate('/login');
-                      return;
-                    }
-                    if (!startDate || !endDate) {
-                      toast.error(t('listing.selectDatesRequired'));
-                      return;
-                    }
-                    rentalMutation.mutate();
-                  }}
-                  disabled={rentalMutation.isPending || listing.status !== 'ACTIVE'}
-                  className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20 active:scale-[0.98]"
-                >
-                  {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
-                </button>
+                {isOwner ? (
+                  <div className="w-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 text-sm font-medium py-3 px-4 rounded-xl text-center">
+                    {t('listing.ownListingHint')}
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          toast.error(t('listing.loginRequired'));
+                          navigate('/login');
+                          return;
+                        }
+                        if (!startDate || !endDate) {
+                          toast.error(t('listing.selectDatesRequired'));
+                          return;
+                        }
+                        rentalMutation.mutate();
+                      }}
+                      disabled={rentalMutation.isPending || listing.status !== 'ACTIVE'}
+                      className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20 active:scale-[0.98]"
+                    >
+                      {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
+                    </button>
 
-                <button
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      toast.error(t('listing.loginRequired'));
-                      navigate('/login');
-                      return;
-                    }
-                    messageMutation.mutate();
-                  }}
-                  disabled={messageMutation.isPending}
-                  className="w-full mt-2 border-2 border-[#1A1A2E] dark:border-white/10 text-[#1A1A2E] dark:text-white hover:bg-[#1A1A2E] hover:text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
-                >
-                  <MessageSquare size={18} />
-                  {t('listing.sendMessage')}
-                </button>
+                    <button
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          toast.error(t('listing.loginRequired'));
+                          navigate('/login');
+                          return;
+                        }
+                        messageMutation.mutate();
+                      }}
+                      disabled={messageMutation.isPending}
+                      className="w-full mt-2 border-2 border-[#1A1A2E] dark:border-white/10 text-[#1A1A2E] dark:text-white hover:bg-[#1A1A2E] hover:text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      <MessageSquare size={18} />
+                      {t('listing.sendMessage')}
+                    </button>
+                  </>
+                )}
 
                 <button
                   onClick={() => {
@@ -413,23 +465,45 @@ export default function ListingPage() {
 
             {listingReviews.length > 0 ? (
               <div className="space-y-4">
-                {listingReviews.map((review) => (
-                  <div key={review.id} className="border border-gray-100 dark:border-white/10 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-[#1A1A2E]/10 dark:bg-white/10 flex items-center justify-center">
-                          <span className="text-xs font-bold text-[#1A1A2E] dark:text-white">
-                            {review.reviewer?.display_name?.[0] || 'U'}
-                          </span>
+                {listingReviews.map((review) => {
+                  const canDelete =
+                    isAuthenticated &&
+                    (user?.role === 'ADMIN' || review.customer_id === user?.id);
+
+                  return (
+                    <div key={review.id} className="border border-gray-100 dark:border-white/10 rounded-xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-full bg-[#1A1A2E]/10 dark:bg-white/10 flex items-center justify-center">
+                            <span className="text-xs font-bold text-[#1A1A2E] dark:text-white">
+                              {(review.customer_name || 'U')[0]}
+                            </span>
+                          </div>
+                          <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">{review.customer_name || 'Пользователь'}</span>
                         </div>
-                        <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">{review.reviewer?.display_name || 'Пользователь'}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-gray-400">{new Date(review.created_at).toLocaleDateString('ru-RU')}</span>
+                          {canDelete && (
+                            <button
+                              onClick={() => {
+                                if (confirm(t('listing.confirmDeleteReview'))) {
+                                  deleteReviewMutation.mutate(review.id);
+                                }
+                              }}
+                              disabled={deleteReviewMutation.isPending}
+                              className="text-red-500 hover:text-red-600 transition disabled:opacity-50"
+                              title={t('listing.deleteReview')}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <span className="text-xs text-gray-400">{new Date(review.created_at).toLocaleDateString('ru-RU')}</span>
+                      <StarRating rating={review.rating} size={14} />
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{review.comment}</p>
                     </div>
-                    <StarRating rating={review.rating} size={14} />
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{review.comment}</p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-gray-400 text-sm text-center py-4">{t('listing.noReviews')}</p>

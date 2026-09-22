@@ -5,7 +5,7 @@ from app.models.rental_request import RentalRequest, RentalRequestStatus
 from app.models.listing import Listing, PriceUnit
 from app.repositories.rental_request import RentalRequestRepository
 from app.repositories.listing import ListingRepository
-from app.repositories.notification import NotificationRepository
+from app.services.notification import NotificationService
 from app.schemas.rental_request import RentalRequestCreate
 
 
@@ -35,7 +35,7 @@ class RentalRequestService:
         self.db = db
         self.repo = RentalRequestRepository(db)
         self.listing_repo = ListingRepository(db)
-        self.notif_repo = NotificationRepository(db)
+        self.notif_service = NotificationService(db)
 
     async def create(self, renter_id: int, data: RentalRequestCreate) -> RentalRequest:
         listing = await self.listing_repo.get_by_id(data.listing_id)
@@ -69,7 +69,7 @@ class RentalRequestService:
             status=RentalRequestStatus.PENDING,
         )
 
-        await self.notif_repo.create(
+        await self.notif_service.create(
             user_id=listing.owner_id,
             title="New Rental Request",
             message=f"Someone wants to rent {listing.title}",
@@ -95,7 +95,7 @@ class RentalRequestService:
             owner_response=response,
         )
 
-        await self.notif_repo.create(
+        await self.notif_service.create(
             user_id=request.renter_id,
             title="Rental Request Accepted",
             message="Your rental request has been accepted!",
@@ -121,7 +121,7 @@ class RentalRequestService:
             owner_response=response,
         )
 
-        await self.notif_repo.create(
+        await self.notif_service.create(
             user_id=request.renter_id,
             title="Rental Request Rejected",
             message="Your rental request has been rejected.",
@@ -141,7 +141,45 @@ class RentalRequestService:
         if request.status not in [RentalRequestStatus.PENDING, RentalRequestStatus.ACCEPTED]:
             raise HTTPException(status_code=400, detail="Request cannot be cancelled")
 
-        return await self.repo.update(request, status=RentalRequestStatus.CANCELLED)
+        request = await self.repo.update(request, status=RentalRequestStatus.CANCELLED)
+
+        await self.notif_service.create(
+            user_id=request.owner_id,
+            title="Rental Request Cancelled",
+            message="A rental request was cancelled by the renter.",
+            type="rental_cancelled",
+            reference_id=request.id,
+            reference_type="rental_request",
+        )
+
+        return request
+
+    async def complete(self, request_id: int, owner_id: int) -> RentalRequest:
+        request = await self.repo.get_by_id(request_id)
+        if not request:
+            raise HTTPException(status_code=404, detail="Rental request not found")
+        if request.owner_id != owner_id:
+            raise HTTPException(status_code=403, detail="Not authorized")
+        if request.status != RentalRequestStatus.ACCEPTED:
+            raise HTTPException(status_code=400, detail="Only accepted requests can be completed")
+
+        request = await self.repo.update(request, status=RentalRequestStatus.COMPLETED)
+
+        listing = await self.listing_repo.get_by_id(request.listing_id)
+        if listing:
+            listing.available = True
+            await self.db.flush()
+
+        await self.notif_service.create(
+            user_id=request.renter_id,
+            title="Rental Completed",
+            message=f"The rental of {listing.title if listing else 'your rental'} has been completed. You can now leave a review.",
+            type="rental_completed",
+            reference_id=request.id,
+            reference_type="rental_request",
+        )
+
+        return request
 
     async def get_by_renter(self, renter_id: int, skip: int = 0, limit: int = 20) -> tuple[list[RentalRequest], int]:
         requests = await self.repo.get_by_renter(renter_id, skip, limit)

@@ -4,6 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { listings, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 type ListingCardData = (Listing | ListingListItem) & {
   images?: { id: number; image_url: string }[];
@@ -75,6 +76,7 @@ function getRating(listing: ListingCardData): string | null {
 
 export default function ListingCard({ listing }: ListingCardProps) {
   const [isFavorited, setIsFavorited] = useState(listing.is_favorited ?? false);
+  const queryClient = useQueryClient();
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -82,6 +84,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
     try {
       const res = await listings.toggleFavorite(listing.id);
       setIsFavorited(res.is_favorited);
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
     } catch {}
   };
 
@@ -101,9 +104,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group block"
+      className="bg-white dark:bg-[#1A1A2E] rounded-xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300 group block"
     >
-      <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+      <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800 overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -114,18 +117,18 @@ export default function ListingCard({ listing }: ListingCardProps) {
           />
         ) : null}
         {!imageUrl && (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
-            <User className="w-12 h-12 text-gray-300" />
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
+            <User className="w-12 h-12 text-gray-300 dark:text-slate-600" />
           </div>
         )}
 
         <button
           onClick={toggleFavorite}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white transition-all"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm flex items-center justify-center shadow-md hover:bg-white dark:hover:bg-slate-700 transition-all"
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
-              isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-500'
+              isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-500 dark:text-slate-400'
             }`}
           />
         </button>
@@ -141,7 +144,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
       </div>
 
       <div className="p-4">
-        <h3 className="font-bold text-[#1A1A2E] text-sm leading-snug group-hover:text-[#FF6B35] transition-colors truncate">
+        <h3 className="font-bold text-[#1A1A2E] dark:text-white text-sm leading-snug group-hover:text-[#FF6B35] transition-colors truncate">
           {listing.title}
         </h3>
 
@@ -149,12 +152,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
           <span className="text-lg font-extrabold text-[#FF6B35]">
             {listing.price.toLocaleString('ru-RU')}
           </span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-500 dark:text-slate-400">
             сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
           </span>
         </div>
 
-        <div className="mt-2 flex items-center gap-1 text-xs text-gray-500">
+        <div className="mt-2 flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
           <MapPin className="w-3 h-3 flex-shrink-0" />
           <span className="truncate">
             {cityName}
@@ -163,12 +166,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </div>
 
         {ownerName && (
-          <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500">
-            <div className="w-5 h-5 rounded-full bg-gray-200 overflow-hidden flex-shrink-0">
+          <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400">
+            <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden flex-shrink-0">
               {ownerAvatar ? (
                 <img src={ownerAvatar} alt="" className="w-full h-full object-cover" />
               ) : (
-                <User className="w-3 h-3 m-auto mt-1 text-gray-400" />
+                <User className="w-3 h-3 m-auto mt-1 text-gray-400 dark:text-slate-500" />
               )}
             </div>
             <span className="truncate">{ownerName}</span>
@@ -178,15 +181,15 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
         )}
 
-        <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-          <div className="flex items-center gap-1 text-xs text-gray-500">
+        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
+          <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-slate-400">
             <Star className="w-3 h-3" />
             <span>{rating || '—'}</span>
             {(listing.rating_count ?? 0) > 0 && (
-              <span className="text-gray-400">({listing.rating_count})</span>
+              <span className="text-gray-400 dark:text-slate-500">({listing.rating_count})</span>
             )}
           </div>
-          <div className="flex items-center gap-1 text-xs text-gray-400">
+          <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-slate-500">
             <Clock className="w-3 h-3" />
             <span>{timeAgo}</span>
           </div>

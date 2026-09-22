@@ -55,8 +55,8 @@ class RentalRequestRepository(BaseRepository[RentalRequest]):
                 RentalRequestStatus.PENDING,
                 RentalRequestStatus.ACCEPTED,
             ]),
-            RentalRequest.start_date <= end_date,
-            RentalRequest.end_date >= start_date,
+            RentalRequest.start_date < end_date,
+            RentalRequest.end_date > start_date,
         )
         if exclude_id is not None:
             query = query.where(RentalRequest.id != exclude_id)

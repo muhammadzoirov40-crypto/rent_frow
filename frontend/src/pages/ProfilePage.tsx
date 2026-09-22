@@ -10,15 +10,23 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { auth, listings, favorites, rentalRequests } from '../api';
 import useAuthStore from '../store/authStore';
-import type { Listing, RentalRequest } from '../api';
+import type { Listing, ListingListItem, RentalRequest } from '../api';
 
 type Tab = 'listings' | 'favorites' | 'my-requests' | 'owner-requests' | 'settings';
+
+const PRICE_UNIT_LABELS: Record<string, string> = {
+  per_hour: '/час',
+  per_day: '/день',
+  per_week: '/неделю',
+  per_month: '/месяц',
+};
 
 const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
   pending: { label: 'pending', bg: 'bg-amber-100', text: 'text-amber-700' },
   accepted: { label: 'accepted', bg: 'bg-emerald-100', text: 'text-emerald-700' },
   rejected: { label: 'rejected', bg: 'bg-red-100', text: 'text-red-700' },
   cancelled: { label: 'cancelled', bg: 'bg-gray-100', text: 'text-gray-600' },
+  completed: { label: 'completed', bg: 'bg-blue-100', text: 'text-blue-700' },
 };
 
 export default function ProfilePage() {
@@ -39,24 +47,24 @@ export default function ProfilePage() {
 
   const meUser = meData || user;
 
-  const { data: userListings = [] } = useQuery({
+  const { data: userListings = [] } = useQuery<Listing[]>({
     queryKey: ['owner-listings'],
-    queryFn: listings.getOwnerListings,
+    queryFn: () => listings.getOwnerListings(),
   });
 
-  const { data: favs = [] } = useQuery({
+  const { data: favs = [] } = useQuery<ListingListItem[]>({
     queryKey: ['favorites'],
-    queryFn: favorites.getFavorites,
+    queryFn: () => favorites.getFavorites(),
   });
 
   const { data: myRequests = [] } = useQuery({
     queryKey: ['my-requests'],
-    queryFn: rentalRequests.getMyRequests,
+    queryFn: () => rentalRequests.getMyRequests().then((r) => r.items),
   });
 
   const { data: ownerRequests = [] } = useQuery({
     queryKey: ['owner-requests'],
-    queryFn: rentalRequests.getOwnerRequests,
+    queryFn: () => rentalRequests.getOwnerRequests().then((r) => r.items),
   });
 
   const updateProfileMutation = useMutation({
@@ -315,8 +323,13 @@ export default function ProfilePage() {
                 {userListings.map((listing) => (
                   <div key={listing.id} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition">
                     <div className="relative h-40 bg-gray-100 dark:bg-white/5">
-                      {listing.images?.[0] ? (
-                        <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover" />
+                      {listing.images?.[0]?.image_url ? (
+                        <img
+                          src={listing.images[0].image_url}
+                          alt={listing.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300">
                           <Package className="w-10 h-10" />
@@ -344,21 +357,21 @@ export default function ProfilePage() {
                     <div className="p-4">
                       <h3 className="font-semibold text-[#1A1A2E] dark:text-white truncate">{listing.title}</h3>
                       <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        {listing.city && (
+                        {listing.city_name && (
                           <span className="flex items-center gap-1">
                             <MapPin className="w-3.5 h-3.5" />
-                            {listing.city.name}
+                            {listing.city_name}
                           </span>
                         )}
                         <span className="font-bold text-[#FF6B35]">
-                          {listing.price.toLocaleString()} {listing.currency || 'сомони'}
+                          {listing.price.toLocaleString()} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-3">
                         <span className={`text-xs px-2 py-1 rounded-full ${
-                          listing.is_available ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
+                          listing.available ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
                         }`}>
-                          {listing.is_available ? t('profile.available') : t('profile.unavailable')}
+                          {listing.available ? t('profile.available') : t('profile.unavailable')}
                         </span>
                       </div>
                     </div>
@@ -388,8 +401,13 @@ export default function ProfilePage() {
                 {favs.map((listing) => (
                   <div key={listing.id} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition">
                     <div className="relative h-40 bg-gray-100 dark:bg-white/5">
-                      {listing.images?.[0] ? (
-                        <img src={listing.images[0]} alt={listing.title} className="w-full h-full object-cover" />
+                      {listing.primary_image ? (
+                        <img
+                          src={listing.primary_image}
+                          alt={listing.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300">
                           <Package className="w-10 h-10" />
@@ -407,14 +425,14 @@ export default function ProfilePage() {
                         {listing.title}
                       </Link>
                       <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        {listing.city && (
+                        {listing.city_name && (
                           <span className="flex items-center gap-1">
                             <MapPin className="w-3.5 h-3.5" />
-                            {listing.city.name}
+                            {listing.city_name}
                           </span>
                         )}
                         <span className="font-bold text-[#FF6B35]">
-                          {listing.price.toLocaleString()} {listing.currency || 'сомони'}
+                          {listing.price.toLocaleString()} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
                         </span>
                       </div>
                     </div>
@@ -441,7 +459,7 @@ export default function ProfilePage() {
               </div>
             ) : (
               myRequests.map((req) => {
-                const statusKey = req.status as string;
+                const statusKey = (req.status || 'pending').toLowerCase();
                 const status = statusConfig[statusKey] || statusConfig.pending;
                 return (
                   <div key={req.id} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
@@ -449,7 +467,7 @@ export default function ProfilePage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-[#1A1A2E] dark:text-white truncate">
-                            {req.listing?.title || `Объявление #${req.listing_id}`}
+                            {req.listing_title || `Объявление #${req.listing_id}`}
                           </h3>
                           <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${status.bg} ${status.text}`}>
                             {t(`profile.status.${statusKey}`)}
@@ -460,9 +478,9 @@ export default function ProfilePage() {
                             <Calendar className="w-3.5 h-3.5" />
                             {new Date(req.start_date).toLocaleDateString('ru-RU')} — {new Date(req.end_date).toLocaleDateString('ru-RU')}
                           </span>
-                          {req.listing?.price && (
+                          {req.total_price > 0 && (
                             <span className="font-bold text-[#FF6B35]">
-                              {req.listing.price.toLocaleString()} {req.listing.currency || 'сомони'}/день
+                              {req.total_price.toLocaleString()} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}
                         </div>
@@ -470,7 +488,7 @@ export default function ProfilePage() {
                           <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 rounded-lg p-3">{req.message}</p>
                         )}
                       </div>
-                      {req.status === 'pending' && (
+                      {statusKey === 'pending' && (
                         <button
                           onClick={() => cancelRequestMutation.mutate(req.id)}
                           disabled={cancelRequestMutation.isPending}
@@ -497,7 +515,7 @@ export default function ProfilePage() {
               </div>
             ) : (
               ownerRequests.map((req) => {
-                const statusKey = req.status as string;
+                const statusKey = (req.status || 'pending').toLowerCase();
                 const status = statusConfig[statusKey] || statusConfig.pending;
                 return (
                   <div key={req.id} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
@@ -505,23 +523,23 @@ export default function ProfilePage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-[#1A1A2E] dark:text-white truncate">
-                            {req.listing?.title || `Объявление #${req.listing_id}`}
+                            {req.listing_title || `Объявление #${req.listing_id}`}
                           </h3>
                           <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${status.bg} ${status.text}`}>
                             {t(`profile.status.${statusKey}`)}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                          От: <span className="font-medium text-gray-700 dark:text-gray-300">{req.requester?.display_name || req.requester?.email || `Пользователь #${req.requester_id}`}</span>
+                          От: <span className="font-medium text-gray-700 dark:text-gray-300">{req.renter_name || `Пользователь #${req.renter_id}`}</span>
                         </p>
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3.5 h-3.5" />
                             {new Date(req.start_date).toLocaleDateString('ru-RU')} — {new Date(req.end_date).toLocaleDateString('ru-RU')}
                           </span>
-                          {req.listing?.price && (
+                          {req.total_price > 0 && (
                             <span className="font-bold text-[#FF6B35]">
-                              {req.listing.price.toLocaleString()} {req.listing.currency || 'сомони'}/день
+                              {req.total_price.toLocaleString()} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}
                         </div>
@@ -529,7 +547,7 @@ export default function ProfilePage() {
                           <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 rounded-lg p-3">{req.message}</p>
                         )}
                       </div>
-                      {req.status === 'pending' && (
+                      {statusKey === 'pending' && (
                         <div className="flex gap-2 whitespace-nowrap">
                           <button
                             onClick={() => acceptRequestMutation.mutate(req.id)}

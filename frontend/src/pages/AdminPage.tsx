@@ -17,6 +17,89 @@ interface AdminStats {
   completedRentals: number;
 }
 
+interface CrmStats {
+  totalUsers: number;
+  activeUsers: number;
+  verifiedUsers: number;
+  totalListings: number;
+  activeListings: number;
+  unverifiedListings: number;
+  totalEquipment: number;
+  totalRequests: number;
+  totalBookings: number;
+  totalRentals: number;
+  totalPayments: number;
+  totalPosts: number;
+  totalReviews: number;
+  totalPenalties: number;
+  totalRevenue: number;
+}
+
+interface CrmPipelineItem {
+  type: string;
+  id: number;
+  title: string;
+  status: string;
+  amount: number | null;
+  user: string | null;
+  created_at: string;
+}
+
+interface CrmData {
+  stats: CrmStats;
+  requestsByStatus: Record<string, number>;
+  bookingsByStatus: Record<string, number>;
+  rentalsByStatus: Record<string, number>;
+  paymentsByStatus: Record<string, number>;
+  listingsByStatus: Record<string, number>;
+  pipeline: CrmPipelineItem[];
+  recentRequests: {
+    id: number;
+    listing_title: string | null;
+    renter_name: string | null;
+    owner_name: string | null;
+    status: string;
+    total_price: number;
+    start_date: string;
+    end_date: string;
+    created_at: string;
+  }[];
+  recentBookings: {
+    id: number;
+    equipment_name: string | null;
+    customer_name: string | null;
+    status: string;
+    total_price: number;
+    start_date: string;
+    end_date: string;
+    created_at: string;
+  }[];
+  recentRentals: {
+    id: number;
+    equipment_name: string | null;
+    customer_name: string | null;
+    status: string;
+    created_at: string;
+  }[];
+  recentPayments: {
+    id: number;
+    amount: number;
+    payment_type: string;
+    status: string;
+    customer_name: string | null;
+    created_at: string;
+  }[];
+  recentUsers: {
+    id: number;
+    email: string;
+    display_name: string | null;
+    role: string;
+    is_active: boolean;
+    is_verified: boolean;
+    created_at: string;
+  }[];
+}
+
 const adminApi = {
   getStats: () => client.get<{ data: { data: AdminStats } }>('/admin/stats').then((r) => r.data.data),
   getUsers: () => client.get<{ data: { data: User[] } }>('/admin/users').then((r) => r.data.data),
@@ -28,6 +111,7 @@ const adminApi = {
   rejectListing: (id: number) => client.put(`/admin/listings/${id}/reject`).then((r) => r.data),
   deleteListing: (id: number) => client.delete(`/admin/listings/${id}`).then((r) => r.data),
   getRequests: () => client.get<{ data: { data: RentalRequest[] } }>('/admin/requests').then((r) => r.data.data),
+  getCrm: () => client.get<{ data: { data: CrmData } }>('/admin/crm').then((r) => r.data.data),
   getCategories: () => client.get<{ data: { data: Category[] } }>('/categories').then((r) => r.data.data),
   createCategory: (data: { name: string }) => client.post('/categories', data).then((r) => r.data),
   updateCategory: (id: number, data: { name: string }) => client.put(`/categories/${id}`, data).then((r) => r.data),
@@ -70,7 +154,7 @@ const fallbackCategories: Category[] = [
   { id: 5, name: 'Электроника', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
 ];
 
-type TabKey = 'dashboard' | 'users' | 'listings' | 'requests' | 'categories';
+type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'categories';
 
 function StatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   const styles: Record<string, string> = {
@@ -136,6 +220,12 @@ export default function AdminPage() {
     queryKey: ['admin-categories'],
     queryFn: adminApi.getCategories,
     placeholderData: fallbackCategories,
+  });
+
+  const { data: crm, isLoading: crmLoading } = useQuery({
+    queryKey: ['admin-crm'],
+    queryFn: adminApi.getCrm,
+    enabled: activeTab === 'crm',
   });
 
   const blockMutation = useMutation({
@@ -227,6 +317,7 @@ export default function AdminPage() {
 
   const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
     { key: 'dashboard', label: t('admin.overview'), icon: <LayoutDashboard className="w-5 h-5" /> },
+    { key: 'crm', label: t('admin.crm'), icon: <BarChart3 className="w-5 h-5" /> },
     { key: 'users', label: t('admin.users'), icon: <Users className="w-5 h-5" /> },
     { key: 'listings', label: t('admin.listings'), icon: <FileText className="w-5 h-5" /> },
     { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" /> },
@@ -319,6 +410,195 @@ export default function AdminPage() {
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'crm' && (
+            <div>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.crm')}</h1>
+                <p className="text-sm text-gray-500 mt-0.5">{t('admin.crmSubtitle')}</p>
+              </div>
+
+              {crmLoading ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : crm ? (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {[
+                      { label: t('admin.totalUsers'), value: crm.stats.totalUsers, icon: <Users className="w-6 h-6" />, color: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/20' },
+                      { label: t('admin.activeListings'), value: crm.stats.activeListings, icon: <FileText className="w-6 h-6" />, color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/20' },
+                      { label: t('admin.totalRequests'), value: crm.stats.totalRequests, icon: <ClipboardList className="w-6 h-6" />, color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/20' },
+                      { label: t('admin.totalRevenue'), value: crm.stats.totalRevenue, icon: <TrendingUp className="w-6 h-6" />, color: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/20' },
+                      { label: t('admin.totalBookings'), value: crm.stats.totalBookings, icon: <Clock className="w-6 h-6" />, color: 'from-cyan-500 to-sky-600', shadow: 'shadow-cyan-500/20' },
+                      { label: t('admin.totalRentals'), value: crm.stats.totalRentals, icon: <CheckCircle className="w-6 h-6" />, color: 'from-teal-500 to-green-600', shadow: 'shadow-teal-500/20' },
+                      { label: t('admin.totalPayments'), value: crm.stats.totalPayments, icon: <BarChart3 className="w-6 h-6" />, color: 'from-rose-500 to-red-600', shadow: 'shadow-rose-500/20' },
+                      { label: t('admin.unverifiedListings'), value: crm.stats.unverifiedListings, icon: <AlertTriangle className="w-6 h-6" />, color: 'from-yellow-500 to-amber-600', shadow: 'shadow-yellow-500/20' },
+                    ].map((card) => (
+                      <div key={card.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center text-white shadow-lg ${card.shadow}`}>
+                            {card.icon}
+                          </div>
+                          <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                        </div>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                          {card.label === t('admin.totalRevenue') ? `${card.value.toLocaleString()} сом` : card.value.toLocaleString()}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-4">{t('admin.pipeline')}</h3>
+                    {crm.pipeline.length === 0 ? (
+                      <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    ) : (
+                      <div className="space-y-3">
+                        {crm.pipeline.map((item) => (
+                          <div key={`${item.type}-${item.id}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
+                              item.type === 'request' ? 'bg-amber-100 text-amber-600' :
+                              item.type === 'booking' ? 'bg-blue-100 text-blue-600' :
+                              item.type === 'rental' ? 'bg-emerald-100 text-emerald-600' :
+                              item.type === 'payment' ? 'bg-purple-100 text-purple-600' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>
+                              {item.type === 'user' ? <Users className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{item.title}</p>
+                                <StatusBadge status={item.status.toLowerCase()} t={t} />
+                              </div>
+                              <p className="text-xs text-gray-400 mt-0.5">
+                                {t(`admin.crmType_${item.type}`)} · {item.user || '—'}
+                                {item.amount != null ? ` · ${item.amount.toLocaleString()} сом` : ''}
+                              </p>
+                            </div>
+                            <p className="text-xs text-gray-400 whitespace-nowrap">
+                              {new Date(item.created_at).toLocaleDateString('ru-RU')}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
+                      <h3 className="font-bold text-gray-900 dark:text-white">{t('admin.recentRequests')}</h3>
+                    </div>
+                    {crm.recentRequests.length === 0 ? (
+                      <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-200 dark:border-white/10">
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.listing')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.user')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.period')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.price')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.date')}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                            {crm.recentRequests.map((r) => (
+                              <tr key={r.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                                <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">{r.listing_title || `#${r.id}`}</td>
+                                <td className="px-6 py-3 text-sm text-gray-500">{r.renter_name || '—'}</td>
+                                <td className="px-6 py-3 text-sm text-gray-500">{r.start_date} — {r.end_date}</td>
+                                <td className="px-6 py-3"><StatusBadge status={r.status.toLowerCase()} t={t} /></td>
+                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{r.total_price.toLocaleString()} сом</td>
+                                <td className="px-6 py-3 text-sm text-gray-400">{new Date(r.created_at).toLocaleDateString('ru-RU')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
+                      <h3 className="font-bold text-gray-900 dark:text-white">{t('admin.recentPayments')}</h3>
+                    </div>
+                    {crm.recentPayments.length === 0 ? (
+                      <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-200 dark:border-white/10">
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">ID</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.user')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.price')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.date')}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                            {crm.recentPayments.map((p) => (
+                              <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                                <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">#{p.id}</td>
+                                <td className="px-6 py-3 text-sm text-gray-500">{p.customer_name || '—'}</td>
+                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{p.amount.toLocaleString()} сом</td>
+                                <td className="px-6 py-3"><StatusBadge status={p.status.toLowerCase()} t={t} /></td>
+                                <td className="px-6 py-3 text-sm text-gray-400">{new Date(p.created_at).toLocaleDateString('ru-RU')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
+                      <h3 className="font-bold text-gray-900 dark:text-white">{t('admin.recentUsers')}</h3>
+                    </div>
+                    {crm.recentUsers.length === 0 ? (
+                      <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full">
+                          <thead>
+                            <tr className="border-b border-gray-200 dark:border-white/10">
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.user')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.email')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.role')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+                              <th className="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.date')}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                            {crm.recentUsers.map((u) => (
+                              <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                                <td className="px-6 py-3 text-sm font-medium text-gray-900 dark:text-white">{u.display_name || u.email}</td>
+                                <td className="px-6 py-3 text-sm text-gray-500">{u.email}</td>
+                                <td className="px-6 py-3">
+                                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${u.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}>
+                                    {u.role === 'ADMIN' ? t('admin.admin') : t('admin.customer')}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-3"><StatusBadge status={u.is_active ? 'active' : 'blocked'} t={t} /></td>
+                                <td className="px-6 py-3 text-sm text-gray-400">{new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+              )}
             </div>
           )}
 

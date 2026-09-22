@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.core.config import get_settings
 from app.core.database import engine, Base
+from app.core.migrations import run_schema_migrations
 from app.api.router import api_router
 
 settings = get_settings()
@@ -16,6 +17,14 @@ UPLOAD_DIR = Path("uploads")
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    try:
+        applied = await run_schema_migrations(engine)
+        if applied:
+            print("Schema migrations applied:")
+            for change in applied:
+                print(f"  - {change}")
+    except Exception as e:
+        print(f"Schema migrations skipped: {e}")
     UPLOAD_DIR.mkdir(exist_ok=True)
     try:
         from app.seed_data import seed_database

@@ -19,6 +19,13 @@ from app.models.user import User
 from app.models.listing import Listing
 from app.models.listing_image import ListingImage
 from app.models.rental_request import RentalRequest
+from app.models.booking import Booking
+from app.models.rental import Rental
+from app.models.payment import Payment
+from app.models.equipment import Equipment
+from app.models.review import Review
+from app.models.post import Post
+from app.models.penalty import Penalty
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -53,6 +60,232 @@ async def get_stats(
         "activeListings": active_listings_count,
         "rentalRequests": total_requests_count,
         "completedRentals": completed_count,
+    })
+
+
+@router.get("/crm", response_model=APIResponse[dict])
+async def get_crm(
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    def _count_map(rows):
+        return {str(k): int(v) for k, v in rows}
+
+    async def _by_status(model, status_col):
+        result = await db.execute(
+            select(status_col, func.count()).group_by(status_col)
+        )
+        return _count_map(result.all())
+
+    total_users = (await db.execute(select(func.count()).select_from(User))).scalar_one()
+    active_users = (
+        await db.execute(
+            select(func.count()).select_from(User).where(User.is_active == True)
+        )
+    ).scalar_one()
+    verified_users = (
+        await db.execute(
+            select(func.count()).select_from(User).where(User.is_verified == True)
+        )
+    ).scalar_one()
+
+    total_listings = (await db.execute(select(func.count()).select_from(Listing))).scalar_one()
+    active_listings = (
+        await db.execute(
+            select(func.count()).select_from(Listing).where(Listing.status == ListingStatus.ACTIVE)
+        )
+    ).scalar_one()
+    unverified_listings = (
+        await db.execute(
+            select(func.count()).select_from(Listing).where(Listing.is_verified == False)
+        )
+    ).scalar_one()
+
+    total_equipment = (await db.execute(select(func.count()).select_from(Equipment))).scalar_one()
+    total_requests = (await db.execute(select(func.count()).select_from(RentalRequest))).scalar_one()
+    total_bookings = (await db.execute(select(func.count()).select_from(Booking))).scalar_one()
+    total_rentals = (await db.execute(select(func.count()).select_from(Rental))).scalar_one()
+    total_payments = (await db.execute(select(func.count()).select_from(Payment))).scalar_one()
+    total_posts = (await db.execute(select(func.count()).select_from(Post))).scalar_one()
+    total_reviews = (await db.execute(select(func.count()).select_from(Review))).scalar_one()
+    total_penalties = (await db.execute(select(func.count()).select_from(Penalty))).scalar_one()
+
+    revenue_result = await db.execute(
+        select(func.coalesce(func.sum(Payment.amount), 0)).where(Payment.status == "PAID")
+    )
+    total_revenue = float(revenue_result.scalar_one())
+
+    requests_by_status = await _by_status(RentalRequest, RentalRequest.status)
+    bookings_by_status = await _by_status(Booking, Booking.status)
+    rentals_by_status = await _by_status(Rental, Rental.status)
+    payments_by_status = await _by_status(Payment, Payment.status)
+    listings_by_status = await _by_status(Listing, Listing.status)
+
+    recent_requests_result = await db.execute(
+        select(RentalRequest)
+        .order_by(RentalRequest.created_at.desc())
+        .limit(20)
+    )
+    recent_requests = list(recent_requests_result.scalars().all())
+
+    recent_bookings_result = await db.execute(
+        select(Booking).order_by(Booking.created_at.desc()).limit(20)
+    )
+    recent_bookings = list(recent_bookings_result.scalars().all())
+
+    recent_rentals_result = await db.execute(
+        select(Rental).order_by(Rental.created_at.desc()).limit(20)
+    )
+    recent_rentals = list(recent_rentals_result.scalars().all())
+
+    recent_payments_result = await db.execute(
+        select(Payment).order_by(Payment.created_at.desc()).limit(20)
+    )
+    recent_payments = list(recent_payments_result.scalars().all())
+
+    recent_users_result = await db.execute(
+        select(User).order_by(User.created_at.desc()).limit(20)
+    )
+    recent_users = list(recent_users_result.scalars().all())
+
+    pipeline = []
+    for r in recent_requests:
+        pipeline.append({
+            "type": "request",
+            "id": r.id,
+            "title": r.listing.title if r.listing else f"Request #{r.id}",
+            "status": r.status.value if hasattr(r.status, "value") else str(r.status),
+            "amount": float(r.total_price),
+            "user": r.renter.display_name or r.renter.email if r.renter else None,
+            "created_at": r.created_at.isoformat(),
+        })
+    for b in recent_bookings:
+        pipeline.append({
+            "type": "booking",
+            "id": b.id,
+            "title": b.equipment.name if b.equipment else f"Booking #{b.id}",
+            "status": b.status.value if hasattr(b.status, "value") else str(b.status),
+            "amount": float(b.total_price),
+            "user": b.customer.display_name or b.customer.email if b.customer else None,
+            "created_at": b.created_at.isoformat(),
+        })
+    for rent in recent_rentals:
+        pipeline.append({
+            "type": "rental",
+            "id": rent.id,
+            "title": rent.equipment.name if rent.equipment else f"Rental #{rent.id}",
+            "status": rent.status.value if hasattr(rent.status, "value") else str(rent.status),
+            "amount": None,
+            "user": rent.customer.display_name or rent.customer.email if rent.customer else None,
+            "created_at": rent.created_at.isoformat(),
+        })
+    for p in recent_payments:
+        pipeline.append({
+            "type": "payment",
+            "id": p.id,
+            "title": f"Payment #{p.id}",
+            "status": p.status.value if hasattr(p.status, "value") else str(p.status),
+            "amount": float(p.amount),
+            "user": p.customer.display_name or p.customer.email if p.customer else None,
+            "created_at": p.created_at.isoformat(),
+        })
+    for u in recent_users:
+        pipeline.append({
+            "type": "user",
+            "id": u.id,
+            "title": u.display_name or u.email,
+            "status": "ACTIVE" if u.is_active else "BLOCKED",
+            "amount": None,
+            "user": u.email,
+            "created_at": u.created_at.isoformat(),
+        })
+    pipeline.sort(key=lambda x: x["created_at"], reverse=True)
+    pipeline = pipeline[:50]
+
+    return APIResponse(data={
+        "stats": {
+            "totalUsers": int(total_users),
+            "activeUsers": int(active_users),
+            "verifiedUsers": int(verified_users),
+            "totalListings": int(total_listings),
+            "activeListings": int(active_listings),
+            "unverifiedListings": int(unverified_listings),
+            "totalEquipment": int(total_equipment),
+            "totalRequests": int(total_requests),
+            "totalBookings": int(total_bookings),
+            "totalRentals": int(total_rentals),
+            "totalPayments": int(total_payments),
+            "totalPosts": int(total_posts),
+            "totalReviews": int(total_reviews),
+            "totalPenalties": int(total_penalties),
+            "totalRevenue": total_revenue,
+        },
+        "requestsByStatus": requests_by_status,
+        "bookingsByStatus": bookings_by_status,
+        "rentalsByStatus": rentals_by_status,
+        "paymentsByStatus": payments_by_status,
+        "listingsByStatus": listings_by_status,
+        "pipeline": pipeline,
+        "recentRequests": [
+            {
+                "id": r.id,
+                "listing_title": r.listing.title if r.listing else None,
+                "renter_name": r.renter.display_name or r.renter.email if r.renter else None,
+                "owner_name": r.owner.display_name or r.owner.email if r.owner else None,
+                "status": r.status.value if hasattr(r.status, "value") else str(r.status),
+                "total_price": float(r.total_price),
+                "start_date": str(r.start_date),
+                "end_date": str(r.end_date),
+                "created_at": r.created_at.isoformat(),
+            }
+            for r in recent_requests
+        ],
+        "recentBookings": [
+            {
+                "id": b.id,
+                "equipment_name": b.equipment.name if b.equipment else None,
+                "customer_name": b.customer.display_name or b.customer.email if b.customer else None,
+                "status": b.status.value if hasattr(b.status, "value") else str(b.status),
+                "total_price": float(b.total_price),
+                "start_date": str(b.start_date),
+                "end_date": str(b.end_date),
+                "created_at": b.created_at.isoformat(),
+            }
+            for b in recent_bookings
+        ],
+        "recentRentals": [
+            {
+                "id": rent.id,
+                "equipment_name": rent.equipment.name if rent.equipment else None,
+                "customer_name": rent.customer.display_name or rent.customer.email if rent.customer else None,
+                "status": rent.status.value if hasattr(rent.status, "value") else str(rent.status),
+                "created_at": rent.created_at.isoformat(),
+            }
+            for rent in recent_rentals
+        ],
+        "recentPayments": [
+            {
+                "id": p.id,
+                "amount": float(p.amount),
+                "payment_type": p.payment_type.value if hasattr(p.payment_type, "value") else str(p.payment_type),
+                "status": p.status.value if hasattr(p.status, "value") else str(p.status),
+                "customer_name": p.customer.display_name or p.customer.email if p.customer else None,
+                "created_at": p.created_at.isoformat(),
+            }
+            for p in recent_payments
+        ],
+        "recentUsers": [
+            {
+                "id": u.id,
+                "email": u.email,
+                "display_name": u.display_name,
+                "role": u.role.value if hasattr(u.role, "value") else str(u.role),
+                "is_active": u.is_active,
+                "is_verified": u.is_verified,
+                "created_at": u.created_at.isoformat(),
+            }
+            for u in recent_users
+        ],
     })
 
 
@@ -221,6 +454,8 @@ async def admin_delete_listing(
     listing = await repo.get_by_id(listing_id)
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
+    from app.services.listing import detach_listing_conversations
+    await detach_listing_conversations(db, listing_id)
     await repo.delete(listing)
     return APIResponse(message="Listing deleted")
 

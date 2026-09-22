@@ -1,17 +1,17 @@
 from datetime import datetime
+from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
 
 
 class ReviewCreate(BaseModel):
-    equipment_id: int
-    booking_id: int
     rating: int = Field(..., ge=1, le=5)
-    comment: str | None = None
+    comment: Optional[str] = None
+    rental_request_id: Optional[int] = None
 
 
 class ReviewUpdate(BaseModel):
-    rating: int | None = Field(None, ge=1, le=5)
-    comment: str | None = None
+    rating: Optional[int] = Field(None, ge=1, le=5)
+    comment: Optional[str] = None
 
 
 class ReviewResponse(BaseModel):
@@ -19,10 +19,9 @@ class ReviewResponse(BaseModel):
 
     id: int
     customer_id: int
-    equipment_id: int
-    booking_id: int
+    listing_id: int
+    rental_request_id: Optional[int] = None
     rating: int
-    comment: str | None = None
+    comment: Optional[str] = None
     created_at: datetime
-    customer_name: str | None = None
-    equipment_name: str | None = None
+    customer_name: Optional[str] = None

@@ -34,9 +34,11 @@ function RequestCard({
     accepted: { label: t('admin.accepted'), bg: 'bg-emerald-50 dark:bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-400' },
     rejected: { label: t('admin.rejected'), bg: 'bg-red-50 dark:bg-red-500/10', text: 'text-red-700 dark:text-red-400', dot: 'bg-red-400' },
     cancelled: { label: t('admin.cancelled'), bg: 'bg-gray-100 dark:bg-white/5', text: 'text-gray-600 dark:text-gray-400', dot: 'bg-gray-400' },
+    completed: { label: t('admin.completed', 'Completed'), bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', dot: 'bg-blue-400' },
   };
 
-  const status = statusConfig[req.status] || statusConfig.pending;
+  const statusKey = (req.status || 'pending').toLowerCase();
+  const status = statusConfig[statusKey] || statusConfig.pending;
 
   return (
     <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-5 sm:p-6 shadow-sm hover:shadow-md transition">
@@ -96,7 +98,7 @@ function RequestCard({
             </div>
           )}
 
-          {req.status === 'pending' && (
+          {statusKey === 'pending' && (
             <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
               {type === 'renter' && onCancel && (
                 <button

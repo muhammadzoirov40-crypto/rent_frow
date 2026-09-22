@@ -1,10 +1,11 @@
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_auth, CurrentUser
 from app.schemas.listing import (
     ListingCreate, ListingUpdate, ListingResponse,
-    ListingListResponse, ListingImageResponse, ListingOwnerResponse,
+    ListingListResponse, NearbyListingResponse, ListingImageResponse, ListingOwnerResponse,
 )
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.listing import ListingService
@@ -69,8 +70,19 @@ def _listing_to_response(listing, is_favorited: bool = False) -> ListingResponse
         price=float(listing.price),
         price_unit=listing.price_unit,
         deposit=float(listing.deposit),
+        property_type=listing.property_type,
+        rooms=listing.rooms,
+        bathrooms=listing.bathrooms,
+        area_sqm=listing.area_sqm,
+        furnished=bool(listing.furnished),
+        parking=bool(listing.parking),
+        wifi_included=bool(listing.wifi_included),
+        available=bool(listing.available),
+        latitude=float(listing.latitude) if listing.latitude is not None else None,
+        longitude=float(listing.longitude) if listing.longitude is not None else None,
         address=listing.address,
         status=listing.status,
+        verification_status=listing.verification_status,
         is_verified=listing.is_verified,
         views_count=listing.views_count,
         rating_sum=float(listing.rating_sum),
@@ -104,13 +116,25 @@ def _listing_to_list_response(listing, is_favorited: bool = False) -> ListingLis
         title=listing.title,
         price=float(listing.price),
         price_unit=listing.price_unit,
+        property_type=listing.property_type,
+        rooms=listing.rooms,
         city_name=listing.city_rel.name if listing.city_rel else None,
+        district_name=listing.district_rel.name if listing.district_rel else None,
         primary_image=primary,
         views_count=listing.views_count,
         average_rating=listing.average_rating,
+        available=bool(listing.available),
+        is_verified=listing.is_verified,
         created_at=listing.created_at,
         is_favorited=is_favorited,
     )
+
+
+def _listing_to_nearby_response(listing, is_favorited: bool = False) -> NearbyListingResponse:
+    resp = _listing_to_list_response(listing, is_favorited)
+    distance = getattr(listing, "distance_km", None)
+    resp.distance_km = distance
+    return resp
 
 
 @router.get("", response_model=PaginatedResponse[ListingListResponse])
@@ -124,6 +148,15 @@ async def search_listings(
     price_max: float = Query(None),
     price_unit: str = Query(None),
     is_verified: bool = Query(None),
+    verification_status: str = Query(None),
+    property_type: str = Query(None),
+    rooms_min: int = Query(None, ge=0),
+    rooms_max: int = Query(None, ge=0),
+    bathrooms_min: int = Query(None, ge=0),
+    furnished: bool = Query(None),
+    parking: bool = Query(None),
+    wifi_included: bool = Query(None),
+    available: bool = Query(None),
     sort_by: str = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
@@ -143,6 +176,15 @@ async def search_listings(
         price_max=price_max,
         price_unit=price_unit,
         is_verified=is_verified,
+        verification_status=verification_status,
+        property_type=property_type,
+        rooms_min=rooms_min,
+        rooms_max=rooms_max,
+        bathrooms_min=bathrooms_min,
+        furnished=furnished,
+        parking=parking,
+        wifi_included=wifi_included,
+        available=available,
         sort_by=sort_by,
         skip=skip,
         limit=page_size,
@@ -160,6 +202,74 @@ async def search_listings(
         page=page,
         page_size=page_size,
     )
+
+
+@router.get("/nearby", response_model=APIResponse[list[NearbyListingResponse]])
+async def get_nearby_listings(
+    lat: float = Query(..., ge=-90, le=90),
+    lng: float = Query(..., ge=-180, le=180),
+    radius: float = Query(5.0, ge=0.1, le=1000),
+    q: str = Query(None),
+    category_id: int = Query(None),
+    district_id: int = Query(None),
+    price_min: float = Query(None),
+    price_max: float = Query(None),
+    price_unit: str = Query(None),
+    property_type: str = Query(None),
+    rooms_min: int = Query(None, ge=0),
+    rooms_max: int = Query(None, ge=0),
+    furnished: bool = Query(None),
+    parking: bool = Query(None),
+    wifi_included: bool = Query(None),
+    available: bool = Query(None),
+    is_verified: bool = Query(None),
+    sort_by: str = Query(None),
+    limit: int = Query(50, ge=1, le=100),
+    current_user: CurrentUser = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    service = ListingService(db)
+    fav_service = FavoriteService(db)
+    listings = await service.nearby(
+        latitude=lat,
+        longitude=lng,
+        radius_km=radius,
+        q=q,
+        category_id=category_id,
+        district_id=district_id,
+        price_min=price_min,
+        price_max=price_max,
+        price_unit=price_unit,
+        property_type=property_type,
+        rooms_min=rooms_min,
+        rooms_max=rooms_max,
+        furnished=furnished,
+        parking=parking,
+        wifi_included=wifi_included,
+        available=available,
+        is_verified=is_verified,
+        sort_by=sort_by,
+        limit=limit,
+    )
+    items = []
+    for listing in listings:
+        is_fav = False
+        if current_user:
+            is_fav = await fav_service.is_favorited(current_user.user_id, listing.id)
+        items.append(_listing_to_nearby_response(listing, is_fav))
+    return APIResponse(data=items)
+
+
+@router.get("/{listing_id}/availability", response_model=APIResponse[dict])
+async def get_availability(
+    listing_id: int,
+    start_date: date = Query(...),
+    end_date: date = Query(...),
+    db: AsyncSession = Depends(get_db),
+):
+    service = ListingService(db)
+    available = await service.check_availability(listing_id, start_date, end_date)
+    return APIResponse(data={"listing_id": listing_id, "available": available})
 
 
 @router.get("/owner/my", response_model=PaginatedResponse[ListingResponse])
@@ -241,4 +351,18 @@ async def toggle_favorite(
     return APIResponse(
         message="Added to favorites" if is_favorited else "Removed from favorites",
         data={"is_favorited": is_favorited},
+    )
+
+
+@router.post("/{listing_id}/submit-for-verification", response_model=APIResponse[ListingResponse])
+async def submit_for_verification(
+    listing_id: int,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    service = ListingService(db)
+    listing = await service.submit_for_verification(listing_id, current_user.user_id)
+    return APIResponse(
+        message="Listing submitted for verification",
+        data=_listing_to_response(listing),
     )

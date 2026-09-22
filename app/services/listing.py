@@ -1,13 +1,23 @@
 from datetime import date
 from fastapi import HTTPException
-from sqlalchemy import select, func
+from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.listing import Listing, ListingStatus
+from app.models.conversation import Conversation
 from app.models.listing_image import ListingImage
 from app.models.rental_request import RentalRequest, RentalRequestStatus
 from app.repositories.listing import ListingRepository
 from app.repositories.favorite import FavoriteRepository
 from app.schemas.listing import ListingCreate, ListingUpdate
+from app.core.enums import VerificationStatus
+
+
+async def detach_listing_conversations(db: AsyncSession, listing_id: int) -> None:
+    await db.execute(
+        update(Conversation)
+        .where(Conversation.listing_id == listing_id)
+        .values(listing_id=None)
+    )
 
 
 class ListingService:
@@ -55,6 +65,7 @@ class ListingService:
             raise HTTPException(status_code=404, detail="Listing not found")
         if listing.owner_id != owner_id:
             raise HTTPException(status_code=403, detail="Not authorized to delete this listing")
+        await detach_listing_conversations(self.db, listing_id)
         await self.repo.delete(listing)
 
     async def search(self, **kwargs) -> tuple[list[Listing], int]:
@@ -64,6 +75,26 @@ class ListingService:
         listings = await self.repo.search(skip=skip, limit=limit, sort_by=sort_by, **kwargs)
         total = await self.repo.count_filtered(**kwargs)
         return listings, total
+
+    async def nearby(self, latitude: float, longitude: float, radius_km: float = 5.0, **kwargs) -> list[Listing]:
+        skip = kwargs.pop("skip", 0)
+        limit = kwargs.pop("limit", 20)
+        sort_by = kwargs.pop("sort_by", None)
+        return await self.repo.nearby(
+            latitude, longitude, radius_km, skip=skip, limit=limit, sort_by=sort_by, **kwargs
+        )
+
+    async def submit_for_verification(self, listing_id: int, owner_id: int) -> Listing:
+        listing = await self.repo.get_by_id(listing_id)
+        if not listing:
+            raise HTTPException(status_code=404, detail="Listing not found")
+        if listing.owner_id != owner_id:
+            raise HTTPException(status_code=403, detail="Not authorized to update this listing")
+        listing.verification_status = VerificationStatus.PENDING
+        listing.is_verified = False
+        await self.db.flush()
+        await self.db.refresh(listing)
+        return listing
 
     async def increment_views(self, listing_id: int) -> None:
         listing = await self.repo.get_by_id(listing_id)

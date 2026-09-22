@@ -20,9 +20,10 @@ async def get_notifications(
     skip = (page - 1) * page_size
     notifications = await service.get_user_notifications(current_user.user_id, skip, page_size)
     items = [NotificationResponse.model_validate(n) for n in notifications]
+    total = await service.count_user_notifications(current_user.user_id)
     return PaginatedResponse(
         data=items,
-        total=len(items),
+        total=total,
         page=page,
         page_size=page_size,
     )
