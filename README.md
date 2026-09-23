@@ -50,7 +50,7 @@ docker compose up --build
 ```
 
 Services:
-- Frontend: http://localhost:5173
+- Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
 - pgAdmin: http://localhost:5050
