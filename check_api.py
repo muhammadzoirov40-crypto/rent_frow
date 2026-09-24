@@ -5,6 +5,9 @@ db = sqlite3.connect('rentflow.db')
 c = db.cursor()
 email = 'dalerjonski1127@gmail.com'
 code = '112233'
+
+
+
 now = datetime.utcnow()
 expire = (now + timedelta(minutes=15)).isoformat(sep=' ', timespec='seconds')
 c.execute("UPDATE otp_codes SET used=1 WHERE email=?", (email,))
