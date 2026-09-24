@@ -106,6 +106,7 @@
     "changeEmail": "Изменить email",
     "welcome": "Добро пожаловать!",
     "invalidOtp": "Неверный код OTP",
+    "otpSendError": "Не удалось отправить код OTP. Пожалуйста, попробуйте снова.",
     "accountCreated": "Аккаунт создан",
     "registrationError": "Ошибка регистрации",
     "invalidCredentials": "Неверные данные",

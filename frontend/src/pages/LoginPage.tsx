@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -11,11 +11,17 @@ import useAuthStore from '../store/authStore';
 type AuthMode = 'login' | 'register';
 type Step = 'email' | 'otp';
 
+const getApiError = (err: any): string | undefined =>
+  err?.response?.data?.detail ?? err?.response?.data?.message;
+
 export default function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { login: storeLogin, isAuthenticated } = useAuthStore();
-  const [mode, setMode] = useState<AuthMode>('login');
+  const [mode, setMode] = useState<AuthMode>(
+    location.pathname === '/register' ? 'register' : 'login'
+  );
   const [step, setStep] = useState<Step>('email');
   const [email, setEmail] = useState('');
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
@@ -42,13 +48,20 @@ export default function LoginPage() {
     mutationFn: (email: string) => auth.sendOtp(email),
     onSuccess: (data) => {
       setIsRegistered(data.is_registered);
+      if (mode === 'login' && !data.is_registered) {
+        toast.error(t('auth.emailNotFound'));
+        return;
+      }
       setStep('otp');
       setResendTimer(60);
       toast.success(t('auth.otpSentTo'));
       setTimeout(() => otpRefs.current[0]?.focus(), 300);
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || t('auth.registrationError'));
+      toast.error(
+        getApiError(err) ||
+          (mode === 'register' ? t('auth.registrationError') : t('auth.otpSendError'))
+      );
     },
   });
 
@@ -60,7 +73,7 @@ export default function LoginPage() {
       navigate('/');
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || t('auth.invalidOtp'));
+      toast.error(getApiError(err) || t('auth.invalidOtp'));
       setOtpDigits(['', '', '', '', '', '']);
       setTimeout(() => otpRefs.current[0]?.focus(), 100);
     },
@@ -75,7 +88,7 @@ export default function LoginPage() {
       navigate('/');
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || t('auth.registrationError'));
+      toast.error(getApiError(err) || t('auth.registrationError'));
     },
   });
 
@@ -88,7 +101,7 @@ export default function LoginPage() {
       navigate('/');
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || t('auth.invalidCredentials'));
+      toast.error(getApiError(err) || t('auth.invalidCredentials'));
     },
   });
 
@@ -100,7 +113,7 @@ export default function LoginPage() {
       navigate('/');
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || t('auth.googleLoginFailed'));
+      toast.error(getApiError(err) || t('auth.googleLoginFailed'));
     },
   });
 
@@ -127,7 +140,7 @@ export default function LoginPage() {
       otpRefs.current[index + 1]?.focus();
     }
     const full = newDigits.join('');
-    if (full.length === 6) {
+    if (full.length === 6 && !verifyOtpMutation.isPending && !registerMutation.isPending) {
       setTimeout(() => {
         if (isRegistered) {
           verifyOtpMutation.mutate(full);
@@ -162,7 +175,7 @@ export default function LoginPage() {
     setOtpDigits(newDigits);
     const nextEmpty = newDigits.findIndex((d) => d === '');
     otpRefs.current[nextEmpty === -1 ? 5 : nextEmpty]?.focus();
-    if (pasted.length === 6) {
+    if (pasted.length === 6 && !verifyOtpMutation.isPending && !registerMutation.isPending) {
       setTimeout(() => {
         if (isRegistered) {
           verifyOtpMutation.mutate(pasted);
@@ -191,6 +204,8 @@ export default function LoginPage() {
     setEmail('');
     setDisplayName('');
     setPassword('');
+    setIsRegistered(true);
+    setResendTimer(0);
   };
 
   const isSending = sendOtpMutation.isPending;

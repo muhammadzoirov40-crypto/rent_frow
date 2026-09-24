@@ -107,6 +107,7 @@
     "changeEmail": "Change email",
     "welcome": "Welcome!",
     "invalidOtp": "Invalid OTP code",
+    "otpSendError": "Failed to send OTP code. Please try again.",
     "accountCreated": "Account created",
     "registrationError": "Registration error",
     "invalidCredentials": "Invalid credentials",

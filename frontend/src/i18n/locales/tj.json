@@ -107,6 +107,7 @@
     "changeEmail": "Почтаро иваз кунед",
     "welcome": "Хуш омадед!",
     "invalidOtp": "Коди OTP нодуруст аст",
+    "otpSendError": "Коди OTP фиристода нашуд. Лутфан аз нав кӯшиш кунед.",
     "accountCreated": "Ҳисоб эҷод шуд",
     "registrationError": "Хатои ба қайд гирифтан",
     "invalidCredentials": "Маълумоти воридшавӣ нодуруст аст",

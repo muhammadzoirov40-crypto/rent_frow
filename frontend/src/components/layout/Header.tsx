@@ -273,8 +273,7 @@ export default function Header() {
                   {t('header.login')}
                 </Link>
                 <Link
-                  to="/login"
-                  className="hidden sm:flex px-4 py-2.5 text-sm font-semibold text-[#FF6B35] border-2 border-[#FF6B35] hover:bg-orange-50 dark:hover:bg-[#FF6B35]/10 rounded-xl transition"
+                  to="/register"
                 >
                   {t('header.register')}
                 </Link>

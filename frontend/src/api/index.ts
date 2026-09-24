@@ -208,7 +208,7 @@ export const auth = {
   verifyOtp: (email: string, code: string) =>
     client.post<APIResponse<{ valid: boolean }>>('/auth/verify-otp', { email, code }).then(unwrap),
 
-  register: (data: { email: string; otp_code: string; role?: string }) =>
+  register: (data: { email: string; otp_code: string; role?: string; display_name?: string }) =>
     client.post<APIResponse<{ access_token: string; token_type: string; user: { id: number; email: string; role: string } }>>('/auth/register', data).then(unwrap),
 
   login: (email: string, otp_code: string) =>
