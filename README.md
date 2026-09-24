@@ -56,6 +56,30 @@ Services:
 - pgAdmin: http://localhost:5050
 - MinIO Console: http://localhost:9001
 
+### Local / Server (without Docker)
+
+```bash
+# Windows (local)
+./run.ps1
+
+# Linux server (or WSL/macOS) — one command:
+bash run.sh
+```
+
+`run.sh` starts:
+- Backend → http://127.0.0.1:8000 (logs: `backend.log`)
+- Frontend → http://<server-ip>:3000 (binds `0.0.0.0`)
+
+On first run it creates `.env` and `frontend/.env` from `.env.example`. Fill `SMTP_*`
+in `.env` to send real OTP emails — otherwise the code is printed to `backend.log`.
+
+After `git pull` on the server, run `bash run.sh` again (backend restarts, Vite
+auto-restarts on config changes and hot-reloads source).
+
+If Google login is used from the server, add `http://<server-ip>:3000` to the
+**Authorized JavaScript origins** of the OAuth client in Google Cloud Console.
+
+
 ### Running Tests
 
 ```bash
