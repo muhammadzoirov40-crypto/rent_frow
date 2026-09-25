@@ -42,7 +42,7 @@ print('rental backend', req('POST', '/api/v1/rental-requests', {
 }, token))
 
 # via vite proxy
-print('me proxy', req('GET', '/api/v1/auth/me', token=token, base='http://localhost:5173'))
+print('me i proxy', req('GET', '/api/v1/auth/me', token=token, base='http://localhost:5173'))
 print('rental proxy', req('POST', '/api/v1/rental-requests', {
     'listing_id': 2, 'start_date': '2026-12-01', 'end_date': '2026-12-07'
 }, token, base='http://localhost:5173'))
