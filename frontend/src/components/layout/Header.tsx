@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Search,
@@ -20,10 +20,8 @@ import {
   Globe,
   Settings,
   Shield,
-  PanelLeft,
 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
-import useUiStore from '../../store/uiStore'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useQuery } from '@tanstack/react-query'
 import { notifications as notificationsApi } from '../../api/index'
@@ -39,13 +37,6 @@ export default function Header() {
   const navigate = useNavigate()
   const { user, isAuthenticated, logout } = useAuthStore()
   const { theme, toggleTheme } = useTheme()
-  const { pathname } = useLocation()
-  const { sidebarOpen, toggleSidebar } = useUiStore()
-  const showSidebarToggle =
-    !pathname.startsWith('/admin') &&
-    !pathname.startsWith('/revenlo') &&
-    pathname !== '/login' &&
-    pathname !== '/register'
   const [searchQuery, setSearchQuery] = useState('')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
@@ -103,16 +94,6 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-1 shrink-0">
-            {showSidebarToggle && (
-              <button
-                onClick={toggleSidebar}
-                aria-label="Toggle sidebar"
-                title={sidebarOpen ? t('nav.collapseSidebar') : t('nav.expandSidebar')}
-                className="hidden md:flex p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition"
-              >
-                <PanelLeft className="w-5 h-5" />
-              </button>
-            )}
             <Link to="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#FF6B35] rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">R</span>
