@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "RentFlow"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
+    SQL_ECHO: bool = False
 
     DATABASE_URL: str = "postgresql+asyncpg://rentflow:rentflow@localhost:5432/rentflow"
     DATABASE_URL_SYNC: str = "postgresql+psycopg2://rentflow:rentflow@localhost:5432/rentflow"

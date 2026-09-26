@@ -42,7 +42,7 @@ export interface GoogleAuthData {
 }
 
 export const authApi = {
-  sendOtp: (data: SendOtpData) => api.post<{ data: { email: string; sent_via_email: boolean; is_registered: boolean } }>('/auth/send-otp', data),
+  sendOtp: (data: SendOtpData) => api.post<{ data: { email: string; sent_via_email: boolean; is_registered: boolean; dev_code?: string | null } }>('/auth/send-otp', data),
   verifyOtp: (data: VerifyOtpData) => api.post<{ data: { valid: boolean } }>('/auth/verify-otp', data),
   login: (data: LoginData) => api.post<{ data: TokenResponse }>('/auth/login', data),
   register: (data: RegisterData) => api.post<{ data: TokenResponse }>('/auth/register', data),

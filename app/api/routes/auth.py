@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi import HTTPException, status as http_status
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_auth, CurrentUser
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, SendOtpRequest, VerifyOtpRequest, GoogleAuthRequest
@@ -20,17 +21,24 @@ MAX_AVATAR_SIZE = 5 * 1024 * 1024  # 5MB
 @router.post("/send-otp", response_model=APIResponse[dict])
 async def send_otp(data: SendOtpRequest, db: AsyncSession = Depends(get_db)):
     """Send OTP to email for login or registration."""
+    settings = get_settings()
     repo = UserRepository(db)
     existing = await repo.get_by_email(data.email)
     code = generate_otp()
     await save_otp(db, data.email, code)
     sent_via_email = await asyncio.to_thread(send_otp_email, data.email, code)
-    if not sent_via_email:
+    dev_code = code if settings.DEBUG else None
+    if not sent_via_email and dev_code is None:
         raise HTTPException(
             status_code=http_status.HTTP_502_BAD_GATEWAY,
             detail="Failed to send OTP email. Please try again later.",
         )
-    response_data = {"email": data.email, "sent_via_email": sent_via_email, "is_registered": existing is not None}
+    response_data = {
+        "email": data.email,
+        "sent_via_email": sent_via_email,
+        "is_registered": existing is not None,
+        "dev_code": dev_code,
+    }
     return APIResponse(
         message="OTP sent successfully",
         data=response_data

@@ -27,6 +27,7 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
   const [loading, setLoading] = useState(false)
   const [resendTimer, setResendTimer] = useState(0)
   const [shakeOtp, setShakeOtp] = useState(false)
+  const [devCode, setDevCode] = useState('')
   const otpRefs = useRef<(HTMLInputElement | null)[]>([])
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
 
   const goBackToEmail = () => {
     resetOtp()
+    setDevCode('')
     setResendTimer(0)
     if (viewRef.current === 'login-verification') setView('login-email')
     else if (viewRef.current === 'register-verification') setView('register-email')
@@ -67,7 +69,8 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
     setLoading(true)
     try {
       const res = await authApi.sendOtp({ email: email.trim() })
-      const { is_registered } = res.data.data as any
+      const { is_registered, dev_code } = res.data.data as any
+      setDevCode(dev_code || '')
 
       if (isLogin && !is_registered) {
         setError('Email not found. Please register first.')
@@ -181,7 +184,8 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
     resetOtp()
     setLoading(true)
     try {
-      await authApi.sendOtp({ email: emailRef.current })
+      const res = await authApi.sendOtp({ email: emailRef.current })
+      setDevCode((res.data.data as any).dev_code || '')
       setResendTimer(45)
       otpRefs.current[0]?.focus()
     } catch (err: any) {
@@ -331,6 +335,14 @@ export default function AuthPage({ onAuth }: AuthPageProps) {
                   />
                 ))}
               </div>
+
+              {devCode && (
+                <div className="mb-6 px-4 py-3 rounded-xl text-center"
+                  style={{ background: 'rgba(255, 255, 255, 0.15)', border: '1px solid rgba(255, 213, 79, 0.5)' }}>
+                  <p className="text-white/70 text-xs uppercase tracking-wider">Dev mode</p>
+                  <p className="text-white text-xl font-mono font-bold tracking-[0.3em]">{devCode}</p>
+                </div>
+              )}
 
               <button
                 onClick={() => { if (otpCode.length === 6) verifyCode(otpCode) }}

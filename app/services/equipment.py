@@ -53,18 +53,13 @@ class EquipmentService:
 
     async def check_availability(self, data: AvailabilityCheck) -> dict:
         equipment = await self.get_by_id(data.equipment_id)
-        if equipment.status != EquipmentStatus.AVAILABLE:
-            return {
-                "equipment_id": data.equipment_id,
-                "available": False,
-                "conflicting_booking_id": None,
-            }
         conflicting = await self.repo.check_availability(
             data.equipment_id, data.start_date, data.end_date
         )
+        available = equipment.status == EquipmentStatus.AVAILABLE and conflicting is None
         return {
             "equipment_id": data.equipment_id,
-            "available": conflicting is None,
+            "available": available,
             "conflicting_booking_id": conflicting,
         }
 

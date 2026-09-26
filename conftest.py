@@ -1,8 +1,10 @@
 import asyncio
 import os
+import uuid
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient, ASGITransport
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.pool import NullPool
 
@@ -10,6 +12,7 @@ from app.core.database import Base, get_db
 from app.core.config import get_settings
 from app.main import app
 from app.core.enums import UserRole
+from app.models.user import User
 
 settings = get_settings()
 
@@ -48,7 +51,7 @@ async def setup_db():
 async def db_session():
     async with TestSessionLocal() as session:
         yield session
-        await session.rollback()
+        await session.commit()
 
 
 async def override_get_db():
@@ -76,47 +79,42 @@ def _create_token(external_user_id: str, role: UserRole) -> str:
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-@pytest_asyncio.fixture
-async def admin_token(db_session: AsyncSession):
-    from app.repositories.user import UserRepository
-    from app.models.user import User
-    from sqlalchemy import select
-    import uuid
-
-    external_id = str(uuid.uuid4())
-    result = await db_session.execute(select(User).where(User.email == "test_admin@rentflow.com"))
-    user = result.scalar_one_or_none()
-    if not user:
-        user = User(
-            email="test_admin@rentflow.com",
-            hashed_password="",
-            external_user_id=external_id,
-            role=UserRole.ADMIN,
-        )
-        db_session.add(user)
-        await db_session.flush()
-    return _create_token(user.external_user_id, UserRole.ADMIN)
+async def _ensure_user(email: str, role: UserRole) -> tuple[int, str]:
+    """Create (or reuse) a user in its own committed session so that requests
+    made through the app's own DB session can see it."""
+    async with TestSessionLocal() as session:
+        result = await session.execute(select(User).where(User.email == email))
+        user = result.scalar_one_or_none()
+        if not user:
+            user = User(
+                email=email,
+                hashed_password="",
+                external_user_id=str(uuid.uuid4()),
+                role=role,
+            )
+            session.add(user)
+            await session.flush()
+        user_id, external_id = user.id, user.external_user_id
+        await session.commit()
+        return user_id, external_id
 
 
 @pytest_asyncio.fixture
-async def customer_token(db_session: AsyncSession):
-    from app.models.user import User
-    from sqlalchemy import select
-    import uuid
+async def admin_token(setup_db) -> str:
+    _, external_id = await _ensure_user("test_admin@rentflow.com", UserRole.ADMIN)
+    return _create_token(external_id, UserRole.ADMIN)
 
-    external_id = str(uuid.uuid4())
-    result = await db_session.execute(select(User).where(User.email == "test_customer@rentflow.com"))
-    user = result.scalar_one_or_none()
-    if not user:
-        user = User(
-            email="test_customer@rentflow.com",
-            hashed_password="",
-            external_user_id=external_id,
-            role=UserRole.CUSTOMER,
-        )
-        db_session.add(user)
-        await db_session.flush()
-    return _create_token(user.external_user_id, UserRole.CUSTOMER)
+
+@pytest_asyncio.fixture
+async def customer_token(setup_db) -> str:
+    _, external_id = await _ensure_user("test_customer@rentflow.com", UserRole.CUSTOMER)
+    return _create_token(external_id, UserRole.CUSTOMER)
+
+
+@pytest_asyncio.fixture
+async def customer_id(setup_db) -> int:
+    user_id, _ = await _ensure_user("test_customer@rentflow.com", UserRole.CUSTOMER)
+    return user_id
 
 
 @pytest_asyncio.fixture

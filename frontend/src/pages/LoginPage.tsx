@@ -30,6 +30,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [isRegistered, setIsRegistered] = useState(true);
+  const [devCode, setDevCode] = useState('');
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -47,7 +48,9 @@ export default function LoginPage() {
   const sendOtpMutation = useMutation({
     mutationFn: (email: string) => auth.sendOtp(email),
     onSuccess: (data) => {
-      if (data.sent_via_email === false) {
+      const code = data.dev_code || '';
+      setDevCode(code);
+      if (data.sent_via_email === false && !code) {
         toast.error(t('auth.otpSendError'));
         return;
       }
@@ -58,7 +61,11 @@ export default function LoginPage() {
       }
       setStep('otp');
       setResendTimer(60);
-      toast.success(t('auth.otpSentTo'));
+      if (data.sent_via_email === false) {
+        toast(t('auth.devMode'));
+      } else {
+        toast.success(t('auth.otpSentTo'));
+      }
       setTimeout(() => otpRefs.current[0]?.focus(), 300);
     },
     onError: (err: any) => {
@@ -199,6 +206,7 @@ export default function LoginPage() {
   const goBack = () => {
     setStep('email');
     setOtpDigits(['', '', '', '', '', '']);
+    setDevCode('');
   };
 
   const toggleMode = () => {
@@ -210,6 +218,7 @@ export default function LoginPage() {
     setPassword('');
     setIsRegistered(true);
     setResendTimer(0);
+    setDevCode('');
   };
 
   const isSending = sendOtpMutation.isPending;
@@ -217,51 +226,69 @@ export default function LoginPage() {
   const otpCode = otpDigits.join('');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#1A1A2E] dark:bg-[#1A1A2E] px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#1A1A2E] px-4 transition-colors">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
             style={{ background: 'linear-gradient(135deg, #FF6B35, #e85d2c)' }}>
             <span className="text-white font-bold text-2xl">R</span>
           </div>
-          <h1 className="text-2xl font-bold text-white">{t('auth.rentflow')}</h1>
-          <p className="text-gray-400 mt-1 text-sm">{t('auth.equipmentRentalMgmt')}</p>
+          <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white">{t('auth.rentflow')}</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">{t('auth.equipmentRentalMgmt')}</p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-lg font-bold text-[#1A1A2E] mb-1">
-            {step === 'otp'
-              ? t('auth.enterCode')
-              : mode === 'login'
-                ? t('auth.signIn')
-                : t('auth.signUp')}
-          </h2>
-          {step === 'email' && (
-            <p className="text-sm text-gray-500 mb-6">
-              {mode === 'login'
-                ? t('auth.signInSubtitle')
-                : t('auth.signUpSubtitle')}
-            </p>
-          )}
+        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl p-8 transition-colors">
+          <div className={step === 'otp' ? 'text-center' : ''}>
+            <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
+              {step === 'otp'
+                ? t('auth.enterCode')
+                : mode === 'login'
+                  ? t('auth.signIn')
+                  : t('auth.signUp')}
+            </h2>
+            {step === 'email' && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                {mode === 'login'
+                  ? t('auth.signInSubtitle')
+                  : t('auth.signUpSubtitle')}
+              </p>
+            )}
+          </div>
           {step === 'otp' && (
-            <p className="text-sm text-gray-500 mb-6">
-              {t('auth.codeSentTo')} <span className="font-medium text-[#1A1A2E]">{email}</span>
-            </p>
+            <div className="mb-6">
+              <div className="flex justify-center mb-4">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#e85d2c] flex items-center justify-center shadow-lg shadow-[#FF6B35]/30">
+                    <Mail className="w-8 h-8 text-white" />
+                  </div>
+                  <span className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white border-2 border-[#FF6B35] flex items-center justify-center shadow-sm">
+                    <CheckCircle2 className="w-4 h-4 text-[#FF6B35]" />
+                  </span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t('auth.codeSentTo')}</p>
+              <div className="flex justify-center mt-1.5">
+                <span className="inline-flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full px-3.5 py-1.5 text-sm font-semibold text-[#1A1A2E] dark:text-white max-w-full">
+                  <Mail className="w-3.5 h-3.5 text-[#FF6B35] shrink-0" />
+                  <span className="truncate">{email}</span>
+                </span>
+              </div>
+            </div>
           )}
 
           {step === 'email' ? (
             <form onSubmit={handleSendOtp} className="space-y-4">
               {mode === 'register' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('auth.name')}</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('auth.name')}</label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
                     <input
                       type="text"
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder={t('auth.namePlaceholder')}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 dark:bg-gray-50 text-[#1A1A2E] focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
                       required
                     />
                   </div>
@@ -269,15 +296,15 @@ export default function LoginPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('auth.email')}</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('auth.email')}</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('auth.emailPlaceholder')}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl bg-gray-50 dark:bg-gray-50 text-[#1A1A2E] focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
                     autoFocus
                     required
                   />
@@ -286,21 +313,21 @@ export default function LoginPage() {
 
               {mode === 'register' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('auth.password')}</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1.5">{t('auth.password')}</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={t('auth.passwordPlaceholder')}
-                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-xl bg-gray-50 dark:bg-gray-50 text-[#1A1A2E] focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
+                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -321,24 +348,37 @@ export default function LoginPage() {
               </button>
             </form>
           ) : (
-            <div className="space-y-5">
-              <div className="flex justify-center gap-2.5">
+            <div className="space-y-4">
+              <div className="flex justify-center gap-2 sm:gap-2.5">
                 {otpDigits.map((digit, i) => (
                   <input
                     key={i}
                     ref={(el) => { otpRefs.current[i] = el; }}
                     type="text"
                     inputMode="numeric"
+                    autoComplete="one-time-code"
                     maxLength={1}
+                    aria-label={`${t('auth.otpCode')} ${i + 1}`}
                     value={digit}
                     onChange={(e) => handleOtpChange(i, e.target.value)}
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     onPaste={handleOtpPaste}
                     onFocus={(e) => e.target.select()}
-                    className="w-11 h-13 text-center text-xl font-bold rounded-xl border-2 border-gray-200 bg-gray-50 dark:bg-gray-50 text-[#1A1A2E] focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
+                    className={`w-11 h-14 sm:w-12 sm:h-15 text-center text-2xl font-bold rounded-2xl border-2 outline-none transition-all duration-150 ${
+                      digit
+                        ? 'border-[#FF6B35] bg-white dark:bg-white/10 text-[#1A1A2E] dark:text-white shadow-sm'
+                        : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white'
+                    } focus:border-[#FF6B35] focus:ring-4 focus:ring-[#FF6B35]/15 focus:bg-white dark:focus:bg-white/10`}
                   />
                 ))}
               </div>
+
+              {devCode && (
+                <div className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-gradient-to-b from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 px-4 py-3 text-center">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">{t('auth.devMode')}</p>
+                  <p className="mt-0.5 text-2xl font-mono font-bold tracking-[0.35em] text-amber-700 dark:text-amber-300">{devCode}</p>
+                </div>
+              )}
 
               <button
                 onClick={() => {
@@ -351,7 +391,11 @@ export default function LoginPage() {
                   }
                 }}
                 disabled={otpCode.length !== 6 || isVerifying}
-                className="w-full bg-[#FF6B35] text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-[#e85d2c] disabled:opacity-50 transition flex items-center justify-center gap-2"
+                className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
+                  otpCode.length === 6
+                    ? 'bg-gradient-to-r from-[#FF6B35] to-[#e85d2c] text-white shadow-lg shadow-[#FF6B35]/25 hover:shadow-xl hover:shadow-[#FF6B35]/30 active:scale-[0.99]'
+                    : 'bg-gray-100 dark:bg-white/10 text-gray-400 dark:text-white/40 cursor-not-allowed'
+                }`}
               >
                 {isVerifying ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -362,19 +406,21 @@ export default function LoginPage() {
                 )}
               </button>
 
-              <div className="text-center">
+              <div className="flex justify-center">
                 {resendTimer > 0 ? (
-                  <p className="text-gray-400 text-xs">
-                    {t('auth.resendIn')}{' '}
-                    <span className="font-mono font-semibold text-gray-600">
+                  <span className="inline-flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full px-4 py-1.5">
+                    {t('auth.resendIn')}
+                    <span className="font-mono font-semibold text-[#1A1A2E] dark:text-white">
                       {String(Math.floor(resendTimer / 60)).padStart(2, '0')}:{String(resendTimer % 60).padStart(2, '0')}
                     </span>
-                  </p>
+                  </span>
                 ) : (
                   <button
                     onClick={handleResend}
-                    className="text-[#FF6B35] text-xs font-semibold hover:underline"
+                    disabled={isSending}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6B35] border border-[#FF6B35]/40 rounded-full px-4 py-1.5 hover:bg-[#FF6B35]/5 transition disabled:opacity-50"
                   >
+                    {isSending && <Loader2 className="w-3 h-3 animate-spin" />}
                     {t('auth.resendOtp')}
                   </button>
                 )}
@@ -382,7 +428,7 @@ export default function LoginPage() {
 
               <button
                 onClick={goBack}
-                className="w-full text-gray-500 py-2 rounded-xl text-sm font-medium hover:text-[#1A1A2E] transition flex items-center justify-center gap-1.5"
+                className="w-full border border-gray-200 dark:border-white/10 rounded-xl py-2.5 text-sm font-medium text-gray-600 dark:text-slate-300 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5 transition flex items-center justify-center gap-2"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 {t('auth.changeEmail')}
@@ -390,8 +436,8 @@ export default function LoginPage() {
             </div>
           )}
 
-          <div className="mt-6 pt-5 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
+          <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/10 text-center">
+            <p className="text-sm text-gray-500 dark:text-slate-400">
               {mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}{' '}
               <button
                 onClick={toggleMode}
@@ -402,14 +448,14 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
             <div className="relative flex justify-center text-xs mb-3">
-              <span className="px-2 bg-white text-gray-400">{t('auth.orContinueWith')}</span>
+              <span className="px-2 bg-white dark:bg-slate-900 text-gray-400 dark:text-slate-500">{t('auth.orContinueWith')}</span>
             </div>
             <button
               onClick={() => googleLogin()}
               type="button"
-              className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 rounded-xl text-sm font-medium text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 transition"
+              className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 transition"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path

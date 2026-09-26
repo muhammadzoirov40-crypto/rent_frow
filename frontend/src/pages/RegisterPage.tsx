@@ -15,6 +15,7 @@ export default function RegisterPage({ onLogin }: RegisterPageProps) {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
+  const [devCode, setDevCode] = useState('')
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,7 +23,8 @@ export default function RegisterPage({ onLogin }: RegisterPageProps) {
     setLoading(true)
     try {
       const res = await authApi.sendOtp({ email })
-      const { is_registered } = res.data.data as any
+      const { is_registered, dev_code } = res.data.data as any
+      setDevCode(dev_code || '')
       if (is_registered) {
         setError(t('auth.emailExists'))
         setLoading(false)
@@ -93,6 +95,12 @@ export default function RegisterPage({ onLogin }: RegisterPageProps) {
               <div className="bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-sm rounded-lg p-3">
                 {t('auth.otpSentTo')} <strong>{email}</strong>
               </div>
+              {devCode && (
+                <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-lg p-3 text-center">
+                  <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">{t('auth.devMode')}</p>
+                  <p className="text-xl font-mono font-bold text-amber-700 dark:text-amber-300 tracking-[0.3em]">{devCode}</p>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-1">{t('auth.otpCode')}</label>
                 <input
@@ -114,7 +122,7 @@ export default function RegisterPage({ onLogin }: RegisterPageProps) {
               </button>
               <button
                 type="button"
-                onClick={() => { setStep('email'); setOtpCode(''); setError(''); setOtpSent(false) }}
+                onClick={() => { setStep('email'); setOtpCode(''); setError(''); setOtpSent(false); setDevCode('') }}
                 className="w-full text-gray-500 dark:text-slate-400 py-2 rounded-lg font-medium hover:text-gray-700 dark:hover:text-white transition text-sm"
               >
                 {t('auth.backToEmail')}

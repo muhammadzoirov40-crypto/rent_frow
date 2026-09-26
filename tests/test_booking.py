@@ -10,7 +10,7 @@ from app.schemas.category import CategoryCreate
 
 
 @pytest.mark.asyncio
-async def test_price_calculation(db_session: AsyncSession):
+async def test_price_calculation(db_session: AsyncSession, customer_id: int):
     cat_service = CategoryService(db_session)
     cat = await cat_service.create(CategoryCreate(name="TestCat"))
 
@@ -30,7 +30,7 @@ async def test_price_calculation(db_session: AsyncSession):
 
     booking_service = BookingService(db_session)
     booking = await booking_service.create(
-        customer_id=1,
+        customer_id=customer_id,
         data=BookingCreate(equipment_id=equip.id, start_date=start, end_date=end),
     )
 
@@ -39,7 +39,7 @@ async def test_price_calculation(db_session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_availability_check(db_session: AsyncSession):
+async def test_availability_check(db_session: AsyncSession, customer_id: int):
     cat_service = CategoryService(db_session)
     cat = await cat_service.create(CategoryCreate(name="AvailTestCat"))
 
@@ -64,7 +64,7 @@ async def test_availability_check(db_session: AsyncSession):
 
     booking_service = BookingService(db_session)
     await booking_service.create(
-        customer_id=1,
+        customer_id=customer_id,
         data=BookingCreate(equipment_id=equip.id, start_date=start, end_date=end),
     )
 
@@ -80,7 +80,7 @@ async def test_availability_check(db_session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_overlap_detection(db_session: AsyncSession):
+async def test_overlap_detection(db_session: AsyncSession, customer_id: int):
     cat_service = CategoryService(db_session)
     cat = await cat_service.create(CategoryCreate(name="OverlapCat"))
 
@@ -100,14 +100,14 @@ async def test_overlap_detection(db_session: AsyncSession):
 
     booking_service = BookingService(db_session)
     await booking_service.create(
-        customer_id=1,
+        customer_id=customer_id,
         data=BookingCreate(equipment_id=equip.id, start_date=start1, end_date=end1),
     )
 
     from fastapi import HTTPException
     with pytest.raises(HTTPException) as exc_info:
         await booking_service.create(
-            customer_id=2,
+            customer_id=customer_id,
             data=BookingCreate(
                 equipment_id=equip.id,
                 start_date=date(2026, 9, 12),

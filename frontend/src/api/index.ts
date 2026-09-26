@@ -203,7 +203,7 @@ const unwrapPaginated = <T>(response: { data: PaginatedResponse<T> }): { items: 
 
 export const auth = {
   sendOtp: (email: string) =>
-    client.post<APIResponse<{ email: string; sent_via_email: boolean; is_registered: boolean; dev_code?: string }>>('/auth/send-otp', { email }).then(unwrap),
+    client.post<APIResponse<{ email: string; sent_via_email: boolean; is_registered: boolean; dev_code?: string | null }>>('/auth/send-otp', { email }).then(unwrap),
 
   verifyOtp: (email: string, code: string) =>
     client.post<APIResponse<{ valid: boolean }>>('/auth/verify-otp', { email, code }).then(unwrap),

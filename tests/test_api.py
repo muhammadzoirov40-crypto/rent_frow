@@ -157,6 +157,7 @@ async def test_category_unauthorized(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_equipment_list_requires_auth(client: AsyncClient):
+async def test_equipment_list_is_public(client: AsyncClient):
     response = await client.get("/api/v1/equipment")
-    assert response.status_code == 401
+    assert response.status_code == 200
+    assert "total" in response.json()
