@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     SMTP_USERNAME: str = ""
     SMTP_PASSWORD: str = ""
     SMTP_FROM: str = ""
+    RESEND_API_KEY: str = ""
+    EMAIL_FROM: str = "RentFlow <no-reply@renthub.qobus.tj>"
     OTP_EXPIRE_MINUTES: int = 10
     JWT_ALGORITHM: str = "HS256"
 

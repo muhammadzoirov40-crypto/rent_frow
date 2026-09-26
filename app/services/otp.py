@@ -1,7 +1,11 @@
+import json
 import random
 import smtplib
 import time
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import parseaddr
@@ -13,6 +17,8 @@ from app.models.otp_code import OtpCode
 
 SMTP_MAX_RETRIES = 3
 SMTP_RETRY_DELAY = 2
+RESEND_MAX_RETRIES = 3
+RESEND_API_URL = "https://api.resend.com/emails"
 
 
 def generate_otp() -> str:
@@ -48,14 +54,23 @@ async def verify_otp(db: AsyncSession, email: str, code: str) -> bool:
     return False
 
 
-def _build_otp_email(email: str, code: str) -> MIMEMultipart:
-    settings = get_settings()
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = f"RentFlow — Your verification code: {code}"
-    msg["From"] = settings.SMTP_FROM or settings.SMTP_USERNAME
-    msg["To"] = email
+def _otp_subject(code: str) -> str:
+    return f"RentFlow - Your verification code: {code}"
 
-    html_body = f"""
+
+def _text_body(code: str) -> str:
+    settings = get_settings()
+    return (
+        "Hello!\n\n"
+        f"Your RentFlow verification code: {code}\n\n"
+        f"This code expires in {settings.OTP_EXPIRE_MINUTES} minutes.\n"
+        "If you didn't request this, just ignore this email.\n"
+    )
+
+
+def _html_body(code: str) -> str:
+    settings = get_settings()
+    return f"""
     <html>
     <body style="font-family: 'Helvetica Neue', Arial, sans-serif; background: #f8fafc; padding: 40px;">
       <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
@@ -84,7 +99,15 @@ def _build_otp_email(email: str, code: str) -> MIMEMultipart:
     </html>
     """
 
-    msg.attach(MIMEText(html_body, "html"))
+
+def _build_otp_email(email: str, code: str) -> MIMEMultipart:
+    settings = get_settings()
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = Header(_otp_subject(code), "utf-8")
+    msg["From"] = settings.SMTP_FROM or settings.SMTP_USERNAME
+    msg["To"] = email
+    msg.attach(MIMEText(_text_body(code), "plain", "utf-8"))
+    msg.attach(MIMEText(_html_body(code), "html", "utf-8"))
     return msg
 
 
@@ -108,12 +131,55 @@ def _smtp_send(msg: MIMEMultipart) -> bool:
                 pass
 
 
+def _resend_send(email: str, code: str) -> bool:
+    settings = get_settings()
+    payload = json.dumps(
+        {
+            "from": settings.EMAIL_FROM,
+            "to": [email],
+            "subject": _otp_subject(code),
+            "text": _text_body(code),
+            "html": _html_body(code),
+        }
+    ).encode("utf-8")
+    req = urllib.request.Request(
+        RESEND_API_URL,
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {settings.RESEND_API_KEY}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=20) as resp:
+        if resp.status < 200 or resp.status >= 300:
+            raise RuntimeError(f"Resend API returned HTTP {resp.status}")
+    return True
+
+
+def _print_code(email: str, code: str) -> None:
+    print(f"\n{'='*40}")
+    print(f"  OTP CODE for {email}: {code}")
+    print(f"{'='*40}\n")
+
+
 def send_otp_email(email: str, code: str) -> bool:
     settings = get_settings()
+
+    if settings.RESEND_API_KEY:
+        for attempt in range(1, RESEND_MAX_RETRIES + 1):
+            try:
+                _resend_send(email, code)
+                print(f"[OTP EMAIL] Sent via Resend to {email} (attempt {attempt})")
+                return True
+            except Exception as e:
+                print(f"[OTP EMAIL] Resend attempt {attempt}/{RESEND_MAX_RETRIES} failed: {e}")
+                if attempt < RESEND_MAX_RETRIES:
+                    time.sleep(SMTP_RETRY_DELAY)
+        print(f"[OTP EMAIL] Resend failed for {email}, falling back to SMTP")
+
     if not settings.SMTP_USERNAME or not settings.SMTP_PASSWORD:
-        print(f"\n{'='*40}")
-        print(f"  OTP CODE for {email}: {code}")
-        print(f"{'='*40}\n")
+        _print_code(email, code)
         return False
 
     msg = _build_otp_email(email, code)
@@ -129,7 +195,5 @@ def send_otp_email(email: str, code: str) -> bool:
                 time.sleep(SMTP_RETRY_DELAY)
 
     print(f"[OTP EMAIL] All {SMTP_MAX_RETRIES} attempts failed for {email}")
-    print(f"\n{'='*40}")
-    print(f"  OTP CODE for {email}: {code}")
-    print(f"{'='*40}\n")
+    _print_code(email, code)
     return False
