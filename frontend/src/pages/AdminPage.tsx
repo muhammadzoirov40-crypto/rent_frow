@@ -5,6 +5,7 @@ import {
   LayoutDashboard, Users, FileText, ClipboardList, FolderTree,
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
   ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
+  PanelLeft, PanelLeftClose,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import client from '../api/client';
@@ -185,6 +186,7 @@ function StatusBadge({ status, t }: { status: string; t: (key: string) => string
 export default function AdminPage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
+  const [adminSidebarCollapsed, setAdminSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -334,30 +336,53 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0f0f23]">
       <div className="flex">
-        <aside className="w-64 flex-shrink-0 bg-white dark:bg-[#1A1A2E] border-r border-gray-200 dark:border-white/10 min-h-[calc(100vh-4rem)] sticky top-16">
-          <div className="p-6">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] rounded-xl flex items-center justify-center">
+        <aside
+          className={`${
+            adminSidebarCollapsed ? 'w-[76px]' : 'w-64'
+          } flex-shrink-0 bg-white dark:bg-[#1A1A2E] border-r border-gray-200 dark:border-white/10 min-h-[calc(100vh-4rem)] sticky top-16 transition-[width] duration-300 ease-out overflow-hidden`}
+        >
+          <div className={adminSidebarCollapsed ? 'p-3' : 'p-6'}>
+            <div
+              className={`flex items-center gap-3 mb-8 ${
+                adminSidebarCollapsed ? 'flex-col gap-2 mb-6' : ''
+              }`}
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] rounded-xl flex items-center justify-center shrink-0">
                 <Shield className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('admin.panel')}</h2>
-                <p className="text-[11px] text-gray-500">{t('admin.platformManagement')}</p>
-              </div>
+              {!adminSidebarCollapsed && (
+                <div className="flex-1 min-w-0">
+                  <h2 className="font-bold text-gray-900 dark:text-white text-sm truncate">{t('admin.panel')}</h2>
+                  <p className="text-[11px] text-gray-500 truncate">{t('admin.platformManagement')}</p>
+                </div>
+              )}
+              <button
+                onClick={() => setAdminSidebarCollapsed(!adminSidebarCollapsed)}
+                aria-label="Toggle sidebar"
+                title={adminSidebarCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
+                className={`p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition ${
+                  adminSidebarCollapsed ? '' : 'shrink-0'
+                }`}
+              >
+                {adminSidebarCollapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+              </button>
             </div>
             <nav className="space-y-1">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => { setActiveTab(tab.key); setSearchQuery(''); }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition ${
+                  title={adminSidebarCollapsed ? tab.label : undefined}
+                  className={`w-full flex items-center rounded-xl text-sm font-medium transition ${
+                    adminSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-4 py-2.5'
+                  } ${
                     activeTab === tab.key
                       ? 'bg-[#FF6B35]/10 text-[#FF6B35]'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  {tab.icon}
-                  {tab.label}
+                  <span className="shrink-0">{tab.icon}</span>
+                  {!adminSidebarCollapsed && <span>{tab.label}</span>}
                 </button>
               ))}
             </nav>

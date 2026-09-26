@@ -1,187 +1,213 @@
-import { useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useState, type FormEvent, type ReactNode } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { UserProfile } from '../api/authApi'
+import {
+  LayoutDashboard,
+  Search,
+  Heart,
+  MessageSquare,
+  Bell,
+  PlusCircle,
+  User,
+  Settings,
+  LogOut,
+  LogIn,
+  Sun,
+  Moon,
+  PanelLeftClose,
+} from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import useAuthStore from '../store/authStore'
+import useUiStore from '../store/uiStore'
+import { useTheme } from '../contexts/ThemeContext'
+import { notifications as notificationsApi } from '../api/index'
 
-interface SidebarProps {
-  user: UserProfile
-  onLogout?: () => void
-  collapsed?: boolean
+interface NavItem {
+  to: string
+  label: string
+  icon: ReactNode
+  authOnly?: boolean
+  badge?: number
 }
 
-function getInitials(nameOrEmail: string): string {
-  if (!nameOrEmail) return 'AD'
-  const parts = nameOrEmail.split(/[\s@]+/).filter(Boolean)
-  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
-  return nameOrEmail.slice(0, 2).toUpperCase()
-}
+const iconBtn =
+  'p-2.5 rounded-xl text-gray-500 dark:text-slate-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/5 transition flex items-center justify-center shrink-0'
 
-function cacheBust(url: string): string {
-  const separator = url.includes('?') ? '&' : '?'
-  return `${url}${separator}t=${Date.now()}`
-}
-
-export default function Sidebar({ user, onLogout, collapsed = false }: SidebarProps) {
-  const location = useLocation()
+export default function Sidebar() {
   const { t } = useTranslation()
-  const initials = getInitials(user?.display_name || user?.email || '')
-  const isCustomer = user?.role === 'CUSTOMER'
-  const isOwner = user?.role === 'OWNER'
-  const isAdmin = user?.role === 'ADMIN'
-  const profilePath = isCustomer ? '/profile' : '/admin/profile'
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { isAuthenticated, user, logout } = useAuthStore()
+  const { sidebarOpen, toggleSidebar } = useUiStore()
+  const { theme, toggleTheme } = useTheme()
+  const [query, setQuery] = useState('')
   const [imgError, setImgError] = useState(false)
 
-  const navLinks = [
-    {
-      path: '/',
-      label: t('nav.dashboard'),
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-        </svg>
-      ),
-    },
-    {
-      path: '/equipment',
-      label: t('nav.equipment'),
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-        </svg>
-      ),
-    },
-    {
-      path: '/bookings',
-      label: t('nav.bookings'),
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-      ),
-    },
-    {
-      path: '/rentals',
-      label: t('nav.rentals'),
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      ),
-    },
+  const open = sidebarOpen
+
+  const { data: unreadData } = useQuery({
+    queryKey: ['unread-count'],
+    queryFn: () => notificationsApi.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  })
+  const unread = unreadData?.count || 0
+
+  const profilePath = '/profile'
+  const initials = (user?.display_name || user?.email || 'R').replace(/[^a-zA-Zа-яА-Я]/g, '').slice(0, 2).toUpperCase() || 'R'
+
+  const isActive = (to: string) =>
+    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)
+
+  const items: NavItem[] = [
+    { to: '/', label: t('nav.dashboard'), icon: <LayoutDashboard className="w-5 h-5" /> },
+    { to: '/search', label: t('nav.search'), icon: <Search className="w-5 h-5" /> },
+    { to: '/favorites', label: t('nav.favorites'), icon: <Heart className="w-5 h-5" />, authOnly: true },
+    { to: '/messages', label: t('nav.messages'), icon: <MessageSquare className="w-5 h-5" />, authOnly: true },
+    { to: '/notifications', label: t('nav.notifications'), icon: <Bell className="w-5 h-5" />, authOnly: true, badge: unread },
+    { to: '/create-listing', label: t('nav.createListing'), icon: <PlusCircle className="w-5 h-5" />, authOnly: true },
+    { to: profilePath, label: t('nav.profile'), icon: <User className="w-5 h-5" />, authOnly: true },
+    { to: '/settings', label: t('nav.settings'), icon: <Settings className="w-5 h-5" />, authOnly: true },
   ]
 
-  const bottomLinks = [
-    {
-      path: profilePath,
-      label: t('nav.profile'),
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      ),
-    },
-  ]
+  const visibleItems = items.filter((item) => !item.authOnly || isAuthenticated)
+
+  const handleSearch = (e: FormEvent) => {
+    e.preventDefault()
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`)
+      setQuery('')
+    }
+  }
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
+
+  const renderItem = (item: NavItem) => {
+    const active = isActive(item.to)
+    const hasBadge = item.badge != null && item.badge > 0
+    return (
+      <Link
+        key={item.to}
+        to={item.to}
+        title={open ? undefined : item.label}
+        className={`relative flex items-center rounded-xl text-sm font-medium transition-colors duration-200 ${
+          open ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5'
+        } ${
+          active
+            ? 'bg-[#FF6B35]/10 text-[#FF6B35]'
+            : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
+        }`}
+      >
+        <span className="relative shrink-0">
+          {item.icon}
+          {hasBadge && !open && (
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#FF6B35] ring-2 ring-white dark:ring-[#12122a]" />
+          )}
+        </span>
+        {open && <span className="flex-1 truncate">{item.label}</span>}
+        {open && hasBadge && (
+          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#FF6B35] text-white text-[10px] font-bold flex items-center justify-center">
+            {item.badge}
+          </span>
+        )}
+      </Link>
+    )
+  }
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-white/5">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-5 h-16 border-b border-gray-200 dark:border-white/5 shrink-0">
-        <div className="w-9 h-9 bg-gradient-to-br from-brand-500 to-brand-700 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
-          <span className="text-white font-bold text-base">R</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="text-base font-extrabold text-gray-900 dark:text-white tracking-tight leading-none">
-            {t('sidebar.brand')}
-          </span>
-          <span className="text-[10px] font-medium text-gray-400 dark:text-slate-500 tracking-wider uppercase">
-            {t('sidebar.subtitle')}
-          </span>
-        </div>
-      </div>
-
-      {/* Nav Links */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-600">
-          {t('nav.main')}
-        </p>
-        {navLinks.map((link) => {
-          const isActive = location.pathname === link.path
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-brand-600/15 text-brand-600 dark:text-brand-400 border border-brand-500/20 shadow-sm shadow-brand-500/5'
-                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
-              }`}
-            >
-              <span className={isActive ? 'text-brand-600 dark:text-brand-400' : 'text-gray-400 dark:text-slate-500'}>
-                {link.icon}
-              </span>
-              {!collapsed && <span>{link.label}</span>}
-            </Link>
-          )
-        })}
-
-        <div className="pt-4 pb-2">
-          <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-600">
-            {t('nav.account')}
-          </p>
-        </div>
-        {bottomLinks.map((link) => {
-          const isActive = location.pathname === link.path
-          return (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-brand-600/15 text-brand-600 dark:text-brand-400 border border-brand-500/20 shadow-sm shadow-brand-500/5'
-                  : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
-              }`}
-            >
-              <span className={isActive ? 'text-brand-600 dark:text-brand-400' : 'text-gray-400 dark:text-slate-500'}>
-                {link.icon}
-              </span>
-              {!collapsed && <span>{link.label}</span>}
-            </Link>
-          )
-        })}
-      </nav>
-
-      {/* User Card */}
-      <div className="px-3 pb-4 shrink-0">
-        <Link
-          to={profilePath}
-          className="flex items-center gap-3 px-3 py-3 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/8 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200 group"
-        >
+    <aside
+      className={`hidden md:flex fixed left-3 top-20 bottom-4 z-40 flex-col rounded-3xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#12122a] shadow-xl shadow-black/5 dark:shadow-black/40 overflow-hidden transition-all duration-300 ease-out ${
+        open ? 'w-[248px] p-3' : 'w-[76px] p-2.5'
+      }`}
+    >
+      {/* Profile / toggle */}
+      <div className={`flex items-center gap-2.5 shrink-0 ${open ? 'justify-between px-1' : 'justify-center px-0'} pb-2`}>
+        <Link to={isAuthenticated ? profilePath : '/'} className="flex items-center gap-2.5 min-w-0" title={open ? undefined : t('nav.profile')}>
           {user?.avatar_url && !imgError ? (
             <img
-              src={cacheBust(user.avatar_url)}
-              alt={user.display_name || user.email}
-              className="w-9 h-9 rounded-lg object-cover border border-gray-300 dark:border-white/10"
+              src={user.avatar_url}
+              alt=""
+              className="w-9 h-9 rounded-full object-cover border border-gray-200 dark:border-white/10 shrink-0"
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-md shadow-brand-500/20">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#e55a2b] flex items-center justify-center shadow-md shadow-[#FF6B35]/20 shrink-0">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>
           )}
-          {!collapsed && (
+          {open && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                {user?.display_name || user?.email}
+              <p className="text-sm font-semibold text-gray-900 dark:text-white truncate leading-tight">
+                {user?.display_name || user?.email || t('sidebar.brand')}
               </p>
-              <p className="text-[11px] text-gray-400 dark:text-slate-500 truncate">{user?.email}</p>
+              <p className="text-[11px] text-gray-400 dark:text-slate-500 truncate leading-tight">
+                {user?.role ? user.role.toLowerCase() : t('sidebar.subtitle')}
+              </p>
             </div>
           )}
-          {!collapsed && (
-            <svg className="w-4 h-4 text-gray-400 dark:text-slate-600 group-hover:text-gray-600 dark:group-hover:text-slate-400 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          )}
         </Link>
+        {open && (
+          <button onClick={toggleSidebar} aria-label="Collapse sidebar" className={iconBtn}>
+            <PanelLeftClose className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {/* Search */}
+      {open ? (
+        <form onSubmit={handleSearch} className="shrink-0 pb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t('header.searchPlaceholder')}
+              className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] transition"
+            />
+          </div>
+        </form>
+      ) : (
+        <Link
+          to="/search"
+          aria-label={t('nav.search')}
+          className="flex items-center justify-center py-2.5 mx-auto w-full rounded-xl text-gray-500 dark:text-slate-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/5 transition shrink-0"
+        >
+          <Search className="w-5 h-5" />
+        </Link>
+      )}
+
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto py-1 space-y-1">
+        {open && (
+          <p className="px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-slate-600">
+            {t('nav.main')}
+          </p>
+        )}
+        {visibleItems.map(renderItem)}
+      </nav>
+
+      {/* Bottom actions */}
+      <div
+        className={`shrink-0 pt-2 mt-2 border-t border-gray-100 dark:border-white/10 ${
+          open ? 'flex items-center justify-between px-1' : 'flex flex-col items-center gap-1'
+        }`}
+      >
+        <button onClick={toggleTheme} aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')} className={iconBtn}>
+          {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </button>
+        {isAuthenticated ? (
+          <button onClick={handleLogout} aria-label={t('header.signOut')} className={`${iconBtn} hover:text-red-500`}>
+            <LogOut className="w-5 h-5" />
+          </button>
+        ) : (
+          <Link to="/login" aria-label={t('header.login')} className={iconBtn}>
+            <LogIn className="w-5 h-5" />
+          </Link>
+        )}
       </div>
     </aside>
   )

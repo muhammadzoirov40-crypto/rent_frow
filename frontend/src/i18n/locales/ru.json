@@ -51,7 +51,9 @@
     "rentalRequests": "Запросы на аренду",
     "adminDashboard": "Панель администратора",
     "myBookings": "Мои бронирования",
-    "myRentals": "Мои аренды"
+    "myRentals": "Мои аренды",
+    "collapseSidebar": "Свернуть меню",
+    "expandSidebar": "Развернуть меню"
   },
   "sidebar": {
     "brand": "RentFlow",

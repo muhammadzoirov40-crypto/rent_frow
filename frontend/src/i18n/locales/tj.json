@@ -51,7 +51,9 @@
     "rentalRequests": "Дархостҳои иҷора",
     "adminDashboard": "Тахтаи администратор",
     "myBookings": "Бронкунӣҳои ман",
-    "myRentals": "Иҷораҳои ман"
+    "myRentals": "Иҷораҳои ман",
+    "collapseSidebar": "Хурд кардани меню",
+    "expandSidebar": "Калон кардани меню"
   },
   "sidebar": {
     "brand": "RentFlow",

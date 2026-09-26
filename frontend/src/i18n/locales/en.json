@@ -52,7 +52,9 @@
     "rentalRequests": "Rental requests",
     "adminDashboard": "Admin Dashboard",
     "myBookings": "My Bookings",
-    "myRentals": "My Rentals"
+    "myRentals": "My Rentals",
+    "collapseSidebar": "Collapse menu",
+    "expandSidebar": "Expand menu"
   },
   "sidebar": {
     "brand": "RentFlow",
