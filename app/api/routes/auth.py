@@ -25,6 +25,11 @@ async def send_otp(data: SendOtpRequest, db: AsyncSession = Depends(get_db)):
     code = generate_otp()
     await save_otp(db, data.email, code)
     sent_via_email = await asyncio.to_thread(send_otp_email, data.email, code)
+    if not sent_via_email:
+        raise HTTPException(
+            status_code=http_status.HTTP_502_BAD_GATEWAY,
+            detail="Failed to send OTP email. Please try again later.",
+        )
     response_data = {"email": data.email, "sent_via_email": sent_via_email, "is_registered": existing is not None}
     return APIResponse(
         message="OTP sent successfully",

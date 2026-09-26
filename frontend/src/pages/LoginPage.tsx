@@ -47,6 +47,10 @@ export default function LoginPage() {
   const sendOtpMutation = useMutation({
     mutationFn: (email: string) => auth.sendOtp(email),
     onSuccess: (data) => {
+      if (data.sent_via_email === false) {
+        toast.error(t('auth.otpSendError'));
+        return;
+      }
       setIsRegistered(data.is_registered);
       if (mode === 'login' && !data.is_registered) {
         toast.error(t('auth.emailNotFound'));
