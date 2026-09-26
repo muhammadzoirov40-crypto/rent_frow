@@ -4,6 +4,7 @@ import time
 from datetime import datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import parseaddr
 from fastapi import HTTPException, status
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -96,7 +97,8 @@ def _smtp_send(msg: MIMEMultipart) -> bool:
         server.starttls()
         server.ehlo()
         server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
-        server.sendmail(msg["From"], [msg["To"]], msg.as_string())
+        _, envelope_from = parseaddr(msg["From"] or settings.SMTP_USERNAME)
+        server.sendmail(envelope_from, [msg["To"]], msg.as_string())
         return True
     finally:
         if server:
