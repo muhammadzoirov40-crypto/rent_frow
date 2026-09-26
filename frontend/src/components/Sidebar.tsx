@@ -157,7 +157,7 @@ export default function Sidebar() {
       </div>
 
       {/* Search */}
-      {open ? (
+      {open && (
         <form onSubmit={handleSearch} className="shrink-0 pb-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -170,14 +170,6 @@ export default function Sidebar() {
             />
           </div>
         </form>
-      ) : (
-        <Link
-          to="/search"
-          aria-label={t('nav.search')}
-          className="flex items-center justify-center py-2.5 mx-auto w-full rounded-xl text-gray-500 dark:text-slate-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/5 transition shrink-0"
-        >
-          <Search className="w-5 h-5" />
-        </Link>
       )}
 
       {/* Nav */}
