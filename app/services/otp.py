@@ -21,6 +21,11 @@ RESEND_MAX_RETRIES = 3
 RESEND_API_URL = "https://api.resend.com/emails"
 
 
+def _log(message: str) -> None:
+    """Print with flush so OTP delivery logs show up in backend.log immediately."""
+    print(message, flush=True)
+
+
 def generate_otp() -> str:
     return str(random.randint(100000, 999999))
 
@@ -158,9 +163,9 @@ def _resend_send(email: str, code: str) -> bool:
 
 
 def _print_code(email: str, code: str) -> None:
-    print(f"\n{'='*40}")
-    print(f"  OTP CODE for {email}: {code}")
-    print(f"{'='*40}\n")
+    print(f"\n{'='*40}", flush=True)
+    print(f"  OTP CODE for {email}: {code}", flush=True)
+    print(f"{'='*40}\n", flush=True)
 
 
 def send_otp_email(email: str, code: str) -> bool:
@@ -170,13 +175,13 @@ def send_otp_email(email: str, code: str) -> bool:
         for attempt in range(1, RESEND_MAX_RETRIES + 1):
             try:
                 _resend_send(email, code)
-                print(f"[OTP EMAIL] Sent via Resend to {email} (attempt {attempt})")
+                _log(f"[OTP EMAIL] Sent via Resend to {email} (attempt {attempt})")
                 return True
             except Exception as e:
-                print(f"[OTP EMAIL] Resend attempt {attempt}/{RESEND_MAX_RETRIES} failed: {e}")
+                _log(f"[OTP EMAIL] Resend attempt {attempt}/{RESEND_MAX_RETRIES} failed: {e}")
                 if attempt < RESEND_MAX_RETRIES:
                     time.sleep(SMTP_RETRY_DELAY)
-        print(f"[OTP EMAIL] Resend failed for {email}, falling back to SMTP")
+        _log(f"[OTP EMAIL] Resend failed for {email}, falling back to SMTP")
 
     if not settings.SMTP_USERNAME or not settings.SMTP_PASSWORD:
         _print_code(email, code)
@@ -187,13 +192,13 @@ def send_otp_email(email: str, code: str) -> bool:
     for attempt in range(1, SMTP_MAX_RETRIES + 1):
         try:
             if _smtp_send(msg):
-                print(f"[OTP EMAIL] Sent to {email} (attempt {attempt})")
+                _log(f"[OTP EMAIL] Sent to {email} (attempt {attempt})")
                 return True
         except Exception as e:
-            print(f"[OTP EMAIL] Attempt {attempt}/{SMTP_MAX_RETRIES} failed: {e}")
+            _log(f"[OTP EMAIL] Attempt {attempt}/{SMTP_MAX_RETRIES} failed: {e}")
             if attempt < SMTP_MAX_RETRIES:
                 time.sleep(SMTP_RETRY_DELAY)
 
-    print(f"[OTP EMAIL] All {SMTP_MAX_RETRIES} attempts failed for {email}")
+    _log(f"[OTP EMAIL] All {SMTP_MAX_RETRIES} attempts failed for {email}")
     _print_code(email, code)
     return False
