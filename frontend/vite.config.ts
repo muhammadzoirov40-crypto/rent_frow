@@ -5,7 +5,7 @@ const FALLBACK_API = 'http://127.0.0.1:8000'
 
 const normalize = (url: string) => url.trim().replace(/\/+$/, '')
 
-async function isRentFlowBackend(target: string): Promise<boolean> {
+async function isRentHubBackend(target: string): Promise<boolean> {
   try {
     const res = await fetch(new URL('/health', target), {
       signal: AbortSignal.timeout(1500),
@@ -21,11 +21,11 @@ async function isRentFlowBackend(target: string): Promise<boolean> {
 async function resolveApiTarget(env: Record<string, string>): Promise<string> {
   const override = env.VITE_API_URL ? normalize(env.VITE_API_URL) : ''
   if (override && override !== normalize(FALLBACK_API)) {
-    if (await isRentFlowBackend(override)) {
+    if (await isRentHubBackend(override)) {
       return override
     }
     console.warn(
-      `[vite] VITE_API_URL=${override} is not a reachable RentFlow backend, falling back to ${FALLBACK_API}`
+      `[vite] VITE_API_URL=${override} is not a reachable RentHub backend, falling back to ${FALLBACK_API}`
     )
   }
   return FALLBACK_API

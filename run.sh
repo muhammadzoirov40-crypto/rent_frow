@@ -2,7 +2,7 @@
 set -e
 cd "$(dirname "$0")"
 
-echo "== RentFlow =="
+echo "== RentHub =="
 
 # ---------- Backend: http://127.0.0.1:8000 ----------
 if [ ! -d .venv ]; then

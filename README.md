@@ -1,4 +1,4 @@
-# RentFlow - Equipment Rental Management Platform
+# RentHub - Equipment Rental Management Platform
 
 A full-stack rental management platform built with React, FastAPI, and PostgreSQL.
 

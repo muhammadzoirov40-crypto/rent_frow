@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    APP_NAME: str = "RentFlow"
+    APP_NAME: str = "RentHub"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
     SQL_ECHO: bool = False
@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     SMTP_FROM: str = ""
     RESEND_API_KEY: str = ""
-    EMAIL_FROM: str = "RentFlow <no-reply@renthub.qobus.tj>"
+    EMAIL_FROM: str = "RentHub <no-reply@renthub.qobus.tj>"
     OTP_EXPIRE_MINUTES: int = 10
     JWT_ALGORITHM: str = "HS256"
 

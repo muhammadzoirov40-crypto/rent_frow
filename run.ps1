@@ -14,7 +14,7 @@ $frontend = Start-Process -FilePath "powershell" -ArgumentList @(
 
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Green
-Write-Host "  RentFlow ishlawda!" -ForegroundColor Green
+Write-Host "  RentHub ishlawda!" -ForegroundColor Green
 Write-Host "  Frontend: http://localhost:3000" -ForegroundColor Cyan
 Write-Host "  Backend:  http://localhost:8000" -ForegroundColor Cyan
 Write-Host "  API Docs: http://localhost:8000/docs" -ForegroundColor Cyan
