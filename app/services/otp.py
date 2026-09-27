@@ -55,14 +55,14 @@ async def verify_otp(db: AsyncSession, email: str, code: str) -> bool:
 
 
 def _otp_subject(code: str) -> str:
-    return f"RentFlow - Your verification code: {code}"
+    return f"RentHub - Your verification code: {code}"
 
 
 def _text_body(code: str) -> str:
     settings = get_settings()
     return (
         "Hello!\n\n"
-        f"Your RentFlow verification code: {code}\n\n"
+        f"Your RentHub verification code: {code}\n\n"
         f"This code expires in {settings.OTP_EXPIRE_MINUTES} minutes.\n"
         "If you didn't request this, just ignore this email.\n"
     )
@@ -75,18 +75,18 @@ def _html_body(code: str) -> str:
     <body style="font-family: 'Helvetica Neue', Arial, sans-serif; background: #f8fafc; padding: 40px;">
       <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.08);">
         <div style="text-align: center; margin-bottom: 24px;">
-          <div style="width: 48px; height: 48px; background: #1285ff; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+          <div style="width: 48px; height: 48px; background: #FF6B35; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px;">
             <span style="color: white; font-weight: bold; font-size: 22px;">R</span>
           </div>
-          <h1 style="font-size: 22px; font-weight: 800; color: #111827; margin: 0;">RentFlow</h1>
+          <h1 style="font-size: 22px; font-weight: 800; color: #111827; margin: 0;">RentHub</h1>
           <p style="color: #6b7280; font-size: 14px; margin: 4px 0 0;">Equipment & Tool Rental</p>
         </div>
 
         <p style="color: #374151; font-size: 15px;">Hello! To complete your registration, enter this code:</p>
 
         <div style="text-align: center; margin: 28px 0;">
-          <div style="display: inline-block; background: #f0f9ff; border: 2px solid #bae6fd; border-radius: 12px; padding: 18px 40px;">
-            <span style="font-size: 38px; font-weight: 800; letter-spacing: 8px; color: #1285ff; font-family: monospace;">{code}</span>
+          <div style="display: inline-block; background: #fff4ed; border: 2px solid #ffc8a8; border-radius: 12px; padding: 18px 40px;">
+            <span style="font-size: 38px; font-weight: 800; letter-spacing: 8px; color: #FF6B35; font-family: monospace;">{code}</span>
           </div>
         </div>
 
