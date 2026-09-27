@@ -658,7 +658,9 @@
     "verifiedUser": "Verified",
     "notVerified": "Not verified",
     "approved": "Approved",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "chartRequests": "Rental requests — last 30 days",
+    "chartListingsStatus": "Listings by status"
   },
   "validation": {
     "required": "This field is required",

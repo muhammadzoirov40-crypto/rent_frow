@@ -8,6 +8,10 @@ import {
   PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from 'recharts';
 import client from '../api/client';
 import type { User, Listing, RentalRequest, Category } from '../api';
 
@@ -16,6 +20,23 @@ interface AdminStats {
   activeListings: number;
   rentalRequests: number;
   completedRentals: number;
+}
+
+interface ChartPoint {
+  date: string;
+  count: number;
+}
+
+interface ChartGroup {
+  key: string;
+  count: number;
+}
+
+interface AdminChartData {
+  requestsByDay: ChartPoint[];
+  listingsByStatus: ChartGroup[];
+  requestsByStatus: ChartGroup[];
+  usersByRole: ChartGroup[];
 }
 
 interface CrmStats {
@@ -130,7 +151,8 @@ interface AdminUserProfile {
 }
 
 const adminApi = {
-  getStats: () => client.get<{ data: { data: AdminStats } }>('/admin/stats').then((r) => r.data.data),
+  getStats: () => client.get<{ data: AdminStats }>('/admin/stats').then((r) => r.data.data),
+  getChartData: () => client.get<{ data: AdminChartData }>('/admin/chart-data').then((r) => r.data.data),
   getUsers: () => client.get<{ data: { data: User[] } }>('/admin/users').then((r) => r.data.data),
   getUser: (id: number) => client.get(`/admin/users/${id}`).then((r) => r.data.data) as Promise<AdminUserProfile>,
   blockUser: (id: number) => client.put(`/admin/users/${id}/block`).then((r) => r.data),
@@ -145,7 +167,7 @@ const adminApi = {
   rejectListing: (id: number) => client.put(`/admin/listings/${id}/reject`).then((r) => r.data),
   deleteListing: (id: number) => client.delete(`/admin/listings/${id}`).then((r) => r.data),
   getRequests: () => client.get<{ data: { data: RentalRequest[] } }>('/admin/requests').then((r) => r.data.data),
-  getCrm: () => client.get<{ data: { data: CrmData } }>('/admin/crm').then((r) => r.data.data),
+  getCrm: () => client.get<{ data: CrmData }>('/admin/crm').then((r) => r.data.data),
   getCategories: () => client.get<{ data: { data: Category[] } }>('/categories').then((r) => r.data.data),
   createCategory: (data: { name: string }) => client.post('/categories', data).then((r) => r.data),
   updateCategory: (id: number, data: { name: string }) => client.put(`/categories/${id}`, data).then((r) => r.data),
@@ -234,6 +256,12 @@ export default function AdminPage() {
     queryFn: adminApi.getStats,
     placeholderData: fallbackStats,
     meta: { usePlaceholder: true },
+  });
+
+  const { data: chartData } = useQuery({
+    queryKey: ['admin-chart'],
+    queryFn: adminApi.getChartData,
+    refetchInterval: 60000,
   });
 
   const { data: users = fallbackUsers, isLoading: usersLoading } = useQuery({
@@ -484,7 +512,7 @@ export default function AdminPage() {
                 {statCards.map((card) => (
                   <div key={card.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center text-white shadow-lg ${card.shadow}`}>
+                      <div className="w-12 h-12 rounded-xl bg-[#FF6B35]/10 flex items-center justify-center text-[#FF6B35]">
                         {card.icon}
                       </div>
                       <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
@@ -493,6 +521,76 @@ export default function AdminPage() {
                     <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
                   </div>
                 ))}
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+                <div className="lg:col-span-2 bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-4">{t('admin.chartRequests')}</h3>
+                  <div className="h-64">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartData?.requestsByDay || []} margin={{ top: 5, right: 10, left: -18, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="orangeArea" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#FF6B35" stopOpacity={0.35} />
+                            <stop offset="100%" stopColor="#FF6B35" stopOpacity={0.02} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 4" stroke="rgba(148,163,184,0.15)" vertical={false} />
+                        <XAxis
+                          dataKey="date"
+                          axisLine={false}
+                          tickLine={false}
+                          interval={4}
+                          tick={{ fill: '#94a3b8', fontSize: 11 }}
+                          tickFormatter={(v: string) => v.slice(8) + '.' + v.slice(5, 7)}
+                        />
+                        <YAxis axisLine={false} tickLine={false} allowDecimals={false} width={40} tick={{ fill: '#94a3b8', fontSize: 11 }} />
+                        <Tooltip
+                          contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 12 }}
+                          labelStyle={{ color: '#6b7280' }}
+                        />
+                        <Area type="monotone" dataKey="count" stroke="#FF6B35" strokeWidth={2.5} fill="url(#orangeArea)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-4">{t('admin.chartListingsStatus')}</h3>
+                  <div className="h-48">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={(chartData?.listingsByStatus || []).map((g: ChartGroup) => ({ name: g.key, value: g.count }))}
+                          dataKey="value"
+                          nameKey="name"
+                          innerRadius={45}
+                          outerRadius={70}
+                          paddingAngle={2}
+                        >
+                          {(chartData?.listingsByStatus || []).map((_: ChartGroup, i: number) => (
+                            <Cell key={i} fill={['#FF6B35', '#1A1A2E', '#FFB088', '#94A3B8', '#22C55E', '#F59E0B'][i % 6]} />
+                          ))}
+                        </Pie>
+                        <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 12 }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="space-y-1.5 mt-2">
+                    {(chartData?.listingsByStatus || []).map((g: ChartGroup, i: number) => (
+                      <div key={g.key} className="flex items-center justify-between text-xs">
+                        <span className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ background: ['#FF6B35', '#1A1A2E', '#FFB088', '#94A3B8', '#22C55E', '#F59E0B'][i % 6] }} />
+                          {g.key}
+                        </span>
+                        <span className="font-bold text-gray-900 dark:text-white">{g.count}</span>
+                      </div>
+                    ))}
+                    {(chartData?.listingsByStatus || []).length === 0 && (
+                      <p className="text-xs text-gray-400 text-center py-4">—</p>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
@@ -548,7 +646,7 @@ export default function AdminPage() {
                     ].map((card) => (
                       <div key={card.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} flex items-center justify-center text-white shadow-lg ${card.shadow}`}>
+                          <div className="w-12 h-12 rounded-xl bg-[#FF6B35]/10 flex items-center justify-center text-[#FF6B35]">
                             {card.icon}
                           </div>
                           <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />

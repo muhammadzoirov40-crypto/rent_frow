@@ -657,7 +657,9 @@
     "verifiedUser": "Подтверждён",
     "notVerified": "Не подтверждён",
     "approved": "Одобрено",
-    "inactive": "Неактивен"
+    "inactive": "Неактивен",
+    "chartRequests": "Дархостҳои иҷора — 30 рӯзи охир",
+    "chartListingsStatus": "Эълонҳо аз рӯи ҳолат"
   },
   "validation": {
     "required": "Обязательное поле",

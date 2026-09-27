@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
+from datetime import datetime, timedelta
 from pydantic import BaseModel
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -61,6 +62,37 @@ async def get_stats(
         "activeListings": active_listings_count,
         "rentalRequests": total_requests_count,
         "completedRentals": completed_count,
+    })
+
+
+@router.get("/chart-data", response_model=APIResponse[dict])
+async def get_chart_data(
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    since = datetime.utcnow() - timedelta(days=29)
+    day_col = func.date(RentalRequest.created_at)
+    rows = await db.execute(
+        select(day_col, func.count())
+        .where(RentalRequest.created_at >= since)
+        .group_by(day_col)
+    )
+    counts = {str(d): int(c) for d, c in rows.all()}
+    start = since.date()
+    requests_by_day = [
+        {"date": (start + timedelta(days=i)).isoformat(), "count": counts.get((start + timedelta(days=i)).isoformat(), 0)}
+        for i in range(30)
+    ]
+
+    async def _group(col):
+        res = await db.execute(select(col, func.count()).group_by(col))
+        return [{"key": getattr(k, "value", k), "count": int(c)} for k, c in res.all()]
+
+    return APIResponse(data={
+        "requestsByDay": requests_by_day,
+        "listingsByStatus": await _group(Listing.status),
+        "requestsByStatus": await _group(RentalRequest.status),
+        "usersByRole": await _group(User.role),
     })
 
 

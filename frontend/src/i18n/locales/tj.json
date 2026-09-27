@@ -658,7 +658,9 @@
     "verifiedUser": "Тасдиқшуда",
     "notVerified": "Тасдиқнашуда",
     "approved": "Тасдиқшуда",
-    "inactive": "Ғайрифаъол"
+    "inactive": "Ғайрифаъол",
+    "chartRequests": "Дархостҳои иҷора — 30 рӯзи охир",
+    "chartListingsStatus": "Эълонҳо аз рӯи ҳолат"
   },
   "validation": {
     "required": "Ин майдон ҳатмӣ аст",
