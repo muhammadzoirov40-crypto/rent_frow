@@ -828,7 +828,8 @@ async def seed_database():
 
     async with async_session_factory() as session:
         result = await session.execute(select(func.count()).select_from(City))
-        if result.scalar() and result.scalar() > 0:
+        city_count = result.scalar_one_or_none() or 0
+        if city_count > 0:
             print("Data already exists. Skipping seed.")
             return
 
