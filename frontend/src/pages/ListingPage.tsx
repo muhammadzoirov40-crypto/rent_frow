@@ -125,6 +125,19 @@ export default function ListingPage() {
     },
   });
 
+  const requestRental = () => {
+    if (!isAuthenticated) {
+      toast.error(t('listing.loginRequired'));
+      navigate('/login');
+      return;
+    }
+    if (!startDate || !endDate) {
+      toast.error(t('listing.selectDatesRequired'));
+      return;
+    }
+    rentalMutation.mutate();
+  };
+
   const reviewMutation = useMutation({
     mutationFn: () =>
       reviews.createReview(Number(id), { rating: reviewRating, comment: reviewComment }),
@@ -209,7 +222,7 @@ export default function ListingPage() {
   const avgRating = listingReviews.length > 0 ? Math.round(listingReviews.reduce((s, r) => s + r.rating, 0) / listingReviews.length) : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-6 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-6 px-4 sm:px-6 lg:px-8 pb-24 lg:pb-6">
       <div className="max-w-7xl mx-auto">
         <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#1A1A2E] dark:hover:text-white mb-6 transition-colors">
           <ChevronLeft size={16} />
@@ -305,7 +318,7 @@ export default function ListingPage() {
           </div>
 
           <div className="lg:w-[40%]">
-            <div className="sticky top-6 space-y-4">
+            <div id="booking-card" className="sticky top-6 space-y-4">
               <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                 <h1 className="text-xl font-bold text-[#1A1A2E] dark:text-white mb-4">{listing.title}</h1>
                 <div className="mb-4">
@@ -352,18 +365,7 @@ export default function ListingPage() {
                 ) : (
                   <>
                     <button
-                      onClick={() => {
-                        if (!isAuthenticated) {
-                          toast.error(t('listing.loginRequired'));
-                          navigate('/login');
-                          return;
-                        }
-                        if (!startDate || !endDate) {
-                          toast.error(t('listing.selectDatesRequired'));
-                          return;
-                        }
-                        rentalMutation.mutate();
-                      }}
+                      onClick={requestRental}
                       disabled={rentalMutation.isPending || listing.status !== 'ACTIVE'}
                       className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20 active:scale-[0.98]"
                     >
@@ -609,6 +611,43 @@ export default function ListingPage() {
           </div>
         )}
       </div>
+
+      {!isOwner && listing.status === 'ACTIVE' && (
+        <div className="lg:hidden fixed left-0 right-0 bottom-20 z-40 px-4">
+          <div className="bg-white dark:bg-[#151528] border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/10 px-3 py-2.5 flex items-center gap-3">
+            <div className="min-w-0">
+              <div className="text-lg font-extrabold text-[#FF6B35] leading-none">
+                {listing.price.toLocaleString('ru-RU')}
+              </div>
+              <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                сом / {t('listing.' + listing.price_unit)}
+              </div>
+            </div>
+            <button
+              onClick={requestRental}
+              disabled={rentalMutation.isPending}
+              className="flex-1 bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white text-sm font-semibold py-3 rounded-xl transition active:scale-[0.98]"
+            >
+              {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
+            </button>
+            <button
+              onClick={() => {
+                if (!isAuthenticated) {
+                  toast.error(t('listing.loginRequired'));
+                  navigate('/login');
+                  return;
+                }
+                messageMutation.mutate();
+              }}
+              disabled={messageMutation.isPending}
+              aria-label={t('listing.sendMessage')}
+              className="w-11 h-11 shrink-0 border border-gray-200 dark:border-white/10 rounded-xl flex items-center justify-center text-[#1A1A2E] dark:text-white"
+            >
+              <MessageSquare size={18} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

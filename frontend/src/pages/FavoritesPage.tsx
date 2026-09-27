@@ -58,7 +58,7 @@ export default function FavoritesPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {favs.map((listing) => (
               <div key={listing.id} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group">
                 <div className="relative h-48 bg-gray-100">

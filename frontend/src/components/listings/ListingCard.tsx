@@ -143,13 +143,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
         )}
       </div>
 
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <h3 className="font-bold text-[#1A1A2E] dark:text-white text-sm leading-snug group-hover:text-[#FF6B35] transition-colors truncate">
           {listing.title}
         </h3>
 
         <div className="mt-2 flex items-baseline gap-1">
-          <span className="text-lg font-extrabold text-[#FF6B35]">
+          <span className="text-base sm:text-lg font-extrabold text-[#FF6B35]">
             {listing.price.toLocaleString('ru-RU')}
           </span>
           <span className="text-sm text-gray-500 dark:text-slate-400">
