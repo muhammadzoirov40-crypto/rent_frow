@@ -91,6 +91,12 @@ def delete_file(key: str) -> None:
             local_path.unlink()
         return
 
+    if key.startswith("/uploads/"):
+        local_path = UPLOAD_DIR / key[len("/uploads/"):]
+        if local_path.exists():
+            local_path.unlink()
+        return
+
     if S3_OK:
         try:
             s3 = _get_s3_client()

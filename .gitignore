@@ -20,3 +20,8 @@ frontend copy/
 node_modules/
 *.log
 backend.pid
+
+# local-only files
+.env.*
+backups/
+nohup.out

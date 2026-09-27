@@ -1033,6 +1033,8 @@ async def seed_database():
         print(f"  Favorites: {favorite_count}")
         print(f"  Rental Requests: {req_count}")
 
+async def seed_data():
+    return
 
 if __name__ == "__main__":
     asyncio.run(seed_database())

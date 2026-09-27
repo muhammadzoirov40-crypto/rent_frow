@@ -31,6 +31,12 @@ class VerificationStatus(str, enum.Enum):
     REQUEST_INFO = "request_info"
 
 
+class PostStatus(str, enum.Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+
+
 class PriceUnit(str, enum.Enum):
     PER_HOUR = "per_hour"
     PER_DAY = "per_day"

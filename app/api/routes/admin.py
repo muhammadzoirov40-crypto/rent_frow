@@ -4,9 +4,10 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import require_admin, CurrentUser
-from app.core.enums import UserRole, ListingStatus
+from app.core.enums import UserRole, ListingStatus, PostStatus
 from app.schemas.statistics import StatisticsResponse, AuditLogResponse
 from app.schemas.base import APIResponse, PaginatedResponse
+from app.schemas.post import PostResponse
 from app.services.statistics import StatisticsService
 from app.services.audit_log import AuditLogService
 from app.schemas.user import UserResponse
@@ -380,6 +381,21 @@ async def get_user_by_email(
     return APIResponse(data=UserResponse.model_validate(user))
 
 
+@router.get("/users/{user_id}", response_model=APIResponse[UserResponse])
+async def get_user(
+    user_id: int,
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    repo = UserRepository(db)
+    user = await repo.get_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    ur = UserResponse.model_validate(user)
+    ur.listing_count = len(user.listings) if user.listings else 0
+    return APIResponse(data=ur)
+
+
 @router.get("/listings", response_model=APIResponse[list[ListingListResponse]])
 async def admin_list_listings(
     skip: int = Query(0, ge=0),
@@ -525,3 +541,86 @@ async def get_entity_audit_logs(
     service = AuditLogService(db)
     items = await service.get_by_entity(entity_type, entity_id)
     return APIResponse(data=items)
+
+
+async def _get_post_or_404(db: AsyncSession, post_id: int) -> Post:
+    result = await db.execute(select(Post).where(Post.id == post_id))
+    post = result.scalar_one_or_none()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return post
+
+
+@router.get("/posts", response_model=APIResponse[list[PostResponse]])
+async def admin_list_posts(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=500),
+    status_filter: str | None = Query(None, alias="status"),
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    query = select(Post).order_by(Post.created_at.desc())
+    if status_filter:
+        try:
+            query = query.where(Post.status == PostStatus(status_filter))
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid post status")
+    query = query.offset(skip).limit(limit)
+    result = await db.execute(query)
+    posts = result.scalars().all()
+    from app.api.routes.posts import _post_to_response
+    return APIResponse(data=[_post_to_response(p) for p in posts])
+
+
+@router.put("/posts/{post_id}/approve", response_model=APIResponse[PostResponse])
+async def admin_approve_post(
+    post_id: int,
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    post = await _get_post_or_404(db, post_id)
+    post.status = PostStatus.APPROVED
+    await db.flush()
+    await db.refresh(post)
+    from app.api.routes.posts import _post_to_response
+    return APIResponse(message="Post approved", data=_post_to_response(post))
+
+
+@router.put("/posts/{post_id}/reject", response_model=APIResponse[PostResponse])
+async def admin_reject_post(
+    post_id: int,
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    post = await _get_post_or_404(db, post_id)
+    post.status = PostStatus.REJECTED
+    await db.flush()
+    await db.refresh(post)
+    from app.api.routes.posts import _post_to_response
+    return APIResponse(message="Post rejected", data=_post_to_response(post))
+
+
+@router.delete("/posts/{post_id}")
+async def admin_delete_post(
+    post_id: int,
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    post = await _get_post_or_404(db, post_id)
+
+    if post.image_url:
+        try:
+            from app.utils.s3 import delete_file
+            delete_file(post.image_url)
+        except Exception:
+            pass
+
+    from app.models.comment import Comment
+    from app.models.like import Like
+    for comment in (await db.execute(select(Comment).where(Comment.post_id == post_id))).scalars().all():
+        await db.delete(comment)
+    for like in (await db.execute(select(Like).where(Like.post_id == post_id))).scalars().all():
+        await db.delete(like)
+
+    await db.delete(post)
+    return APIResponse(message="Post deleted")

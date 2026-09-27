@@ -17,6 +17,7 @@ class PostResponse(BaseModel):
     comments_count: int = 0
     author_name: Optional[str] = None
     author_avatar: Optional[str] = None
+    status: str = "approved"
     created_at: datetime
     updated_at: datetime
 

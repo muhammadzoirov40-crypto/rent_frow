@@ -5,6 +5,7 @@ from app.core.database import get_db
 from app.core.dependencies import get_current_user, CurrentUser
 from app.schemas.post import PostResponse, CreatePostRequest, UpdatePostRequest
 from app.schemas.base import APIResponse
+from app.core.enums import PostStatus
 from app.models.post import Post
 from app.models.like import Like
 from app.models.user import User
@@ -49,9 +50,17 @@ def _post_to_response(post: Post) -> PostResponse:
         comments_count=post.comments_count,
         author_name=author_name,
         author_avatar=author_avatar,
+        status=post.status.value if hasattr(post.status, "value") else str(post.status),
         created_at=post.created_at,
         updated_at=post.updated_at,
     )
+
+
+def _can_view(post: Post, current_user: CurrentUser) -> bool:
+    status_value = post.status.value if hasattr(post.status, "value") else str(post.status)
+    if status_value == "approved":
+        return True
+    return post.user_id == current_user.user_id or current_user.is_admin
 
 
 @router.get("", response_model=APIResponse[list[PostResponse]])
@@ -65,6 +74,10 @@ async def list_posts(
     query = select(Post).order_by(Post.created_at.desc())
     if user_id:
         query = query.where(Post.user_id == user_id)
+        if user_id != current_user.user_id and not current_user.is_admin:
+            query = query.where(Post.status == PostStatus.APPROVED)
+    else:
+        query = query.where(Post.status == PostStatus.APPROVED)
     query = query.offset(skip).limit(limit)
     result = await db.execute(query)
     posts = result.scalars().all()
@@ -79,7 +92,7 @@ async def get_post(
 ):
     result = await db.execute(select(Post).where(Post.id == post_id))
     post = result.scalar_one_or_none()
-    if not post:
+    if not post or not _can_view(post, current_user):
         raise HTTPException(status_code=404, detail="Post not found")
     return APIResponse(data=_post_to_response(post))
 

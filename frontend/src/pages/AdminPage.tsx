@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, FileText, ClipboardList, FolderTree,
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
   ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
-  PanelLeft, PanelLeftClose,
+  PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import client from '../api/client';
@@ -101,12 +101,45 @@ interface CrmData {
   }[];
 }
 
+interface AdminPost {
+  id: number;
+  user_id: number;
+  title: string;
+  content: string;
+  image_url: string | null;
+  author_name: string | null;
+  likes_count: number;
+  comments_count: number;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+}
+
+interface AdminUserProfile {
+  id: number;
+  email: string;
+  display_name: string | null;
+  avatar_url?: string | null;
+  phone?: string | null;
+  role: string;
+  is_active: boolean;
+  is_verified: boolean;
+  rating_sum?: number;
+  rating_count?: number;
+  listing_count?: number;
+  created_at: string;
+}
+
 const adminApi = {
   getStats: () => client.get<{ data: { data: AdminStats } }>('/admin/stats').then((r) => r.data.data),
   getUsers: () => client.get<{ data: { data: User[] } }>('/admin/users').then((r) => r.data.data),
+  getUser: (id: number) => client.get(`/admin/users/${id}`).then((r) => r.data.data) as Promise<AdminUserProfile>,
   blockUser: (id: number) => client.put(`/admin/users/${id}/block`).then((r) => r.data),
   unblockUser: (id: number) => client.put(`/admin/users/${id}/unblock`).then((r) => r.data),
   verifyUser: (id: number) => client.put(`/admin/users/${id}/verify`).then((r) => r.data),
+  getPosts: () => client.get('/admin/posts').then((r) => r.data.data) as Promise<AdminPost[]>,
+  approvePost: (id: number) => client.put(`/admin/posts/${id}/approve`).then((r) => r.data),
+  rejectPost: (id: number) => client.put(`/admin/posts/${id}/reject`).then((r) => r.data),
+  deletePost: (id: number) => client.delete(`/admin/posts/${id}`).then((r) => r.data),
   getListings: () => client.get<{ data: { data: Listing[] } }>('/admin/listings').then((r) => r.data.data),
   approveListing: (id: number) => client.put(`/admin/listings/${id}/approve`).then((r) => r.data),
   rejectListing: (id: number) => client.put(`/admin/listings/${id}/reject`).then((r) => r.data),
@@ -155,12 +188,13 @@ const fallbackCategories: Category[] = [
   { id: 5, name: 'Электроника', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
 ];
 
-type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'categories';
+type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'categories' | 'posts';
 
 function StatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   const styles: Record<string, string> = {
     pending: 'bg-amber-50 text-amber-700 border border-amber-200',
     accepted: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
+    approved: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
     rejected: 'bg-red-50 text-red-700 border border-red-200',
     cancelled: 'bg-gray-100 text-gray-600 border border-gray-200',
     active: 'bg-emerald-50 text-emerald-700 border border-emerald-200',
@@ -170,10 +204,11 @@ function StatusBadge({ status, t }: { status: string; t: (key: string) => string
   const labelKeys: Record<string, string> = {
     pending: 'admin.pending',
     accepted: 'admin.accepted',
+    approved: 'admin.approved',
     rejected: 'admin.rejected',
     cancelled: 'admin.cancelled',
     active: 'admin.active',
-    inactive: 'admin.active',
+    inactive: 'admin.inactive',
     blocked: 'admin.blocked',
   };
   return (
@@ -191,6 +226,7 @@ export default function AdminPage() {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryName, setCategoryName] = useState('');
+  const [profileUser, setProfileUser] = useState<AdminUserProfile | null>(null);
   const queryClient = useQueryClient();
 
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
@@ -230,6 +266,12 @@ export default function AdminPage() {
     enabled: activeTab === 'crm',
   });
 
+  const { data: posts = [], isLoading: postsLoading } = useQuery<AdminPost[]>({
+    queryKey: ['admin-posts'],
+    queryFn: adminApi.getPosts,
+    enabled: activeTab === 'posts',
+  });
+
   const blockMutation = useMutation({
     mutationFn: adminApi.blockUser,
     onSuccess: () => { toast.success(t('admin.blockedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-users'] }); },
@@ -263,6 +305,24 @@ export default function AdminPage() {
   const deleteListingMutation = useMutation({
     mutationFn: adminApi.deleteListing,
     onSuccess: () => { toast.success(t('admin.deletedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const approvePostMutation = useMutation({
+    mutationFn: adminApi.approvePost,
+    onSuccess: () => { toast.success(t('admin.approvedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const rejectPostMutation = useMutation({
+    mutationFn: adminApi.rejectPost,
+    onSuccess: () => { toast.success(t('admin.rejectedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: adminApi.deletePost,
+    onSuccess: () => { toast.success(t('admin.deletedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); },
     onError: () => toast.error(t('admin.failedAction')),
   });
 
@@ -307,8 +367,31 @@ export default function AdminPage() {
   };
 
   const filteredUsers = users.filter(
-    (u) => u.display_name.toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase())
+    (u) => (u.display_name || '').toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const filteredPosts = posts.filter(
+    (p) => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || (p.author_name || '').toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const openProfile = async (u: User) => {
+    setProfileUser({
+      id: u.id,
+      email: u.email,
+      display_name: u.display_name,
+      avatar_url: u.avatar_url,
+      role: u.role,
+      is_active: (u as any).is_active ?? true,
+      is_verified: (u as any).is_verified ?? false,
+      created_at: u.created_at,
+    });
+    try {
+      const full = await adminApi.getUser(u.id);
+      setProfileUser(full);
+    } catch {
+      /* keep data from the row */
+    }
+  };
 
   const filteredListings = listings.filter((l) => l.title.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -324,6 +407,7 @@ export default function AdminPage() {
     { key: 'listings', label: t('admin.listings'), icon: <FileText className="w-5 h-5" /> },
     { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" /> },
     { key: 'categories', label: t('admin.categories'), icon: <FolderTree className="w-5 h-5" /> },
+    { key: 'posts', label: t('admin.posts'), icon: <MessageSquare className="w-5 h-5" /> },
   ];
 
   const statCards = [
@@ -665,17 +749,21 @@ export default function AdminPage() {
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                         {filteredUsers.map((u) => (
-                          <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                          <tr
+                            key={u.id}
+                            onClick={() => openProfile(u)}
+                            className="hover:bg-gray-50 dark:hover:bg-white/5 transition cursor-pointer"
+                          >
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3">
                                 {u.avatar_url ? (
                                   <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
                                 ) : (
                                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white text-xs font-semibold">
-                                    {u.display_name.charAt(0)}
+                                    {(u.display_name || u.email).charAt(0)}
                                   </div>
                                 )}
-                                <span className="font-medium text-sm text-gray-900 dark:text-white">{u.display_name}</span>
+                                <span className="font-medium text-sm text-gray-900 dark:text-white">{u.display_name || u.email}</span>
                               </div>
                             </td>
                             <td className="px-6 py-4 text-sm text-gray-500">{u.email}</td>
@@ -685,24 +773,44 @@ export default function AdminPage() {
                               </span>
                             </td>
                             <td className="px-6 py-4">
-                              <StatusBadge status="active" t={t} />
+                              <StatusBadge
+                                status={((u as any).is_active ?? true) ? 'active' : 'blocked'}
+                                t={t}
+                              />
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex items-center justify-end gap-1">
                                 <button
-                                  onClick={() => verifyMutation.mutate(u.id)}
+                                  onClick={(e) => { e.stopPropagation(); openProfile(u); }}
+                                  className="p-2 rounded-lg text-blue-600 hover:bg-blue-50 transition"
+                                  title={t('admin.viewProfile')}
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); verifyMutation.mutate(u.id); }}
                                   className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50 transition"
                                   title={t('admin.verifyUser')}
                                 >
                                   <CheckCircle className="w-4 h-4" />
                                 </button>
-                                <button
-                                  onClick={() => blockMutation.mutate(u.id)}
-                                  className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition"
-                                  title={t('admin.blockUser')}
-                                >
-                                  <Ban className="w-4 h-4" />
-                                </button>
+                                {(u as any).is_active === false ? (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); unblockMutation.mutate(u.id); }}
+                                    className="p-2 rounded-lg text-amber-600 hover:bg-amber-50 transition"
+                                    title={t('admin.unblockUser')}
+                                  >
+                                    <Shield className="w-4 h-4" />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); blockMutation.mutate(u.id); }}
+                                    className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition"
+                                    title={t('admin.blockUser')}
+                                  >
+                                    <Ban className="w-4 h-4" />
+                                  </button>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -954,6 +1062,112 @@ export default function AdminPage() {
               )}
             </div>
           )}
+          {activeTab === 'posts' && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.postsManagement')}</h1>
+                  <p className="text-sm text-gray-500 mt-0.5">{t('admin.postsSubtitle')}</p>
+                </div>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder={t('admin.search')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition w-64"
+                  />
+                </div>
+              </div>
+
+              {postsLoading ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-white/10">
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.post')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.author')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.date')}</th>
+                          <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                        {filteredPosts.map((p) => (
+                          <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                            <td className="px-6 py-4">
+                              <div className="flex items-center gap-3">
+                                {p.image_url ? (
+                                  <img src={p.image_url} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                                ) : (
+                                  <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0">
+                                    <ImageIcon className="w-5 h-5 text-gray-400" />
+                                  </div>
+                                )}
+                                <div className="min-w-0 max-w-xs">
+                                  <p className="font-medium text-sm text-gray-900 dark:text-white truncate">{p.title}</p>
+                                  <p className="text-xs text-gray-400 truncate">{p.content}</p>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500 dark:text-slate-400">{p.author_name || '—'}</td>
+                            <td className="px-6 py-4">
+                              <StatusBadge status={p.status} t={t} />
+                            </td>
+                            <td className="px-6 py-4 text-xs text-gray-400">
+                              {new Date(p.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center justify-end gap-1">
+                                {p.status !== 'approved' && (
+                                  <button
+                                    onClick={() => approvePostMutation.mutate(p.id)}
+                                    className="p-2 rounded-lg text-emerald-600 hover:bg-emerald-50 transition"
+                                    title={t('admin.approvePost')}
+                                  >
+                                    <CheckCircle className="w-4 h-4" />
+                                  </button>
+                                )}
+                                {p.status !== 'rejected' && (
+                                  <button
+                                    onClick={() => rejectPostMutation.mutate(p.id)}
+                                    className="p-2 rounded-lg text-amber-600 hover:bg-amber-50 transition"
+                                    title={t('admin.rejectPost')}
+                                  >
+                                    <X className="w-4 h-4" />
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => {
+                                    if (confirm(`${t('admin.deleteAction')} "${p.title}"?`)) {
+                                      deletePostMutation.mutate(p.id);
+                                    }
+                                  }}
+                                  className="p-2 rounded-lg text-red-600 hover:bg-red-50 transition"
+                                  title={t('admin.deleteAction')}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {filteredPosts.length === 0 && (
+                    <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </main>
       </div>
 
@@ -994,6 +1208,98 @@ export default function AdminPage() {
                   {saveCategoryMutation.isPending ? t('admin.saving') : t('admin.save')}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {profileUser && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
+          <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin.userProfile')}</h2>
+              <button onClick={() => setProfileUser(null)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition">
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4 mb-5">
+              {profileUser.avatar_url ? (
+                <img src={profileUser.avatar_url} alt="" className="w-16 h-16 rounded-2xl object-cover border border-gray-200 dark:border-white/10" />
+              ) : (
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white text-xl font-bold shrink-0">
+                  {(profileUser.display_name || profileUser.email).charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div className="min-w-0">
+                <p className="text-lg font-bold text-gray-900 dark:text-white truncate">{profileUser.display_name || profileUser.email}</p>
+                <p className="text-sm text-gray-500 dark:text-slate-400 truncate">{profileUser.email}</p>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${profileUser.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}>
+                    {profileUser.role === 'ADMIN' ? t('admin.admin') : t('admin.customer')}
+                  </span>
+                  <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${profileUser.is_verified ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {profileUser.is_verified ? t('admin.verifiedUser') : t('admin.notVerified')}
+                  </span>
+                  <StatusBadge status={profileUser.is_active ? 'active' : 'blocked'} t={t} />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                  <Star className="w-3.5 h-3.5" /> {t('admin.rating')}
+                </p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
+                  {profileUser.rating_count
+                    ? `${(Number(profileUser.rating_sum) / Number(profileUser.rating_count)).toFixed(1)} (${profileUser.rating_count})`
+                    : '—'}
+                </p>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                  <FileText className="w-3.5 h-3.5" /> {t('admin.listingsCount')}
+                </p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{profileUser.listing_count ?? 0}</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                  <Phone className="w-3.5 h-3.5" /> {t('admin.phone')}
+                </p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white mt-1 truncate">{profileUser.phone || '—'}</p>
+              </div>
+              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" /> {t('admin.joinedDate')}
+                </p>
+                <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
+                  {new Date(profileUser.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => verifyMutation.mutate(profileUser.id)}
+                className="flex-1 py-2.5 border border-emerald-300 text-emerald-700 rounded-xl text-sm font-semibold hover:bg-emerald-50 transition flex items-center justify-center gap-1.5"
+              >
+                <CheckCircle className="w-4 h-4" /> {t('admin.verifyUser')}
+              </button>
+              {profileUser.is_active ? (
+                <button
+                  onClick={() => { blockMutation.mutate(profileUser.id); setProfileUser(null); }}
+                  className="flex-1 py-2.5 bg-red-500 text-white rounded-xl text-sm font-semibold hover:bg-red-600 transition flex items-center justify-center gap-1.5"
+                >
+                  <Ban className="w-4 h-4" /> {t('admin.blockUser')}
+                </button>
+              ) : (
+                <button
+                  onClick={() => { unblockMutation.mutate(profileUser.id); setProfileUser(null); }}
+                  className="flex-1 py-2.5 bg-[#FF6B35] text-white rounded-xl text-sm font-semibold hover:bg-[#e55a2b] transition flex items-center justify-center gap-1.5"
+                >
+                  <Shield className="w-4 h-4" /> {t('admin.unblockUser')}
+                </button>
+              )}
             </div>
           </div>
         </div>
