@@ -21,6 +21,13 @@ import {
   Truck,
   Utensils,
   Ship,
+  ShieldCheck,
+  Zap,
+  Headset,
+  CalendarCheck,
+  PlusCircle,
+  Users,
+  Star,
 } from 'lucide-react';
 import { listings, categories, cities, type Category, type City, type ListingListItem } from '../api/index';
 import ListingGrid from '../components/listings/ListingGrid';
@@ -208,6 +215,28 @@ export default function HomePage() {
         </section>
       )}
 
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#FF6B35] to-[#e55a2b] shadow-xl shadow-[#FF6B35]/20">
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute -top-16 -right-10 w-64 h-64 bg-white rounded-full blur-3xl" />
+            <div className="absolute -bottom-20 left-10 w-72 h-72 bg-yellow-300 rounded-full blur-3xl" />
+          </div>
+          <div className="relative flex flex-col md:flex-row items-center gap-6 p-6 sm:p-8 lg:p-10">
+            <div className="flex-1 text-center md:text-left">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-white">{t('home.promoTitle')}</h3>
+              <p className="mt-2 text-sm sm:text-base text-white/85 max-w-2xl">{t('home.promoText')}</p>
+            </div>
+            <button
+              onClick={() => navigate('/create-listing')}
+              className="shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-white text-[#FF6B35] font-bold rounded-xl hover:bg-orange-50 transition shadow-lg"
+            >
+              <PlusCircle className="w-5 h-5" />
+              {t('home.promoBtn')}
+            </button>
+          </div>
+        </div>
+      </section>
+
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-[#1A1A2E] dark:text-white">{t('home.newListings')}</h2>
@@ -234,6 +263,49 @@ export default function HomePage() {
           </button>
         </div>
         <ListingGrid listings={popularListings} loading={loadingPopular} />
+      </section>
+
+      <section className="bg-[#1A1A2E] dark:bg-[#111120] py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-white text-center mb-4">{t('home.whyTitle')}</h2>
+          <p className="text-center text-gray-400 max-w-2xl mx-auto mb-10 text-sm sm:text-base">
+            {t('home.whySubtitle')}
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { icon: ShieldCheck, title: t('home.why1Title'), desc: t('home.why1Desc') },
+              { icon: Zap, title: t('home.why2Title'), desc: t('home.why2Desc') },
+              { icon: CalendarCheck, title: t('home.why3Title'), desc: t('home.why3Desc') },
+              { icon: Headset, title: t('home.why4Title'), desc: t('home.why4Desc') },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="rounded-2xl bg-white/5 border border-white/10 p-6 hover:border-[#FF6B35]/50 hover:bg-white/[0.07] transition group"
+              >
+                <div className="w-12 h-12 rounded-xl bg-[#FF6B35]/15 flex items-center justify-center mb-4 group-hover:bg-[#FF6B35] transition">
+                  <item.icon className="w-6 h-6 text-[#FF6B35] group-hover:text-white transition" />
+                </div>
+                <h3 className="font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
+            {[
+              { value: '1 000+', label: t('home.statsListings'), icon: Star },
+              { value: '5 000+', label: t('home.statsUsers'), icon: Users },
+              { value: '10', label: t('home.statsCities'), icon: MapPin },
+              { value: '4.8', label: t('home.statsRating'), icon: ShieldCheck },
+            ].map((stat, idx) => (
+              <div key={idx} className="rounded-2xl bg-[#FF6B35]/10 border border-[#FF6B35]/20 p-5 text-center">
+                <div className="text-2xl sm:text-3xl font-extrabold text-[#FF6B35]">{stat.value}</div>
+                <div className="mt-1 text-xs sm:text-sm text-gray-400">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section className="bg-[#1A1A2E] py-16">
@@ -266,6 +338,29 @@ export default function HomePage() {
                 <p className="text-sm text-gray-400">{step.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="rounded-3xl bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-white/10 p-8 sm:p-10 flex flex-col md:flex-row items-center gap-6">
+          <div className="flex-1 text-center md:text-left">
+            <h3 className="text-xl sm:text-2xl font-extrabold text-white">{t('home.ctaTitle')}</h3>
+            <p className="mt-2 text-sm sm:text-base text-gray-400">{t('home.ctaText')}</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+            <button
+              onClick={() => navigate('/create-listing')}
+              className="px-6 py-3 bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-bold rounded-xl transition shadow-lg shadow-[#FF6B35]/30"
+            >
+              {t('home.ctaPrimary')}
+            </button>
+            <button
+              onClick={() => navigate('/search')}
+              className="px-6 py-3 bg-white/10 hover:bg-white/15 text-white font-bold rounded-xl border border-white/15 transition"
+            >
+              {t('home.ctaSecondary')}
+            </button>
           </div>
         </div>
       </section>
