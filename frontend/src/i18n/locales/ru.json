@@ -56,7 +56,7 @@
     "expandSidebar": "Развернуть меню"
   },
   "sidebar": {
-    "brand": "RentFlow",
+    "brand": "RentHub",
     "subtitle": "Аренда оборудования"
   },
   "header": {
@@ -92,7 +92,7 @@
     "creating": "Создание аккаунта...",
     "emailNotFound": "Почта не найдена. Пожалуйста, зарегистрируйтесь.",
     "emailExists": "Почта уже зарегистрирована. Пожалуйста, войдите.",
-    "rentflow": "RentFlow",
+    "rentflow": "RentHub",
     "equipmentRentalMgmt": "Управление арендой оборудования",
     "createYourAccount": "Создайте свой аккаунт",
     "signInSubtitle": "Введите email, чтобы войти в аккаунт",
@@ -536,7 +536,7 @@
     "panel": "Админ-панель",
     "platformManagement": "Управление платформой",
     "overview": "Обзор",
-    "platformStats": "Статистика платформы RentFlow",
+    "platformStats": "Статистика платформы RentHub",
     "users": "Пользователи",
     "usersManagement": "Управление пользователями платформы",
     "listings": "Объявления",

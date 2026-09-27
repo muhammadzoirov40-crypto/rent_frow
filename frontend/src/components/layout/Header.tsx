@@ -98,7 +98,7 @@ export default function Header() {
               <div className="w-8 h-8 bg-[#FF6B35] rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">R</span>
               </div>
-              <span className="text-xl font-bold text-[#FF6B35] hidden sm:block">RentFlow</span>
+              <span className="text-xl font-bold text-[#FF6B35] hidden sm:block">RentHub</span>
             </Link>
           </div>
 
@@ -276,6 +276,7 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/register"
+                  className="px-4 py-2.5 text-sm font-semibold bg-[#FF6B35] hover:bg-[#e55a2b] text-white rounded-xl transition shadow-sm shadow-[#FF6B35]/20"
                 >
                   {t('header.register')}
                 </Link>

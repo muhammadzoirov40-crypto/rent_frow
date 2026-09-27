@@ -42,7 +42,7 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-sm min-w-0">
-          <span className="text-gray-400 font-medium hidden sm:inline">Revenlo</span>
+          <span className="text-gray-400 font-medium hidden sm:inline">RentHub</span>
           <svg className="w-3.5 h-3.5 text-gray-300 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

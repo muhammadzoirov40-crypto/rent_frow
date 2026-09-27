@@ -31,7 +31,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">R</span>
               </div>
-              <span className="text-xl font-bold text-white">RentFlow</span>
+              <span className="text-xl font-bold text-white">RentHub</span>
             </Link>
             <p className="text-sm text-gray-400 leading-relaxed">
               {t('footer.aboutText')}
@@ -98,7 +98,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-gray-500">
-            &copy; {new Date().getFullYear()} RentFlow. {t('footer.copyright')}.
+            &copy; {new Date().getFullYear()} RentHub. {t('footer.copyright')}.
           </p>
           <div className="flex items-center gap-4 text-xs text-gray-500">
             <Link to="/terms" className="hover:text-gray-300 transition">{t('footer.terms')}</Link>

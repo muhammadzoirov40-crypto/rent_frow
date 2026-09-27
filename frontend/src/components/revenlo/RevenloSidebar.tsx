@@ -49,12 +49,12 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
         {/* Logo */}
         <div className="flex items-center justify-between px-5 h-[68px] shrink-0">
           <Link to="/revenlo" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shadow-md shadow-blue-500/25">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M9 17V9m4 8V5m4 12v-6M5 21h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
-              </svg>
+            <div className="w-9 h-9 rounded-xl bg-[#FF6B35] flex items-center justify-center shadow-md shadow-[#FF6B35]/25">
+              <span className="text-white font-extrabold text-base leading-none">R</span>
             </div>
-            <span className="text-lg font-extrabold text-gray-900 tracking-tight">Revenlo</span>
+            <span className="text-lg font-extrabold text-gray-900 tracking-tight">
+              RentHub <span className="text-[#FF6B35]">Admin</span>
+            </span>
           </Link>
           <button
             onClick={onClose}

@@ -57,7 +57,7 @@
     "expandSidebar": "Expand menu"
   },
   "sidebar": {
-    "brand": "RentFlow",
+    "brand": "RentHub",
     "subtitle": "Equipment Rental"
   },
   "header": {
@@ -93,7 +93,7 @@
     "creating": "Creating account...",
     "emailNotFound": "Email not found. Please register first.",
     "emailExists": "Email already registered. Please sign in instead.",
-    "rentflow": "RentFlow",
+    "rentflow": "RentHub",
     "equipmentRentalMgmt": "Equipment Rental Management",
     "createYourAccount": "Create your account",
     "signInSubtitle": "Enter your email to sign in",
@@ -537,7 +537,7 @@
     "panel": "Admin panel",
     "platformManagement": "Platform management",
     "overview": "Overview",
-    "platformStats": "RentFlow platform statistics",
+    "platformStats": "RentHub platform statistics",
     "users": "Users",
     "usersManagement": "Manage platform users",
     "listings": "Listings",
