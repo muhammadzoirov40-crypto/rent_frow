@@ -104,7 +104,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="bg-white dark:bg-[#1A1A2E] rounded-xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300 group block"
+      className="bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300 group block"
     >
       <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800 overflow-hidden">
         {imageUrl ? (

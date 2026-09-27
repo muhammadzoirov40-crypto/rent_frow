@@ -119,20 +119,37 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen dark:bg-[#0a0a1a]">
-      <section className="relative bg-gradient-to-br from-[#1A1A2E] via-[#16213E] to-[#0F3460] overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
+      <section className="relative bg-white dark:bg-gradient-to-br dark:from-[#1A1A2E] dark:via-[#16213E] dark:to-[#0F3460] border-b border-gray-100 dark:border-white/5 overflow-hidden">
+        <div className="absolute inset-0 opacity-10 dark:opacity-10">
           <div className="absolute top-20 left-20 w-72 h-72 bg-[#FF6B35] rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-20 w-96 h-96 bg-blue-500 rounded-full blur-3xl" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-20 md:pt-24 md:pb-28">
-          <div className="text-center mb-10">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 pb-16 md:pt-20 md:pb-20">
+          <div className="text-center mb-8">
+            <span className="inline-block px-4 py-1.5 rounded-full bg-[#FF6B35]/10 text-[#FF6B35] text-xs sm:text-sm font-bold uppercase tracking-wider mb-4">
+              {t('home.heroKicker')}
+            </span>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1A1A2E] dark:text-white leading-tight">
               {t('home.heroTitle')}
             </h1>
-            <p className="mt-4 text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
               {t('home.heroSubtitle')}
             </p>
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => navigate('/search')}
+                className="px-7 py-3 bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-bold rounded-xl shadow-lg shadow-[#FF6B35]/30 transition active:scale-[0.98]"
+              >
+                {t('home.find')}
+              </button>
+              <a
+                href="#how"
+                className="px-7 py-3 border-2 border-gray-200 dark:border-white/15 text-[#1A1A2E] dark:text-white hover:border-[#FF6B35] hover:text-[#FF6B35] font-bold rounded-xl transition"
+              >
+                {t('home.howItWorks')}
+              </a>
+            </div>
           </div>
 
           <form
@@ -198,7 +215,7 @@ export default function HomePage() {
                 <button
                   key={cat.id}
                   onClick={() => navigate(`/search?category_id=${cat.id}`)}
-                  className="bg-white dark:bg-[#1A1A2E] dark:border-white/10 rounded-xl border border-gray-100 p-5 text-left hover:shadow-lg hover:border-[#FF6B35]/30 transition-all group"
+                  className="bg-white dark:bg-[#1A1A2E] dark:border-white/10 rounded-2xl border border-gray-100 p-5 text-left hover:shadow-lg hover:border-[#FF6B35]/30 transition-all group"
                 >
                   <div
                     className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-3 shadow-md`}
@@ -308,7 +325,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-[#1A1A2E] py-16">
+      <section id="how" className="bg-[#1A1A2E] py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-white text-center mb-10">{t('home.howItWorks')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -373,7 +390,7 @@ export default function HomePage() {
               <button
                 key={city.id}
                 onClick={() => navigate(`/search?city_id=${city.id}`)}
-                className="bg-white dark:bg-[#1A1A2E] dark:border-white/10 rounded-xl border border-gray-100 p-5 text-left hover:shadow-lg hover:border-[#FF6B35]/30 transition-all group"
+                className="bg-white dark:bg-[#1A1A2E] dark:border-white/10 rounded-2xl border border-gray-100 p-5 text-left hover:shadow-lg hover:border-[#FF6B35]/30 transition-all group"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#FF6B35]/10 flex items-center justify-center">

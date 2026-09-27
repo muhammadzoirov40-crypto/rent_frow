@@ -157,7 +157,8 @@
     "ctaTitle": "Rent or earn with RentHub",
     "ctaText": "Join thousands of users across Tajikistan.",
     "ctaPrimary": "Post a listing",
-    "ctaSecondary": "Browse listings"
+    "ctaSecondary": "Browse listings",
+    "heroKicker": "Rent · Earn · Repeat"
   },
   "search": {
     "resultsFound": "Found {{count}} listings",
