@@ -44,8 +44,10 @@ export default function FavoritesPage() {
         <p className="text-gray-500 dark:text-gray-400 mb-8">{t('favorites.count', { count: favs.length })}</p>
 
         {favs.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-gray-100 p-16 text-center">
-            <Heart className="w-16 h-16 text-gray-200 mx-auto mb-5" />
+          <div className="bg-white dark:bg-[#12121f] dark:border-white/10 rounded-2xl border border-gray-100 p-12 sm:p-16 text-center">
+            <div className="w-20 h-20 rounded-full bg-[#FF6B35]/10 flex items-center justify-center mx-auto mb-5">
+              <Heart className="w-10 h-10 text-[#FF6B35]" />
+            </div>
             <h3 className="text-xl font-bold text-[#1A1A2E] dark:text-white mb-2">{t('favorites.empty')}</h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
               {t('favorites.emptyHint')}

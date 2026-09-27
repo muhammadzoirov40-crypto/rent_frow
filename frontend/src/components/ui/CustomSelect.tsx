@@ -42,10 +42,10 @@ export default function CustomSelect({
         type="button"
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm text-left transition
-          border border-[#FF6B35]/30 bg-[#2A2A3E] text-white
+        className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm text-left transition
+          border border-gray-200 dark:border-[#FF6B35]/30 bg-white dark:bg-[#2A2A3E] text-gray-900 dark:text-white
           hover:border-[#FF6B35]/60 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/50
-          disabled:opacity-50 disabled:cursor-not-allowed
+          disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:disabled:bg-white/5
           ${isOpen ? 'border-[#FF6B35] ring-2 ring-[#FF6B35]/50' : ''}`}
       >
         <span className={!value ? 'text-gray-400' : ''}>{selectedLabel}</span>
@@ -55,7 +55,7 @@ export default function CustomSelect({
       </button>
 
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full mt-1 bg-[#2A2A3E] border border-[#FF6B35]/30 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-[#2A2A3E] border border-gray-200 dark:border-[#FF6B35]/30 rounded-xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
           {options.map((option) => (
             <button
               key={option.value}
@@ -64,10 +64,10 @@ export default function CustomSelect({
                 onChange(option.value);
                 setIsOpen(false);
               }}
-              className={`w-full text-left px-3 py-2.5 text-sm transition
+              className={`w-full text-left px-3.5 py-2.5 text-sm transition
                 ${option.value === value
                   ? 'bg-[#FF6B35] text-white'
-                  : 'text-gray-300 hover:bg-[#FF6B35]/20 hover:text-white'
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-[#FF6B35]/10 dark:hover:bg-[#FF6B35]/20 hover:text-[#FF6B35] dark:hover:text-white'
                 }`}
             >
               {option.label}

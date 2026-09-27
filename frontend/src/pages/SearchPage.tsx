@@ -122,14 +122,14 @@ function FilterSidebar({
             placeholder={t('search.priceFrom')}
             value={filters.price_min || ''}
             onChange={(e) => onFilterChange('price_min', e.target.value)}
-            className="w-1/2 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
+            className="w-1/2 border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
           />
           <input
             type="number"
             placeholder={t('search.priceTo')}
             value={filters.price_max || ''}
             onChange={(e) => onFilterChange('price_max', e.target.value)}
-            className="w-1/2 border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
+            className="w-1/2 border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
           />
         </div>
       </div>
@@ -141,7 +141,7 @@ function FilterSidebar({
         <select
           value={filters.price_unit || ''}
           onChange={(e) => onFilterChange('price_unit', e.target.value)}
-          className="w-full border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
+          className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm bg-white dark:bg-white/5 appearance-none text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
         >
           {PRICE_UNITS.map((u) => (
             <option key={u.value} value={u.value}>
@@ -176,7 +176,7 @@ function FilterSidebar({
 
       <button
         onClick={onReset}
-        className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 dark:border-white/10 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition"
+        className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:border-[#FF6B35]/50 hover:text-[#FF6B35] hover:bg-[#FF6B35]/5 dark:hover:bg-[#FF6B35]/10 transition"
       >
         <RotateCcw className="w-4 h-4" />
         {t('search.resetFilters')}
@@ -343,7 +343,7 @@ export default function SearchPage() {
 
       <div className="flex gap-6">
         <aside className="hidden lg:block w-[280px] flex-shrink-0">
-          <div className="bg-white dark:bg-[#1A1A2E] rounded-xl border border-gray-100 dark:border-white/10 p-5 sticky top-24">
+          <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-6 shadow-sm sticky top-24">
             <h3 className="font-bold text-[#1A1A2E] dark:text-white mb-4">{t('search.filters')}</h3>
             <FilterSidebar
               citiesList={citiesData || []}

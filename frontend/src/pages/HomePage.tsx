@@ -282,10 +282,10 @@ export default function HomePage() {
         <ListingGrid listings={popularListings} loading={loadingPopular} />
       </section>
 
-      <section className="bg-[#1A1A2E] dark:bg-[#111120] py-16">
+      <section className="bg-white dark:bg-[#111120] border-y border-gray-100 dark:border-white/5 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-white text-center mb-4">{t('home.whyTitle')}</h2>
-          <p className="text-center text-gray-400 max-w-2xl mx-auto mb-10 text-sm sm:text-base">
+          <h2 className="text-2xl font-bold text-[#1A1A2E] dark:text-white text-center mb-4">{t('home.whyTitle')}</h2>
+          <p className="text-center text-gray-500 dark:text-gray-400 max-w-2xl mx-auto mb-10 text-sm sm:text-base">
             {t('home.whySubtitle')}
           </p>
 
@@ -298,13 +298,13 @@ export default function HomePage() {
             ].map((item, idx) => (
               <div
                 key={idx}
-                className="rounded-2xl bg-white/5 border border-white/10 p-6 hover:border-[#FF6B35]/50 hover:bg-white/[0.07] transition group"
+                className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 p-6 hover:border-[#FF6B35]/50 hover:bg-white dark:hover:bg-white/[0.07] hover:shadow-md transition group"
               >
                 <div className="w-12 h-12 rounded-xl bg-[#FF6B35]/15 flex items-center justify-center mb-4 group-hover:bg-[#FF6B35] transition">
                   <item.icon className="w-6 h-6 text-[#FF6B35] group-hover:text-white transition" />
                 </div>
-                <h3 className="font-bold text-white mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
+                <h3 className="font-bold text-[#1A1A2E] dark:text-white mb-2">{item.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -318,16 +318,16 @@ export default function HomePage() {
             ].map((stat, idx) => (
               <div key={idx} className="rounded-2xl bg-[#FF6B35]/10 border border-[#FF6B35]/20 p-5 text-center">
                 <div className="text-2xl sm:text-3xl font-extrabold text-[#FF6B35]">{stat.value}</div>
-                <div className="mt-1 text-xs sm:text-sm text-gray-400">{stat.label}</div>
+                <div className="mt-1 text-xs sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="how" className="bg-[#1A1A2E] py-16">
+      <section id="how" className="bg-gray-50 dark:bg-[#16162b] py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-white text-center mb-10">{t('home.howItWorks')}</h2>
+          <h2 className="text-2xl font-bold text-[#1A1A2E] dark:text-white text-center mb-10">{t('home.howItWorks')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
@@ -351,8 +351,8 @@ export default function HomePage() {
                   <step.icon className="w-8 h-8 text-[#FF6B35]" />
                 </div>
                 <div className="text-sm font-bold text-[#FF6B35] mb-2">{t('home.step')} {idx + 1}</div>
-                <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-sm text-gray-400">{step.desc}</p>
+                <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -360,10 +360,10 @@ export default function HomePage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="rounded-3xl bg-gradient-to-r from-[#1A1A2E] to-[#16213E] border border-white/10 p-8 sm:p-10 flex flex-col md:flex-row items-center gap-6">
+        <div className="rounded-3xl bg-white dark:bg-gradient-to-r dark:from-[#1A1A2E] dark:to-[#16213E] border border-gray-200 dark:border-white/10 shadow-sm p-8 sm:p-10 flex flex-col md:flex-row items-center gap-6">
           <div className="flex-1 text-center md:text-left">
-            <h3 className="text-xl sm:text-2xl font-extrabold text-white">{t('home.ctaTitle')}</h3>
-            <p className="mt-2 text-sm sm:text-base text-gray-400">{t('home.ctaText')}</p>
+            <h3 className="text-xl sm:text-2xl font-extrabold text-[#1A1A2E] dark:text-white">{t('home.ctaTitle')}</h3>
+            <p className="mt-2 text-sm sm:text-base text-gray-500 dark:text-gray-400">{t('home.ctaText')}</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 shrink-0">
             <button
@@ -374,7 +374,7 @@ export default function HomePage() {
             </button>
             <button
               onClick={() => navigate('/search')}
-              className="px-6 py-3 bg-white/10 hover:bg-white/15 text-white font-bold rounded-xl border border-white/15 transition"
+              className="px-6 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/15 text-[#1A1A2E] dark:text-white font-bold rounded-xl border border-gray-200 dark:border-white/15 transition"
             >
               {t('home.ctaSecondary')}
             </button>
