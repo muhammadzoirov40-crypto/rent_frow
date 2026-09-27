@@ -19,7 +19,7 @@ function getSystemTheme(): Theme {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('theme') as Theme | null
-    return saved || getSystemTheme()
+    return saved || 'dark'
   })
 
   useEffect(() => {
