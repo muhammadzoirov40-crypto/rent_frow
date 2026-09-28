@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import Header from './Header'
 import Footer from './Footer'
 import MobileBottomNav from './MobileBottomNav'
+import { useLocation } from 'react-router-dom'
 import useAuthStore from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
 
@@ -11,6 +12,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation()
+  const { pathname } = useLocation()
   const { isAuthenticated } = useAuthStore()
   const { isLoading } = useAuth()
 
@@ -31,7 +33,7 @@ export default function Layout({ children }: LayoutProps) {
       <main className="flex-1 pt-16 pb-20 md:pb-0">
         {children}
       </main>
-      <Footer />
+      {pathname !== '/messages' && <Footer />}
       <MobileBottomNav isAuthenticated={isAuthenticated} />
     </div>
   )

@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 import useAuthStore from '../../store/authStore'
 import { useTheme } from '../../contexts/ThemeContext'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifications as notificationsApi } from '../../api/index'
 
 const LANGUAGES = [
@@ -55,6 +55,43 @@ export default function Header() {
   })
 
   const unreadCount = unreadData?.count || 0
+  const queryClient = useQueryClient()
+
+  const { data: notifList = [] } = useQuery({
+    queryKey: ['notifications-dropdown'],
+    queryFn: () => notificationsApi.getAll(1, 8).then((r) => r.items),
+    enabled: isAuthenticated && notifOpen,
+    refetchOnWindowFocus: false,
+  })
+
+  const invalidateNotifs = () => {
+    queryClient.invalidateQueries({ queryKey: ['notifications-dropdown'] })
+    queryClient.invalidateQueries({ queryKey: ['unread-count'] })
+  }
+
+  const notifReadMutation = useMutation({
+    mutationFn: (id: number) => notificationsApi.markRead(id),
+    onSuccess: invalidateNotifs,
+  })
+
+  const notifAllReadMutation = useMutation({
+    mutationFn: () => notificationsApi.markAllRead(),
+    onSuccess: invalidateNotifs,
+  })
+
+  const notifUnread = notifList.filter((n) => !n.is_read).length
+
+  const timeAgo = (iso: string) => {
+    const diff = Date.now() - new Date(iso).getTime()
+    const mins = Math.floor(diff / 60000)
+    if (mins < 1) return 'сейчас'
+    if (mins < 60) return `${mins} мин назад`
+    const hours = Math.floor(mins / 60)
+    if (hours < 24) return `${hours} ч назад`
+    const days = Math.floor(hours / 24)
+    if (days < 30) return `${days} дн назад`
+    return new Date(iso).toLocaleDateString('ru-RU')
+  }
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -189,11 +226,44 @@ export default function Header() {
                           {t('header.all')}
                         </Link>
                       </div>
-                      <div className="max-h-80 overflow-y-auto">
-                        <div className="px-4 py-6 text-center text-sm text-gray-400">
-                          {t('header.noNotifications')}
-                        </div>
+                      <div className="max-h-80 overflow-y-auto divide-y divide-gray-100 dark:divide-white/5">
+                        {notifList.length === 0 ? (
+                          <div className="px-4 py-6 text-center text-sm text-gray-400">
+                            {t('header.noNotifications')}
+                          </div>
+                        ) : (
+                          notifList.map((n) => (
+                            <button
+                              key={n.id}
+                              onClick={() => {
+                                if (!n.is_read) notifReadMutation.mutate(n.id)
+                                setNotifOpen(false)
+                                navigate('/notifications')
+                              }}
+                              className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition"
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <p className={`text-sm leading-snug ${n.is_read ? 'text-gray-600 dark:text-gray-300' : 'text-gray-900 dark:text-white font-semibold'}`}>
+                                  {n.title}
+                                </p>
+                                {!n.is_read && <span className="w-2 h-2 rounded-full bg-[#FF6B35] shrink-0 mt-1.5" />}
+                              </div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{n.message}</p>
+                              <p className="text-[11px] text-gray-400 mt-1.5">{timeAgo(n.created_at)}</p>
+                            </button>
+                          ))
+                        )}
                       </div>
+                      {notifUnread > 0 && (
+                        <div className="border-t border-gray-100 dark:border-white/10 px-4 py-2.5">
+                          <button
+                            onClick={() => notifAllReadMutation.mutate()}
+                            className="w-full text-center text-xs text-[#FF6B35] hover:underline font-medium"
+                          >
+                            {t('notifications.markAllRead', 'Прочитать все')}
+                          </button>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
