@@ -5,6 +5,7 @@ from app.models.rental_request import RentalRequest, RentalRequestStatus
 from app.models.listing import Listing, PriceUnit
 from app.repositories.rental_request import RentalRequestRepository
 from app.repositories.listing import ListingRepository
+from app.repositories.user import UserRepository
 from app.services.notification import NotificationService
 from app.schemas.rental_request import RentalRequestCreate
 
@@ -35,6 +36,7 @@ class RentalRequestService:
         self.db = db
         self.repo = RentalRequestRepository(db)
         self.listing_repo = ListingRepository(db)
+        self.user_repo = UserRepository(db)
         self.notif_service = NotificationService(db)
 
     async def create(self, renter_id: int, data: RentalRequestCreate) -> RentalRequest:
@@ -69,10 +71,20 @@ class RentalRequestService:
             status=RentalRequestStatus.PENDING,
         )
 
+        renter = await self.user_repo.get_by_id(renter_id)
+        renter_name = ""
+        if renter:
+            renter_name = renter.display_name or (renter.email or "").split("@")[0]
+        request_text = (
+            f"{renter_name} wants to rent {listing.title}"
+            if renter_name
+            else f"Someone wants to rent {listing.title}"
+        )
+
         await self.notif_service.create(
             user_id=listing.owner_id,
             title="New Rental Request",
-            message=f"Someone wants to rent {listing.title}",
+            message=request_text,
             type="rental_request",
             reference_id=request.id,
             reference_type="rental_request",

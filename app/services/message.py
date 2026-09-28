@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.message import Message
 from app.repositories.message import MessageRepository
 from app.repositories.conversation import ConversationRepository
+from app.repositories.user import UserRepository
 from app.services.notification import NotificationService
 from app.utils.websocket import manager
 
@@ -13,6 +14,7 @@ class MessageService:
         self.db = db
         self.repo = MessageRepository(db)
         self.conv_repo = ConversationRepository(db)
+        self.user_repo = UserRepository(db)
         self.notif_service = NotificationService(db)
 
     async def send(self, conversation_id: int, sender_id: int, content: str) -> Message:
@@ -33,10 +35,16 @@ class MessageService:
 
         other_user_id = conv.user1_id if conv.user2_id == sender_id else conv.user2_id
 
+        sender = await self.user_repo.get_by_id(sender_id)
+        sender_name = ""
+        if sender:
+            sender_name = sender.display_name or (sender.email or "").split("@")[0]
+        notification_text = f"{sender_name}: {content[:110]}" if sender_name else content[:120]
+
         await self.notif_service.create(
             user_id=other_user_id,
             title="New Message",
-            message=content[:120],
+            message=notification_text,
             type="new_message",
             reference_id=conversation_id,
             reference_type="conversation",
