@@ -80,15 +80,15 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <Phone className="w-4 h-4 text-brand-500 shrink-0" />
-                +992 (900) 123-456
+                +992 (002) 119-831
               </li>
               <li className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <Mail className="w-4 h-4 text-brand-500 shrink-0" />
-                info@renthub.tj
+                muhammadzoirov40@gmail.com
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <MapPin className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
-                <span>г. Душанбе, ул. Рудаки 45</span>
+                <span>г. Душанбе, район Сино, мкр. Арбобхутун-3</span>
               </li>
             </ul>
           </div>
