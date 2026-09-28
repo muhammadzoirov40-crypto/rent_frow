@@ -262,7 +262,7 @@ export default function ChatInput({
             onKeyDown={handleKeyDown}
             placeholder={t('messages.typeMessage')}
             disabled={disabled}
-            className="flex-1 resize-none max-h-[150px] rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[#FF6B35]/60 focus:ring-2 focus:ring-[#FF6B35]/15 transition"
+            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[#FF6B35]/60 focus:ring-2 focus:ring-[#FF6B35]/15 transition"
           />
 
           <button

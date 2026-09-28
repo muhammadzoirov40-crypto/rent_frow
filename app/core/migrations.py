@@ -29,6 +29,10 @@ LISTING_COLUMNS_V2: list = [
     ("expires_at", "TIMESTAMP"),
 ]
 
+POST_COLUMNS: list = [
+    ("status", "VARCHAR(16) NOT NULL DEFAULT 'pending'"),
+]
+
 LISTING_INDEXES: list = [
     "idx_listing_price_unit",
     "idx_listing_district",
@@ -134,6 +138,12 @@ async def run_schema_migrations(engine: AsyncEngine) -> list:
             n_added = await _add_missing_columns(conn, "notifications", NOTIFICATION_COLUMNS, notification_columns)
             if n_added:
                 applied.append(f"notifications: added columns {', '.join(n_added)}")
+
+        if await conn.run_sync(lambda sync_conn: Inspector.from_engine(sync_conn).has_table("posts")):
+            post_columns = await conn.run_sync(_get_columns, "posts")
+            p_added = await _add_missing_columns(conn, "posts", POST_COLUMNS, post_columns)
+            if p_added:
+                applied.append(f"posts: added columns {', '.join(p_added)}")
 
         await conn.commit()
     return applied
