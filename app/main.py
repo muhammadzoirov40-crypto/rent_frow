@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -31,8 +32,18 @@ async def lifespan(app: FastAPI):
         await seed_database()
     except Exception as e:
         print(f"Seed skipped: {e}")
-    yield
-    await engine.dispose()
+
+    from app.services.listing_expiry import run_expiry_loop
+    expiry_task = asyncio.create_task(run_expiry_loop())
+    try:
+        yield
+    finally:
+        expiry_task.cancel()
+        try:
+            await expiry_task
+        except asyncio.CancelledError:
+            pass
+        await engine.dispose()
 
 
 app = FastAPI(

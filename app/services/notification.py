@@ -11,6 +11,7 @@ def _notification_payload(notification) -> dict:
         "title": notification.title,
         "message": notification.message,
         "type": notification.type,
+        "data": getattr(notification, "data", None),
         "reference_id": notification.reference_id,
         "reference_type": notification.reference_type,
         "is_read": notification.is_read,
@@ -31,6 +32,7 @@ class NotificationService:
         type: str,
         reference_id: Optional[int] = None,
         reference_type: Optional[str] = None,
+        data: Optional[dict] = None,
     ):
         notification = await self.repo.create(
             user_id=user_id,
@@ -39,6 +41,7 @@ class NotificationService:
             type=type,
             reference_id=reference_id,
             reference_type=reference_type,
+            data=data,
         )
         await self.db.flush()
         await manager.send_personal_message(

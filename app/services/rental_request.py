@@ -81,6 +81,18 @@ class RentalRequestService:
             else f"Someone wants to rent {listing.title}"
         )
 
+        notif_data = {
+            "actor_id": renter_id,
+            "actor_name": renter_name,
+            "listing_id": listing.id,
+            "listing_title": listing.title,
+            "request_message": data.message,
+            "start_date": str(data.start_date),
+            "end_date": str(data.end_date),
+            "total_days": total_days,
+            "total_price": total_price,
+        }
+
         await self.notif_service.create(
             user_id=listing.owner_id,
             title="New Rental Request",
@@ -88,6 +100,7 @@ class RentalRequestService:
             type="rental_request",
             reference_id=request.id,
             reference_type="rental_request",
+            data=notif_data,
         )
 
         return request
@@ -107,6 +120,8 @@ class RentalRequestService:
             owner_response=response,
         )
 
+        notif_data = await self._listing_context(request)
+        notif_data["response"] = response
         await self.notif_service.create(
             user_id=request.renter_id,
             title="Rental Request Accepted",
@@ -114,9 +129,17 @@ class RentalRequestService:
             type="rental_accepted",
             reference_id=request.id,
             reference_type="rental_request",
+            data=notif_data,
         )
 
         return request
+
+    async def _listing_context(self, request: RentalRequest) -> dict:
+        listing = await self.listing_repo.get_by_id(request.listing_id)
+        return {
+            "listing_id": request.listing_id,
+            "listing_title": listing.title if listing else None,
+        }
 
     async def reject(self, request_id: int, owner_id: int, response: str | None = None) -> RentalRequest:
         request = await self.repo.get_by_id(request_id)
@@ -133,6 +156,8 @@ class RentalRequestService:
             owner_response=response,
         )
 
+        notif_data = await self._listing_context(request)
+        notif_data["reason"] = response
         await self.notif_service.create(
             user_id=request.renter_id,
             title="Rental Request Rejected",
@@ -140,6 +165,7 @@ class RentalRequestService:
             type="rental_rejected",
             reference_id=request.id,
             reference_type="rental_request",
+            data=notif_data,
         )
 
         return request
@@ -155,6 +181,12 @@ class RentalRequestService:
 
         request = await self.repo.update(request, status=RentalRequestStatus.CANCELLED)
 
+        renter = await self.user_repo.get_by_id(request.renter_id)
+        renter_name = ""
+        if renter:
+            renter_name = renter.display_name or (renter.email or "").split("@")[0]
+        notif_data = await self._listing_context(request)
+        notif_data.update({"actor_id": request.renter_id, "actor_name": renter_name})
         await self.notif_service.create(
             user_id=request.owner_id,
             title="Rental Request Cancelled",
@@ -162,6 +194,7 @@ class RentalRequestService:
             type="rental_cancelled",
             reference_id=request.id,
             reference_type="rental_request",
+            data=notif_data,
         )
 
         return request
@@ -189,6 +222,10 @@ class RentalRequestService:
             type="rental_completed",
             reference_id=request.id,
             reference_type="rental_request",
+            data={
+                "listing_id": request.listing_id,
+                "listing_title": listing.title if listing else None,
+            },
         )
 
         return request

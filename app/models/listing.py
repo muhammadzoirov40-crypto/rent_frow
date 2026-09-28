@@ -48,6 +48,7 @@ class Listing(Base):
     status: Mapped[ListingStatus] = mapped_column(
         SAEnum(ListingStatus), default=ListingStatus.ACTIVE, nullable=False
     )
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False, index=True)
     views_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     rating_sum: Mapped[float] = mapped_column(Numeric(3, 1), default=0, nullable=False)

@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from app.models.review import Review
 from app.models.rental_request import RentalRequest, RentalRequestStatus
 from app.models.listing import Listing
+from app.models.user import User
 from app.schemas.review import ReviewCreate, ReviewUpdate
 from app.services.notification import NotificationService
 
@@ -75,6 +76,11 @@ class ReviewService:
         await self.db.flush()
         await self.db.refresh(review)
 
+        reviewer = await self.db.get(User, customer_id)
+        reviewer_name = ""
+        if reviewer:
+            reviewer_name = reviewer.display_name or (reviewer.email or "").split("@")[0]
+
         await self.notif_service.create(
             user_id=listing.owner_id,
             title="New Review",
@@ -82,6 +88,14 @@ class ReviewService:
             type="new_review",
             reference_id=listing_id,
             reference_type="listing",
+            data={
+                "actor_id": customer_id,
+                "actor_name": reviewer_name,
+                "listing_id": listing.id,
+                "listing_title": listing.title,
+                "rating": data.rating,
+                "comment": data.comment,
+            },
         )
 
         return review

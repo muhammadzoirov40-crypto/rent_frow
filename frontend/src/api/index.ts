@@ -156,6 +156,7 @@ export interface Notification {
   title: string;
   message: string;
   type: string;
+  data?: Record<string, string | number | boolean | null> | null;
   reference_id: number | null;
   reference_type: string | null;
   is_read: boolean;

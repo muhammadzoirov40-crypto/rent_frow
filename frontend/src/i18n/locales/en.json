@@ -339,7 +339,75 @@
     "markAllRead": "Mark all as read",
     "empty": "No notifications",
     "emptyHint": "Your notifications will appear here",
-    "failedToUpdate": "Failed to update notifications"
+    "failedToUpdate": "Failed to update notifications",
+    "types": {
+      "new_message": {
+        "title": "New message"
+      },
+      "rental_request": {
+        "title": "New rental request"
+      },
+      "rental_accepted": {
+        "title": "Request approved",
+        "body": "Your rental request for \"{{listing}}\" has been approved by the owner."
+      },
+      "rental_rejected": {
+        "title": "Request rejected",
+        "body": "The owner rejected your rental request for \"{{listing}}\"."
+      },
+      "rental_cancelled": {
+        "title": "Rental cancelled",
+        "body": "The rental request for \"{{listing}}\" was cancelled by the renter."
+      },
+      "rental_completed": {
+        "title": "Rental completed",
+        "body": "The rental of \"{{listing}}\" is completed. You can leave a review now."
+      },
+      "new_favorite": {
+        "title": "Your listing was added to favorites"
+      },
+      "new_comment": {
+        "title": "New comment"
+      },
+      "new_review": {
+        "title": "New review"
+      },
+      "listing_approved": {
+        "title": "Listing approved",
+        "body": "Your listing \"{{listing}}\" has been approved and published."
+      },
+      "listing_rejected": {
+        "title": "Listing rejected",
+        "body": "Your listing \"{{listing}}\" was rejected by the moderator."
+      },
+      "listing_expired": {
+        "title": "Listing expired",
+        "body": "The listing period for \"{{listing}}\" has expired. Renew it to appear in search again."
+      },
+      "listing_deactivated": {
+        "title": "Listing deactivated",
+        "body": "Your listing \"{{listing}}\" has been deactivated."
+      },
+      "listing_request_info": {
+        "title": "More information required",
+        "body": "A moderator requested more information about your listing \"{{listing}}\"."
+      }
+    },
+    "markAllReadSuccess": "All notifications marked as read",
+    "labels": {
+      "from": "From",
+      "user": "User",
+      "listing": "Listing",
+      "message": "Message",
+      "comment": "Comment",
+      "rating": "Rating",
+      "reason": "Reason"
+    },
+    "reasons": {
+      "deleted_by_owner": "deleted by owner",
+      "removed_by_admin": "removed by admin",
+      "deactivated_by_owner": "deactivated by owner"
+    }
   },
   "profile": {
     "title": "Profile",
@@ -664,7 +732,8 @@
     "approved": "Approved",
     "inactive": "Inactive",
     "chartRequests": "Rental requests — last 30 days",
-    "chartListingsStatus": "Listings by status"
+    "chartListingsStatus": "Listings by status",
+    "rejectReasonLabel": "Rejection reason (optional)"
   },
   "validation": {
     "required": "This field is required",

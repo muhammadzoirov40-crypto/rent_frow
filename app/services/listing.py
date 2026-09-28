@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timedelta
 from fastapi import HTTPException
 from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +9,10 @@ from app.models.rental_request import RentalRequest, RentalRequestStatus
 from app.repositories.listing import ListingRepository
 from app.repositories.favorite import FavoriteRepository
 from app.schemas.listing import ListingCreate, ListingUpdate
+from app.services.notification import NotificationService
 from app.core.enums import VerificationStatus
+
+LISTING_TTL_DAYS = 30
 
 
 async def detach_listing_conversations(db: AsyncSession, listing_id: int) -> None:
@@ -25,11 +28,17 @@ class ListingService:
         self.db = db
         self.repo = ListingRepository(db)
         self.fav_repo = FavoriteRepository(db)
+        self.notif_service = NotificationService(db)
 
     async def create(self, owner_id: int, data: ListingCreate) -> Listing:
         image_urls = data.image_urls
         data_dict = data.model_dump(exclude={"image_urls"})
-        listing = await self.repo.create(owner_id=owner_id, status=ListingStatus.ACTIVE, **data_dict)
+        listing = await self.repo.create(
+            owner_id=owner_id,
+            status=ListingStatus.ACTIVE,
+            expires_at=datetime.utcnow() + timedelta(days=LISTING_TTL_DAYS),
+            **data_dict,
+        )
 
         for i, url in enumerate(image_urls):
             self.db.add(
@@ -57,7 +66,33 @@ class ListingService:
         if listing.owner_id != owner_id:
             raise HTTPException(status_code=403, detail="Not authorized to update this listing")
         update_data = data.model_dump(exclude_unset=True)
-        return await self.repo.update(listing, **update_data)
+
+        new_status = update_data.get("status")
+        new_available = update_data.get("available")
+        was_visible = listing.status == ListingStatus.ACTIVE and listing.available
+        now_deactivated = (
+            (new_status in (ListingStatus.PAUSED, ListingStatus.REMOVED, ListingStatus.EXPIRED)
+             and listing.status != new_status)
+            or (new_available is False and listing.available)
+        )
+
+        updated = await self.repo.update(listing, **update_data)
+
+        if was_visible and now_deactivated:
+            await self.notif_service.create(
+                user_id=listing.owner_id,
+                title="Listing Deactivated",
+                message=f"Your listing '{listing.title}' has been deactivated.",
+                type="listing_deactivated",
+                reference_id=listing.id,
+                reference_type="listing",
+                data={
+                    "listing_id": listing.id,
+                    "listing_title": listing.title,
+                    "reason": "deactivated_by_owner",
+                },
+            )
+        return updated
 
     async def delete(self, listing_id: int, owner_id: int) -> None:
         listing = await self.repo.get_by_id(listing_id)
@@ -65,6 +100,19 @@ class ListingService:
             raise HTTPException(status_code=404, detail="Listing not found")
         if listing.owner_id != owner_id:
             raise HTTPException(status_code=403, detail="Not authorized to delete this listing")
+        await self.notif_service.create(
+            user_id=listing.owner_id,
+            title="Listing Deactivated",
+            message=f"Your listing '{listing.title}' has been removed.",
+            type="listing_deactivated",
+            reference_id=None,
+            reference_type="listing",
+            data={
+                "listing_id": listing.id,
+                "listing_title": listing.title,
+                "reason": "deleted_by_owner",
+            },
+        )
         await detach_listing_conversations(self.db, listing_id)
         await self.repo.delete(listing)
 

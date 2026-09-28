@@ -41,6 +41,12 @@ class FavoriteService:
                     type="new_favorite",
                     reference_id=listing_id,
                     reference_type="listing",
+                    data={
+                        "actor_id": user_id,
+                        "actor_name": liker_name,
+                        "listing_id": listing.id,
+                        "listing_title": listing.title,
+                    },
                 )
             return True
 

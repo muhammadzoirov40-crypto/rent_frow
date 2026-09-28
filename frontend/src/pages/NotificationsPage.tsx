@@ -1,10 +1,15 @@
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Bell, MessageSquare, Star, CheckCircle, AlertTriangle, Info, CheckCheck, Clock } from 'lucide-react';
+import { Bell, CheckCheck, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '../api';
 import type { Notification } from '../api';
+import {
+  formatNotification,
+  getNotificationRoute,
+  getTypeStyle,
+} from '../utils/notifications';
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -18,62 +23,6 @@ function timeAgo(dateStr: string): string {
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days} дн. назад`;
   return new Date(dateStr).toLocaleDateString('ru-RU');
-}
-
-const typeConfig: Record<string, { icon: React.ReactNode; color: string; bgColor: string }> = {
-  message: {
-    icon: <MessageSquare className="w-5 h-5" />,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
-  },
-  review: {
-    icon: <Star className="w-5 h-5" />,
-    color: 'text-amber-600',
-    bgColor: 'bg-amber-100',
-  },
-  rental_request: {
-    icon: <CheckCircle className="w-5 h-5" />,
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-100',
-  },
-  listing_approved: {
-    icon: <CheckCircle className="w-5 h-5" />,
-    color: 'text-emerald-600',
-    bgColor: 'bg-emerald-100',
-  },
-  listing_rejected: {
-    icon: <AlertTriangle className="w-5 h-5" />,
-    color: 'text-red-600',
-    bgColor: 'bg-red-100',
-  },
-  system: {
-    icon: <Info className="w-5 h-5" />,
-    color: 'text-indigo-600',
-    bgColor: 'bg-indigo-100',
-  },
-  default: {
-    icon: <Bell className="w-5 h-5" />,
-    color: 'text-[#FF6B35]',
-    bgColor: 'bg-[#FF6B35]/10',
-  },
-};
-
-function getNotificationRoute(notif: Notification): string | null {
-  switch (notif.type) {
-    case 'new_favorite':
-      return notif.reference_id ? `/listing/${notif.reference_id}` : '/search';
-    case 'message':
-    case 'new_message':
-      return '/messages';
-    case 'review':
-    case 'listing_approved':
-    case 'listing_rejected':
-      return '/favorites';
-    case 'rental_request':
-      return '/rental-requests';
-    default:
-      return null;
-  }
 }
 
 export default function NotificationsPage() {
@@ -159,7 +108,8 @@ export default function NotificationsPage() {
         ) : (
           <div className="space-y-2">
             {allNotifications.map((notif) => {
-              const config = typeConfig[notif.type] || typeConfig.default;
+              const config = getTypeStyle(notif.type);
+              const { title, body, details } = formatNotification(t, notif);
               return (
                 <button
                   key={notif.id}
@@ -174,15 +124,31 @@ export default function NotificationsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-3">
                       <p className="font-semibold text-sm text-gray-900 dark:text-white leading-snug">
-                        {notif.title}
+                        {title}
                       </p>
                       {!notif.is_read && (
                         <div className="w-2.5 h-2.5 bg-[#FF6B35] rounded-full flex-shrink-0 mt-1" />
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
-                      {notif.message}
-                    </p>
+                    {body && (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 leading-relaxed">
+                        {body}
+                      </p>
+                    )}
+                    {details.length > 0 && (
+                      <div className="mt-1.5 space-y-1">
+                        {details.map((detail) => (
+                          <p key={detail.label} className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            <span className="font-semibold text-gray-600 dark:text-gray-300">
+                              {detail.label}:
+                            </span>{' '}
+                            <span className={detail.stars ? 'text-amber-500 tracking-widest' : ''}>
+                              {detail.value}
+                            </span>
+                          </p>
+                        ))}
+                      </div>
+                    )}
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {timeAgo(notif.created_at)}

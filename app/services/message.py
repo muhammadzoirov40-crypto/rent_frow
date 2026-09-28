@@ -48,6 +48,12 @@ class MessageService:
             type="new_message",
             reference_id=conversation_id,
             reference_type="conversation",
+            data={
+                "actor_id": sender_id,
+                "actor_name": sender_name,
+                "conversation_id": conversation_id,
+                "message_preview": content[:200],
+            },
         )
 
         event = {

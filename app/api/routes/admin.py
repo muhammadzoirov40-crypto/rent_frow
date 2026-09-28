@@ -11,6 +11,7 @@ from app.schemas.base import APIResponse, PaginatedResponse
 from app.schemas.post import PostResponse
 from app.services.statistics import StatisticsService
 from app.services.audit_log import AuditLogService
+from app.services.notification import NotificationService
 from app.schemas.user import UserResponse
 from app.schemas.listing import ListingResponse, ListingListResponse, ListingImageResponse, ListingOwnerResponse
 from app.schemas.rental_request import RentalRequestResponse
@@ -475,12 +476,22 @@ async def approve_listing(
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
     await repo.update(listing, is_verified=True, status=ListingStatus.ACTIVE)
+    await NotificationService(db).create(
+        user_id=listing.owner_id,
+        title="Listing Approved",
+        message=f"Your listing '{listing.title}' has been approved and is now published.",
+        type="listing_approved",
+        reference_id=listing.id,
+        reference_type="listing",
+        data={"listing_id": listing.id, "listing_title": listing.title},
+    )
     return APIResponse(message="Listing approved")
 
 
 @router.put("/listings/{listing_id}/reject")
 async def reject_listing(
     listing_id: int,
+    reason: str | None = Query(None, max_length=500),
     current_user: CurrentUser = Depends(require_admin),
     db: AsyncSession = Depends(get_db),
 ):
@@ -489,6 +500,15 @@ async def reject_listing(
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
     await repo.update(listing, is_verified=False, status=ListingStatus.PAUSED)
+    await NotificationService(db).create(
+        user_id=listing.owner_id,
+        title="Listing Rejected",
+        message=f"Your listing '{listing.title}' was rejected by the moderator.",
+        type="listing_rejected",
+        reference_id=listing.id,
+        reference_type="listing",
+        data={"listing_id": listing.id, "listing_title": listing.title, "reason": reason},
+    )
     return APIResponse(message="Listing rejected")
 
 
@@ -502,6 +522,19 @@ async def admin_delete_listing(
     listing = await repo.get_by_id(listing_id)
     if not listing:
         raise HTTPException(status_code=404, detail="Listing not found")
+    await NotificationService(db).create(
+        user_id=listing.owner_id,
+        title="Listing Deactivated",
+        message=f"Your listing '{listing.title}' was removed by the administration.",
+        type="listing_deactivated",
+        reference_id=None,
+        reference_type="listing",
+        data={
+            "listing_id": listing.id,
+            "listing_title": listing.title,
+            "reason": "removed_by_admin",
+        },
+    )
     from app.services.listing import detach_listing_conversations
     await detach_listing_conversations(db, listing_id)
     await repo.delete(listing)

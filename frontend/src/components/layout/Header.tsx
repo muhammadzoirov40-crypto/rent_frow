@@ -25,6 +25,12 @@ import useAuthStore from '../../store/authStore'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { notifications as notificationsApi } from '../../api/index'
+import {
+  formatNotification,
+  getNotificationRoute,
+  getTypeStyle,
+  notificationSummary,
+} from '../../utils/notifications'
 
 const LANGUAGES = [
   { code: 'tj', label: 'Тоҷикӣ', flag: '🇹🇯' },
@@ -66,6 +72,7 @@ export default function Header() {
 
   const invalidateNotifs = () => {
     queryClient.invalidateQueries({ queryKey: ['notifications-dropdown'] })
+    queryClient.invalidateQueries({ queryKey: ['notifications'] })
     queryClient.invalidateQueries({ queryKey: ['unread-count'] })
   }
 
@@ -232,30 +239,38 @@ export default function Header() {
                             {t('header.noNotifications')}
                           </div>
                         ) : (
-                          notifList.map((n) => (
+                          notifList.map((n) => {
+                            const style = getTypeStyle(n.type)
+                            const { title } = formatNotification(t, n)
+                            const summary = notificationSummary(t, n)
+                            return (
                             <button
                               key={n.id}
                               onClick={() => {
                                 if (!n.is_read) notifReadMutation.mutate(n.id)
                                 setNotifOpen(false)
-                                if (n.type === 'new_favorite' && n.reference_id) {
-                                  navigate(`/listing/${n.reference_id}`)
-                                } else {
-                                  navigate('/notifications')
-                                }
+                                navigate(getNotificationRoute(n) || '/notifications')
                               }}
                               className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition"
                             >
-                              <div className="flex items-start justify-between gap-2">
-                                <p className={`text-sm leading-snug ${n.is_read ? 'text-gray-600 dark:text-gray-300' : 'text-gray-900 dark:text-white font-semibold'}`}>
-                                  {n.title}
-                                </p>
-                                {!n.is_read && <span className="w-2 h-2 rounded-full bg-[#FF6B35] shrink-0 mt-1.5" />}
+                              <div className="flex items-start gap-3">
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${style.bgColor} ${style.color}`}>
+                                  {style.icon}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <p className={`text-sm leading-snug ${n.is_read ? 'text-gray-600 dark:text-gray-300' : 'text-gray-900 dark:text-white font-semibold'}`}>
+                                      {title}
+                                    </p>
+                                    {!n.is_read && <span className="w-2 h-2 rounded-full bg-[#FF6B35] shrink-0 mt-1.5" />}
+                                  </div>
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{summary}</p>
+                                  <p className="text-[11px] text-gray-400 mt-1.5">{timeAgo(n.created_at)}</p>
+                                </div>
                               </div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{n.message}</p>
-                              <p className="text-[11px] text-gray-400 mt-1.5">{timeAgo(n.created_at)}</p>
                             </button>
-                          ))
+                            )
+                          })
                         )}
                       </div>
                       {notifUnread > 0 && (

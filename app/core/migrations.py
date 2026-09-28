@@ -21,6 +21,14 @@ REVIEW_COLUMNS: list = [
     ("rental_request_id", "INTEGER"),
 ]
 
+NOTIFICATION_COLUMNS: list = [
+    ("data", "JSON"),
+]
+
+LISTING_COLUMNS_V2: list = [
+    ("expires_at", "TIMESTAMP"),
+]
+
 LISTING_INDEXES: list = [
     "idx_listing_price_unit",
     "idx_listing_district",
@@ -101,6 +109,10 @@ async def run_schema_migrations(engine: AsyncEngine) -> list:
         if added:
             applied.append(f"listings: added columns {', '.join(added)}")
 
+        v2_added = await _add_missing_columns(conn, "listings", LISTING_COLUMNS_V2, listing_columns)
+        if v2_added:
+            applied.append(f"listings: added columns {', '.join(v2_added)}")
+
         idx_created = await _create_missing_indexes(conn, "listings", LISTING_INDEXES, listing_indexes)
         if idx_created:
             applied.append(f"listings: created indexes {', '.join(idx_created)}")
@@ -116,6 +128,12 @@ async def run_schema_migrations(engine: AsyncEngine) -> list:
             r_created = await _create_missing_indexes(conn, "reviews", REVIEW_INDEXES, review_indexes)
             if r_created:
                 applied.append(f"reviews: created indexes {', '.join(r_created)}")
+
+        if await conn.run_sync(lambda sync_conn: Inspector.from_engine(sync_conn).has_table("notifications")):
+            notification_columns = await conn.run_sync(_get_columns, "notifications")
+            n_added = await _add_missing_columns(conn, "notifications", NOTIFICATION_COLUMNS, notification_columns)
+            if n_added:
+                applied.append(f"notifications: added columns {', '.join(n_added)}")
 
         await conn.commit()
     return applied

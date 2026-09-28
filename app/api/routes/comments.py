@@ -7,6 +7,8 @@ from app.schemas.comment import CommentResponse, CreateCommentRequest, UpdateCom
 from app.schemas.base import APIResponse
 from app.models.comment import Comment
 from app.models.post import Post
+from app.models.user import User
+from app.services.notification import NotificationService
 from app.utils.s3 import get_presigned_url
 
 router = APIRouter(prefix="/posts", tags=["Comments"])
@@ -81,6 +83,30 @@ async def create_comment(
     post.comments_count += 1
     await db.flush()
     await db.refresh(comment)
+
+    if post.user_id != current_user.user_id:
+        author_row = await db.get(User, current_user.user_id)
+        commenter_name = ""
+        if author_row:
+            commenter_name = author_row.display_name or (author_row.email or "").split("@")[0]
+        post_title = getattr(post, "title", None) or getattr(post, "content", "") or ""
+
+        await NotificationService(db).create(
+            user_id=post.user_id,
+            title="New Comment",
+            message=f"{commenter_name} commented on your post: {data.content[:160]}",
+            type="new_comment",
+            reference_id=post_id,
+            reference_type="post",
+            data={
+                "actor_id": current_user.user_id,
+                "actor_name": commenter_name,
+                "post_id": post_id,
+                "post_title": post_title[:200],
+                "comment": data.content[:200],
+            },
+        )
+
     return APIResponse(message="Comment created successfully", data=_comment_to_response(comment))
 
 

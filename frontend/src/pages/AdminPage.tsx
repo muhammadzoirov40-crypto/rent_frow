@@ -164,7 +164,10 @@ const adminApi = {
   deletePost: (id: number) => client.delete(`/admin/posts/${id}`).then((r) => r.data),
   getListings: () => client.get<{ data: Listing[] }>('/admin/listings').then((r) => r.data.data),
   approveListing: (id: number) => client.put(`/admin/listings/${id}/approve`).then((r) => r.data),
-  rejectListing: (id: number) => client.put(`/admin/listings/${id}/reject`).then((r) => r.data),
+  rejectListing: (id: number, reason?: string) =>
+    client
+      .put(`/admin/listings/${id}/reject`, null, { params: reason ? { reason } : {} })
+      .then((r) => r.data),
   deleteListing: (id: number) => client.delete(`/admin/listings/${id}`).then((r) => r.data),
   getRequests: () => client.get<{ data: RentalRequest[] }>('/admin/requests').then((r) => r.data.data),
   getCrm: () => client.get<{ data: CrmData }>('/admin/crm').then((r) => r.data.data),
@@ -325,7 +328,7 @@ export default function AdminPage() {
   });
 
   const rejectMutation = useMutation({
-    mutationFn: adminApi.rejectListing,
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) => adminApi.rejectListing(id, reason),
     onSuccess: () => { toast.success(t('admin.rejectedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); },
     onError: () => toast.error(t('admin.failedAction')),
   });
@@ -995,7 +998,10 @@ export default function AdminPage() {
                                   </button>
                                 )}
                                 <button
-                                  onClick={() => rejectMutation.mutate(l.id)}
+                                  onClick={() => {
+                                    const reason = window.prompt(t('admin.rejectReasonLabel'))
+                                    rejectMutation.mutate({ id: l.id, reason: reason || undefined })
+                                  }}
                                   className="p-2 rounded-lg text-amber-600 hover:bg-amber-50 transition"
                                   title={t('admin.rejectAction')}
                                 >

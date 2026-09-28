@@ -11,6 +11,7 @@ class NotificationResponse(BaseModel):
     title: str
     message: str
     type: str
+    data: Optional[dict] = None
     reference_id: Optional[int] = None
     reference_type: Optional[str] = None
     is_read: bool

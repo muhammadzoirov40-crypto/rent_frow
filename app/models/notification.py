@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Integer, DateTime, Text, Boolean, String, ForeignKey, Index
+from sqlalchemy import Integer, DateTime, Text, Boolean, String, ForeignKey, Index, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
@@ -12,6 +12,7 @@ class Notification(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     message: Mapped[str] = mapped_column(Text, nullable=False)
     type: Mapped[str] = mapped_column(String(50), nullable=False)
+    data: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     reference_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     reference_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
