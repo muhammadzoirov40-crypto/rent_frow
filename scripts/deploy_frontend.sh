@@ -10,7 +10,7 @@ echo "==> git pull"
 git -C "$REPO" pull --ff-only origin master
 
 echo "==> npm build"
-(cd "$REPO/frontend" && npm run build)
+(cd "$REPO/frontend" && npm install --no-audit --no-fund && npm run build)
 
 echo "==> deploy to $TARGET"
 rm -rf "$TARGET/assets" "$TARGET/index.html" "$TARGET/favicon.svg"
