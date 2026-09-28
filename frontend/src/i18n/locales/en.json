@@ -553,7 +553,10 @@
     "contact": "Contact",
     "copyright": "All rights reserved",
     "terms": "Terms of use",
-    "privacy": "Privacy policy"
+    "privacy": "Privacy policy",
+    "mobileApp": "Mobile app",
+    "scanHint": "Point your phone camera to download the APK",
+    "downloadApp": "Download APK"
   },
   "admin": {
     "panel": "Admin panel",

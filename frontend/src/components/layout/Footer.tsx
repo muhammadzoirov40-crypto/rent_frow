@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Mail, Phone, MapPin, Globe, MessageCircle, Send } from 'lucide-react'
+import { Mail, Phone, MapPin, Globe, MessageCircle, Send, Download } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
+
+const APK_URL = 'https://renthub.qobus.tj/app/RentHub.apk'
 
 export default function Footer() {
   const { t } = useTranslation()
@@ -91,6 +94,31 @@ export default function Footer() {
                 <span>г. Душанбе, район Сино, мкр. Арбобхутун-3</span>
               </li>
             </ul>
+
+            <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/10">
+              <h4 className="text-[#1A1A2E] dark:text-white font-semibold text-sm uppercase tracking-wider mb-3">{t('footer.mobileApp')}</h4>
+              <div className="flex items-center gap-3">
+                <a
+                  href={APK_URL}
+                  download
+                  aria-label={t('footer.downloadApp')}
+                  className="shrink-0 bg-white rounded-xl p-1.5 border border-gray-200 dark:border-white/10 hover:border-brand-500 transition"
+                >
+                  <QRCodeSVG value={APK_URL} size={84} />
+                </a>
+                <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                  <p className="mb-2">{t('footer.scanHint')}</p>
+                  <a
+                    href={APK_URL}
+                    download
+                    className="inline-flex items-center gap-1 font-semibold text-brand-500 hover:underline"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    {t('footer.downloadApp')}
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
