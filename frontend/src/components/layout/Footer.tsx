@@ -105,23 +105,23 @@ export default function Footer() {
                     {t('footer.mobileApp')}
                   </h4>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                   <a
                     href={APK_URL}
                     download
                     aria-label={t('footer.downloadApp')}
                     className="shrink-0 bg-white rounded-xl p-2 border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-md hover:border-brand-500 transition"
                   >
-                    <QRCodeSVG value={APK_URL} size={84} />
+                    <QRCodeSVG value={APK_URL} size={96} />
                   </a>
-                  <div className="flex-1 min-w-0">
+                  <div className="w-full sm:flex-1 sm:min-w-0">
                     <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
                       {t('footer.scanHint')}
                     </p>
                     <a
                       href={APK_URL}
                       download
-                      className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition"
+                      className="inline-flex w-full sm:w-auto justify-center items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-4 py-2.5 rounded-lg shadow-sm transition"
                     >
                       <Download className="w-3.5 h-3.5" />
                       {t('footer.downloadApp')}

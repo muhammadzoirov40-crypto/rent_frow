@@ -270,13 +270,13 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition"
+                  className="px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition whitespace-nowrap"
                 >
                   {t('header.login')}
                 </Link>
                 <Link
                   to="/register"
-                  className="px-4 py-2.5 text-sm font-semibold bg-[#FF6B35] hover:bg-[#e55a2b] text-white rounded-xl transition shadow-sm shadow-[#FF6B35]/20"
+                  className="hidden sm:block px-4 py-2.5 text-sm font-semibold bg-[#FF6B35] hover:bg-[#e55a2b] text-white rounded-xl transition shadow-sm shadow-[#FF6B35]/20 whitespace-nowrap"
                 >
                   {t('header.register')}
                 </Link>
@@ -358,6 +358,9 @@ export default function Header() {
               <div className="pt-2 border-t border-gray-100 dark:border-white/10 space-y-2">
                 <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center px-4 py-3 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl">
                   {t('header.login')}
+                </Link>
+                <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center px-4 py-3 bg-[#FF6B35] text-white text-sm font-semibold rounded-xl shadow-sm shadow-[#FF6B35]/20">
+                  {t('header.register')}
                 </Link>
               </div>
             )}
