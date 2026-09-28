@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -454,45 +455,51 @@ export default function AdminPage() {
         <aside
           className={`${
             adminSidebarCollapsed ? 'w-[76px]' : 'w-64'
-          } flex-shrink-0 bg-white dark:bg-[#1A1A2E] border-r border-gray-200 dark:border-white/10 min-h-[calc(100vh-4rem)] sticky top-16 transition-[width] duration-300 ease-out overflow-hidden`}
+          } flex-shrink-0 bg-white dark:bg-gradient-to-b dark:from-[#1A1A2E] dark:via-[#171730] dark:to-[#12122a] border-r border-gray-200 dark:border-white/10 min-h-[calc(100vh-4rem)] sticky top-16 transition-[width] duration-300 ease-out overflow-hidden`}
         >
-          <div className={adminSidebarCollapsed ? 'p-3' : 'p-6'}>
+          <div className={adminSidebarCollapsed ? 'p-3' : 'p-4'}>
             <div
-              className={`flex items-center gap-3 mb-8 ${
-                adminSidebarCollapsed ? 'flex-col gap-2 mb-6' : ''
+              className={`relative overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.04] mb-5 ${
+                adminSidebarCollapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-4 flex items-center gap-3'
               }`}
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] rounded-xl flex items-center justify-center shrink-0">
+              <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[#FF6B35]/20 rounded-full blur-2xl" />
+              <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#ff9a66] flex items-center justify-center shrink-0 shadow-lg shadow-[#FF6B35]/30">
                 <Shield className="w-5 h-5 text-white" />
               </div>
               {!adminSidebarCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <h2 className="font-bold text-gray-900 dark:text-white text-sm truncate">{t('admin.panel')}</h2>
-                  <p className="text-[11px] text-gray-500 truncate">{t('admin.platformManagement')}</p>
+                <div className="relative flex-1 min-w-0">
+                  <h2 className="font-extrabold text-[15px] text-gray-900 dark:text-white truncate">{t('admin.panel')}</h2>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">{t('admin.platformManagement')}</p>
                 </div>
               )}
               <button
                 onClick={() => setAdminSidebarCollapsed(!adminSidebarCollapsed)}
                 aria-label="Toggle sidebar"
                 title={adminSidebarCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-                className={`p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition ${
+                className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/10 transition ${
                   adminSidebarCollapsed ? '' : 'shrink-0'
                 }`}
               >
                 {adminSidebarCollapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
               </button>
             </div>
-            <nav className="space-y-1">
+            <nav className="space-y-1.5">
+              {!adminSidebarCollapsed && (
+                <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500">
+                  {t('admin.menu')}
+                </p>
+              )}
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
                   onClick={() => { setActiveTab(tab.key); setSearchQuery(''); }}
                   title={adminSidebarCollapsed ? tab.label : undefined}
-                  className={`w-full flex items-center rounded-xl text-sm font-medium transition ${
-                    adminSidebarCollapsed ? 'justify-center px-0 py-2.5' : 'gap-3 px-4 py-2.5'
+                  className={`w-full flex items-center rounded-2xl text-sm font-semibold transition-all duration-200 ${
+                    adminSidebarCollapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
                   } ${
                     activeTab === tab.key
-                      ? 'bg-[#FF6B35]/10 text-[#FF6B35]'
+                      ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff9162] text-white shadow-lg shadow-[#FF6B35]/30'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
@@ -501,6 +508,19 @@ export default function AdminPage() {
                 </button>
               ))}
             </nav>
+            {!adminSidebarCollapsed && (
+              <div className="mt-6 rounded-2xl border border-[#FF6B35]/25 bg-gradient-to-br from-[#FF6B35]/10 via-transparent to-transparent p-4">
+                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mb-3">
+                  {t('admin.sidebarCta')}
+                </p>
+                <Link
+                  to="/create-listing"
+                  className="block w-full text-center px-4 py-2.5 rounded-xl bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-semibold transition shadow-lg shadow-[#FF6B35]/25"
+                >
+                  {t('nav.createListing')}
+                </Link>
+              </div>
+            )}
           </div>
         </aside>
 

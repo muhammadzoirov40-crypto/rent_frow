@@ -733,7 +733,9 @@
     "inactive": "Inactive",
     "chartRequests": "Rental requests — last 30 days",
     "chartListingsStatus": "Listings by status",
-    "rejectReasonLabel": "Rejection reason (optional)"
+    "rejectReasonLabel": "Rejection reason (optional)",
+    "menu": "Menu",
+    "sidebarCta": "Something to rent out? Publish a listing in a couple of minutes."
   },
   "validation": {
     "required": "This field is required",
