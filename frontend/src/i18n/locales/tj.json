@@ -53,7 +53,8 @@
     "myBookings": "Бронкунӣҳои ман",
     "myRentals": "Иҷораҳои ман",
     "collapseSidebar": "Хурд кардани меню",
-    "expandSidebar": "Калон кардани меню"
+    "expandSidebar": "Калон кардани меню",
+    "menuSubtitle": "Менюи асосӣ"
   },
   "sidebar": {
     "brand": "RentHub",

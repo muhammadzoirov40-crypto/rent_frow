@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import Header from './Header'
 import Footer from './Footer'
 import MobileBottomNav from './MobileBottomNav'
+import SiteSidebar from './SiteSidebar'
 import { useLocation } from 'react-router-dom'
 import useAuthStore from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
@@ -15,6 +17,16 @@ export default function Layout({ children }: LayoutProps) {
   const { pathname } = useLocation()
   const { isAuthenticated } = useAuthStore()
   const { isLoading } = useAuth()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => localStorage.getItem('siteSidebarCollapsed') === '1'
+  )
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      localStorage.setItem('siteSidebarCollapsed', prev ? '0' : '1')
+      return !prev
+    })
+  }
 
   if (isLoading) {
     return (
@@ -30,10 +42,15 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] flex flex-col">
       <Header />
-      <main className="flex-1 pt-16 pb-20 md:pb-0">
-        {children}
-      </main>
-      {!['/messages', '/notifications', '/favorites'].includes(pathname) && <Footer />}
+      <div className="flex flex-1 min-h-0">
+        <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+        <div className="flex-1 min-w-0 flex flex-col">
+          <main className="flex-1 pt-16 pb-20 md:pb-0">
+            {children}
+          </main>
+          {!['/messages', '/notifications', '/favorites'].includes(pathname) && <Footer />}
+        </div>
+      </div>
       <MobileBottomNav isAuthenticated={isAuthenticated} />
     </div>
   )

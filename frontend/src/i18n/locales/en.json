@@ -54,7 +54,8 @@
     "myBookings": "My Bookings",
     "myRentals": "My Rentals",
     "collapseSidebar": "Collapse menu",
-    "expandSidebar": "Expand menu"
+    "expandSidebar": "Expand menu",
+    "menuSubtitle": "Main menu"
   },
   "sidebar": {
     "brand": "RentHub",

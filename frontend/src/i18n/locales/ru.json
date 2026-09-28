@@ -53,7 +53,8 @@
     "myBookings": "Мои бронирования",
     "myRentals": "Мои аренды",
     "collapseSidebar": "Свернуть меню",
-    "expandSidebar": "Развернуть меню"
+    "expandSidebar": "Развернуть меню",
+    "menuSubtitle": "Главное меню"
   },
   "sidebar": {
     "brand": "RentHub",
