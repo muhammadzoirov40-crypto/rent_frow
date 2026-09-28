@@ -1,0 +1,64 @@
+name: android-apk
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/android-apk.yml'
+      - '!mobile/RentHub.apk'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install deps
+        working-directory: mobile
+        run: npm ci
+
+      - name: Prebuild android
+        working-directory: mobile
+        run: npx expo prebuild -p android --no-install
+
+      - name: Build APK
+        working-directory: mobile
+        run: |
+          chmod +x android/gradlew
+          cd android && ./gradlew assembleRelease --no-daemon
+
+      - name: Collect APK
+        run: |
+          cp mobile/android/app/build/outputs/apk/release/app-release.apk mobile/RentHub.apk
+          ls -lh mobile/RentHub.apk
+
+      - name: Commit APK to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add mobile/RentHub.apk
+          git diff --cached --quiet && echo "no changes" && exit 0
+          git commit -m "chore: RentHub Android APK [skip ci]"
+          git push
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RentHub-apk
+          path: mobile/RentHub.apk

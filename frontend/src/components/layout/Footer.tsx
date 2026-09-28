@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Mail, Phone, MapPin, Globe, MessageCircle, Send, Download } from 'lucide-react'
+import { Mail, Phone, MapPin, Globe, MessageCircle, Send, Download, Smartphone } from 'lucide-react'
 import { QRCodeSVG } from 'qrcode.react'
 
 const APK_URL = 'https://renthub.qobus.tj/app/RentHub.apk'
@@ -96,26 +96,37 @@ export default function Footer() {
             </ul>
 
             <div className="mt-6 pt-5 border-t border-gray-100 dark:border-white/10">
-              <h4 className="text-[#1A1A2E] dark:text-white font-semibold text-sm uppercase tracking-wider mb-3">{t('footer.mobileApp')}</h4>
-              <div className="flex items-center gap-3">
-                <a
-                  href={APK_URL}
-                  download
-                  aria-label={t('footer.downloadApp')}
-                  className="shrink-0 bg-white rounded-xl p-1.5 border border-gray-200 dark:border-white/10 hover:border-brand-500 transition"
-                >
-                  <QRCodeSVG value={APK_URL} size={84} />
-                </a>
-                <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                  <p className="mb-2">{t('footer.scanHint')}</p>
+              <div className="rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 p-4">
+                <div className="flex items-center gap-2.5 mb-3.5">
+                  <div className="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center shrink-0">
+                    <Smartphone className="w-4 h-4 text-white" />
+                  </div>
+                  <h4 className="text-[#1A1A2E] dark:text-white font-semibold text-sm uppercase tracking-wider">
+                    {t('footer.mobileApp')}
+                  </h4>
+                </div>
+                <div className="flex items-center gap-4">
                   <a
                     href={APK_URL}
                     download
-                    className="inline-flex items-center gap-1 font-semibold text-brand-500 hover:underline"
+                    aria-label={t('footer.downloadApp')}
+                    className="shrink-0 bg-white rounded-xl p-2 border border-gray-100 dark:border-white/10 shadow-sm hover:shadow-md hover:border-brand-500 transition"
                   >
-                    <Download className="w-3.5 h-3.5" />
-                    {t('footer.downloadApp')}
+                    <QRCodeSVG value={APK_URL} size={84} />
                   </a>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed mb-3">
+                      {t('footer.scanHint')}
+                    </p>
+                    <a
+                      href={APK_URL}
+                      download
+                      className="inline-flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm transition"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      {t('footer.downloadApp')}
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
