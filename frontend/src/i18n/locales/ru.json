@@ -346,7 +346,8 @@
     "voiceUnsupported": "Запись голоса не поддерживается в этом браузере",
     "previewImage": "📷 Фото",
     "previewVoice": "🎤 Голосовое сообщение",
-    "previewFile": "📎 Файл"
+    "previewFile": "📎 Файл",
+    "speaker": "Динамик"
   },
   "notifications": {
     "title": "Уведомления",
@@ -760,5 +761,47 @@
     "maxLength": "Максимум {{max}} символов",
     "invalidPhone": "Неверный номер телефона",
     "passwordMismatch": "Пароли не совпадают"
+  },
+  "dashboard": {
+    "title": "Дашборд",
+    "searchPlaceholder": "Поиск...",
+    "menu": "Меню",
+    "add": "Добавить",
+    "settings": "Настройки",
+    "themeLight": "Светлая тема",
+    "themeDark": "Тёмная тема",
+    "collapse": "Свернуть панель",
+    "expand": "Развернуть панель",
+    "greeting": "С возвращением",
+    "nav": {
+      "dashboard": "Дашборд",
+      "support": "Поддержка",
+      "customers": "Клиенты",
+      "tickets": "Тикеты",
+      "tasks": "Задачи",
+      "projects": "Проекты",
+      "applications": "Заявки",
+      "userManagement": "Пользователи"
+    },
+    "stats": {
+      "revenue": "Доход",
+      "activeUsers": "Активные пользователи",
+      "openTickets": "Открытые тикеты",
+      "inProgress": "В работе"
+    },
+    "period": "за 30 дней",
+    "activity": "Последняя активность",
+    "table": {
+      "user": "Пользователь",
+      "status": "Статус",
+      "date": "Дата",
+      "amount": "Сумма"
+    },
+    "statuses": {
+      "active": "Активен",
+      "pending": "Ожидает",
+      "closed": "Закрыт"
+    },
+    "projectProgress": "Ход проектов"
   }
 }

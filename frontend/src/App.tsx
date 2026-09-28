@@ -17,6 +17,7 @@ const NotificationsPage = React.lazy(() => import('./pages/NotificationsPage'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const RevenloDashboard = React.lazy(() => import('./pages/RevenloDashboard'));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -86,6 +87,11 @@ export default function App() {
               <SuspenseWrapper><RevenloDashboard /></SuspenseWrapper>
             </ProtectedRoute>
           }
+        />
+        {/* Standalone SaaS dashboard demo — full-screen, outside site Layout */}
+        <Route
+          path="/dashboard"
+          element={<SuspenseWrapper><DashboardPage /></SuspenseWrapper>}
         />
         <Route element={<SiteLayout />}>
           <Route path="/" element={<HomePage />} />

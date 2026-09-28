@@ -347,7 +347,8 @@
     "voiceUnsupported": "Voice recording is not supported in this browser",
     "previewImage": "📷 Photo",
     "previewVoice": "🎤 Voice message",
-    "previewFile": "📎 File"
+    "previewFile": "📎 File",
+    "speaker": "Speaker"
   },
   "notifications": {
     "title": "Notifications",
@@ -761,5 +762,47 @@
     "maxLength": "Maximum {{max}} characters",
     "invalidPhone": "Invalid phone number",
     "passwordMismatch": "Passwords do not match"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "searchPlaceholder": "Search...",
+    "menu": "Menu",
+    "add": "Add",
+    "settings": "Settings",
+    "themeLight": "Light theme",
+    "themeDark": "Dark theme",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "greeting": "Welcome back",
+    "nav": {
+      "dashboard": "Dashboard",
+      "support": "Support",
+      "customers": "Customers",
+      "tickets": "Tickets",
+      "tasks": "Tasks",
+      "projects": "Projects",
+      "applications": "Applications",
+      "userManagement": "User Management"
+    },
+    "stats": {
+      "revenue": "Revenue",
+      "activeUsers": "Active users",
+      "openTickets": "Open tickets",
+      "inProgress": "In progress"
+    },
+    "period": "last 30 days",
+    "activity": "Recent activity",
+    "table": {
+      "user": "User",
+      "status": "Status",
+      "date": "Date",
+      "amount": "Amount"
+    },
+    "statuses": {
+      "active": "Active",
+      "pending": "Pending",
+      "closed": "Closed"
+    },
+    "projectProgress": "Project progress"
   }
 }

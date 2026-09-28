@@ -347,7 +347,8 @@
     "voiceUnsupported": "Навори овоз дар ин браузер пуштибонӣ намешавад",
     "previewImage": "📷 Тасвир",
     "previewVoice": "🎤 Паёми овозӣ",
-    "previewFile": "📎 Файл"
+    "previewFile": "📎 Файл",
+    "speaker": "Баландгӯяк"
   },
   "notifications": {
     "title": "Хабардиҳиҳо",
@@ -761,5 +762,47 @@
     "maxLength": "Ҳадди аксар {{max}} белгӣ",
     "invalidPhone": "Телефони нодуруст",
     "passwordMismatch": "Рамзҳо мувофиқат намекунанд"
+  },
+  "dashboard": {
+    "title": "Панели",
+    "searchPlaceholder": "Ҷустуҷӯ...",
+    "menu": "Меню",
+    "add": "Илова кардан",
+    "settings": "Танзимот",
+    "themeLight": "Заминаи равшан",
+    "themeDark": "Заминаи торик",
+    "collapse": "Пинҳон кардани панел",
+    "expand": "Кушодани панел",
+    "greeting": "Хуш омадед",
+    "nav": {
+      "dashboard": "Панели",
+      "support": "Дастгирӣ",
+      "customers": "Муштариён",
+      "tickets": "Тикетҳо",
+      "tasks": "Вазифаҳо",
+      "projects": "Лоиҳаҳо",
+      "applications": "Дархостҳо",
+      "userManagement": "Идоракунии корбарон"
+    },
+    "stats": {
+      "revenue": "Даромад",
+      "activeUsers": "Корбарони фаъол",
+      "openTickets": "Тикетҳои кушода",
+      "inProgress": "Дар ҷараён"
+    },
+    "period": "30 рӯзи охир",
+    "activity": "Фаъолияти охир",
+    "table": {
+      "user": "Корбар",
+      "status": "Ҳолат",
+      "date": "Сана",
+      "amount": "Маблағ"
+    },
+    "statuses": {
+      "active": "Фаъол",
+      "pending": "Дар интизор",
+      "closed": "Пӯшида"
+    },
+    "projectProgress": "Пешрафти лоиҳаҳо"
   }
 }
