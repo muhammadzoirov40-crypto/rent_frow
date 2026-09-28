@@ -382,4 +382,13 @@ export const upload = {
       headers: { 'Content-Type': 'multipart/form-data' },
     }).then(unwrap);
   },
+  uploadFile: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return client.post<
+      APIResponse<{ file_url: string; file_key: string; name: string; size: number; content_type: string }>
+    >('/upload/file', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then(unwrap);
+  },
 };

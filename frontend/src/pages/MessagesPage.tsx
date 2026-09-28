@@ -1,12 +1,18 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, Send, MessageSquare, ArrowLeft, ImageIcon } from 'lucide-react';
+import { Search, MessageSquare } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { messages } from '../api';
-import type { Conversation, Message, User, Listing } from '../api';
+import { messages, upload } from '../api';
+import type { Conversation, Message } from '../api';
 import useAuthStore from '../store/authStore';
+import ChatHeader from '../components/chat/ChatHeader';
+import ChatMessageList from '../components/chat/ChatMessageList';
+import ChatInput from '../components/chat/ChatInput';
+import Lightbox from '../components/chat/Lightbox';
+import CallOverlay, { type CallType } from '../components/chat/CallOverlay';
+import useChatSocket from '../components/chat/useChatSocket';
+import { parseContent } from '../components/chat/messageContent';
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
@@ -22,8 +28,11 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('ru-RU');
 }
 
-function formatTime(dateStr: string): string {
-  return new Date(dateStr).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+function voiceExt(mimeType: string): string {
+  if (mimeType.includes('ogg')) return 'ogg';
+  if (mimeType.includes('mp4')) return 'm4a';
+  if (mimeType.includes('wav')) return 'wav';
+  return 'webm';
 }
 
 export default function MessagesPage() {
@@ -33,8 +42,9 @@ export default function MessagesPage() {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [inputText, setInputText] = useState('');
   const [search, setSearch] = useState('');
+  const [call, setCall] = useState<CallType | null>(null);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: conversations = [], isLoading: convLoading } = useQuery<Conversation[]>({
     queryKey: ['conversations'],
@@ -71,6 +81,19 @@ export default function MessagesPage() {
     },
   });
 
+  useChatSocket((event) => {
+    if (event.event === 'new_message' || event.type === 'message') {
+      const convId = Number(event.conversation_id);
+      if (selectedId && convId === selectedId) {
+        queryClient.invalidateQueries({ queryKey: ['messages', selectedId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    }
+    if (event.type === 'notification') {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    }
+  });
+
   const filteredConversations = useMemo(() => {
     if (!search.trim()) return conversations;
     return conversations.filter((conv) => {
@@ -93,10 +116,26 @@ export default function MessagesPage() {
     sendMutation.mutate(inputText.trim());
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  const sendAttachment = async (file: File | Blob, kind: 'image' | 'file' | 'voice', duration?: number) => {
+    if (!selectedId) return;
+    try {
+      let envelope: Record<string, unknown>;
+      if (kind === 'image') {
+        const res = await upload.uploadImage(file as File);
+        envelope = { kind: 'image', url: res.image_url };
+      } else if (kind === 'voice') {
+        const voiceFile = new File([file], `voice-${Date.now()}.${voiceExt(file.type)}`, {
+          type: file.type || 'audio/webm',
+        });
+        const res = await upload.uploadFile(voiceFile);
+        envelope = { kind: 'voice', url: res.file_url, duration };
+      } else {
+        const res = await upload.uploadFile(file as File);
+        envelope = { kind: 'file', url: res.file_url, name: res.name, size: res.size };
+      }
+      sendMutation.mutate(JSON.stringify(envelope));
+    } catch {
+      toast.error(t('messages.uploadFailed'));
     }
   };
 
@@ -107,7 +146,19 @@ export default function MessagesPage() {
     };
   };
 
+  const previewText = (content: string | null | undefined) => {
+    if (!content) return '';
+    const parsed = parseContent(content);
+    if (parsed.kind === 'text') return parsed.text;
+    if (parsed.kind === 'image') return t('messages.previewImage');
+    if (parsed.kind === 'voice') return t('messages.previewVoice');
+    return `📎 ${parsed.name || t('messages.previewFile')}`;
+  };
+
   const selectedConversation = conversations.find((c) => c.id === selectedId);
+  const otherName = selectedConversation
+    ? getOtherUser(selectedConversation)?.display_name || t('messages.user')
+    : '';
 
   if (convLoading) {
     return (
@@ -118,8 +169,8 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] max-w-7xl mx-auto bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-xl my-4">
-      <div className={`w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col bg-gray-50 dark:bg-[#1A1A2E] ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+    <div className="flex h-[calc(100vh-4rem)] max-w-7xl mx-auto bg-white dark:bg-[#121418] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-xl my-4">
+      <div className={`w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col bg-gray-50 dark:bg-[#1a1d24] ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t('messages.title')}</h2>
           <div className="relative">
@@ -184,7 +235,9 @@ export default function MessagesPage() {
                         )}
                       </div>
                       {conv.last_message_content && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{conv.last_message_content}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          {previewText(conv.last_message_content)}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -195,7 +248,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className={`flex-1 flex flex-col ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 flex flex-col bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div className="w-20 h-20 bg-[#FF6B35]/10 rounded-full flex items-center justify-center mb-4">
@@ -208,81 +261,43 @@ export default function MessagesPage() {
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#1A1A2E]">
-              <button
-                onClick={() => setSelectedId(null)}
-                className="md:hidden p-1.5 rounded-lg hover:bg-gray-200 dark:hover:bg-white/10 transition"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-              </button>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 dark:text-white text-sm truncate">
-                  {getOtherUser(selectedConversation!)?.display_name || t('messages.user')}
-                </h3>
-              </div>
-            </div>
+            <ChatHeader
+              name={otherName}
+              avatar={selectedConversation ? getOtherUser(selectedConversation)?.avatar_url : null}
+              onBack={() => setSelectedId(null)}
+              onAudioCall={() => setCall('audio')}
+              onVideoCall={() => setCall('video')}
+            />
 
-            <div
-              ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-100 dark:bg-[#0f0f23]"
-            >
-              {msgLoading ? (
-                <div className="flex items-center justify-center h-full">
-                  <div className="w-8 h-8 border-3 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
-                </div>
-              ) : chatMessages.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-sm text-gray-400 dark:text-gray-500">
-                  {t('messages.noMessages')}
-                </div>
-              ) : (
-                chatMessages.map((msg) => {
-                  const isMine = msg.sender_id === user?.id;
-                  return (
-                    <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                      <div
-                        className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
-                          isMine
-                            ? 'bg-[#FF6B35] text-white rounded-br-md'
-                            : 'bg-white dark:bg-white/10 text-gray-900 dark:text-white rounded-bl-md border border-gray-200 dark:border-white/10'
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap break-words">{msg.content}</p>
-                        <p className={`text-[10px] mt-1 ${isMine ? 'text-white/70' : 'text-gray-400'}`}>
-                          {formatTime(msg.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+            <ChatMessageList
+              messages={chatMessages}
+              currentUserId={user?.id}
+              loading={msgLoading}
+              onOpenImage={setLightboxSrc}
+            />
+            <div ref={messagesEndRef} className="hidden" />
 
-            <div className="px-4 py-3 border-t border-gray-200 dark:border-white/10 bg-white dark:bg-[#1A1A2E]">
-              <div className="flex items-end gap-2">
-                <input
-                  type="text"
-                  value={inputText}
-                  onChange={(e) => setInputText(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={t('messages.typeMessage')}
-                  className="flex-1 px-4 py-2.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition resize-none"
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!inputText.trim() || sendMutation.isPending}
-                  className="p-2.5 bg-[#FF6B35] text-white rounded-xl hover:bg-[#e55a2b] disabled:opacity-40 disabled:cursor-not-allowed transition shadow-lg shadow-[#FF6B35]/20"
-                >
-                  {sendMutation.isPending ? (
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  ) : (
-                    <Send className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
+            <ChatInput
+              value={inputText}
+              onChange={setInputText}
+              onSend={handleSend}
+              onAttach={(file, kind) => sendAttachment(file, kind)}
+              onVoice={(blob, duration) => sendAttachment(blob, 'voice', duration)}
+              sending={sendMutation.isPending}
+            />
           </>
         )}
+
+        {call && selectedConversation && (
+          <CallOverlay
+            type={call}
+            name={otherName}
+            avatar={getOtherUser(selectedConversation)?.avatar_url}
+            onClose={() => setCall(null)}
+          />
+        )}
+
+        <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
       </div>
     </div>
   );
