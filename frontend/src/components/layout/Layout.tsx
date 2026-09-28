@@ -33,7 +33,7 @@ export default function Layout({ children }: LayoutProps) {
       <main className="flex-1 pt-16 pb-20 md:pb-0">
         {children}
       </main>
-      {pathname !== '/messages' && <Footer />}
+      {!['/messages', '/notifications'].includes(pathname) && <Footer />}
       <MobileBottomNav isAuthenticated={isAuthenticated} />
     </div>
   )
