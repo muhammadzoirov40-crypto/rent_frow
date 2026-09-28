@@ -599,6 +599,7 @@
     "accepted": "Accepted",
     "rejected": "Rejected",
     "cancelled": "Cancelled",
+    "completed": "Completed",
     "notFound": "Not found",
     "newUser": "New user registered",
     "newListing": "New listing added",

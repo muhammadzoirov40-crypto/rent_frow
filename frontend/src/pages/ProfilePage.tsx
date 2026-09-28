@@ -169,7 +169,7 @@ export default function ProfilePage() {
               {meUser?.avatar_url ? (
                 <img
                   src={meUser.avatar_url}
-                  alt={meUser.display_name}
+                  alt={meUser.display_name ?? ''}
                   className="w-24 h-24 rounded-2xl object-cover border-4 border-white dark:border-white/10 shadow-lg"
                 />
               ) : (

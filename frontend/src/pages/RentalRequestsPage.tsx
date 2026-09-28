@@ -34,7 +34,7 @@ function RequestCard({
     accepted: { label: t('admin.accepted'), bg: 'bg-emerald-50 dark:bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-400' },
     rejected: { label: t('admin.rejected'), bg: 'bg-red-50 dark:bg-red-500/10', text: 'text-red-700 dark:text-red-400', dot: 'bg-red-400' },
     cancelled: { label: t('admin.cancelled'), bg: 'bg-gray-100 dark:bg-white/5', text: 'text-gray-600 dark:text-gray-400', dot: 'bg-gray-400' },
-    completed: { label: t('admin.completed', 'Completed'), bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', dot: 'bg-blue-400' },
+    completed: { label: t('admin.completed'), bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', dot: 'bg-blue-400' },
   };
 
   const statusKey = (req.status || 'pending').toLowerCase();
@@ -145,12 +145,12 @@ export default function RentalRequestsPage() {
 
   const { data: myRequests = [], isLoading: myLoading } = useQuery({
     queryKey: ['my-requests'],
-    queryFn: rentalRequests.getMyRequests,
+    queryFn: () => rentalRequests.getMyRequests().then((r) => r.items),
   });
 
   const { data: ownerRequests = [], isLoading: ownerLoading } = useQuery({
     queryKey: ['owner-requests'],
-    queryFn: rentalRequests.getOwnerRequests,
+    queryFn: () => rentalRequests.getOwnerRequests().then((r) => r.items),
   });
 
   const cancelMutation = useMutation({

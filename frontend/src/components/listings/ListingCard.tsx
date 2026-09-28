@@ -56,7 +56,7 @@ function getOwnerName(listing: ListingCardData): string | null {
 }
 
 function getOwnerAvatar(listing: ListingCardData): string | null {
-  if (listing.owner && 'avatar_url' in listing.owner) return listing.owner.avatar_url;
+  if (listing.owner && 'avatar_url' in listing.owner) return listing.owner.avatar_url ?? null;
   return null;
 }
 
