@@ -238,7 +238,11 @@ export default function Header() {
                               onClick={() => {
                                 if (!n.is_read) notifReadMutation.mutate(n.id)
                                 setNotifOpen(false)
-                                navigate('/notifications')
+                                if (n.type === 'new_favorite' && n.reference_id) {
+                                  navigate(`/listing/${n.reference_id}`)
+                                } else {
+                                  navigate('/notifications')
+                                }
                               }}
                               className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-white/5 transition"
                             >

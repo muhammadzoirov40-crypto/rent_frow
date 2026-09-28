@@ -60,7 +60,10 @@ const typeConfig: Record<string, { icon: React.ReactNode; color: string; bgColor
 
 function getNotificationRoute(notif: Notification): string | null {
   switch (notif.type) {
+    case 'new_favorite':
+      return notif.reference_id ? `/listing/${notif.reference_id}` : '/search';
     case 'message':
+    case 'new_message':
       return '/messages';
     case 'review':
     case 'listing_approved':
