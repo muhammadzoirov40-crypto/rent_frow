@@ -10,7 +10,6 @@ import {
   Menu,
   X,
   User,
-  Home,
   LogOut,
   ChevronDown,
   List,
@@ -21,6 +20,7 @@ import {
   Settings,
   Shield,
 } from 'lucide-react'
+import MobileSidebar from './MobileSidebar'
 import useAuthStore from '../../store/authStore'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -374,6 +374,7 @@ export default function Header() {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={t('nav.main')}
               className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition md:hidden"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -395,67 +396,7 @@ export default function Header() {
         </form>
       </div>
 
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-[#1A1A2E] border-t border-gray-100 dark:border-white/10 shadow-lg">
-          <div className="px-4 py-3 space-y-1">
-            <Link to="/" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
-              <Home className="w-5 h-5 text-gray-400" />
-              <span className="text-sm font-medium">{t('nav.home')}</span>
-            </Link>
-            <Link to="/search" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
-              <Search className="w-5 h-5 text-gray-400" />
-              <span className="text-sm font-medium">{t('nav.search')}</span>
-            </Link>
-            {isAuthenticated && (
-              <>
-                <Link to="/favorites" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
-                  <Heart className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium">{t('nav.favorites')}</span>
-                </Link>
-                <Link to="/messages" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
-                  <MessageSquare className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm font-medium">{t('nav.messages')}</span>
-                </Link>
-                <Link to="/create-listing" onClick={() => setMobileMenuOpen(false)} className="flex items-center gap-3 px-3 py-3 rounded-xl text-[#FF6B35] bg-orange-50 dark:bg-[#FF6B35]/10 font-semibold transition">
-                  <PlusCircle className="w-5 h-5" />
-                  <span className="text-sm">{t('nav.createListing')}</span>
-                </Link>
-              </>
-            )}
-            <div className="flex items-center gap-2 px-3 py-2 pt-2">
-              <button onClick={toggleTheme} className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition">
-                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                {theme === 'dark' ? t('theme.light') : t('theme.dark')}
-              </button>
-              <div className="flex items-center gap-1">
-                {LANGUAGES.map((lang) => (
-                  <button
-                    key={lang.code}
-                    onClick={() => changeLanguage(lang.code)}
-                    className={`px-2 py-1 rounded-lg text-xs font-medium transition ${
-                      i18n.language === lang.code
-                        ? 'bg-[#FF6B35] text-white'
-                        : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
-                    }`}
-                  >
-                    {lang.flag}
-                  </button>
-                ))}
-              </div>
-            </div>
-            {!isAuthenticated && (
-              <div className="pt-2 border-t border-gray-100 dark:border-white/10 space-y-2">
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center px-4 py-3 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl">
-                  {t('header.login')}
-                </Link>
-                <Link to="/register" onClick={() => setMobileMenuOpen(false)} className="block w-full text-center px-4 py-3 bg-[#FF6B35] text-white text-sm font-semibold rounded-xl shadow-sm shadow-[#FF6B35]/20">
-                  {t('header.register')}
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <MobileSidebar open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </header>
   )
 }
