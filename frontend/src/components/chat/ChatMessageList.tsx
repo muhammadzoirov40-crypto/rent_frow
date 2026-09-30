@@ -40,8 +40,6 @@ const QUICK_REACTIONS = ['👍', '🔥', '❤️', '😂', '👀', '👎'];
 
 interface MenuState {
   msg: Message;
-  x: number;
-  y: number;
 }
 
 const WALLPAPER = {
@@ -208,19 +206,15 @@ export default function ChatMessageList({
     };
   }, [menu]);
 
-  const openMenu = (msg: Message, clientX: number, clientY: number) => {
-    const W = 236;
-    const H = 430;
-    const x = Math.max(8, Math.min(clientX, window.innerWidth - W - 8));
-    const y = Math.max(8, Math.min(clientY, window.innerHeight - H - 8));
-    setMenu({ msg, x, y });
+  const openMenu = (msg: Message) => {
+    setMenu({ msg });
   };
 
   const closeMenu = () => setMenu(null);
 
-  const startPress = (msg: Message, x: number, y: number) => {
+  const startPress = (msg: Message) => {
     window.clearTimeout(pressTimer.current);
-    pressTimer.current = window.setTimeout(() => openMenu(msg, x, y), 450);
+    pressTimer.current = window.setTimeout(() => openMenu(msg), 450);
   };
   const cancelPress = () => window.clearTimeout(pressTimer.current);
 
@@ -291,15 +285,15 @@ export default function ChatMessageList({
 
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  onContextMenu={(e) => {
-                    if (message.id <= 0) return;
-                    e.preventDefault();
-                    openMenu(message, e.clientX, e.clientY);
-                  }}
-                  onTouchStart={() => {
-                    if (message.id <= 0) return;
-                    startPress(message, window.innerWidth / 2, window.innerHeight / 2);
-                  }}
+                onContextMenu={(e) => {
+                  if (message.id <= 0) return;
+                  e.preventDefault();
+                  openMenu(message);
+                }}
+                onTouchStart={() => {
+                  if (message.id <= 0) return;
+                  startPress(message);
+                }}
                   onTouchMove={cancelPress}
                   onTouchEnd={cancelPress}
                   className={`group flex items-end gap-2 ${mine ? 'justify-end' : 'justify-start'} ${
@@ -316,8 +310,7 @@ export default function ChatMessageList({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-                          openMenu(message, rect.left - 200, rect.top);
+                          openMenu(message);
                         }}
                         title={t('common.more')}
                         aria-label={t('common.more')}
@@ -436,8 +429,7 @@ export default function ChatMessageList({
           }}
         >
           <div
-            className="fixed z-50 w-56 rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-100 dark:border-white/10 shadow-[0_20px_60px_-15px_rgba(16,24,40,0.4)] overflow-hidden py-1.5"
-            style={{ left: menu.x, top: menu.y }}
+            className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-100 dark:border-white/10 shadow-[0_20px_60px_-15px_rgba(16,24,40,0.4)] overflow-hidden py-1.5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-3 pb-2 mb-1 border-b border-gray-100 dark:border-white/10">
