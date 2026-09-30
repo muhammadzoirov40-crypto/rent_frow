@@ -31,7 +31,8 @@
     "noData": "No data",
     "currency": "TJS",
     "perDay": "/ day",
-    "somoni": "somoni"
+    "somoni": "somoni",
+    "more": "More"
   },
   "nav": {
     "home": "Home",
@@ -119,8 +120,8 @@
     "googleLoginFailed": "Google login failed. Please try again."
   },
   "home": {
-    "heroTitle": "Rent anything in Tajikistan",
-    "heroSubtitle": "Find the tools, vehicles, or equipment you need for rent",
+    "heroTitle": "Rent what you need.",
+    "heroSubtitle": "Find tools, equipment and other items available for rent near you.",
     "searchPlaceholder": "What do you want to rent?",
     "city": "City",
     "allCities": "All cities",
@@ -159,7 +160,15 @@
     "ctaText": "Join thousands of users across Tajikistan.",
     "ctaPrimary": "Post a listing",
     "ctaSecondary": "Browse listings",
-    "heroKicker": "Rent · Earn · Repeat"
+    "heroKicker": "Rent · Earn · Repeat",
+    "heroLine2": "When you need it.",
+    "searchWhat": "What are you looking for?",
+    "categoriesHint": "Pick a category to see matching listings",
+    "listingsCount": "{{count}} listings",
+    "popularNearYou": "Popular near you",
+    "popularNearYouHint": "Most viewed and rented in your city",
+    "recentlyAdded": "Recently added",
+    "recentlyAddedHint": "Fresh listings from owners"
   },
   "search": {
     "resultsFound": "Found {{count}} listings",
@@ -193,7 +202,18 @@
     "noPhoto": "No photo",
     "gridView": "Grid",
     "listView": "List",
-    "view": "View"
+    "view": "View",
+    "dates": "Rental dates",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "ratingLabel": "Rating",
+    "ratingAny": "Any",
+    "availability": "Availability",
+    "availableOnly": "Available only",
+    "errorTitle": "Something went wrong",
+    "errorText": "We couldn't load listings. Please try again.",
+    "emptyTitle": "No listings found",
+    "emptyText": "Try changing your search criteria"
   },
   "listing": {
     "description": "Description",
@@ -358,7 +378,25 @@
     "deleted": "Message deleted",
     "clearChat": "Clear chat",
     "clearConfirm": "Delete all messages in this chat?",
-    "cleared": "Chat cleared"
+    "cleared": "Chat cleared",
+    "reply": "Reply",
+    "edit": "Edit",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "forward": "Forward",
+    "copy": "Copy",
+    "copied": "Copied",
+    "translate": "Translate",
+    "translation": "Translation:",
+    "translateFailed": "Translation failed",
+    "edited": "edited",
+    "forwardedFrom": "Forwarded from",
+    "forwarded": "Forwarded",
+    "forwardTo": "Forward to",
+    "replyingTo": "Reply to",
+    "editing": "Editing",
+    "pinned": "Pinned",
+    "updated": "Message updated"
   },
   "notifications": {
     "title": "Notifications",

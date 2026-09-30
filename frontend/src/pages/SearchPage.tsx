@@ -12,7 +12,10 @@ import {
   MapPin,
   Star,
   RotateCcw,
+  AlertTriangle,
 } from 'lucide-react';
+import SearchBar from '../components/search/SearchBar';
+import EmptyState from '../components/ui/EmptyState';
 import {
   listings,
   categories,
@@ -40,13 +43,6 @@ const PRICE_UNITS = [
   { value: 'per_day', labelKey: 'search.perDay' },
   { value: 'per_week', labelKey: 'search.perWeek' },
   { value: 'per_month', labelKey: 'search.perMonth' },
-];
-
-const RATING_OPTIONS = [
-  { value: '', label: 'Любой' },
-  { value: '4', label: '4+' },
-  { value: '3', label: '3+' },
-  { value: '2', label: '2+' },
 ];
 
 const ITEMS_PER_PAGE = 12;
@@ -157,6 +153,55 @@ function FilterSidebar({
       </div>
 
       <div className={sectionCls}>
+        <label className={labelCls}>{t('search.dates')}</label>
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="date"
+            value={filters.start_date || ''}
+            onChange={(e) => onFilterChange('start_date', e.target.value)}
+            aria-label={t('search.dateFrom')}
+            className={inputCls}
+          />
+          <input
+            type="date"
+            value={filters.end_date || ''}
+            min={filters.start_date || undefined}
+            onChange={(e) => onFilterChange('end_date', e.target.value)}
+            aria-label={t('search.dateTo')}
+            className={inputCls}
+          />
+        </div>
+      </div>
+
+      <div className={sectionCls}>
+        <label className={labelCls}>{t('search.ratingLabel')}</label>
+        <CustomSelect
+          options={[
+            { value: '', label: t('search.ratingAny') },
+            { value: '4', label: '4+' },
+            { value: '3', label: '3+' },
+            { value: '2', label: '2+' },
+          ]}
+          value={filters.min_rating || ''}
+          onChange={(val) => onFilterChange('min_rating', val)}
+        />
+      </div>
+
+      <div className={sectionCls}>
+        <label className={labelCls}>{t('search.availability')}</label>
+        <label className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/[0.07] px-3.5 py-3 cursor-pointer select-none hover:border-[#FF6B35]/40 hover:bg-[#FF6B35]/5 transition">
+          <input
+            type="checkbox"
+            checked={filters.available === 'true'}
+            onChange={(e) => onFilterChange('available', e.target.checked ? 'true' : '')}
+            className="peer sr-only"
+          />
+          <span className="w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 peer-checked:border-[#FF6B35] peer-checked:bg-[#FF6B35] peer-focus-visible:ring-2 peer-focus-visible:ring-[#FF6B35]/40 transition" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('search.availableOnly')}</span>
+        </label>
+      </div>
+
+      <div className={sectionCls}>
         <label className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/[0.07] px-3.5 py-3 cursor-pointer select-none hover:border-[#FF6B35]/40 hover:bg-[#FF6B35]/5 transition">
           <input
             type="checkbox"
@@ -253,13 +298,18 @@ export default function SearchPage() {
     if (filters.price_max) p.price_max = filters.price_max;
     if (filters.price_unit) p.price_unit = filters.price_unit;
     if (filters.is_verified) p.is_verified = filters.is_verified === 'true';
+    if (filters.min_rating) p.min_rating = filters.min_rating;
+    if (filters.available) p.available = filters.available === 'true';
+    if (filters.start_date) p.start_date = filters.start_date;
+    if (filters.end_date) p.end_date = filters.end_date;
     if (currentSort !== 'relevance') p.sort_by = currentSort;
     return p;
   }, [filters, currentPage, currentSort]);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ['search', apiParams],
     queryFn: () => listings.search(apiParams),
+    retry: 1,
   });
 
   const listingsList: ListingListItem[] = data?.items || [];
@@ -296,6 +346,32 @@ export default function SearchPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dark:bg-[#0a0a1a] min-h-screen">
       <BackButton className="mb-4" />
+      <div className="mb-6">
+        <SearchBar
+          key={`${filters.q || ''}|${filters.city_id || ''}|${filters.start_date || ''}|${filters.end_date || ''}`}
+          compact
+          initial={{
+            q: filters.q || '',
+            city_id: filters.city_id || '',
+            start_date: filters.start_date || '',
+            end_date: filters.end_date || '',
+          }}
+          onSubmit={(values) => {
+            const next = new URLSearchParams(searchParams);
+            const apply = (key: string, value: string) => {
+              if (value) next.set(key, value);
+              else next.delete(key);
+            };
+            apply('q', values.q);
+            apply('city_id', values.city_id);
+            if (values.city_id !== (filters.city_id || '')) next.delete('district_id');
+            apply('start_date', values.start_date);
+            apply('end_date', values.end_date);
+            next.delete('page');
+            setSearchParams(next, { replace: true });
+          }}
+        />
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-white/[0.07]">
         <div>
           <h1 className="text-[22px] font-extrabold tracking-tight text-[#1A1A2E] dark:text-white">
@@ -362,7 +438,15 @@ export default function SearchPage() {
         </aside>
 
         <main className="flex-1 min-w-0">
-          {view === 'list' ? (
+          {isError ? (
+            <EmptyState
+              icon={AlertTriangle}
+              title={t('search.errorTitle')}
+              description={t('search.errorText')}
+              actionLabel={t('common.refresh')}
+              onAction={() => refetch()}
+            />
+          ) : view === 'list' ? (
             <div className="flex flex-col gap-4">
               {listingsList.map((listing) => (
                 <div key={listing.id} className="w-full">

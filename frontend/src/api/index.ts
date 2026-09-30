@@ -86,9 +86,13 @@ export interface ListingListItem {
   price: number;
   price_unit: string;
   city_name: string | null;
+  district_name?: string | null;
   primary_image: string | null;
   views_count: number;
   average_rating: number;
+  rating_count?: number;
+  available?: boolean;
+  is_verified?: boolean;
   created_at: string;
   is_favorited: boolean;
 }
@@ -148,6 +152,13 @@ export interface Message {
   created_at: string;
   sender_name: string | null;
   sender_avatar: string | null;
+  reply_to_id?: number | null;
+  reply_to_content?: string | null;
+  reply_to_sender_name?: string | null;
+  edited_at?: string | null;
+  pinned?: boolean;
+  reactions?: Record<string, number[]>;
+  forwarded_from_name?: string | null;
 }
 
 export interface Notification {
@@ -342,8 +353,25 @@ export const messages = {
   getMessages: (conversationId: number, page = 1, page_size = 50) =>
     client.get<APIResponse<Message[]>>(`/messages/conversations/${conversationId}`, { params: { page, page_size } }).then(unwrap),
 
-  sendMessage: (conversationId: number, content: string) =>
-    client.post<APIResponse<Message>>(`/messages/conversations/${conversationId}`, { content }).then(unwrap),
+  sendMessage: (
+    conversationId: number,
+    content: string,
+    opts?: { reply_to_id?: number | null; forwarded_from_name?: string | null },
+  ) =>
+    client.post<APIResponse<Message>>(`/messages/conversations/${conversationId}`, {
+      content,
+      reply_to_id: opts?.reply_to_id ?? null,
+      forwarded_from_name: opts?.forwarded_from_name ?? null,
+    }).then(unwrap),
+
+  editMessage: (messageId: number, content: string) =>
+    client.patch<APIResponse<Message>>(`/messages/${messageId}`, { content }).then(unwrap),
+
+  toggleReaction: (messageId: number, emoji: string) =>
+    client.post<APIResponse<Record<string, number[]>>>(`/messages/${messageId}/reactions`, { emoji }).then(unwrap),
+
+  pinMessage: (messageId: number, pinned: boolean) =>
+    client.patch<APIResponse<Message>>(`/messages/${messageId}/pin`, { pinned }).then(unwrap),
 
   markRead: (conversationId: number) =>
     client.post(`/messages/conversations/${conversationId}/read`),

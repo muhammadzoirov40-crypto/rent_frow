@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Package } from 'lucide-react';
 import ListingCard from './ListingCard';
 import SkeletonCard from '../ui/SkeletonCard';
@@ -12,6 +13,7 @@ interface ListingGridProps {
 }
 
 export default function ListingGrid({ listings, loading }: ListingGridProps) {
+  const { t } = useTranslation();
   if (loading) {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
@@ -26,8 +28,10 @@ export default function ListingGrid({ listings, loading }: ListingGridProps) {
     return (
       <EmptyState
         icon={Package}
-        title="Объявления не найдены"
-        description="Попробуйте изменить параметры поиска"
+        title={t('search.emptyTitle')}
+        description={t('search.emptyText')}
+        actionLabel={t('common.reset')}
+        onAction={() => window.location.assign('/search')}
       />
     );
   }

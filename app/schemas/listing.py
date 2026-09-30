@@ -138,6 +138,7 @@ class ListingListResponse(BaseModel):
     primary_image: Optional[str] = None
     views_count: int
     average_rating: float = 0
+    rating_count: int = 0
     available: bool = True
     is_verified: bool = False
     created_at: datetime

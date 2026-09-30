@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional
 from sqlalchemy import select, func, or_, and_, desc, asc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -45,6 +46,9 @@ class ListingRepository(BaseRepository[Listing]):
         parking: Optional[bool] = None,
         wifi_included: Optional[bool] = None,
         available: Optional[bool] = None,
+        min_rating: Optional[float] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
     ):
         if status is not None:
             query = query.where(Listing.status == status)
@@ -94,6 +98,28 @@ class ListingRepository(BaseRepository[Listing]):
             query = query.where(Listing.wifi_included == wifi_included)
         if available is not None:
             query = query.where(Listing.available == available)
+        if min_rating is not None:
+            query = query.where(
+                Listing.rating_count > 0,
+                Listing.rating_sum / func.nullif(Listing.rating_count, 0) >= min_rating,
+            )
+        if start_date is not None and end_date is not None:
+            from app.models.rental_request import RentalRequest, RentalRequestStatus
+
+            overlap = (
+                select(RentalRequest.id)
+                .where(
+                    RentalRequest.listing_id == Listing.id,
+                    RentalRequest.status.in_([
+                        RentalRequestStatus.PENDING,
+                        RentalRequestStatus.ACCEPTED,
+                    ]),
+                    RentalRequest.start_date <= end_date,
+                    RentalRequest.end_date >= start_date,
+                )
+                .exists()
+            )
+            query = query.where(~overlap)
 
         return query
 
@@ -129,6 +155,9 @@ class ListingRepository(BaseRepository[Listing]):
         parking: Optional[bool] = None,
         wifi_included: Optional[bool] = None,
         available: Optional[bool] = None,
+        min_rating: Optional[float] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
         sort_by: Optional[str] = None,
         skip: int = 0,
         limit: int = 20,
@@ -154,6 +183,9 @@ class ListingRepository(BaseRepository[Listing]):
             parking,
             wifi_included,
             available,
+            min_rating,
+            start_date,
+            end_date,
         )
         query = self._apply_sort(query, sort_by)
         query = query.offset(skip).limit(limit)
@@ -181,6 +213,9 @@ class ListingRepository(BaseRepository[Listing]):
         parking: Optional[bool] = None,
         wifi_included: Optional[bool] = None,
         available: Optional[bool] = None,
+        min_rating: Optional[float] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
     ) -> int:
         query = self._apply_filters(
             select(func.count()).select_from(Listing),
@@ -203,6 +238,9 @@ class ListingRepository(BaseRepository[Listing]):
             parking,
             wifi_included,
             available,
+            min_rating,
+            start_date,
+            end_date,
         )
         result = await self.db.execute(query)
         return result.scalar_one()
@@ -231,6 +269,9 @@ class ListingRepository(BaseRepository[Listing]):
         parking: Optional[bool] = None,
         wifi_included: Optional[bool] = None,
         available: Optional[bool] = None,
+        min_rating: Optional[float] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
         sort_by: Optional[str] = None,
         skip: int = 0,
         limit: int = 20,
@@ -261,6 +302,9 @@ class ListingRepository(BaseRepository[Listing]):
             parking,
             wifi_included,
             available,
+            min_rating,
+            start_date,
+            end_date,
         )
         query = query.where(
             Listing.latitude.isnot(None),

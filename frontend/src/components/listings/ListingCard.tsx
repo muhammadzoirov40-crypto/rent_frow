@@ -5,7 +5,7 @@ import { ru } from 'date-fns/locale';
 import { listings, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { parseDate } from '../../utils/dates';
+import { useTranslation } from 'react-i18next';
 
 type ListingCardData = (Listing | ListingListItem) & {
   images?: { id: number; image_url: string }[];
@@ -76,6 +76,7 @@ function getRating(listing: ListingCardData): string | null {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
+  const { t } = useTranslation();
   const [isFavorited, setIsFavorited] = useState(listing.is_favorited ?? false);
   const queryClient = useQueryClient();
 
@@ -97,7 +98,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const ownerAvatar = getOwnerAvatar(listing);
   const ownerRole = getOwnerRole(listing);
 
-  const timeAgo = formatDistanceToNow(parseDate(listing.created_at), {
+  const timeAgo = formatDistanceToNow(new Date(listing.created_at), {
     addSuffix: true,
     locale: ru,
   });
@@ -135,6 +136,25 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </button>
 
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {'available' in listing && typeof listing.available === 'boolean' && (
+          <div className="absolute bottom-3 left-3">
+            <span
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm ring-1 ring-inset ${
+                listing.available
+                  ? 'bg-white/95 text-emerald-700 ring-emerald-200 dark:bg-slate-900/90 dark:text-emerald-400 dark:ring-emerald-500/30'
+                  : 'bg-white/95 text-gray-600 ring-gray-200 dark:bg-slate-900/90 dark:text-gray-300 dark:ring-white/15'
+              }`}
+            >
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  listing.available ? 'bg-emerald-500' : 'bg-gray-400'
+                }`}
+              />
+              {listing.available ? t('listing.available') : t('listing.unavailable')}
+            </span>
+          </div>
+        )}
 
         {'is_verified' in listing && listing.is_verified && (
           <div className="absolute top-3 left-3">
