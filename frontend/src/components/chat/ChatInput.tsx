@@ -47,6 +47,7 @@ export default function ChatInput({
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | undefined>(undefined);
+  const secondsRef = useRef(0);
 
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -114,17 +115,22 @@ export default function ChatInput({
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
       recorder.onstop = () => {
-        const duration = seconds;
+        const duration = secondsRef.current;
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
         stream.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
-        if (blob.size > 0 && duration > 0) onVoice(blob, duration);
+        secondsRef.current = 0;
+        if (blob.size > 0) onVoice(blob, Math.max(duration, 1));
       };
 
       recorder.start();
+      secondsRef.current = 0;
       setSeconds(0);
       setRecording(true);
-      timerRef.current = window.setInterval(() => setSeconds((s) => s + 1), 1000);
+      timerRef.current = window.setInterval(() => {
+        secondsRef.current += 1;
+        setSeconds(secondsRef.current);
+      }, 1000);
     } catch {
       toast.error(t('messages.voiceUnsupported'));
     }
@@ -140,6 +146,7 @@ export default function ChatInput({
       chunksRef.current = [];
       streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
+      secondsRef.current = 0;
       setSeconds(0);
       return;
     }
