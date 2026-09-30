@@ -1,12 +1,24 @@
 from sqlalchemy import select, func, update, or_, desc, delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from app.models.message import Message
 from app.repositories.base import BaseRepository
+
+
+MESSAGE_LOADS = (
+    selectinload(Message.reply_to).selectinload(Message.sender),
+)
 
 
 class MessageRepository(BaseRepository[Message]):
     def __init__(self, db: AsyncSession):
         super().__init__(Message, db)
+
+    async def get_by_id(self, id: int) -> Message | None:
+        result = await self.db.execute(
+            select(Message).where(Message.id == id).options(*MESSAGE_LOADS)
+        )
+        return result.scalar_one_or_none()
 
     async def get_conversation_messages(
         self, conversation_id: int, skip: int = 0, limit: int = 50
@@ -14,6 +26,7 @@ class MessageRepository(BaseRepository[Message]):
         result = await self.db.execute(
             select(Message)
             .where(Message.conversation_id == conversation_id)
+            .options(*MESSAGE_LOADS)
             .order_by(Message.created_at.desc())
             .offset(skip)
             .limit(limit)
@@ -59,6 +72,14 @@ class MessageRepository(BaseRepository[Message]):
                 Message.is_read == False,
             )
             .values(is_read=True)
+        )
+        await self.db.flush()
+
+    async def unpin_conversation_messages(self, conversation_id: int) -> None:
+        await self.db.execute(
+            update(Message)
+            .where(Message.conversation_id == conversation_id, Message.pinned == True)
+            .values(pinned=False)
         )
         await self.db.flush()
 

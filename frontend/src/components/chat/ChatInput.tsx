@@ -9,7 +9,9 @@ import {
   Smile,
   Trash2,
 } from 'lucide-react';
-import { formatDuration } from './messageContent';
+import { formatDuration, parseContent } from './messageContent';
+import type { Message } from '../../api';
+import { X } from 'lucide-react';
 
 const EMOJIS = [
   '😀', '😂', '😅', '😊', '😍', '😘', '😎', '🤩',
@@ -27,6 +29,22 @@ interface ChatInputProps {
   onVoice: (blob: Blob, duration: number) => void;
   disabled?: boolean;
   sending?: boolean;
+  replyTo?: Message | null;
+  editing?: Message | null;
+  onCancelReply?: () => void;
+  onCancelEdit?: () => void;
+}
+
+function stripPreview(content: string): string {
+  try {
+    const parsed = parseContent(content || '');
+    if (parsed.kind === 'text') return parsed.text;
+    if (parsed.kind === 'image') return '📷';
+    if (parsed.kind === 'voice') return '🎤';
+    return `📎 ${parsed.name || ''}`.trim();
+  } catch {
+    return content;
+  }
 }
 
 export default function ChatInput({
@@ -37,6 +55,10 @@ export default function ChatInput({
   onVoice,
   disabled = false,
   sending = false,
+  replyTo = null,
+  editing = null,
+  onCancelReply,
+  onCancelEdit,
 }: ChatInputProps) {
   const { t } = useTranslation();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -70,6 +92,10 @@ export default function ChatInput({
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
   }, [emojiOpen]);
+
+  useEffect(() => {
+    if (editing) textareaRef.current?.focus();
+  }, [editing]);
 
   useEffect(() => {
     return () => {
@@ -196,6 +222,31 @@ export default function ChatInput({
         accept="image/*"
         onChange={onFilePicked('image')}
       />
+
+      {(replyTo || editing) && (
+        <div className="mb-2 flex items-start gap-3 px-3 py-2 rounded-xl bg-[#FF6B35]/10 border border-[#FF6B35]/30">
+          <span className="w-1 self-stretch rounded-full bg-[#FF6B35] shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-[#FF6B35]">
+              {editing ? t('messages.editing') : t('messages.replyingTo')}
+            </p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 truncate">
+              <span className="font-medium">{(editing || replyTo)?.sender_name || ''}</span>
+              {': '}
+              {stripPreview((editing || replyTo)?.content || '')}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={editing ? onCancelEdit : onCancelReply}
+            aria-label={t('common.cancel')}
+            title={t('common.cancel')}
+            className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {recording ? (
         <div className="flex items-center gap-3">

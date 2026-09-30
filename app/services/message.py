@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,6 +10,34 @@ from app.services.notification import NotificationService
 from app.utils.websocket import manager
 
 
+def _load_reactions(raw: str | None) -> dict:
+    if not raw:
+        return {}
+    try:
+        data = json.loads(raw)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _serialize(msg: Message) -> dict:
+    reply = getattr(msg, "reply_to", None)
+    return {
+        "id": msg.id,
+        "conversation_id": msg.conversation_id,
+        "sender_id": msg.sender_id,
+        "content": msg.content,
+        "created_at": msg.created_at.isoformat() if msg.created_at else None,
+        "reply_to_id": msg.reply_to_id,
+        "reply_to_content": reply.content if reply else None,
+        "reply_to_sender_id": reply.sender_id if reply else None,
+        "edited_at": msg.edited_at.isoformat() if msg.edited_at else None,
+        "pinned": bool(msg.pinned),
+        "reactions": _load_reactions(msg.reactions),
+        "forwarded_from_name": msg.forwarded_from_name,
+    }
+
+
 class MessageService:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -17,18 +46,44 @@ class MessageService:
         self.user_repo = UserRepository(db)
         self.notif_service = NotificationService(db)
 
-    async def send(self, conversation_id: int, sender_id: int, content: str) -> Message:
+    async def _participants(self, conversation_id: int) -> list[int]:
+        conv = await self.conv_repo.get_by_id(conversation_id)
+        if not conv:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        if not hasattr(conv, "_checked"):
+            conv._checked = True
+        return [conv.user1_id, conv.user2_id]
+
+    async def send(
+        self,
+        conversation_id: int,
+        sender_id: int,
+        content: str,
+        reply_to_id: int | None = None,
+        forwarded_from_name: str | None = None,
+    ) -> Message:
         conv = await self.conv_repo.get_by_id(conversation_id)
         if not conv:
             raise HTTPException(status_code=404, detail="Conversation not found")
         if sender_id not in (conv.user1_id, conv.user2_id):
             raise HTTPException(status_code=403, detail="Not a participant in this conversation")
 
+        reply_msg = None
+        if reply_to_id:
+            reply_msg = await self.repo.get_by_id(reply_to_id)
+            if not reply_msg or reply_msg.conversation_id != conversation_id:
+                reply_to_id = None
+                reply_msg = None
+
         message = await self.repo.create(
             conversation_id=conversation_id,
             sender_id=sender_id,
             content=content,
+            reply_to_id=reply_to_id,
+            forwarded_from_name=forwarded_from_name,
         )
+        if reply_msg:
+            message.reply_to = reply_msg
 
         conv.last_message_at = datetime.utcnow()
         await self.db.flush()
@@ -60,16 +115,85 @@ class MessageService:
             "type": "message",
             "event": "new_message",
             "conversation_id": conversation_id,
-            "message": {
-                "id": message.id,
-                "conversation_id": message.conversation_id,
-                "sender_id": message.sender_id,
-                "content": message.content,
-                "created_at": message.created_at.isoformat() if message.created_at else None,
-            },
+            "message": _serialize(message),
         }
         await manager.send_to_users(event, [conv.user1_id, conv.user2_id])
 
+        return message
+
+    async def edit(self, message_id: int, user_id: int, content: str) -> Message:
+        message = await self.repo.get_by_id(message_id)
+        if not message:
+            raise HTTPException(status_code=404, detail="Message not found")
+        if message.sender_id != user_id:
+            raise HTTPException(status_code=403, detail="Not allowed to edit this message")
+        message.content = content
+        message.edited_at = datetime.utcnow()
+        await self.db.flush()
+
+        event = {
+            "type": "message",
+            "event": "message_updated",
+            "conversation_id": message.conversation_id,
+            "message": _serialize(message),
+        }
+        await manager.send_to_users(event, await self._participants(message.conversation_id))
+        return message
+
+    async def toggle_reaction(self, message_id: int, user_id: int, emoji: str) -> dict:
+        message = await self.repo.get_by_id(message_id)
+        if not message:
+            raise HTTPException(status_code=404, detail="Message not found")
+        conv = await self.conv_repo.get_by_id(message.conversation_id)
+        if conv and user_id not in (conv.user1_id, conv.user2_id):
+            raise HTTPException(status_code=403, detail="Not a participant in this conversation")
+
+        reactions = _load_reactions(message.reactions)
+        users = [int(u) for u in reactions.get(emoji, [])]
+        if user_id in users:
+            users.remove(user_id)
+        else:
+            users.append(user_id)
+        if users:
+            reactions[emoji] = users
+        else:
+            reactions.pop(emoji, None)
+        message.reactions = json.dumps(reactions)
+        await self.db.flush()
+
+        event = {
+            "type": "message",
+            "event": "message_reaction",
+            "conversation_id": message.conversation_id,
+            "message_id": message.id,
+            "reactions": reactions,
+        }
+        if conv:
+            await manager.send_to_users(event, [conv.user1_id, conv.user2_id])
+        return reactions
+
+    async def set_pinned(self, message_id: int, user_id: int, pinned: bool) -> Message:
+        message = await self.repo.get_by_id(message_id)
+        if not message:
+            raise HTTPException(status_code=404, detail="Message not found")
+        conv = await self.conv_repo.get_by_id(message.conversation_id)
+        if conv and user_id not in (conv.user1_id, conv.user2_id):
+            raise HTTPException(status_code=403, detail="Not a participant in this conversation")
+
+        if pinned:
+            await self.repo.unpin_conversation_messages(message.conversation_id)
+        message.pinned = pinned
+        await self.db.flush()
+
+        event = {
+            "type": "message",
+            "event": "message_pinned",
+            "conversation_id": message.conversation_id,
+            "message_id": message.id,
+            "pinned": pinned,
+        }
+        if conv:
+            await manager.send_to_users(event, [conv.user1_id, conv.user2_id])
         return message
 
     async def get_messages(self, conversation_id: int, skip: int = 0, limit: int = 50) -> list[Message]:

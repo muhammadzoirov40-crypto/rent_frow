@@ -4,11 +4,11 @@ from app.core.database import get_db
 from app.core.dependencies import require_auth, CurrentUser
 from app.schemas.conversation import (
     ConversationResponse, MessageResponse, SendMessageRequest,
-    ConversationCreateRequest,
+    ConversationCreateRequest, EditMessageRequest, ReactionRequest, PinMessageRequest,
 )
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.conversation import ConversationService
-from app.services.message import MessageService
+from app.services.message import MessageService, _load_reactions
 from app.utils.s3 import get_presigned_url
 
 router = APIRouter(prefix="/messages", tags=["Messages"])
@@ -22,6 +22,19 @@ def _msg_to_response(msg) -> MessageResponse:
         except Exception:
             sender_avatar = msg.sender.avatar_url
 
+    reply = getattr(msg, "reply_to", None)
+    reply_content = None
+    reply_sender_name = None
+    if reply:
+        reply_content = reply.content
+        if reply.sender:
+            reply_sender_name = reply.sender.display_name
+
+    edited_at = getattr(msg, "edited_at", None)
+    pinned = bool(getattr(msg, "pinned", False))
+    reactions = _load_reactions(getattr(msg, "reactions", None))
+    forwarded = getattr(msg, "forwarded_from_name", None)
+
     return MessageResponse(
         id=msg.id,
         conversation_id=msg.conversation_id,
@@ -31,6 +44,13 @@ def _msg_to_response(msg) -> MessageResponse:
         created_at=msg.created_at,
         sender_name=msg.sender.display_name if msg.sender else None,
         sender_avatar=sender_avatar,
+        reply_to_id=getattr(msg, "reply_to_id", None),
+        reply_to_content=reply_content,
+        reply_to_sender_name=reply_sender_name,
+        edited_at=edited_at,
+        pinned=pinned,
+        reactions=reactions,
+        forwarded_from_name=forwarded,
     )
 
 
@@ -116,8 +136,50 @@ async def send_message(
     db: AsyncSession = Depends(get_db),
 ):
     msg_service = MessageService(db)
-    msg = await msg_service.send(conversation_id, current_user.user_id, data.content)
+    msg = await msg_service.send(
+        conversation_id,
+        current_user.user_id,
+        data.content,
+        reply_to_id=data.reply_to_id,
+        forwarded_from_name=data.forwarded_from_name,
+    )
     return APIResponse(message="Message sent", data=_msg_to_response(msg))
+
+
+@router.patch("/{message_id}", response_model=APIResponse[MessageResponse])
+async def edit_message(
+    message_id: int,
+    data: EditMessageRequest,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    msg_service = MessageService(db)
+    msg = await msg_service.edit(message_id, current_user.user_id, data.content)
+    return APIResponse(message="Message updated", data=_msg_to_response(msg))
+
+
+@router.post("/{message_id}/reactions", response_model=APIResponse[dict])
+async def toggle_reaction(
+    message_id: int,
+    data: ReactionRequest,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    msg_service = MessageService(db)
+    reactions = await msg_service.toggle_reaction(message_id, current_user.user_id, data.emoji)
+    return APIResponse(message="Reaction updated", data=reactions)
+
+
+@router.patch("/{message_id}/pin", response_model=APIResponse[MessageResponse])
+async def pin_message(
+    message_id: int,
+    data: PinMessageRequest,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    msg_service = MessageService(db)
+    msg = await msg_service.set_pinned(message_id, current_user.user_id, data.pinned)
+    return APIResponse(message="Message pinned" if data.pinned else "Message unpinned", data=_msg_to_response(msg))
 
 
 @router.post("/conversations/{conversation_id}/read", response_model=APIResponse)

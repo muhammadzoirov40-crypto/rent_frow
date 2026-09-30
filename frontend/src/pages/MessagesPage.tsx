@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, MessageSquare } from 'lucide-react';
+import { Search, MessageSquare, Pin, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { messages, upload } from '../api';
@@ -37,7 +37,7 @@ function voiceExt(mimeType: string): string {
 }
 
 export default function MessagesPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -45,6 +45,11 @@ export default function MessagesPage() {
   const [search, setSearch] = useState('');
   const [call, setCall] = useState<CallType | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
+  const [editing, setEditing] = useState<Message | null>(null);
+  const [forwardMsg, setForwardMsg] = useState<Message | null>(null);
+  const [translation, setTranslation] = useState<{ id: number; text: string } | null>(null);
+  const [translatingId, setTranslatingId] = useState<number | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: conversations = [], isLoading: convLoading } = useQuery<Conversation[]>({
@@ -61,8 +66,9 @@ export default function MessagesPage() {
   });
 
   const sendMutation = useMutation({
-    mutationFn: (content: string) => messages.sendMessage(selectedId!, content),
-    onMutate: async (content: string) => {
+    mutationFn: ({ content, replyToId }: { content: string; replyToId?: number | null }) =>
+      messages.sendMessage(selectedId!, content, { reply_to_id: replyToId ?? null }),
+    onMutate: async ({ content }: { content: string; replyToId?: number | null }) => {
       const convId = selectedId!;
       await queryClient.cancelQueries({ queryKey: ['messages', convId] });
       const temp: Message = {
@@ -77,15 +83,16 @@ export default function MessagesPage() {
       };
       queryClient.setQueryData<Message[]>(['messages', convId], (old) => (old ? [...old, temp] : [temp]));
       setInputText('');
+      setReplyTo(null);
       return { convId };
     },
-    onSuccess: (_data, _content, ctx) => {
+    onSuccess: (_data, _vars, ctx) => {
       if (ctx?.convId) {
         queryClient.invalidateQueries({ queryKey: ['messages', ctx.convId] });
       }
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     },
-    onError: (_err, _content, ctx) => {
+    onError: (_err, _vars, ctx) => {
       if (ctx?.convId) {
         queryClient.setQueryData<Message[]>(['messages', ctx.convId], (old) =>
           old ? old.filter((m) => m.id > 0) : old,
@@ -93,6 +100,46 @@ export default function MessagesPage() {
       }
       toast.error(t('messages.failedToSend'));
     },
+  });
+
+  const editMutation = useMutation({
+    mutationFn: ({ id, content }: { id: number; content: string }) => messages.editMessage(id, content),
+    onSuccess: () => {
+      setEditing(null);
+      setInputText('');
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      toast.success(t('messages.updated'));
+    },
+    onError: () => toast.error(t('common.error')),
+  });
+
+  const reactMutation = useMutation({
+    mutationFn: ({ id, emoji }: { id: number; emoji: string }) => messages.toggleReaction(id, emoji),
+    onSuccess: (_data, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['messages', selectedId] });
+      void vars;
+    },
+    onError: () => toast.error(t('common.error')),
+  });
+
+  const pinMutation = useMutation({
+    mutationFn: ({ id, pinned }: { id: number; pinned: boolean }) => messages.pinMessage(id, pinned),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages', selectedId] });
+    },
+    onError: () => toast.error(t('common.error')),
+  });
+
+  const forwardMutation = useMutation({
+    mutationFn: ({ targetId, content, fromName }: { targetId: number; content: string; fromName: string }) =>
+      messages.sendMessage(targetId, content, { forwarded_from_name: fromName }),
+    onSuccess: () => {
+      setForwardMsg(null);
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      toast.success(t('messages.forwarded'));
+    },
+    onError: () => toast.error(t('common.error')),
   });
 
   const markReadMutation = useMutation({
@@ -142,7 +189,7 @@ export default function MessagesPage() {
   useChatSocket((event) => {
     if (event.event === 'new_message' && event.message) {
       const convId = Number(event.conversation_id);
-      const m = event.message as {
+      const m = event.message as Record<string, unknown> & {
         id: number;
         conversation_id: number;
         sender_id: number;
@@ -165,11 +212,43 @@ export default function MessagesPage() {
               is_read: false,
               sender_name: null,
               sender_avatar: null,
+              reply_to_id: (m.reply_to_id as number | null) ?? null,
+              reply_to_content: (m.reply_to_content as string | null) ?? null,
+              reply_to_sender_name: (m.reply_to_sender_name as string | null) ?? null,
+              edited_at: (m.edited_at as string | null) ?? null,
+              pinned: Boolean(m.pinned),
+              reactions: (m.reactions as Record<string, number[]>) || {},
+              forwarded_from_name: (m.forwarded_from_name as string | null) ?? null,
             },
           ];
         });
       }
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      return;
+    }
+    if (event.event === 'message_updated' && event.message) {
+      const m = event.message as { id: number; conversation_id: number };
+      queryClient.setQueryData<Message[]>(['messages', Number(m.conversation_id)], (old) =>
+        old ? old.map((x) => (x.id === m.id ? { ...x, ...(m as Partial<Message>) } : x)) : old,
+      );
+      return;
+    }
+    if (event.event === 'message_reaction') {
+      const convId = Number(event.conversation_id);
+      const msgId = Number(event.message_id);
+      const reactions = event.reactions as Record<string, number[]>;
+      queryClient.setQueryData<Message[]>(['messages', convId], (old) =>
+        old ? old.map((x) => (x.id === msgId ? { ...x, reactions } : x)) : old,
+      );
+      return;
+    }
+    if (event.event === 'message_pinned') {
+      const convId = Number(event.conversation_id);
+      const msgId = Number(event.message_id);
+      const pinned = Boolean(event.pinned);
+      queryClient.setQueryData<Message[]>(['messages', convId], (old) =>
+        old ? old.map((x) => ({ ...x, pinned: x.id === msgId ? pinned : false })) : old,
+      );
       return;
     }
     if (event.event === 'message_deleted') {
@@ -200,14 +279,78 @@ export default function MessagesPage() {
 
 
   useEffect(() => {
-    if (selectedId) {
+    if (selectedId && chatMessages.length > 0) {
       markReadMutation.mutate(selectedId);
     }
   }, [selectedId, chatMessages.length]);
 
+  useEffect(() => {
+    if (selectedId) {
+      markReadMutation.mutate(selectedId);
+    }
+    setReplyTo(null);
+    setEditing(null);
+    setInputText('');
+    setTranslation(null);
+    setForwardMsg(null);
+  }, [selectedId]);
+
   const handleSend = () => {
-    if (!inputText.trim() || !selectedId) return;
-    sendMutation.mutate(inputText.trim());
+    if (!selectedId) return;
+    const text = inputText.trim();
+    if (!text) return;
+    if (editing) {
+      editMutation.mutate({ id: editing.id, content: text });
+      return;
+    }
+    sendMutation.mutate({ content: text, replyToId: replyTo?.id ?? null });
+  };
+
+  const handleReply = (msg: Message) => {
+    setEditing(null);
+    setReplyTo(msg);
+  };
+
+  const handleEdit = (msg: Message) => {
+    setReplyTo(null);
+    setEditing(msg);
+    setInputText(parseContent(msg.content || '').kind === 'text' ? parseContent(msg.content).text : msg.content);
+  };
+
+  const handleReact = (id: number, emoji: string) => {
+    reactMutation.mutate({ id, emoji });
+  };
+
+  const handlePin = (msg: Message, pinned: boolean) => {
+    pinMutation.mutate({ id: msg.id, pinned });
+  };
+
+  const handleTranslate = async (msg: Message) => {
+    const parsed = parseContent(msg.content || '');
+    if (parsed.kind !== 'text') return;
+    const lang = (i18n.language || 'en').toLowerCase();
+    const target = lang.startsWith('tj') ? 'tg' : lang.startsWith('ru') ? 'ru' : 'en';
+    setTranslatingId(msg.id);
+    setTranslation(null);
+    try {
+      const url =
+        'https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&dt=t&q=' +
+        encodeURIComponent(parsed.text) +
+        '&tl=' +
+        target;
+      const res = await fetch(url);
+      const data = await res.json();
+      const text = ((data?.[0] as unknown[]) || [])
+        .map((seg) => (Array.isArray(seg) ? String(seg[0] ?? '') : ''))
+        .join('')
+        .trim();
+      if (!text) throw new Error('empty');
+      setTranslation({ id: msg.id, text });
+    } catch {
+      toast.error(t('messages.translateFailed'));
+    } finally {
+      setTranslatingId(null);
+    }
   };
 
   const sendAttachment = async (file: File | Blob, kind: 'image' | 'file' | 'voice', duration?: number) => {
@@ -227,7 +370,7 @@ export default function MessagesPage() {
         const res = await upload.uploadFile(file as File);
         envelope = { kind: 'file', url: res.file_url, name: res.name, size: res.size };
       }
-      sendMutation.mutate(JSON.stringify(envelope));
+      sendMutation.mutate({ content: JSON.stringify(envelope) });
     } catch {
       toast.error(t('messages.uploadFailed'));
     }
@@ -250,6 +393,7 @@ export default function MessagesPage() {
   };
 
   const selectedConversation = conversations.find((c) => c.id === selectedId);
+  const pinnedMessage = selectedId ? chatMessages.find((m) => m.pinned) : undefined;
   const otherName = selectedConversation
     ? getOtherUser(selectedConversation)?.display_name || t('messages.user')
     : '';
@@ -342,7 +486,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className={`flex-1 min-w-0 flex flex-col bg-white dark:bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`relative flex-1 min-w-0 flex flex-col bg-white dark:bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div className="w-20 h-20 bg-[#FF6B35]/10 rounded-full flex items-center justify-center mb-4">
@@ -364,6 +508,29 @@ export default function MessagesPage() {
               onClear={handleClearConversation}
             />
 
+            {pinnedMessage && (
+              <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-white/10 bg-orange-500/10">
+                <span className="w-8 h-8 rounded-full bg-[#FF6B35] text-white flex items-center justify-center shrink-0">
+                  <Pin className="w-4 h-4" />
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-semibold text-[#FF6B35]">{t('messages.pinned')}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate">
+                    {previewText(pinnedMessage.content)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => pinMutation.mutate({ id: pinnedMessage.id, pinned: false })}
+                  aria-label={t('messages.unpin')}
+                  title={t('messages.unpin')}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+
             <ChatMessageList
               messages={chatMessages}
               currentUserId={user?.id}
@@ -371,6 +538,14 @@ export default function MessagesPage() {
               onOpenImage={setLightboxSrc}
               onDelete={handleDeleteMessage}
               canDeleteOthers={user?.role === 'ADMIN'}
+              onReply={handleReply}
+              onEdit={handleEdit}
+              onForward={setForwardMsg}
+              onReact={handleReact}
+              onPin={handlePin}
+              onTranslate={handleTranslate}
+              translation={translation}
+              translatingId={translatingId}
             />
             <div ref={messagesEndRef} className="hidden" />
 
@@ -381,7 +556,67 @@ export default function MessagesPage() {
               onAttach={(file, kind) => sendAttachment(file, kind)}
               onVoice={(blob, duration) => sendAttachment(blob, 'voice', duration)}
               sending={sendMutation.isPending}
+              replyTo={replyTo}
+              editing={editing}
+              onCancelReply={() => setReplyTo(null)}
+              onCancelEdit={() => {
+                setEditing(null);
+                setInputText('');
+              }}
             />
+
+            {forwardMsg && (
+              <div
+                className="absolute inset-0 z-40 bg-black/50 flex items-center justify-center p-4"
+                onClick={() => setForwardMsg(null)}
+              >
+                <div
+                  className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
+                    <p className="font-semibold text-gray-900 dark:text-white text-sm">{t('messages.forwardTo')}</p>
+                    <button
+                      type="button"
+                      onClick={() => setForwardMsg(null)}
+                      aria-label={t('common.cancel')}
+                      className="p-1 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="max-h-72 overflow-y-auto">
+                    {conversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        type="button"
+                        disabled={forwardMutation.isPending}
+                        onClick={() =>
+                          forwardMutation.mutate({
+                            targetId: conv.id,
+                            content: forwardMsg.content,
+                            fromName: otherName || t('messages.user'),
+                          })
+                        }
+                        className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition disabled:opacity-50"
+                      >
+                        <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                          {conv.other_user_name?.charAt(0) || '?'}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {conv.other_user_name || t('messages.user')}
+                          </span>
+                          <span className="block text-xs text-gray-400 truncate">
+                            {previewText(conv.last_message_content)}
+                          </span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         )}
 

@@ -14,6 +14,13 @@ class MessageResponse(BaseModel):
     created_at: datetime
     sender_name: Optional[str] = None
     sender_avatar: Optional[str] = None
+    reply_to_id: Optional[int] = None
+    reply_to_content: Optional[str] = None
+    reply_to_sender_name: Optional[str] = None
+    edited_at: Optional[datetime] = None
+    pinned: bool = False
+    reactions: dict[str, list[int]] = Field(default_factory=dict)
+    forwarded_from_name: Optional[str] = None
 
 
 class ConversationResponse(BaseModel):
@@ -33,6 +40,20 @@ class ConversationResponse(BaseModel):
 
 class SendMessageRequest(BaseModel):
     content: str = Field(..., min_length=1, max_length=5000)
+    reply_to_id: Optional[int] = None
+    forwarded_from_name: Optional[str] = Field(None, max_length=255)
+
+
+class EditMessageRequest(BaseModel):
+    content: str = Field(..., min_length=1, max_length=5000)
+
+
+class ReactionRequest(BaseModel):
+    emoji: str = Field(..., min_length=1, max_length=16)
+
+
+class PinMessageRequest(BaseModel):
+    pinned: bool = True
 
 
 class ConversationCreateRequest(BaseModel):

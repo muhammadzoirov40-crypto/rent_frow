@@ -14,8 +14,15 @@ class Message(Base):
     is_read: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
+    reply_to_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("messages.id"), nullable=True, index=True)
+    edited_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    pinned: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    reactions: Mapped[str | None] = mapped_column(Text, nullable=True)
+    forwarded_from_name: Mapped[str | None] = mapped_column(Text, nullable=True)
+
     conversation = relationship("Conversation", back_populates="messages", lazy="selectin")
     sender = relationship("User", back_populates="sent_messages", lazy="selectin")
+    reply_to = relationship("Message", remote_side=[id], lazy="selectin")
 
     __table_args__ = (
         Index("idx_message_conversation_created", "conversation_id", "created_at"),
