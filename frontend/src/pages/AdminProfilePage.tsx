@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { authApi, UserProfile } from '../api/authApi'
 import Toast from '../components/Toast'
+import { formatDateTime, formatMonthYear } from '../utils/dates';
 
 interface AdminProfilePageProps {
   user: UserProfile
@@ -338,21 +339,14 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
               <div>
                 <label className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('profile.lastLogin')}</label>
                 <p className="text-gray-900 dark:text-white text-sm mt-2 font-medium">
-                  {new Date(profile.updated_at).toLocaleString('en-US', {
-                    dateStyle: 'medium',
-                    timeStyle: 'short',
-                  })}
+                  {formatDateTime(profile.updated_at)}
                 </p>
               </div>
 
               <div>
                 <label className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('profile.memberSince')}</label>
                 <p className="text-gray-900 dark:text-white text-sm mt-2 font-medium">
-                  {new Date(profile.created_at).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
+                  {formatMonthYear(profile.created_at)}
                 </p>
               </div>
             </div>

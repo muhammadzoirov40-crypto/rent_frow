@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { rentalRequests } from '../api';
 import type { RentalRequest } from '../api';
 import BackButton from '../components/ui/BackButton';
+import { formatDate } from '../utils/dates';
 
 type Tab = 'my-requests' | 'owner-requests';
 
@@ -79,16 +80,16 @@ function RequestCard({
           <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-3 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5" />
-              {new Date(req.start_date).toLocaleDateString('ru-RU')} — {new Date(req.end_date).toLocaleDateString('ru-RU')}
+              {formatDate(req.start_date)} — {formatDate(req.end_date)}
             </span>
             {req.total_price > 0 && (
               <span className="font-bold text-[#FF6B35]">
-                {req.total_price.toLocaleString()} сом / {req.total_days} {t('common.days')}
+                {req.total_price.toLocaleString('ru-RU')} сом / {req.total_days} {t('common.days')}
               </span>
             )}
             <span className="flex items-center gap-1.5 text-gray-400">
               <Clock className="w-3.5 h-3.5" />
-              {new Date(req.created_at).toLocaleDateString('ru-RU')}
+              {formatDate(req.created_at)}
             </span>
           </div>
 

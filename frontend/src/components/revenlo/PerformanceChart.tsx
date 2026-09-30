@@ -22,7 +22,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-xs font-medium text-gray-500 mb-0.5">{label}-Apr 2025</p>
         <p className="text-[11px] text-gray-400 mb-1">Total Revenue</p>
         <p className="text-sm font-bold text-gray-900">
-          -${payload[0].value.toLocaleString()}
+          -${payload[0].value.toLocaleString('ru-RU')}
         </p>
       </div>
     )

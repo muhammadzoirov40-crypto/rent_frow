@@ -12,6 +12,7 @@ import { auth, listings, favorites, rentalRequests } from '../api';
 import useAuthStore from '../store/authStore';
 import BackButton from '../components/ui/BackButton';
 import type { Listing, ListingListItem, RentalRequest } from '../api';
+import { formatDate } from '../utils/dates';
 
 type Tab = 'listings' | 'favorites' | 'my-requests' | 'owner-requests' | 'settings';
 
@@ -237,7 +238,7 @@ export default function ProfilePage() {
                 <span className="flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5" />
                   {meUser?.created_at
-                    ? new Date(meUser.created_at).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long' })
+                    ? formatDate(meUser.created_at)
                     : 'Недавно'}
                 </span>
               </div>
@@ -366,7 +367,7 @@ export default function ProfilePage() {
                           </span>
                         )}
                         <span className="font-bold text-[#FF6B35]">
-                          {listing.price.toLocaleString()} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
+                          {listing.price.toLocaleString('ru-RU')} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-3">
@@ -434,7 +435,7 @@ export default function ProfilePage() {
                           </span>
                         )}
                         <span className="font-bold text-[#FF6B35]">
-                          {listing.price.toLocaleString()} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
+                          {listing.price.toLocaleString('ru-RU')} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
                         </span>
                       </div>
                     </div>
@@ -478,11 +479,11 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3.5 h-3.5" />
-                            {new Date(req.start_date).toLocaleDateString('ru-RU')} — {new Date(req.end_date).toLocaleDateString('ru-RU')}
+                            {formatDate(req.start_date)} — {formatDate(req.end_date)}
                           </span>
                           {req.total_price > 0 && (
                             <span className="font-bold text-[#FF6B35]">
-                              {req.total_price.toLocaleString()} {t('common.currency')}/{t('common.days')}
+                              {req.total_price.toLocaleString('ru-RU')} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}
                         </div>
@@ -537,11 +538,11 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3.5 h-3.5" />
-                            {new Date(req.start_date).toLocaleDateString('ru-RU')} — {new Date(req.end_date).toLocaleDateString('ru-RU')}
+                            {formatDate(req.start_date)} — {formatDate(req.end_date)}
                           </span>
                           {req.total_price > 0 && (
                             <span className="font-bold text-[#FF6B35]">
-                              {req.total_price.toLocaleString()} {t('common.currency')}/{t('common.days')}
+                              {req.total_price.toLocaleString('ru-RU')} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}
                         </div>

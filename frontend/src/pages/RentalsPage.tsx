@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { rentalApi, equipmentApi, type Rental, type Equipment } from '../api/dataApi'
+import { formatDate } from '../utils/dates';
 
 export default function RentalsPage() {
   const { t } = useTranslation()
@@ -146,14 +147,14 @@ export default function RentalsPage() {
                     <div className="flex justify-between">
                       <span className="text-gray-500 dark:text-slate-500">{t('rentals.pickedUp')}</span>
                       <span className="font-medium text-gray-800 dark:text-white">
-                        {r.pickup_at ? new Date(r.pickup_at).toLocaleDateString() : t('rentals.pending')}
+                        {r.pickup_at ? formatDate(r.pickup_at) : t('rentals.pending')}
                       </span>
                     </div>
                     {r.returned_at && (
                       <div className="flex justify-between">
                         <span className="text-gray-500 dark:text-slate-500">{t('rentals.returned')}</span>
                         <span className="font-medium text-gray-800 dark:text-white">
-                          {new Date(r.returned_at).toLocaleDateString()}
+                          {formatDate(r.returned_at)}
                         </span>
                       </div>
                     )}

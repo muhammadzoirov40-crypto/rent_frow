@@ -5,6 +5,7 @@ import { ru } from 'date-fns/locale';
 import { listings, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { parseDate } from '../../utils/dates';
 
 type ListingCardData = (Listing | ListingListItem) & {
   images?: { id: number; image_url: string }[];
@@ -96,7 +97,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const ownerAvatar = getOwnerAvatar(listing);
   const ownerRole = getOwnerRole(listing);
 
-  const timeAgo = formatDistanceToNow(new Date(listing.created_at), {
+  const timeAgo = formatDistanceToNow(parseDate(listing.created_at), {
     addSuffix: true,
     locale: ru,
   });

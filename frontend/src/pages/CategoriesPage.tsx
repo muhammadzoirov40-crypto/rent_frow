@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { categoryApi, Category } from '../api/dataApi'
 import Toast from '../components/Toast'
+import { formatDate } from '../utils/dates';
 
 export default function CategoriesPage() {
   const { t, i18n } = useTranslation()
@@ -243,12 +244,12 @@ export default function CategoriesPage() {
                 )}
                 {cat.start_date && (
                   <p className="text-brand-500 dark:text-brand-400 text-[11px] mt-1 font-medium">
-                    {t('categories.startDate')}: {new Date(cat.start_date).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'tj' ? 'ru-TJ' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {t('categories.startDate')}: {formatDate(cat.start_date)}
                   </p>
                 )}
                 <div className="mt-3 pt-3 border-t border-gray-100 dark:border-white/[0.04] flex items-center justify-between">
                   <span className="text-[11px] text-gray-400 dark:text-slate-500">
-                    {new Date(cat.created_at).toLocaleDateString(i18n.language === 'ru' ? 'ru-RU' : i18n.language === 'tj' ? 'ru-TJ' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {formatDate(cat.created_at)}
                   </span>
                   <span className="inline-flex items-center gap-1 text-[11px] font-medium text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 px-2 py-0.5 rounded-full">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

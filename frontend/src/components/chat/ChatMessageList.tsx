@@ -4,6 +4,7 @@ import { Download, FileText, Loader2 } from 'lucide-react';
 import type { Message } from '../../api';
 import { formatBytes, parseContent, type Attachment } from './messageContent';
 import VoicePlayer from './VoicePlayer';
+import { parseDate } from '../../utils/dates';
 
 interface ChatMessageListProps {
   messages: Message[];
@@ -15,7 +16,7 @@ interface ChatMessageListProps {
 function BubbleTime({ date, mine }: { date: string; mine: boolean }) {
   return (
     <span className={`text-[10px] ${mine ? 'text-white/60' : 'text-gray-400 dark:text-gray-500'}`}>
-      {new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      {parseDate(date).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
     </span>
   );
 }

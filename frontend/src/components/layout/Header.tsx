@@ -30,6 +30,7 @@ import {
   getTypeStyle,
   notificationSummary,
 } from '../../utils/notifications'
+import { parseDate, formatDate } from '../../utils/dates';
 
 const LANGUAGES = [
   { code: 'tj', label: 'Тоҷикӣ', flag: '🇹🇯' },
@@ -88,7 +89,7 @@ export default function Header() {
   const notifUnread = notifList.filter((n) => !n.is_read).length
 
   const timeAgo = (iso: string) => {
-    const diff = Date.now() - new Date(iso).getTime()
+    const diff = Date.now() - parseDate(iso).getTime()
     const mins = Math.floor(diff / 60000)
     if (mins < 1) return 'сейчас'
     if (mins < 60) return `${mins} мин назад`
@@ -96,7 +97,7 @@ export default function Header() {
     if (hours < 24) return `${hours} ч назад`
     const days = Math.floor(hours / 24)
     if (days < 30) return `${days} дн назад`
-    return new Date(iso).toLocaleDateString('ru-RU')
+    return formatDate(iso)
   }
 
   useEffect(() => {

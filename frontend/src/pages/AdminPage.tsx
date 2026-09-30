@@ -14,6 +14,7 @@ import {
 } from 'recharts';
 import client from '../api/client';
 import type { User, Listing, RentalRequest, Category } from '../api';
+import { formatDate } from '../utils/dates';
 
 interface AdminStats {
   totalUsers: number;
@@ -526,7 +527,7 @@ export default function AdminPage() {
                       </div>
                       <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
                     </div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value.toLocaleString()}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value.toLocaleString('ru-RU')}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
                   </div>
                 ))}
@@ -661,7 +662,7 @@ export default function AdminPage() {
                           <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
                         </div>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {card.label === t('admin.totalRevenue') ? `${card.value.toLocaleString()} сом` : card.value.toLocaleString()}
+                          {card.label === t('admin.totalRevenue') ? `${card.value.toLocaleString('ru-RU')} сом` : card.value.toLocaleString('ru-RU')}
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
                       </div>
@@ -692,11 +693,11 @@ export default function AdminPage() {
                               </div>
                               <p className="text-xs text-gray-400 mt-0.5">
                                 {t(`admin.crmType_${item.type}`)} · {item.user || '—'}
-                                {item.amount != null ? ` · ${item.amount.toLocaleString()} сом` : ''}
+                                {item.amount != null ? ` · ${item.amount.toLocaleString('ru-RU')} сом` : ''}
                               </p>
                             </div>
                             <p className="text-xs text-gray-400 whitespace-nowrap">
-                              {new Date(item.created_at).toLocaleDateString('ru-RU')}
+                              {formatDate(item.created_at)}
                             </p>
                           </div>
                         ))}
@@ -730,8 +731,8 @@ export default function AdminPage() {
                                 <td className="px-6 py-3 text-sm text-gray-500">{r.renter_name || '—'}</td>
                                 <td className="px-6 py-3 text-sm text-gray-500">{r.start_date} — {r.end_date}</td>
                                 <td className="px-6 py-3"><StatusBadge status={r.status.toLowerCase()} t={t} /></td>
-                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{r.total_price.toLocaleString()} сом</td>
-                                <td className="px-6 py-3 text-sm text-gray-400">{new Date(r.created_at).toLocaleDateString('ru-RU')}</td>
+                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{r.total_price.toLocaleString('ru-RU')} сом</td>
+                                <td className="px-6 py-3 text-sm text-gray-400">{formatDate(r.created_at)}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -763,9 +764,9 @@ export default function AdminPage() {
                               <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
                                 <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">#{p.id}</td>
                                 <td className="px-6 py-3 text-sm text-gray-500">{p.customer_name || '—'}</td>
-                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{p.amount.toLocaleString()} сом</td>
+                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{p.amount.toLocaleString('ru-RU')} сом</td>
                                 <td className="px-6 py-3"><StatusBadge status={p.status.toLowerCase()} t={t} /></td>
-                                <td className="px-6 py-3 text-sm text-gray-400">{new Date(p.created_at).toLocaleDateString('ru-RU')}</td>
+                                <td className="px-6 py-3 text-sm text-gray-400">{formatDate(p.created_at)}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -803,7 +804,7 @@ export default function AdminPage() {
                                   </span>
                                 </td>
                                 <td className="px-6 py-3"><StatusBadge status={u.is_active ? 'active' : 'blocked'} t={t} /></td>
-                                <td className="px-6 py-3 text-sm text-gray-400">{new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
+                                <td className="px-6 py-3 text-sm text-gray-400">{formatDate(u.created_at)}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -1088,7 +1089,7 @@ export default function AdminPage() {
                                 <StatusBadge status={r.status} t={t} />
                               </td>
                               <td className="px-6 py-4 text-sm text-gray-400">
-                                {new Date(r.created_at).toLocaleDateString('ru-RU')}
+                                {formatDate(r.created_at)}
                               </td>
                             </tr>
                           );
@@ -1231,7 +1232,7 @@ export default function AdminPage() {
                               <StatusBadge status={p.status} t={t} />
                             </td>
                             <td className="px-6 py-4 text-xs text-gray-400">
-                              {new Date(p.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                              {formatDate(p.created_at)}
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex items-center justify-end gap-1">
@@ -1383,7 +1384,7 @@ export default function AdminPage() {
                   <Clock className="w-3.5 h-3.5" /> {t('admin.joinedDate')}
                 </p>
                 <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">
-                  {new Date(profileUser.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                  {formatDate(profileUser.created_at)}
                 </p>
               </div>
             </div>

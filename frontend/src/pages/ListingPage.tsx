@@ -22,6 +22,7 @@ import {
   BadgeCheck,
   Trash2,
 } from 'lucide-react';
+import { formatDate } from '../utils/dates';
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
   return (
@@ -304,7 +305,7 @@ export default function ListingPage() {
                 <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
                   <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t('listing.datePosted')}</span>
                   <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">
-                    {new Date(listing.created_at).toLocaleDateString('ru-RU')}
+                    {formatDate(listing.created_at)}
                   </span>
                 </div>
                 <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
@@ -484,7 +485,7 @@ export default function ListingPage() {
                           <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">{review.customer_name || 'Пользователь'}</span>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-xs text-gray-400">{new Date(review.created_at).toLocaleDateString('ru-RU')}</span>
+                          <span className="text-xs text-gray-400">{formatDate(review.created_at)}</span>
                           {canDelete && (
                             <button
                               onClick={() => {

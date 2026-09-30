@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { adminUserApi, AdminUser } from '../api/dataApi'
 import Toast from '../components/Toast'
+import { formatDate } from '../utils/dates';
 
 function getInitials(nameOrEmail: string): string {
   if (!nameOrEmail) return '??'
@@ -176,7 +177,7 @@ export default function UsersPage() {
                           {user.role === 'ADMIN' ? t('users.admin') : t('users.customer')}
                         </span>
                         <span className="text-xs text-gray-400 dark:text-slate-500">
-                          {new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+                          {formatDate(user.created_at)}
                         </span>
                         <button
                           onClick={() => handleEdit(user)}

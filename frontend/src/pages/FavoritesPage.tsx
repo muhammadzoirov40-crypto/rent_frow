@@ -103,7 +103,7 @@ export default function FavoritesPage() {
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
                     <span className="text-xl font-bold text-[#FF6B35]">
-                      {listing.price.toLocaleString()} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}</span>
+                      {listing.price.toLocaleString('ru-RU')} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}</span>
                     </span>
                   </div>
                 </div>

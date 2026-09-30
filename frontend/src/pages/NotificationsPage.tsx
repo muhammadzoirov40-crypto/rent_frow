@@ -11,10 +11,11 @@ import {
   getNotificationRoute,
   getTypeStyle,
 } from '../utils/notifications';
+import { parseDate, formatDate } from '../utils/dates';
 
 function timeAgo(dateStr: string): string {
   const now = Date.now();
-  const then = new Date(dateStr).getTime();
+  const then = parseDate(dateStr).getTime();
   const seconds = Math.floor((now - then) / 1000);
   if (seconds < 60) return 'только что';
   const minutes = Math.floor(seconds / 60);
@@ -23,7 +24,7 @@ function timeAgo(dateStr: string): string {
   if (hours < 24) return `${hours} ч. назад`;
   const days = Math.floor(hours / 24);
   if (days < 7) return `${days} дн. назад`;
-  return new Date(dateStr).toLocaleDateString('ru-RU');
+  return formatDate(dateStr);
 }
 
 export default function NotificationsPage() {
