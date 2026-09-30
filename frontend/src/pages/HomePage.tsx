@@ -30,7 +30,7 @@ import {
   Star,
   LayoutGrid,
 } from 'lucide-react';
-import { listings, categories, cities, type Category, type City, type ListingListItem } from '../api/index';
+import { listings, categories, cities, stats, type Category, type City, type ListingListItem } from '../api/index';
 import ListingGrid from '../components/listings/ListingGrid';
 import SearchBar from '../components/search/SearchBar';
 
@@ -107,6 +107,12 @@ export default function HomePage() {
       );
       return Object.fromEntries(entries) as Record<number, number>;
     },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: siteStats } = useQuery({
+    queryKey: ['publicStats'],
+    queryFn: stats.getPublic,
     staleTime: 5 * 60 * 1000,
   });
 
@@ -295,10 +301,10 @@ export default function HomePage() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {[
-            { value: '1 000+', label: t('home.statsListings'), icon: Star },
-            { value: '5 000+', label: t('home.statsUsers'), icon: Users },
-            { value: '10', label: t('home.statsCities'), icon: MapPin },
-            { value: '4.8', label: t('home.statsRating'), icon: ShieldCheck },
+            { value: siteStats ? String(siteStats.listings) : '—', label: t('home.statsListings'), icon: Star },
+            { value: siteStats ? String(siteStats.users) : '—', label: t('home.statsUsers'), icon: Users },
+            { value: siteStats ? String(siteStats.cities) : '—', label: t('home.statsCities'), icon: MapPin },
+            { value: siteStats ? siteStats.avg_rating.toFixed(1) : '—', label: t('home.statsRating'), icon: ShieldCheck },
           ].map((stat, idx) => (
             <div key={idx} className="rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 text-center">
               <div className="text-2xl font-extrabold text-[#FF6B35]">{stat.value}</div>

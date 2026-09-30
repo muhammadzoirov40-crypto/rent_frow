@@ -22,6 +22,7 @@ from app.api.routes import (
     cities,
     upload,
     statistics,
+    stats,
 )
 from app.utils.websocket import websocket_endpoint
 
@@ -49,6 +50,7 @@ api_router.include_router(notifications.router)
 api_router.include_router(cities.router)
 api_router.include_router(upload.router)
 api_router.include_router(statistics.router)
+api_router.include_router(stats.router)
 
 
 @api_router.websocket("/ws/{user_id}")

@@ -306,6 +306,17 @@ export const cities = {
     client.get<APIResponse<District[]>>(`/cities/${cityId}/districts`).then(unwrap),
 };
 
+export interface PublicStats {
+  listings: number;
+  users: number;
+  cities: number;
+  avg_rating: number;
+}
+
+export const stats = {
+  getPublic: () => client.get<APIResponse<PublicStats>>('/stats').then(unwrap),
+};
+
 export const favorites = {
   getAll: (page = 1, page_size = 20) =>
     client.get<PaginatedResponse<ListingListItem>>('/favorites', { params: { page, page_size } }).then(unwrapPaginated),
