@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { auth, listings, favorites, rentalRequests } from '../api';
 import useAuthStore from '../store/authStore';
+import BackButton from '../components/ui/BackButton';
 import type { Listing, ListingListItem, RentalRequest } from '../api';
 
 type Tab = 'listings' | 'favorites' | 'my-requests' | 'owner-requests' | 'settings';
@@ -163,6 +164,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
+        <BackButton className="mb-4" />
         <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="relative group" onClick={() => avatarInputRef.current?.click()}>

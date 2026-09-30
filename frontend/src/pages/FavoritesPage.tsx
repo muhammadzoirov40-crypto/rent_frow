@@ -4,6 +4,7 @@ import { Heart, MapPin, Package, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { favorites, listings, type ListingListItem } from '../api';
+import BackButton from '../components/ui/BackButton';
 
 const PRICE_UNIT_LABELS: Record<string, string> = {
   per_hour: '/час',
@@ -40,6 +41,7 @@ export default function FavoritesPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-6xl mx-auto">
+        <BackButton className="mb-4" />
         <h1 className="text-3xl font-bold text-[#1A1A2E] dark:text-white mb-2">{t('favorites.title')}</h1>
         <p className="text-gray-500 dark:text-gray-400 mb-8">{t('favorites.count', { count: favs.length })}</p>
 

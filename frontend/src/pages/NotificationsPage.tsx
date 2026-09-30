@@ -4,6 +4,7 @@ import { Bell, CheckCheck, Clock } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '../api';
+import BackButton from '../components/ui/BackButton';
 import type { Notification } from '../api';
 import {
   formatNotification,
@@ -78,6 +79,7 @@ export default function NotificationsPage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-2xl mx-auto">
+        <BackButton className="mb-4" />
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('notifications.title')}</h1>

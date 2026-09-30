@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
@@ -508,19 +507,6 @@ export default function AdminPage() {
                 </button>
               ))}
             </nav>
-            {!adminSidebarCollapsed && (
-              <div className="mt-6 rounded-2xl border border-[#FF6B35]/25 bg-gradient-to-br from-[#FF6B35]/10 via-transparent to-transparent p-4">
-                <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mb-3">
-                  {t('admin.sidebarCta')}
-                </p>
-                <Link
-                  to="/create-listing"
-                  className="block w-full text-center px-4 py-2.5 rounded-xl bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-semibold transition shadow-lg shadow-[#FF6B35]/25"
-                >
-                  {t('nav.createListing')}
-                </Link>
-              </div>
-            )}
           </div>
         </aside>
 

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import useAuthStore from './store/authStore';
 import { useEffect, Suspense } from 'react';
 import LoadingSpinner from './components/ui/LoadingSpinner';
+import { recordPath } from './utils/navHistory';
 import Layout from './components/layout/Layout';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
@@ -62,6 +63,16 @@ function SiteLayout() {
   );
 }
 
+function NavRecorder() {
+  const location = useLocation();
+
+  useEffect(() => {
+    recordPath(location.pathname);
+  }, [location.pathname]);
+
+  return null;
+}
+
 export default function App() {
   const { initialize, isInitialized } = useAuthStore();
 
@@ -78,7 +89,9 @@ export default function App() {
   }
 
   return (
-    <Routes>
+    <>
+      <NavRecorder />
+      <Routes>
         {/* Revenlo admin dashboard — full-screen, outside site Layout */}
         <Route
           path="/revenlo/*"
@@ -165,6 +178,7 @@ export default function App() {
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '../contexts/ThemeContext'
 import Toast from '../components/Toast'
+import BackButton from '../components/ui/BackButton';
 
 const LANGUAGES = [
   { code: 'en', label: 'English' },
@@ -35,6 +36,7 @@ export default function SettingsPage() {
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div className="max-w-2xl mx-auto">
+        <BackButton className="mb-4" />
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{t('settings.title')}</h1>
           <p className="text-gray-500 dark:text-slate-400 mt-1 text-sm">{t('settings.subtitle')}</p>

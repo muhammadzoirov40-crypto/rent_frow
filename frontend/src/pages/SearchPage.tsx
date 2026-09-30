@@ -24,6 +24,7 @@ import {
 } from '../api/index';
 import ListingGrid from '../components/listings/ListingGrid';
 import CustomSelect from '../components/ui/CustomSelect';
+import BackButton from '../components/ui/BackButton';
 
 const SORT_OPTIONS = [
   { value: 'relevance', labelKey: 'search.sortRelevance' },
@@ -56,6 +57,7 @@ function FilterSidebar({
   districts,
   filters,
   onFilterChange,
+  onFilterPatch,
   onReset,
   loadingDistricts,
 }: {
@@ -64,6 +66,7 @@ function FilterSidebar({
   districts: District[];
   filters: Record<string, string>;
   onFilterChange: (key: string, value: string) => void;
+  onFilterPatch: (patch: Record<string, string>) => void;
   onReset: () => void;
   loadingDistricts: boolean;
 }) {
@@ -84,26 +87,26 @@ function FilterSidebar({
     ...categoriesList.map((c) => ({ value: String(c.id), label: c.name })),
   ];
 
+  const labelCls =
+    'block text-[11px] font-bold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2';
+  const sectionCls =
+    'pb-4 mb-4 border-b border-gray-100 dark:border-white/[0.07] last:border-0 last:mb-0 last:pb-0';
+  const inputCls =
+    'w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/40 focus:border-[#FF6B35]/50 transition';
+
   return (
-    <div className="space-y-5">
-      <div>
-        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-          {t('search.city')}
-        </label>
+    <div>
+      <div className={sectionCls}>
+        <label className={labelCls}>{t('search.city')}</label>
         <CustomSelect
           options={cityOptions}
           value={filters.city_id || ''}
-          onChange={(val) => {
-            onFilterChange('city_id', val);
-            onFilterChange('district_id', '');
-          }}
+          onChange={(val) => onFilterPatch({ city_id: val, district_id: '' })}
         />
       </div>
 
-      <div>
-        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-          {t('search.district')}
-        </label>
+      <div className={sectionCls}>
+        <label className={labelCls}>{t('search.district')}</label>
         <CustomSelect
           options={districtOptions}
           value={filters.district_id || ''}
@@ -112,49 +115,40 @@ function FilterSidebar({
         />
       </div>
 
-      <div>
-        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-          {t('search.price')}
-        </label>
-        <div className="flex gap-2">
+      <div className={sectionCls}>
+        <label className={labelCls}>{t('search.price')}</label>
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <input
             type="number"
+            inputMode="numeric"
             placeholder={t('search.priceFrom')}
             value={filters.price_min || ''}
             onChange={(e) => onFilterChange('price_min', e.target.value)}
-            className="w-1/2 border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
+            className={inputCls}
           />
+          <span className="text-gray-300 dark:text-gray-600">&mdash;</span>
           <input
             type="number"
+            inputMode="numeric"
             placeholder={t('search.priceTo')}
             value={filters.price_max || ''}
             onChange={(e) => onFilterChange('price_max', e.target.value)}
-            className="w-1/2 border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm bg-white dark:bg-white/5 text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
+            className={inputCls}
           />
         </div>
       </div>
 
-      <div>
-        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-          {t('search.priceUnit')}
-        </label>
-        <select
+      <div className={sectionCls}>
+        <label className={labelCls}>{t('search.priceUnit')}</label>
+        <CustomSelect
+          options={PRICE_UNITS.map((u) => ({ value: u.value, label: t(u.labelKey) }))}
           value={filters.price_unit || ''}
-          onChange={(e) => onFilterChange('price_unit', e.target.value)}
-          className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-sm bg-white dark:bg-white/5 appearance-none text-gray-900 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 focus:border-[#FF6B35]/50 outline-none"
-        >
-          {PRICE_UNITS.map((u) => (
-            <option key={u.value} value={u.value}>
-              {t(u.labelKey)}
-            </option>
-          ))}
-        </select>
+          onChange={(val) => onFilterChange('price_unit', val)}
+        />
       </div>
 
-      <div>
-        <label className="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-          {t('search.category')}
-        </label>
+      <div className={sectionCls}>
+        <label className={labelCls}>{t('search.category')}</label>
         <CustomSelect
           options={categoryOptions}
           value={filters.category_id || ''}
@@ -162,21 +156,22 @@ function FilterSidebar({
         />
       </div>
 
-      <div>
-        <label className="flex items-center gap-2 cursor-pointer">
+      <div className={sectionCls}>
+        <label className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/[0.07] px-3.5 py-3 cursor-pointer select-none hover:border-[#FF6B35]/40 hover:bg-[#FF6B35]/5 transition">
           <input
             type="checkbox"
             checked={filters.is_verified === 'true'}
             onChange={(e) => onFilterChange('is_verified', e.target.checked ? 'true' : '')}
-            className="w-4 h-4 text-[#FF6B35] border-gray-300 rounded focus:ring-[#FF6B35]"
+            className="peer sr-only"
           />
-          <span className="text-sm text-gray-700 dark:text-gray-300">{t('search.verifiedOnly')}</span>
+          <span className="w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 peer-checked:border-[#FF6B35] peer-checked:bg-[#FF6B35] peer-focus-visible:ring-2 peer-focus-visible:ring-[#FF6B35]/40 transition" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('search.verifiedOnly')}</span>
         </label>
       </div>
 
       <button
         onClick={onReset}
-        className="w-full flex items-center justify-center gap-2 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-300 hover:border-[#FF6B35]/50 hover:text-[#FF6B35] hover:bg-[#FF6B35]/5 dark:hover:bg-[#FF6B35]/10 transition"
+        className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-[#FF6B35]/30 bg-[#FF6B35]/[0.06] text-sm font-bold text-[#FF6B35] hover:bg-[#FF6B35]/15 hover:border-[#FF6B35]/50 transition"
       >
         <RotateCcw className="w-4 h-4" />
         {t('search.resetFilters')}
@@ -208,6 +203,16 @@ export default function SearchPage() {
     } else {
       next.delete(key);
     }
+    next.delete('page');
+    setSearchParams(next, { replace: true });
+  };
+
+  const onFilterPatch = (patch: Record<string, string>) => {
+    const next = new URLSearchParams(searchParams);
+    Object.entries(patch).forEach(([key, value]) => {
+      if (value) next.set(key, value);
+      else next.delete(key);
+    });
     next.delete('page');
     setSearchParams(next, { replace: true });
   };
@@ -290,41 +295,36 @@ export default function SearchPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dark:bg-[#0a0a1a] min-h-screen">
-      <div className="flex items-center justify-between mb-6">
+      <BackButton className="mb-4" />
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-white/[0.07]">
         <div>
-          <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white">
+          <h1 className="text-[22px] font-extrabold tracking-tight text-[#1A1A2E] dark:text-white">
             {isLoading ? t('common.loading') : t('search.resultsFound', { count: totalItems })}
           </h1>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <select
+          <div className="w-44">
+            <CustomSelect
+              options={SORT_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))}
               value={currentSort}
-              onChange={(e) => onFilterChange('sort_by', e.target.value)}
-              className="appearance-none border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 pr-8 text-sm bg-white dark:bg-[#1A1A2E] text-gray-700 dark:text-white focus:ring-2 focus:ring-[#FF6B35]/50 outline-none"
-            >
-              {SORT_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>
-                  {t(o.labelKey)}
-                </option>
-              ))}
-            </select>
+              onChange={(val) => onFilterChange('sort_by', val)}
+            />
           </div>
 
-          <div className="hidden sm:flex items-center border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden">
+          <div className="hidden sm:flex items-center gap-1 border border-gray-200 dark:border-white/10 rounded-xl p-1 bg-white dark:bg-white/[0.03]">
             <button
               onClick={() => setView('grid')}
-              className={`p-2 transition ${
-                view === 'grid' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-[#1A1A2E] text-gray-500 hover:bg-gray-50'
+              className={`p-2 rounded-lg transition ${
+                view === 'grid' ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FF6B35]/30' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'
               }`}
             >
               <Grid3X3 className="w-4 h-4" />
             </button>
             <button
               onClick={() => setView('list')}
-              className={`p-2 transition ${
-                view === 'list' ? 'bg-[#FF6B35] text-white' : 'bg-white dark:bg-[#1A1A2E] text-gray-500 hover:bg-gray-50'
+              className={`p-2 rounded-lg transition ${
+                view === 'list' ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FF6B35]/30' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'
               }`}
             >
               <List className="w-4 h-4" />
@@ -344,13 +344,17 @@ export default function SearchPage() {
       <div className="flex gap-6">
         <aside className="hidden lg:block w-[280px] flex-shrink-0">
           <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-6 shadow-sm sticky top-24">
-            <h3 className="font-bold text-[#1A1A2E] dark:text-white mb-4">{t('search.filters')}</h3>
+            <h3 className="flex items-center gap-2 font-bold text-[#1A1A2E] dark:text-white mb-5">
+              <SlidersHorizontal className="w-[18px] h-[18px] text-[#FF6B35]" />
+              {t('search.filters')}
+            </h3>
             <FilterSidebar
               citiesList={citiesData || []}
               categoriesList={categoriesData?.items || []}
               districts={districtsData || []}
               filters={filters}
               onFilterChange={onFilterChange}
+              onFilterPatch={onFilterPatch}
               onReset={onReset}
               loadingDistricts={loadingDistricts}
             />
@@ -479,6 +483,7 @@ export default function SearchPage() {
                 districts={districtsData || []}
                 filters={filters}
                 onFilterChange={onFilterChange}
+                onFilterPatch={onFilterPatch}
                 onReset={onReset}
                 loadingDistricts={loadingDistricts}
               />

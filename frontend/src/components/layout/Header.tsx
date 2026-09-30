@@ -6,7 +6,6 @@ import {
   Heart,
   MessageSquare,
   Bell,
-  PlusCircle,
   Menu,
   X,
   User,
@@ -286,14 +285,6 @@ export default function Header() {
                     </div>
                   )}
                 </div>
-
-                <Link
-                  to="/create-listing"
-                  className="hidden sm:flex items-center gap-1.5 px-4 py-2.5 bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-semibold rounded-xl transition shadow-sm shadow-[#FF6B35]/20"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  <span>{t('nav.createListing')}</span>
-                </Link>
 
                 <div className="relative" ref={userMenuRef}>
                   <button

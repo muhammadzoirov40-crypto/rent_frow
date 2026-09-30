@@ -15,6 +15,7 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
+  const isAuthPage = pathname === '/login' || pathname === '/register'
   const { isAuthenticated } = useAuthStore()
   const { isLoading } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
@@ -43,15 +44,15 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] flex flex-col">
       <Header />
       <div className="flex flex-1 min-h-0">
-        <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
+        {!isAuthPage && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
         <div className="flex-1 min-w-0 flex flex-col">
-          <main className="flex-1 pt-16 pb-20 md:pb-0">
+          <main className={`flex-1 pt-16 ${isAuthPage ? '' : 'pb-20'} md:pb-0`}>
             {children}
           </main>
-          {!['/messages', '/notifications', '/favorites'].includes(pathname) && <Footer />}
+          {pathname === '/' && <Footer />}
         </div>
       </div>
-      <MobileBottomNav isAuthenticated={isAuthenticated} />
+      {!isAuthPage && <MobileBottomNav isAuthenticated={isAuthenticated} />}
     </div>
   )
 }

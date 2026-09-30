@@ -9,6 +9,7 @@ import {
 import toast from 'react-hot-toast';
 import { rentalRequests } from '../api';
 import type { RentalRequest } from '../api';
+import BackButton from '../components/ui/BackButton';
 
 type Tab = 'my-requests' | 'owner-requests';
 
@@ -187,6 +188,7 @@ export default function RentalRequestsPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        <BackButton className="mb-4" />
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#1A1A2E] dark:text-white">{t('rentalRequests.title')}</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">{t('rentalRequests.subtitle')}</p>
