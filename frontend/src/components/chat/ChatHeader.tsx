@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Phone, Video } from 'lucide-react';
+import { ArrowLeft, Eraser, Phone, Video } from 'lucide-react';
 
 interface ChatHeaderProps {
   name: string;
@@ -8,9 +8,10 @@ interface ChatHeaderProps {
   onBack?: () => void;
   onAudioCall: () => void;
   onVideoCall: () => void;
+  onClear?: () => void;
 }
 
-export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, onVideoCall }: ChatHeaderProps) {
+export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, onVideoCall, onClear }: ChatHeaderProps) {
   const { t } = useTranslation();
 
   const initials = name
@@ -51,6 +52,17 @@ export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, 
       </div>
 
       <div className="flex items-center gap-1.5">
+        {onClear && (
+          <button
+            type="button"
+            onClick={onClear}
+            aria-label={t('messages.clearChat')}
+            title={t('messages.clearChat')}
+            className="p-2.5 rounded-xl text-gray-500 hover:text-red-500 hover:bg-red-50 dark:text-gray-400 dark:hover:bg-red-500/10 transition"
+          >
+            <Eraser className="w-5 h-5" />
+          </button>
+        )}
         <button
           type="button"
           onClick={onAudioCall}

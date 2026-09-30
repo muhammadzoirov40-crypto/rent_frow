@@ -131,6 +131,17 @@ async def mark_read(
     return APIResponse(message="Messages marked as read")
 
 
+@router.delete("/conversations/{conversation_id}", response_model=APIResponse)
+async def clear_conversation(
+    conversation_id: int,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    msg_service = MessageService(db)
+    await msg_service.clear_conversation(conversation_id, current_user.user_id, current_user.is_admin)
+    return APIResponse(message="Conversation cleared")
+
+
 @router.delete("/{message_id}", response_model=APIResponse)
 async def delete_message(
     message_id: int,

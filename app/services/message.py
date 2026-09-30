@@ -96,7 +96,7 @@ class MessageService:
 
         if conv:
             remaining = await self.repo.get_conversation_messages(conversation_id, 0, 1)
-            conv.last_message_at = remaining[0].created_at if remaining else conv.created_at
+            conv.last_message_at = remaining[0].created_at if remaining else None
             await self.db.flush()
 
             event = {
@@ -106,3 +106,21 @@ class MessageService:
                 "message_id": message_id,
             }
             await manager.send_to_users(event, [conv.user1_id, conv.user2_id])
+
+    async def clear_conversation(self, conversation_id: int, user_id: int, is_admin: bool = False) -> None:
+        conv = await self.conv_repo.get_by_id(conversation_id)
+        if not conv:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        if user_id not in (conv.user1_id, conv.user2_id) and not is_admin:
+            raise HTTPException(status_code=403, detail="Not a participant in this conversation")
+
+        await self.repo.delete_conversation_messages(conversation_id)
+        conv.last_message_at = None
+        await self.db.flush()
+
+        event = {
+            "type": "message",
+            "event": "conversation_cleared",
+            "conversation_id": conversation_id,
+        }
+        await manager.send_to_users(event, [conv.user1_id, conv.user2_id])

@@ -100,6 +100,25 @@ export default function MessagesPage() {
     }
   };
 
+  const clearMutation = useMutation({
+    mutationFn: (convId: number) => messages.clearConversation(convId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      toast.success(t('messages.cleared'));
+    },
+    onError: () => {
+      toast.error(t('common.error'));
+    },
+  });
+
+  const handleClearConversation = () => {
+    if (!selectedId) return;
+    if (window.confirm(t('messages.clearConfirm'))) {
+      clearMutation.mutate(selectedId);
+    }
+  };
+
   useChatSocket((event) => {
     if (event.event === 'new_message' || event.type === 'message') {
       const convId = Number(event.conversation_id);
@@ -108,7 +127,7 @@ export default function MessagesPage() {
       }
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     }
-    if (event.event === 'message_deleted') {
+    if (event.event === 'message_deleted' || event.event === 'conversation_cleared') {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     }
@@ -124,9 +143,6 @@ export default function MessagesPage() {
     });
   }, [conversations, search]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
 
   useEffect(() => {
     if (selectedId) {
@@ -290,6 +306,7 @@ export default function MessagesPage() {
               onBack={() => setSelectedId(null)}
               onAudioCall={() => setCall('audio')}
               onVideoCall={() => setCall('video')}
+              onClear={handleClearConversation}
             />
 
             <ChatMessageList

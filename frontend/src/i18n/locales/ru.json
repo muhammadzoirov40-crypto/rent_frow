@@ -350,7 +350,10 @@
     "previewFile": "📎 Файл",
     "speaker": "Динамик",
     "deleteConfirm": "Удалить сообщение?",
-    "deleted": "Сообщение удалено"
+    "deleted": "Сообщение удалено",
+    "clearChat": "Очистить чат",
+    "clearConfirm": "Удалить все сообщения в этом чате?",
+    "cleared": "Чат очищен"
   },
   "notifications": {
     "title": "Уведомления",

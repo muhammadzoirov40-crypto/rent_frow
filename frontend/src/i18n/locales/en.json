@@ -351,7 +351,10 @@
     "previewFile": "📎 File",
     "speaker": "Speaker",
     "deleteConfirm": "Delete message?",
-    "deleted": "Message deleted"
+    "deleted": "Message deleted",
+    "clearChat": "Clear chat",
+    "clearConfirm": "Delete all messages in this chat?",
+    "cleared": "Chat cleared"
   },
   "notifications": {
     "title": "Notifications",

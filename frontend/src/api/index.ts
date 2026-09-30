@@ -349,6 +349,9 @@ export const messages = {
     client.post(`/messages/conversations/${conversationId}/read`),
 
   deleteMessage: (messageId: number) => client.delete(`/messages/${messageId}`),
+
+  clearConversation: (conversationId: number) =>
+    client.delete(`/messages/conversations/${conversationId}`),
 };
 
 export const notifications = {

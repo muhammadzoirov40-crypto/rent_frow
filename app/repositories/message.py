@@ -1,4 +1,4 @@
-from sqlalchemy import select, func, update, or_, desc
+from sqlalchemy import select, func, update, or_, desc, delete as sa_delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.message import Message
 from app.repositories.base import BaseRepository
@@ -59,5 +59,11 @@ class MessageRepository(BaseRepository[Message]):
                 Message.is_read == False,
             )
             .values(is_read=True)
+        )
+        await self.db.flush()
+
+    async def delete_conversation_messages(self, conversation_id: int) -> None:
+        await self.db.execute(
+            sa_delete(Message).where(Message.conversation_id == conversation_id)
         )
         await self.db.flush()

@@ -351,7 +351,10 @@
     "previewFile": "📎 Файл",
     "speaker": "Баландгӯяк",
     "deleteConfirm": "Хабарро нест кунам?",
-    "deleted": "Хабар нест шуд"
+    "deleted": "Хабар нест шуд",
+    "clearChat": "Тоза кардани чат",
+    "clearConfirm": "Ҳамаи хабарҳои ин чат нест шаванд?",
+    "cleared": "Чат тоза шуд"
   },
   "notifications": {
     "title": "Хабардиҳиҳо",
