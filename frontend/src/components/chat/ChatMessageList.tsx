@@ -103,8 +103,8 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
               }}
               className={`flex ${mine ? 'justify-end' : 'justify-start'}`}
             >
-              <div className="relative">
-                {(mine || canDeleteOthers) && (
+              <div className="relative max-w-[85%] sm:max-w-[75%]">
+                {message.id > 0 && (mine || canDeleteOthers) && (
                   <button
                     type="button"
                     onClick={(e) => {
@@ -121,7 +121,7 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
                   </button>
                 )}
                 <div
-                  className={`max-w-[85%] sm:max-w-[75%] ${
+                  className={`${
                     mine
                       ? 'rounded-2xl rounded-br-md bg-[#FF6B35] text-white'
                       : 'rounded-2xl rounded-bl-md bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white'

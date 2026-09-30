@@ -62,15 +62,35 @@ export default function MessagesPage() {
 
   const sendMutation = useMutation({
     mutationFn: (content: string) => messages.sendMessage(selectedId!, content),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['messages', selectedId] });
-      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    onMutate: async (content: string) => {
+      const convId = selectedId!;
+      await queryClient.cancelQueries({ queryKey: ['messages', convId] });
+      const temp: Message = {
+        id: -Date.now(),
+        conversation_id: convId,
+        sender_id: user?.id ?? 0,
+        content,
+        is_read: false,
+        created_at: new Date().toISOString(),
+        sender_name: null,
+        sender_avatar: null,
+      };
+      queryClient.setQueryData<Message[]>(['messages', convId], (old) => (old ? [...old, temp] : [temp]));
       setInputText('');
-      setTimeout(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
+      return { convId };
     },
-    onError: () => {
+    onSuccess: (_data, _content, ctx) => {
+      if (ctx?.convId) {
+        queryClient.invalidateQueries({ queryKey: ['messages', ctx.convId] });
+      }
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    },
+    onError: (_err, _content, ctx) => {
+      if (ctx?.convId) {
+        queryClient.setQueryData<Message[]>(['messages', ctx.convId], (old) =>
+          old ? old.filter((m) => m.id > 0) : old,
+        );
+      }
       toast.error(t('messages.failedToSend'));
     },
   });
@@ -120,16 +140,51 @@ export default function MessagesPage() {
   };
 
   useChatSocket((event) => {
-    if (event.event === 'new_message' || event.type === 'message') {
+    if (event.event === 'new_message' && event.message) {
       const convId = Number(event.conversation_id);
-      if (selectedId && convId === selectedId) {
-        queryClient.invalidateQueries({ queryKey: ['messages', selectedId] });
+      const m = event.message as {
+        id: number;
+        conversation_id: number;
+        sender_id: number;
+        content: string;
+        created_at: string;
+      };
+      if (convId) {
+        queryClient.setQueryData<Message[]>(['messages', convId], (old) => {
+          if (!old) return old;
+          const cleaned = old.filter((x) => !(x.id < 0 && x.sender_id === m.sender_id && x.content === m.content));
+          if (cleaned.some((x) => x.id === m.id)) return cleaned;
+          return [
+            ...cleaned,
+            {
+              id: m.id,
+              conversation_id: m.conversation_id,
+              sender_id: m.sender_id,
+              content: m.content,
+              created_at: m.created_at,
+              is_read: false,
+              sender_name: null,
+              sender_avatar: null,
+            },
+          ];
+        });
       }
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      return;
     }
-    if (event.event === 'message_deleted' || event.event === 'conversation_cleared') {
+    if (event.event === 'message_deleted') {
+      const convId = Number(event.conversation_id);
+      const msgId = Number(event.message_id);
+      queryClient.setQueryData<Message[]>(['messages', convId], (old) =>
+        old ? old.filter((x) => x.id !== msgId) : old,
+      );
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      return;
+    }
+    if (event.event === 'conversation_cleared') {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      return;
     }
     if (event.type === 'notification') {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
