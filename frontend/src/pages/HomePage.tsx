@@ -196,7 +196,7 @@ export default function HomePage() {
                   <button
                     key={cat.id}
                     onClick={() => navigate(`/search?category_id=${cat.id}`)}
-                    className="group text-center bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 rounded-xl p-4 hover:border-[#FF6B35]/50 hover:shadow-[0_10px_30px_-18px_rgba(255,107,53,0.55)] hover:translate-x-1.5 transition"
+                    className="group text-center bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 rounded-xl p-4 hover:border-[#FF6B35]/50 hover:shadow-[0_10px_30px_-18px_rgba(255,107,53,0.55)] transition"
                   >
                     <div className="w-11 h-11 mx-auto rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center mb-3 group-hover:bg-[#FF6B35] group-hover:border-[#FF6B35] transition">
                       {cat.image_url ? (

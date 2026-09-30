@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Search, MapPin, CalendarDays } from 'lucide-react';
 import { cities, type City } from '../../api';
+import CustomSelect from '../ui/CustomSelect';
 
 export interface SearchBarValues {
   q: string;
@@ -77,19 +78,15 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
 
       <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
         <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
-        <select
+        <CustomSelect
           value={cityId}
-          onChange={(e) => setCityId(e.target.value)}
-          aria-label={t('search.city')}
-          className={`${fieldCls} cursor-pointer`}
-        >
-          <option value="">{t('home.allCities')}</option>
-          {cityList.map((city) => (
-            <option key={city.id} value={city.id}>
-              {city.name}
-            </option>
-          ))}
-        </select>
+          onChange={setCityId}
+          options={[
+            { value: '', label: t('home.allCities') },
+            ...cityList.map((c) => ({ value: String(c.id), label: c.name })),
+          ]}
+          buttonClassName="w-full min-w-0 flex items-center justify-between gap-1.5 bg-transparent border-0 focus:outline-none text-sm text-left text-gray-900 dark:text-white py-2.5 cursor-pointer rounded-lg"
+        />
       </div>
 
       <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
