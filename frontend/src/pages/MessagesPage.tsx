@@ -342,7 +342,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className={`flex-1 min-w-0 flex flex-col bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 min-w-0 flex flex-col bg-white dark:bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div className="w-20 h-20 bg-[#FF6B35]/10 rounded-full flex items-center justify-center mb-4">

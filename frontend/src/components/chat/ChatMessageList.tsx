@@ -70,7 +70,7 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
 
   if (loading && messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#121418]">
+      <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#121418]">
         <Loader2 className="w-6 h-6 text-[#FF6B35] animate-spin" />
       </div>
     );
@@ -78,17 +78,17 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
 
   if (messages.length === 0) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center bg-[#121418] text-center px-6">
-        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-2xl mb-4">
+      <div className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-[#121418] text-center px-6">
+        <div className="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-200 dark:bg-white/5 dark:border-white/10 flex items-center justify-center text-2xl mb-4">
           💬
         </div>
-        <p className="text-gray-400 text-sm">{t('messages.noMessages')}</p>
+        <p className="text-gray-500 dark:text-gray-400 text-sm">{t('messages.noMessages')}</p>
       </div>
     );
   }
 
   return (
-    <div ref={scrollRef} onClick={() => setActiveId(null)} className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 bg-[#121418] chat-scroll">
+    <div ref={scrollRef} onClick={() => setActiveId(null)} className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 bg-white dark:bg-[#121418] chat-scroll">
       <div className="space-y-3">
         {messages.map((message) => {
           const mine = message.sender_id === currentUserId;
