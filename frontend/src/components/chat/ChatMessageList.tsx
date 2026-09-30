@@ -429,10 +429,10 @@ export default function ChatMessageList({
           }}
         >
           <div
-            className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-56 rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-100 dark:border-white/10 shadow-[0_20px_60px_-15px_rgba(16,24,40,0.4)] overflow-hidden py-1.5"
+            className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-60 rounded-3xl bg-white/95 dark:bg-[#1a1d24]/95 backdrop-blur-xl border border-white/60 dark:border-white/10 shadow-[0_24px_80px_-20px_rgba(16,24,40,0.55)] overflow-hidden p-2"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-3 pb-2 mb-1 border-b border-gray-100 dark:border-white/10">
+            <div className="flex items-center justify-between px-1 pb-2 mb-1.5 border-b border-gray-100 dark:border-white/10">
               {QUICK_REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
@@ -441,7 +441,7 @@ export default function ChatMessageList({
                     onReact?.(menuMsg.id, emoji);
                     closeMenu();
                   }}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-lg leading-none hover:bg-orange-500/10 hover:scale-125 active:scale-95 transition"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none bg-gray-50 dark:bg-white/[0.06] hover:bg-orange-500/15 hover:scale-[1.35] active:scale-95 transition shadow-sm"
                 >
                   {emoji}
                 </button>
@@ -488,6 +488,9 @@ export default function ChatMessageList({
                 closeMenu();
               }}
             />
+
+            <div className="my-1.5 border-t border-gray-100 dark:border-white/10" />
+
             {(menuMine || canDeleteOthers) && (
               <MenuButton
                 icon={<Trash2 className="w-4 h-4" />}
@@ -548,14 +551,22 @@ function MenuButton({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition rounded-lg mx-0 ${
+      className={`group w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-sm transition ${
         danger
-          ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10'
-          : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10'
+          ? 'text-red-500 hover:bg-red-500/10'
+          : 'text-gray-700 dark:text-gray-200 hover:bg-orange-500/10'
       }`}
     >
-      <span className={`shrink-0 ${danger ? 'text-red-500' : 'text-gray-400 dark:text-gray-500'}`}>{icon}</span>
-      <span className="truncate">{label}</span>
+      <span
+        className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition ${
+          danger
+            ? 'bg-red-500/10 text-red-500 group-hover:bg-red-500 group-hover:text-white'
+            : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF6B35] group-hover:text-white'
+        }`}
+      >
+        {icon}
+      </span>
+      <span className="font-medium truncate">{label}</span>
       {loading && <Loader2 className="w-3.5 h-3.5 ml-auto animate-spin text-[#FF6B35]" />}
     </button>
   );
