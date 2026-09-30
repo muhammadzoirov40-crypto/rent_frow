@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { Search, MapPin, CalendarDays } from 'lucide-react';
-import { cities, type City } from '../../api';
-import CustomSelect from '../ui/CustomSelect';
+import { Search, CalendarDays } from 'lucide-react';
 
 export interface SearchBarValues {
   q: string;
@@ -27,13 +24,9 @@ const groupCls =
 export default function SearchBar({ initial, onSubmit, compact = false }: SearchBarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: cityList = [] } = useQuery<City[]>({
-    queryKey: ['cities'],
-    queryFn: cities.getAll,
-  });
 
   const [q, setQ] = useState(initial?.q ?? '');
-  const [cityId, setCityId] = useState(initial?.city_id ?? '');
+  const [cityId] = useState(initial?.city_id ?? '');
   const [startDate, setStartDate] = useState(initial?.start_date ?? '');
   const [endDate, setEndDate] = useState(initial?.end_date ?? '');
 
@@ -73,19 +66,6 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
           placeholder={t('home.searchWhat')}
           aria-label={t('home.searchWhat')}
           className={fieldCls}
-        />
-      </div>
-
-      <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
-        <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
-        <CustomSelect
-          value={cityId}
-          onChange={setCityId}
-          options={[
-            { value: '', label: t('home.allCities') },
-            ...cityList.map((c) => ({ value: String(c.id), label: c.name })),
-          ]}
-          buttonClassName="w-full min-w-0 flex items-center justify-between gap-1.5 bg-transparent border-0 focus:outline-none text-sm text-left text-gray-900 dark:text-white py-2.5 cursor-pointer rounded-lg"
         />
       </div>
 

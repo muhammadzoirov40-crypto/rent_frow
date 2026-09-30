@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Star, Clock, User, Heart, BadgeCheck } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { ru } from 'date-fns/locale';
+import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Image as ImageIcon } from 'lucide-react';
 import { listings, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -23,13 +21,6 @@ interface ListingCardProps {
   listing: ListingCardData;
 }
 
-const PRICE_UNIT_LABELS: Record<string, string> = {
-  per_hour: '/час',
-  per_day: '/день',
-  per_week: '/неделю',
-  per_month: '/месяц',
-};
-
 function getImageUrl(listing: ListingCardData): string | null {
   if ('primary_image' in listing && listing.primary_image) return listing.primary_image;
   if (listing.images && listing.images.length > 0) {
@@ -48,22 +39,8 @@ function getCityName(listing: ListingCardData): string | null {
 
 function getDistrictName(listing: ListingCardData): string | null {
   if (listing.district && 'name' in listing.district) return listing.district.name;
+  if ('district_name' in listing && listing.district_name) return listing.district_name;
   return null;
-}
-
-function getOwnerName(listing: ListingCardData): string | null {
-  if (listing.owner && 'display_name' in listing.owner) return listing.owner.display_name;
-  return null;
-}
-
-function getOwnerAvatar(listing: ListingCardData): string | null {
-  if (listing.owner && 'avatar_url' in listing.owner) return listing.owner.avatar_url ?? null;
-  return null;
-}
-
-function getOwnerRole(listing: ListingCardData): string | undefined {
-  if (listing.owner && 'role' in listing.owner) return listing.owner.role;
-  return undefined;
 }
 
 function getRating(listing: ListingCardData): string | null {
@@ -94,128 +71,149 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const rating = getRating(listing);
   const cityName = getCityName(listing);
   const districtName = getDistrictName(listing);
-  const ownerName = getOwnerName(listing);
-  const ownerAvatar = getOwnerAvatar(listing);
-  const ownerRole = getOwnerRole(listing);
+  const reviewCount = listing.rating_count;
+  const isVerified = 'is_verified' in listing && listing.is_verified === true;
+  const imageCount =
+    'images' in listing && Array.isArray(listing.images) ? listing.images.length : 0;
 
-  const timeAgo = formatDistanceToNow(new Date(listing.created_at), {
-    addSuffix: true,
-    locale: ru,
-  });
+  const status = 'status' in listing ? listing.status : undefined;
+  const available =
+    'available' in listing && typeof listing.available === 'boolean' ? listing.available : null;
+
+  let availability: { label: string; cls: string } | null = null;
+  if (status === 'RENTED') {
+    availability = {
+      label: t('listing.booked'),
+      cls: 'bg-white/95 text-red-700 ring-red-200 dark:bg-slate-900/90 dark:text-red-400 dark:ring-red-500/30',
+    };
+  } else if (available === true) {
+    availability = {
+      label: t('listing.available'),
+      cls: 'bg-white/95 text-emerald-700 ring-emerald-200 dark:bg-slate-900/90 dark:text-emerald-400 dark:ring-emerald-500/30',
+    };
+  } else if (available === false) {
+    availability = {
+      label: t('listing.unavailable'),
+      cls: 'bg-white/95 text-gray-600 ring-gray-200 dark:bg-slate-900/90 dark:text-gray-300 dark:ring-white/15',
+    };
+  }
+
+  const hasPrice = typeof listing.price === 'number';
+  const unitKey = /^per_(hour|day|week|month)$/.test(listing.price_unit)
+    ? `listing.${listing.price_unit}`
+    : null;
 
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 overflow-hidden group block transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(255,107,53,0.45)] hover:border-[#FF6B35]/40"
+      className="group block bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-[0_2px_12px_-6px_rgba(17,24,39,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[#FF6B35]/40 hover:shadow-[0_18px_40px_-18px_rgba(255,107,53,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0F1115]"
     >
       <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800 overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={listing.title}
-            className="w-full h-full object-cover group-hover:scale-[1.07] transition-transform duration-700"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.06]"
             loading="lazy"
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
-        ) : null}
-        {!imageUrl && (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900">
-            <User className="w-12 h-12 text-gray-300 dark:text-slate-600" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900">
+            <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-white/5 ring-1 ring-black/5 shadow-sm">
+              <ImageIcon className="w-7 h-7 text-gray-400 dark:text-slate-500" aria-hidden="true" />
+            </div>
           </div>
         )}
 
+        {isVerified && (
+          <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
+            <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+            {t('listing.verified')}
+          </span>
+        )}
+
         <button
+          type="button"
           onClick={toggleFavorite}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm flex items-center justify-center shadow-md ring-1 ring-black/5 hover:scale-110 active:scale-95 transition-all"
+          aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
+          aria-pressed={isFavorited}
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm flex items-center justify-center shadow-md ring-1 ring-black/5 hover:scale-110 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]"
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
               isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-500 dark:text-slate-400'
             }`}
+            aria-hidden="true"
           />
         </button>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-        {'available' in listing && typeof listing.available === 'boolean' && (
-          <div className="absolute bottom-3 left-3">
+        {availability && (
+          <span
+            className={`absolute bottom-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm ring-1 ring-inset ${availability.cls}`}
+          >
             <span
-              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm ring-1 ring-inset ${
-                listing.available
-                  ? 'bg-white/95 text-emerald-700 ring-emerald-200 dark:bg-slate-900/90 dark:text-emerald-400 dark:ring-emerald-500/30'
-                  : 'bg-white/95 text-gray-600 ring-gray-200 dark:bg-slate-900/90 dark:text-gray-300 dark:ring-white/15'
+              className={`w-1.5 h-1.5 rounded-full ${
+                available === true && status !== 'RENTED' ? 'bg-emerald-500' : 'bg-red-500'
               }`}
-            >
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${
-                  listing.available ? 'bg-emerald-500' : 'bg-gray-400'
-                }`}
-              />
-              {listing.available ? t('listing.available') : t('listing.unavailable')}
-            </span>
-          </div>
+              aria-hidden="true"
+            />
+            {availability.label}
+          </span>
         )}
 
-        {'is_verified' in listing && listing.is_verified && (
-          <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide bg-emerald-500 text-white shadow-[0_6px_16px_-6px_rgba(16,185,129,0.9)]">
-              <BadgeCheck className="w-3.5 h-3.5" />
-              Verified
-            </span>
-          </div>
+        {imageCount > 1 && (
+          <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
+            <Camera className="w-3.5 h-3.5" aria-hidden="true" />
+            {imageCount}
+          </span>
         )}
       </div>
 
-      <div className="p-3 sm:p-4">
-        <h3 className="font-bold text-[#1A1A2E] dark:text-white text-[15px] leading-snug group-hover:text-[#FF6B35] transition-colors truncate">
+      <div className="p-4 flex flex-col gap-2">
+        <h3 className="font-bold text-[#1A1A2E] dark:text-white text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#FF6B35] transition-colors">
           {listing.title}
         </h3>
 
-        <div className="mt-2 flex items-baseline gap-1">
-          <span className="text-xl sm:text-[22px] font-extrabold leading-none text-[#FF6B35] tracking-tight">
-            {listing.price.toLocaleString('ru-RU')}
-          </span>
-          <span className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500">
-            сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
-          </span>
-        </div>
-
-        <div className="mt-2.5 flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-slate-400">
-          <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-[#FF6B35]" />
-          <span className="truncate">
-            {cityName}
-            {districtName ? `, ${districtName}` : ''}
-          </span>
-        </div>
-
-        {ownerName && (
-          <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-500 dark:text-slate-400">
-            <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-slate-700 overflow-hidden flex-shrink-0">
-              {ownerAvatar ? (
-                <img src={ownerAvatar} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <User className="w-3 h-3 m-auto mt-1 text-gray-400 dark:text-slate-500" />
-              )}
-            </div>
-            <span className="truncate">{ownerName}</span>
-            {ownerRole === 'ADMIN' && (
-              <BadgeCheck className="w-3 h-3 text-blue-500 flex-shrink-0" />
-            )}
+        {(cityName || districtName) && (
+          <div className="flex items-center gap-1.5 text-[13px] font-medium text-gray-500 dark:text-slate-400 min-w-0">
+            <MapPin className="w-3.5 h-3.5 shrink-0 text-[#FF6B35]" aria-hidden="true" />
+            <span className="truncate">
+              {cityName}
+              {districtName ? `, ${districtName}` : ''}
+            </span>
           </div>
         )}
 
-        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-white/10 flex items-center justify-between">
-          <div className="flex items-center gap-1 text-xs font-semibold text-gray-600 dark:text-slate-300">
-            <Star className={`w-3.5 h-3.5 ${rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`} />
-            <span>{rating || '—'}</span>
-            {(listing.rating_count ?? 0) > 0 && (
-              <span className="text-gray-400 dark:text-slate-500">({listing.rating_count})</span>
-            )}
+        <div className="flex items-center gap-1.5 text-[13px]">
+          <Star
+            className={`w-4 h-4 ${rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
+            aria-hidden="true"
+          />
+          <span className="font-bold text-gray-800 dark:text-white">{rating ?? '—'}</span>
+          {typeof reviewCount === 'number' && (
+            <span className="text-gray-400 dark:text-slate-500">
+              ({reviewCount} {t('listing.reviews')})
+            </span>
+          )}
+        </div>
+
+        {hasPrice && (
+          <div className="flex items-baseline gap-1.5 flex-wrap">
+            <span className="text-[22px] font-extrabold leading-none text-[#FF6B35] tracking-tight">
+              {listing.price.toLocaleString('ru-RU')}
+            </span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500">
+              {t('common.somoni')}
+              {unitKey ? ` / ${t(unitKey)}` : ''}
+            </span>
           </div>
-          <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-slate-500">
-            <Clock className="w-3.5 h-3.5" />
-            <span>{timeAgo}</span>
-          </div>
+        )}
+
+        <div className="mt-1 pt-3 border-t border-gray-100 dark:border-white/10">
+          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#FF6B35]">
+            {t('common.viewDetails')}
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          </span>
         </div>
       </div>
     </Link>

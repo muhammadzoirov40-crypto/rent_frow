@@ -274,7 +274,9 @@
     "per_hour": "соат",
     "per_day": "рӯз",
     "per_week": "ҳафта",
-    "per_month": "моҳ"
+    "per_month": "моҳ",
+    "verified": "Тасдиқшуда",
+    "booked": "Гирифта шуда"
   },
   "createListing": {
     "title": "Эълони нав",

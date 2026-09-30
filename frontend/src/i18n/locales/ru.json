@@ -273,7 +273,9 @@
     "per_hour": "час",
     "per_day": "день",
     "per_week": "неделю",
-    "per_month": "месяц"
+    "per_month": "месяц",
+    "verified": "Верифицирован",
+    "booked": "Занято"
   },
   "createListing": {
     "title": "Новое объявление",

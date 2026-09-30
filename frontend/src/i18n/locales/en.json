@@ -274,7 +274,9 @@
     "per_hour": "hour",
     "per_day": "day",
     "per_week": "week",
-    "per_month": "month"
+    "per_month": "month",
+    "verified": "Verified",
+    "booked": "Booked"
   },
   "createListing": {
     "title": "New listing",
