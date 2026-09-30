@@ -164,7 +164,7 @@ export default function HomePage() {
       {loadingCategories ? (
         <section id="categories" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="h-7 w-56 bg-gray-100 dark:bg-white/10 rounded-lg mb-6 animate-skeleton" />
-          <div className="grid grid-flow-col auto-cols-[minmax(10rem,1fr)] lg:grid-cols-6 gap-3 overflow-hidden">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-28 rounded-xl bg-gray-100 dark:bg-white/5 animate-skeleton" />
             ))}
@@ -182,7 +182,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex gap-3 overflow-x-auto pb-2 snap-x scrollbar-thin">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {categoryList.map((cat) => {
                 const Icon = getCategoryIcon(cat.name);
                 const count = categoryCounts[cat.id];
@@ -190,7 +190,7 @@ export default function HomePage() {
                   <button
                     key={cat.id}
                     onClick={() => navigate(`/search?category_id=${cat.id}`)}
-                    className="snap-start flex-shrink-0 w-40 sm:w-44 text-left bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 rounded-xl p-4 hover:border-[#FF6B35]/50 hover:shadow-[0_10px_30px_-18px_rgba(255,107,53,0.55)] transition group"
+                    className="text-left bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 rounded-xl p-4 hover:border-[#FF6B35]/50 hover:shadow-[0_10px_30px_-18px_rgba(255,107,53,0.55)] transition group"
                   >
                     <div className="w-11 h-11 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center mb-3 group-hover:bg-[#FF6B35] group-hover:border-[#FF6B35] transition">
                       {cat.image_url ? (

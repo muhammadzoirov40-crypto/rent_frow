@@ -407,7 +407,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-11rem)] md:h-[calc(100vh-6rem)] max-w-7xl mx-auto bg-white dark:bg-[#121418] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-xl my-4">
+    <div className="flex h-[calc(100vh-11rem)] md:h-[calc(100vh-6rem)] max-w-7xl mx-auto bg-white dark:bg-[#121418] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl my-4">
       <div className={`w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col bg-gray-50 dark:bg-[#1a1d24] ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t('messages.title')}</h2>
@@ -418,7 +418,7 @@ export default function MessagesPage() {
               placeholder={t('messages.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 dark:bg-white/5 border border-transparent rounded-full text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-[#FF6B35]/15 focus:border-[#FF6B35]/40 transition"
             />
           </div>
         </div>
@@ -442,8 +442,10 @@ export default function MessagesPage() {
                 <button
                   key={conv.id}
                   onClick={() => setSelectedId(conv.id)}
-                  className={`w-full text-left p-4 border-b border-gray-200 dark:border-white/5 transition hover:bg-white dark:hover:bg-white/5 ${
-                    isActive ? 'bg-white dark:bg-white/10 border-l-2 border-l-[#FF6B35]' : ''
+                  className={`w-full text-left mx-2 my-1 px-3 py-3 rounded-2xl transition ${
+                    isActive
+                      ? 'bg-gradient-to-r from-[#FF6B35]/15 to-[#FF6B35]/5 ring-1 ring-[#FF6B35]/30 shadow-sm'
+                      : 'hover:bg-gray-100/70 dark:hover:bg-white/5'
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -451,29 +453,29 @@ export default function MessagesPage() {
                       {other?.avatar_url ? (
                         <img src={other.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover" />
                       ) : (
-                        <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white font-semibold text-sm">
+                        <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white font-semibold text-sm shadow-md shadow-orange-500/20">
                           {other?.display_name?.charAt(0) || '?'}
                         </div>
                       )}
                       {unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#FF6B35] rounded-full flex items-center justify-center text-[10px] font-bold text-white">
+                        <div className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-[#FF6B35] rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-md shadow-orange-500/40">
                           {unreadCount}
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-0.5">
-                        <span className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+                        <span className={`text-sm truncate ${unreadCount > 0 ? 'font-bold text-gray-900 dark:text-white' : 'font-semibold text-gray-800 dark:text-gray-100'}`}>
                           {other?.display_name || t('messages.user')}
                         </span>
                         {conv.last_message_at && (
-                          <span className="text-[11px] text-gray-400 flex-shrink-0 ml-2">
+                          <span className={`text-[11px] flex-shrink-0 ml-2 ${unreadCount > 0 ? 'text-[#FF6B35] font-semibold' : 'text-gray-400'}`}>
                             {timeAgo(conv.last_message_at)}
                           </span>
                         )}
                       </div>
                       {conv.last_message_content && (
-                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        <p className={`text-xs truncate ${unreadCount > 0 ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
                           {previewText(conv.last_message_content)}
                         </p>
                       )}
@@ -489,8 +491,8 @@ export default function MessagesPage() {
       <div className={`relative flex-1 min-w-0 flex flex-col bg-white dark:bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <div className="w-20 h-20 bg-[#FF6B35]/10 rounded-full flex items-center justify-center mb-4">
-              <MessageSquare className="w-10 h-10 text-[#FF6B35]" />
+            <div className="w-24 h-24 bg-gradient-to-br from-[#FF6B35]/20 to-[#FF6B35]/5 rounded-[32px] border border-[#FF6B35]/15 flex items-center justify-center mb-5 shadow-xl shadow-orange-500/10">
+              <MessageSquare className="w-11 h-11 text-[#FF6B35]" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('messages.selectConversation')}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
@@ -509,7 +511,7 @@ export default function MessagesPage() {
             />
 
             {pinnedMessage && (
-              <div className="flex items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-white/10 bg-orange-500/10">
+              <div className="flex items-center gap-3 px-4 py-2.5 border-b border-[#FF6B35]/15 bg-gradient-to-r from-orange-500/15 via-orange-500/[0.07] to-transparent backdrop-blur-sm">
                 <span className="w-8 h-8 rounded-full bg-[#FF6B35] text-white flex items-center justify-center shrink-0">
                   <Pin className="w-4 h-4" />
                 </span>
