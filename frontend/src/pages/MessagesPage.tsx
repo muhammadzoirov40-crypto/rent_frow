@@ -82,12 +82,34 @@ export default function MessagesPage() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: (messageId: number) => messages.deleteMessage(messageId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      toast.success(t('messages.deleted'));
+    },
+    onError: () => {
+      toast.error(t('common.error'));
+    },
+  });
+
+  const handleDeleteMessage = (messageId: number) => {
+    if (window.confirm(t('messages.deleteConfirm'))) {
+      deleteMutation.mutate(messageId);
+    }
+  };
+
   useChatSocket((event) => {
     if (event.event === 'new_message' || event.type === 'message') {
       const convId = Number(event.conversation_id);
       if (selectedId && convId === selectedId) {
         queryClient.invalidateQueries({ queryKey: ['messages', selectedId] });
       }
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+    }
+    if (event.event === 'message_deleted') {
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
     }
     if (event.type === 'notification') {
@@ -275,6 +297,8 @@ export default function MessagesPage() {
               currentUserId={user?.id}
               loading={msgLoading}
               onOpenImage={setLightboxSrc}
+              onDelete={handleDeleteMessage}
+              canDeleteOthers={user?.role === 'ADMIN'}
             />
             <div ref={messagesEndRef} className="hidden" />
 

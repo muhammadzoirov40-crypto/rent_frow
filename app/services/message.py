@@ -80,3 +80,29 @@ class MessageService:
 
     async def get_unread_count(self, conversation_id: int, user_id: int) -> int:
         return await self.repo.get_unread_count(conversation_id, user_id)
+
+    async def delete(self, message_id: int, user_id: int, is_admin: bool = False) -> None:
+        message = await self.repo.get_by_id(message_id)
+        if not message:
+            raise HTTPException(status_code=404, detail="Message not found")
+        if message.sender_id != user_id and not is_admin:
+            raise HTTPException(status_code=403, detail="Not allowed to delete this message")
+
+        conversation_id = message.conversation_id
+        conv = await self.conv_repo.get_by_id(conversation_id)
+
+        await self.repo.delete(message)
+        await self.db.flush()
+
+        if conv:
+            remaining = await self.repo.get_conversation_messages(conversation_id, 0, 1)
+            conv.last_message_at = remaining[0].created_at if remaining else conv.created_at
+            await self.db.flush()
+
+            event = {
+                "type": "message",
+                "event": "message_deleted",
+                "conversation_id": conversation_id,
+                "message_id": message_id,
+            }
+            await manager.send_to_users(event, [conv.user1_id, conv.user2_id])

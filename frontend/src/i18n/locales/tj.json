@@ -349,7 +349,9 @@
     "previewImage": "📷 Тасвир",
     "previewVoice": "🎤 Паёми овозӣ",
     "previewFile": "📎 Файл",
-    "speaker": "Баландгӯяк"
+    "speaker": "Баландгӯяк",
+    "deleteConfirm": "Хабарро нест кунам?",
+    "deleted": "Хабар нест шуд"
   },
   "notifications": {
     "title": "Хабардиҳиҳо",

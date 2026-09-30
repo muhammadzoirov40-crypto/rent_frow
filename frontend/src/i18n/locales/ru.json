@@ -348,7 +348,9 @@
     "previewImage": "📷 Фото",
     "previewVoice": "🎤 Голосовое сообщение",
     "previewFile": "📎 Файл",
-    "speaker": "Динамик"
+    "speaker": "Динамик",
+    "deleteConfirm": "Удалить сообщение?",
+    "deleted": "Сообщение удалено"
   },
   "notifications": {
     "title": "Уведомления",

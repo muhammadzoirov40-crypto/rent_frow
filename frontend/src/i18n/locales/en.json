@@ -349,7 +349,9 @@
     "previewImage": "📷 Photo",
     "previewVoice": "🎤 Voice message",
     "previewFile": "📎 File",
-    "speaker": "Speaker"
+    "speaker": "Speaker",
+    "deleteConfirm": "Delete message?",
+    "deleted": "Message deleted"
   },
   "notifications": {
     "title": "Notifications",

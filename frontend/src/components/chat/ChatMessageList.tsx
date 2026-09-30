@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Download, FileText, Loader2 } from 'lucide-react';
+import { Download, FileText, Loader2, Trash2 } from 'lucide-react';
 import type { Message } from '../../api';
 import { formatBytes, parseContent, type Attachment } from './messageContent';
 import VoicePlayer from './VoicePlayer';
@@ -11,6 +11,8 @@ interface ChatMessageListProps {
   currentUserId?: number;
   loading?: boolean;
   onOpenImage: (src: string) => void;
+  onDelete?: (messageId: number) => void;
+  canDeleteOthers?: boolean;
 }
 
 function BubbleTime({ date, mine }: { date: string; mine: boolean }) {
@@ -52,7 +54,7 @@ function FileCard({ parsed, mine }: { parsed: Attachment; mine: boolean }) {
   );
 }
 
-export default function ChatMessageList({ messages, currentUserId, loading, onOpenImage }: ChatMessageListProps) {
+export default function ChatMessageList({ messages, currentUserId, loading, onOpenImage, onDelete, canDeleteOthers }: ChatMessageListProps) {
   const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -92,14 +94,26 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
           const parsed = parseContent(message.content || '');
 
           return (
-            <div key={message.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-              <div
-                className={`max-w-[85%] sm:max-w-[75%] ${
-                  mine
-                    ? 'rounded-2xl rounded-br-md bg-[#FF6B35] text-white'
-                    : 'rounded-2xl rounded-bl-md bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white'
-                } shadow-sm`}
-              >
+            <div key={message.id} className={`group flex ${mine ? 'justify-end' : 'justify-start'}`}>
+              <div className="relative">
+                {(mine || canDeleteOthers) && (
+                  <button
+                    type="button"
+                    onClick={() => onDelete?.(message.id)}
+                    title={t('common.delete')}
+                    aria-label={t('common.delete')}
+                    className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-400 hover:text-red-500 hover:border-red-400 focus:opacity-100 transition opacity-0 group-hover:opacity-100 max-md:opacity-70 shadow-sm ${mine ? '-left-9' : '-right-9'}`}
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                <div
+                  className={`max-w-[85%] sm:max-w-[75%] ${
+                    mine
+                      ? 'rounded-2xl rounded-br-md bg-[#FF6B35] text-white'
+                      : 'rounded-2xl rounded-bl-md bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white'
+                  } shadow-sm`}
+                >
                 {parsed.kind === 'text' && (
                   <div className="px-3.5 py-2.5">
                     <p className="text-sm whitespace-pre-wrap break-words">{parsed.text}</p>
@@ -135,6 +149,7 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
                     </div>
                   </div>
                 )}
+                </div>
               </div>
             </div>
           );
