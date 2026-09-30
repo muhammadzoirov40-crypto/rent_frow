@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Download, FileText, Loader2, Trash2 } from 'lucide-react';
 import type { Message } from '../../api';
@@ -57,6 +57,7 @@ function FileCard({ parsed, mine }: { parsed: Attachment; mine: boolean }) {
 export default function ChatMessageList({ messages, currentUserId, loading, onOpenImage, onDelete, canDeleteOthers }: ChatMessageListProps) {
   const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeId, setActiveId] = useState<number | null>(null);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -87,22 +88,34 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
   }
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 bg-[#121418] chat-scroll">
+    <div ref={scrollRef} onClick={() => setActiveId(null)} className="flex-1 overflow-y-auto px-3 sm:px-4 py-4 bg-[#121418] chat-scroll">
       <div className="space-y-3">
         {messages.map((message) => {
           const mine = message.sender_id === currentUserId;
           const parsed = parseContent(message.content || '');
 
           return (
-            <div key={message.id} className={`group flex ${mine ? 'justify-end' : 'justify-start'}`}>
+            <div
+              key={message.id}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveId((cur) => (cur === message.id ? null : message.id));
+              }}
+              className={`flex ${mine ? 'justify-end' : 'justify-start'}`}
+            >
               <div className="relative">
                 {(mine || canDeleteOthers) && (
                   <button
                     type="button"
-                    onClick={() => onDelete?.(message.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete?.(message.id);
+                    }}
                     title={t('common.delete')}
                     aria-label={t('common.delete')}
-                    className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-400 hover:text-red-500 hover:border-red-400 focus:opacity-100 transition opacity-0 group-hover:opacity-100 max-md:opacity-70 shadow-sm ${mine ? '-left-9' : '-right-9'}`}
+                    className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-400 hover:text-red-500 hover:border-red-400 focus:opacity-100 transition ${
+                      activeId === message.id ? 'opacity-100' : 'opacity-0'
+                    } shadow-sm ${mine ? '-left-9' : '-right-9'}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -126,7 +139,11 @@ export default function ChatMessageList({ messages, currentUserId, loading, onOp
                 {parsed.kind === 'image' && (
                   <button
                     type="button"
-                    onClick={() => onOpenImage(parsed.url)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveId(message.id);
+                      onOpenImage(parsed.url);
+                    }}
                     className="block p-1.5 group focus:outline-none"
                   >
                     <img
