@@ -21,6 +21,7 @@ import {
   AlertTriangle,
   BadgeCheck,
   Trash2,
+  Pencil,
 } from 'lucide-react';
 import { formatDate } from '../utils/dates';
 
@@ -359,9 +360,18 @@ export default function ListingPage() {
                   </div>
                 )}
 
-                {isOwner ? (
-                  <div className="w-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 text-sm font-medium py-3 px-4 rounded-xl text-center">
-                    {t('listing.ownListingHint')}
+                {(isOwner || user?.role === 'ADMIN') ? (
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => navigate(`/create-listing?edit=${listing.id}`)}
+                      className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                      <Pencil size={16} />
+                      {t('listing.editListing')}
+                    </button>
+                    <div className="w-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 text-sm font-medium py-3 px-4 rounded-xl text-center">
+                      {t('listing.ownListingHint')}
+                    </div>
                   </div>
                 ) : (
                   <>

@@ -241,6 +241,7 @@
     "failedToSend": "Failed to send",
     "ownListing": "You cannot rent your own listing",
     "ownListingHint": "This is your listing — rental is not available",
+    "editListing": "Edit",
     "datesTaken": "Selected dates are already booked",
     "endAfterStart": "End date must be after start date",
     "listingNotFound": "Listing not found",
@@ -257,6 +258,7 @@
   },
   "createListing": {
     "title": "New listing",
+    "editTitle": "Edit listing",
     "stepCategory": "Category",
     "stepInfo": "Info",
     "stepPhotos": "Photos",
@@ -301,8 +303,10 @@
     "back": "Back",
     "next": "Next",
     "publish": "Publish",
+    "save": "Save",
     "publishing": "Publishing...",
     "published": "Listing published",
+    "updated": "Listing updated",
     "failedToPublish": "Failed to publish",
     "maxPhotos": "Maximum 8 photos",
     "uploadError": "Image upload error"

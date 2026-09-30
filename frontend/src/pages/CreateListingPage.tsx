@@ -1,5 +1,5 @@
-import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listings, categories, cities, upload } from '../api';
 import CustomSelect from '../components/ui/CustomSelect';
@@ -53,8 +53,11 @@ const initialFormData: FormData = {
 
 export default function CreateListingPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editId = Number(searchParams.get('edit')) || null;
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const prefilledRef = useRef(false);
   const { t } = useTranslation();
 
   const [step, setStep] = useState(0);
@@ -96,9 +99,35 @@ export default function CreateListingPage() {
 
   const categoryList = categoriesData?.items || [];
 
+  const { data: editListing } = useQuery({
+    queryKey: ['listing', editId],
+    queryFn: () => listings.getOne(editId!),
+    enabled: !!editId,
+  });
+
+  useEffect(() => {
+    if (!editListing || prefilledRef.current) return;
+    prefilledRef.current = true;
+    setForm({
+      category_id: editListing.category_id ?? null,
+      title: editListing.title || '',
+      description: editListing.description || '',
+      contact_name: editListing.contact_name || '',
+      contact_phone: editListing.contact_phone || '',
+      image_urls: (editListing.images || []).map((img) => img.image_url),
+      price: editListing.price ? String(editListing.price) : '',
+      price_unit: editListing.price_unit || 'per_day',
+      deposit: editListing.deposit ? String(editListing.deposit) : '',
+      city_id: editListing.city_id ?? null,
+      district_id: editListing.district_id ?? null,
+      address: editListing.address || '',
+      rules: editListing.rental_rules || '',
+    });
+  }, [editListing]);
+
   const createMutation = useMutation({
     mutationFn: (formData: FormData) => {
-      return listings.create({
+      const payload = {
         title: formData.title,
         description: formData.description || undefined,
         category_id: formData.category_id!,
@@ -112,11 +141,13 @@ export default function CreateListingPage() {
         contact_name: formData.contact_name || undefined,
         contact_phone: formData.contact_phone || undefined,
         image_urls: formData.image_urls,
-      });
+      };
+      return editId ? listings.update(editId, payload) : listings.create(payload);
     },
     onSuccess: (data) => {
-      toast.success(t('createListing.published'));
+      toast.success(editId ? t('createListing.updated') : t('createListing.published'));
       queryClient.invalidateQueries({ queryKey: ['listings'] });
+      queryClient.invalidateQueries({ queryKey: ['listing', editId] });
       navigate(`/listing/${data.id}`);
     },
     onError: (error: any) => {
@@ -194,7 +225,7 @@ export default function CreateListingPage() {
         </button>
 
         <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 mb-6">
-          <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white mb-6">{t('createListing.title')}</h1>
+          <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white mb-6">{editId ? t('createListing.editTitle') : t('createListing.title')}</h1>
           <div className="flex items-center gap-1 mb-2">
             {STEPS.map((label, i) => (
               <div key={i} className="flex-1">
@@ -476,7 +507,7 @@ export default function CreateListingPage() {
                 ) : (
                   <Check size={16} />
                 )}
-                {t('createListing.publish')}
+                {editId ? t('createListing.save') : t('createListing.publish')}
               </button>
             )}
           </div>
