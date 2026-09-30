@@ -246,7 +246,7 @@ export default function ListingPage() {
                   </div>
                 </div>
                 {images.length > 1 && (
-                  <div className="flex gap-2 overflow-x-auto pb-1">
+                  <div className="flex flex-wrap gap-2 pb-1">
                     {images.map((img, i) => (
                       <button
                         key={i}
@@ -589,7 +589,7 @@ export default function ListingPage() {
         {similarData?.items && similarData.items.length > 0 && (
           <div className="mt-12">
             <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-4">{t('listing.similarListings')}</h2>
-            <div className="flex gap-4 overflow-x-auto pb-4">
+            <div className="flex flex-wrap gap-4 pb-4">
               {similarData.items.map((item) => (
                 <Link
                   key={item.id}

@@ -347,11 +347,11 @@ export default function HomePage() {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="rounded-2xl bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 p-6 sm:p-8 flex flex-col md:flex-row items-center gap-6">
-          <div className="flex-1 text-center md:text-left">
+          <div className="flex-1 min-w-0 text-center md:text-left">
             <h3 className="text-xl sm:text-2xl font-extrabold text-[#1A1A2E] dark:text-white">{t('home.ctaTitle')}</h3>
             <p className="mt-2 text-sm sm:text-base text-gray-500 dark:text-gray-400">{t('home.ctaText')}</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 min-w-0">
             <button
               onClick={() => navigate('/create-listing')}
               className="px-6 py-3 bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-bold rounded-xl transition shadow-lg shadow-[#FF6B35]/30"

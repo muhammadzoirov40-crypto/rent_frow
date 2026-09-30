@@ -283,7 +283,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="flex gap-1 bg-white dark:bg-[#1A1A2E] rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/10 mb-6 overflow-x-auto">
+        <div className="flex flex-wrap gap-1 bg-white dark:bg-[#1A1A2E] rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/10 mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
