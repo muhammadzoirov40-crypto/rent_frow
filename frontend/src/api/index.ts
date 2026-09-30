@@ -251,6 +251,14 @@ export const listings = {
   getOne: (id: number) =>
     client.get<APIResponse<Listing>>(`/listings/${id}`).then(unwrap),
 
+  getCalendar: (id: number, startDate: string, endDate: string) =>
+    client
+      .get<APIResponse<{ listing_id: number; days: { date: string; status: string }[] }>>(
+        `/listings/${id}/calendar`,
+        { params: { start_date: startDate, end_date: endDate } },
+      )
+      .then(unwrap),
+
   create: (data: ListingCreateData) =>
     client.post<APIResponse<Listing>>('/listings', data).then(unwrap),
 

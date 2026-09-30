@@ -275,7 +275,11 @@
     "per_week": "неделю",
     "per_month": "месяц",
     "verified": "Верифицирован",
-    "booked": "Занято"
+    "booked": "Занято",
+    "availability": "Доступность",
+    "pending": "На рассмотрении",
+    "clearDates": "Очистить",
+    "fullscreen": "На весь экран"
   },
   "createListing": {
     "title": "Новое объявление",

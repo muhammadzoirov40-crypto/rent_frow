@@ -279,6 +279,18 @@ async def get_availability(
     return APIResponse(data={"listing_id": listing_id, "available": available})
 
 
+@router.get("/{listing_id}/calendar", response_model=APIResponse[dict])
+async def get_listing_calendar(
+    listing_id: int,
+    start_date: date = Query(...),
+    end_date: date = Query(...),
+    db: AsyncSession = Depends(get_db),
+):
+    service = ListingService(db)
+    days = await service.get_calendar(listing_id, start_date, end_date)
+    return APIResponse(data={"listing_id": listing_id, "days": days})
+
+
 @router.get("/owner/my", response_model=PaginatedResponse[ListingResponse])
 async def get_my_listings(
     page: int = Query(1, ge=1),

@@ -169,3 +169,32 @@ class ListingService:
             )
         )
         return result.scalar_one() == 0
+
+    async def get_calendar(self, listing_id: int, start_date: date, end_date: date) -> list[dict]:
+        listing = await self.repo.get_by_id(listing_id)
+        if not listing:
+            raise HTTPException(status_code=404, detail="Listing not found")
+        result = await self.db.execute(
+            select(RentalRequest.start_date, RentalRequest.end_date, RentalRequest.status)
+            .where(
+                RentalRequest.listing_id == listing_id,
+                RentalRequest.status.in_([
+                    RentalRequestStatus.PENDING,
+                    RentalRequestStatus.ACCEPTED,
+                    RentalRequestStatus.COMPLETED,
+                ]),
+                RentalRequest.start_date <= end_date,
+                RentalRequest.end_date >= start_date,
+            )
+        )
+        days: dict[str, str] = {}
+        for req_start, req_end, status in result.all():
+            day_status = "pending" if status == RentalRequestStatus.PENDING else "booked"
+            current = max(req_start, start_date)
+            last = min(req_end, end_date)
+            while current <= last:
+                key = current.isoformat()
+                if days.get(key) != "booked":
+                    days[key] = day_status
+                current += timedelta(days=1)
+        return [{"date": key, "status": days[key]} for key in sorted(days)]

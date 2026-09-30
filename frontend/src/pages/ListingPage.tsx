@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -13,6 +13,7 @@ import {
   Phone,
   MessageSquare,
   ChevronLeft,
+  ChevronRight,
   Shield,
   Clock,
   Tag,
@@ -22,8 +23,11 @@ import {
   BadgeCheck,
   Trash2,
   Pencil,
+  Maximize2,
+  X,
 } from 'lucide-react';
 import { formatDate } from '../utils/dates';
+import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
   return (
@@ -47,6 +51,8 @@ export default function ListingPage() {
   const { user, isAuthenticated } = useAuthStore();
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const touchX = useRef<number | null>(null);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [showPhone, setShowPhone] = useState(false);
@@ -66,6 +72,22 @@ export default function ListingPage() {
       setIsFavorited(listing.is_favorited);
     }
   }, [listing]);
+
+  const galleryLen = listing?.images?.length ?? 0;
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFullscreen(false);
+      if (galleryLen > 0 && e.key === 'ArrowRight') {
+        setCurrentImageIndex((i) => (i + 1) % galleryLen);
+      }
+      if (galleryLen > 0 && e.key === 'ArrowLeft') {
+        setCurrentImageIndex((i) => (i - 1 + galleryLen) % galleryLen);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [fullscreen, galleryLen]);
 
   const { data: listingReviews = [] } = useQuery({
     queryKey: ['reviews', id],
@@ -235,15 +257,60 @@ export default function ListingPage() {
           <div className="lg:w-[60%] space-y-8">
             {images.length > 0 ? (
               <div className="space-y-3">
-                <div className="relative bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 aspect-[4/3]">
+                <div
+                  className="relative bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 aspect-[4/3] touch-pan-y"
+                  onTouchStart={(e) => {
+                    touchX.current = e.touches[0].clientX;
+                  }}
+                  onTouchEnd={(e) => {
+                    if (touchX.current == null || images.length < 2) return;
+                    const dx = e.changedTouches[0].clientX - touchX.current;
+                    if (Math.abs(dx) > 40) {
+                      setCurrentImageIndex((i) =>
+                        dx < 0 ? (i + 1) % images.length : (i - 1 + images.length) % images.length,
+                      );
+                    }
+                    touchX.current = null;
+                  }}
+                >
                   <img
                     src={images[currentImageIndex]}
                     alt={listing.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-4 right-4 bg-black/60 text-white text-xs font-medium px-3 py-1.5 rounded-full backdrop-blur-sm">
-                    {currentImageIndex + 1}/{images.length}
+                  <div className="absolute top-4 right-4 flex items-center gap-2">
+                    <div className="bg-black/65 text-white text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">
+                      {currentImageIndex + 1}/{images.length}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFullscreen(true)}
+                      aria-label={t('listing.fullscreen')}
+                      className="w-8 h-8 rounded-full bg-black/65 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/80 transition"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </button>
                   </div>
+                  {images.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Previous image"
+                        onClick={() => setCurrentImageIndex((i) => (i - 1 + images.length) % images.length)}
+                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 dark:bg-black/60 text-gray-800 dark:text-white flex items-center justify-center shadow-md hover:scale-105 transition hidden sm:flex"
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label="Next image"
+                        onClick={() => setCurrentImageIndex((i) => (i + 1) % images.length)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 dark:bg-black/60 text-gray-800 dark:text-white flex items-center justify-center shadow-md hover:scale-105 transition hidden sm:flex"
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </button>
+                    </>
+                  )}
                 </div>
                 {images.length > 1 && (
                   <div className="flex flex-wrap gap-2 pb-1">
@@ -251,6 +318,7 @@ export default function ListingPage() {
                       <button
                         key={i}
                         onClick={() => setCurrentImageIndex(i)}
+                        aria-label={`${i + 1}/${images.length}`}
                         className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                           i === currentImageIndex
                             ? 'border-[#FF6B35] ring-2 ring-[#FF6B35]/30'
@@ -322,33 +390,51 @@ export default function ListingPage() {
           <div className="lg:w-[40%]">
             <div id="booking-card" className="sticky top-6 space-y-4">
               <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
-                <h1 className="text-xl font-bold text-[#1A1A2E] dark:text-white mb-4">{listing.title}</h1>
-                <div className="mb-4">
-                  <span className="text-3xl font-extrabold text-[#FF6B35]">{listing.price}</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-sm ml-1">сом / {t('listing.' + listing.price_unit)}</span>
+                <h1 className="text-xl font-bold text-[#1A1A2E] dark:text-white mb-3">{listing.title}</h1>
+
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  {listing.is_verified && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/70 text-white ring-1 ring-white/15">
+                      <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      {t('listing.verified')}
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    {(listing.average_rating ?? 0) > 0 ? listing.average_rating.toFixed(1) : '—'}
+                    <span className="font-normal text-gray-400 dark:text-gray-500">
+                      · {listingReviews.length} {t('listing.reviews')}
+                    </span>
+                  </span>
                 </div>
 
-                <div className="space-y-3 mb-6">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('listing.from')}</label>
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
-                    />
+                {(listing.city_name || listing.district_name) && (
+                  <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    <MapPin className="w-4 h-4 shrink-0 text-[#FF6B35]" />
+                    <span className="truncate">
+                      {listing.city_name}
+                      {listing.district_name ? `, ${listing.district_name}` : ''}
+                    </span>
                   </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('listing.to')}</label>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      min={startDate || new Date().toISOString().split('T')[0]}
-                      className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
-                    />
-                  </div>
+                )}
+
+                <div className="mb-4">
+                  <span className="text-3xl font-extrabold text-[#FF6B35]">{listing.price.toLocaleString('ru-RU')}</span>
+                  <span className="text-gray-500 dark:text-gray-400 text-sm ml-1">
+                    {t('common.somoni')} / {t('listing.' + listing.price_unit)}
+                  </span>
+                </div>
+
+                <div className="mb-4">
+                  <AvailabilityCalendar
+                    listingId={Number(id)}
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(s, e) => {
+                      setStartDate(s);
+                      setEndDate(e);
+                    }}
+                  />
                 </div>
 
                 {startDate && endDate && (
@@ -622,6 +708,62 @@ export default function ListingPage() {
           </div>
         )}
       </div>
+
+      {fullscreen && images.length > 0 && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/95 flex flex-col"
+          onClick={() => setFullscreen(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="flex items-center justify-between px-4 py-3 shrink-0">
+            <span className="text-white text-sm font-semibold">
+              {currentImageIndex + 1}/{images.length}
+            </span>
+            <button
+              type="button"
+              aria-label={t('common.close')}
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullscreen(false);
+              }}
+              className="w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div
+            className="flex-1 flex items-center justify-center gap-3 px-3 pb-6 min-h-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {images.length > 1 && (
+              <button
+                type="button"
+                aria-label="Previous image"
+                onClick={() => setCurrentImageIndex((i) => (i - 1 + images.length) % images.length)}
+                className="w-10 h-10 shrink-0 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+            <img
+              src={images[currentImageIndex]}
+              alt={listing.title}
+              className="max-h-full max-w-full object-contain rounded-lg"
+            />
+            {images.length > 1 && (
+              <button
+                type="button"
+                aria-label="Next image"
+                onClick={() => setCurrentImageIndex((i) => (i + 1) % images.length)}
+                className="w-10 h-10 shrink-0 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {!isOwner && listing.status === 'ACTIVE' && (
         <div className="lg:hidden fixed left-0 right-0 bottom-20 z-40 px-4">

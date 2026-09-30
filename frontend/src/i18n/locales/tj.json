@@ -276,7 +276,11 @@
     "per_week": "ҳафта",
     "per_month": "моҳ",
     "verified": "Тасдиқшуда",
-    "booked": "Гирифта шуда"
+    "booked": "Гирифта шуда",
+    "availability": "Дастрасӣ",
+    "pending": "Дар баррасӣ",
+    "clearDates": "Тоза кардан",
+    "fullscreen": "Тамоми экран"
   },
   "createListing": {
     "title": "Эълони нав",
