@@ -432,7 +432,7 @@ export default function ChatMessageList({
             className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-60 rounded-3xl bg-white/95 dark:bg-[#1a1d24]/95 backdrop-blur-xl border border-white/60 dark:border-white/10 shadow-[0_24px_80px_-20px_rgba(16,24,40,0.55)] overflow-hidden p-2"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-1 pb-2 mb-1.5 border-b border-gray-100 dark:border-white/10">
+            <div className="flex items-center justify-center gap-1.5 px-1 pb-2 mb-1.5 border-b border-gray-100 dark:border-white/10">
               {QUICK_REACTIONS.map((emoji) => (
                 <button
                   key={emoji}
@@ -551,7 +551,7 @@ function MenuButton({
     <button
       type="button"
       onClick={onClick}
-      className={`group w-full flex items-center gap-3 px-2 py-2 rounded-2xl text-sm transition ${
+      className={`group w-full flex items-center justify-center gap-2.5 px-3 py-2 rounded-2xl text-sm transition ${
         danger
           ? 'text-red-500 hover:bg-red-500/10'
           : 'text-gray-700 dark:text-gray-200 hover:bg-orange-500/10'
@@ -567,7 +567,7 @@ function MenuButton({
         {icon}
       </span>
       <span className="font-medium truncate">{label}</span>
-      {loading && <Loader2 className="w-3.5 h-3.5 ml-auto animate-spin text-[#FF6B35]" />}
+      {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-[#FF6B35]" />}
     </button>
   );
 }
