@@ -276,7 +276,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
               }
             }}
             aria-label={t('dashboard.menu')}
-            className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition"
+            className="md:hidden p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition"
           >
             <Menu className="w-5 h-5" />
           </button>
