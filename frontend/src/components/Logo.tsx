@@ -17,7 +17,7 @@ const SIZES = {
 function Mark({ className }: { className: string }) {
   return (
     <span
-      className={`${className} shrink-0 flex items-center justify-center bg-gradient-to-br from-[#FF6B35] via-[#ff7f4d] to-[#ff9162] shadow-lg shadow-orange-500/30 ring-1 ring-inset ring-white/20`}
+      className={`${className} shrink-0 flex items-center justify-center bg-gradient-to-br from-[var(--accent)] via-[var(--accent-light)] to-[var(--accent-light)] shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] ring-1 ring-inset ring-white/20`}
     >
       <svg viewBox="0 0 64 64" className="w-[64%] h-[64%]" aria-hidden="true">
         <path
@@ -39,7 +39,7 @@ export default function Logo({ size = 'md', to = '/', showWord = true, hideWordO
           className={`${s.word} font-extrabold tracking-tight ${hideWordOnMobile ? 'hidden sm:block' : ''}`}
         >
           <span className="text-[#1A1A2E] dark:text-white">Rent</span>
-          <span className="text-[#FF6B35]">Hub</span>
+          <span className="text-[var(--accent)]">Hub</span>
         </span>
       )}
     </Link>

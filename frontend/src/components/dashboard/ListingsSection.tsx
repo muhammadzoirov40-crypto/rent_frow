@@ -84,7 +84,7 @@ export default function ListingsSection() {
   if (isLoading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FF6B35]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" />
       </div>
     );
   }
@@ -99,8 +99,8 @@ export default function ListingsSection() {
             onClick={() => setFilter(f.key)}
             className={`px-4 py-2 rounded-xl text-sm font-semibold transition border ${
               filter === f.key
-                ? 'bg-[#FF6B35] text-white border-[#FF6B35] shadow-sm shadow-[#FF6B35]/25'
-                : 'bg-white dark:bg-[#1a1d24] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40'
+                ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-sm shadow-[rgb(var(--accent-rgb)/0.25)]'
+                : 'bg-white dark:bg-[#1a1d24] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
             }`}
           >
             {f.label}
@@ -109,7 +109,7 @@ export default function ListingsSection() {
         ))}
         <Link
           to="/create-listing"
-          className="ml-auto px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#FF6B35] hover:bg-[#e55a2b] transition shadow-sm shadow-[#FF6B35]/25"
+          className="ml-auto px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition shadow-sm shadow-[rgb(var(--accent-rgb)/0.25)]"
         >
           + {t('dashboard.listings.create')}
         </Link>
@@ -147,11 +147,11 @@ export default function ListingsSection() {
                     <div className="min-w-0">
                       <Link
                         to={`/listing/${l.id}`}
-                        className="font-bold text-[#1A1A2E] dark:text-white hover:text-[#FF6B35] transition block truncate"
+                        className="font-bold text-[#1A1A2E] dark:text-white hover:text-[var(--accent)] transition block truncate"
                       >
                         {l.title}
                       </Link>
-                      <p className="text-sm font-semibold text-[#FF6B35] mt-0.5 tabular-nums">
+                      <p className="text-sm font-semibold text-[var(--accent)] mt-0.5 tabular-nums">
                         {l.price.toLocaleString('ru-RU')} {t('common.somoni')} / {t(`listing.${l.price_unit}`)}
                       </p>
                     </div>
@@ -193,7 +193,7 @@ export default function ListingsSection() {
                     </Link>
                     <Link
                       to={`/create-listing?edit=${l.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-[#FF6B35] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/20 px-3.5 py-1.5 rounded-lg transition"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.1)] hover:bg-[rgb(var(--accent-rgb)/0.2)] px-3.5 py-1.5 rounded-lg transition"
                     >
                       <Pencil className="w-4 h-4" />
                       {t('dashboard.listings.edit')}

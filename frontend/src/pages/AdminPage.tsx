@@ -445,7 +445,7 @@ export default function AdminPage() {
   const statCards = [
     { label: t('admin.platformStats') || t('admin.overview'), value: stats?.totalUsers ?? 0, icon: <Users className="w-6 h-6" />, color: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/20' },
     { label: t('admin.activeListings') || t('admin.overview'), value: stats?.activeListings ?? 0, icon: <FileText className="w-6 h-6" />, color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/20' },
-    { label: t('admin.rentalRequests') || t('admin.overview'), value: stats?.rentalRequests ?? 0, icon: <ClipboardList className="w-6 h-6" />, color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/20' },
+    { label: t('admin.rentalRequests') || t('admin.overview'), value: stats?.rentalRequests ?? 0, icon: <ClipboardList className="w-6 h-6" />, color: 'from-amber-500 to-[var(--accent-hover)]', shadow: 'shadow-amber-500/20' },
     { label: t('admin.completedRentals') || t('admin.overview'), value: stats?.completedRentals ?? 0, icon: <TrendingUp className="w-6 h-6" />, color: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/20' },
   ];
 
@@ -463,8 +463,8 @@ export default function AdminPage() {
                 adminSidebarCollapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-4 flex items-center gap-3'
               }`}
             >
-              <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[#FF6B35]/20 rounded-full blur-2xl" />
-              <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#ff9a66] flex items-center justify-center shrink-0 shadow-lg shadow-[#FF6B35]/30">
+              <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[rgb(var(--accent-rgb)/0.2)] rounded-full blur-2xl" />
+              <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[#ff9a66] flex items-center justify-center shrink-0 shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]">
                 <Shield className="w-5 h-5 text-white" />
               </div>
               {!adminSidebarCollapsed && (
@@ -477,7 +477,7 @@ export default function AdminPage() {
                 onClick={() => setAdminSidebarCollapsed(!adminSidebarCollapsed)}
                 aria-label="Toggle sidebar"
                 title={adminSidebarCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-                className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/10 transition ${
+                className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/10 transition ${
                   adminSidebarCollapsed ? '' : 'shrink-0'
                 }`}
               >
@@ -499,7 +499,7 @@ export default function AdminPage() {
                     adminSidebarCollapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
                   } ${
                     activeTab === tab.key
-                      ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff9162] text-white shadow-lg shadow-[#FF6B35]/30'
+                      ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
@@ -522,7 +522,7 @@ export default function AdminPage() {
                 {statCards.map((card) => (
                   <div key={card.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
-                      <div className="w-12 h-12 rounded-xl bg-[#FF6B35]/10 flex items-center justify-center text-[#FF6B35]">
+                      <div className="w-12 h-12 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center text-[var(--accent)]">
                         {card.icon}
                       </div>
                       <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
@@ -541,8 +541,8 @@ export default function AdminPage() {
                       <AreaChart data={chartData?.requestsByDay || []} margin={{ top: 5, right: 10, left: -18, bottom: 0 }}>
                         <defs>
                           <linearGradient id="orangeArea" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#FF6B35" stopOpacity={0.35} />
-                            <stop offset="100%" stopColor="#FF6B35" stopOpacity={0.02} />
+                            <stop offset="0%" stopColor="var(--accent)" stopOpacity={0.35} />
+                            <stop offset="100%" stopColor="var(--accent)" stopOpacity={0.02} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 4" stroke="rgba(148,163,184,0.15)" vertical={false} />
@@ -559,7 +559,7 @@ export default function AdminPage() {
                           contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 12 }}
                           labelStyle={{ color: '#6b7280' }}
                         />
-                        <Area type="monotone" dataKey="count" stroke="#FF6B35" strokeWidth={2.5} fill="url(#orangeArea)" />
+                        <Area type="monotone" dataKey="count" stroke="var(--accent)" strokeWidth={2.5} fill="url(#orangeArea)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -579,7 +579,7 @@ export default function AdminPage() {
                           paddingAngle={2}
                         >
                           {(chartData?.listingsByStatus || []).map((_: ChartGroup, i: number) => (
-                            <Cell key={i} fill={['#FF6B35', '#1A1A2E', '#FFB088', '#94A3B8', '#22C55E', '#F59E0B'][i % 6]} />
+                            <Cell key={i} fill={['var(--accent)', '#1A1A2E', 'var(--accent-light)', '#94A3B8', '#22C55E', '#F59E0B'][i % 6]} />
                           ))}
                         </Pie>
                         <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #e5e7eb', fontSize: 12 }} />
@@ -590,7 +590,7 @@ export default function AdminPage() {
                     {(chartData?.listingsByStatus || []).map((g: ChartGroup, i: number) => (
                       <div key={g.key} className="flex items-center justify-between text-xs">
                         <span className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                          <span className="w-2.5 h-2.5 rounded-full" style={{ background: ['#FF6B35', '#1A1A2E', '#FFB088', '#94A3B8', '#22C55E', '#F59E0B'][i % 6] }} />
+                          <span className="w-2.5 h-2.5 rounded-full" style={{ background: ['var(--accent)', '#1A1A2E', 'var(--accent-light)', '#94A3B8', '#22C55E', '#F59E0B'][i % 6] }} />
                           {g.key}
                         </span>
                         <span className="font-bold text-gray-900 dark:text-white">{g.count}</span>
@@ -639,7 +639,7 @@ export default function AdminPage() {
 
               {crmLoading ? (
                 <div className="flex justify-center py-16">
-                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : crm ? (
                 <div className="space-y-6">
@@ -647,7 +647,7 @@ export default function AdminPage() {
                     {[
                       { label: t('admin.totalUsers'), value: crm.stats.totalUsers, icon: <Users className="w-6 h-6" />, color: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/20' },
                       { label: t('admin.activeListings'), value: crm.stats.activeListings, icon: <FileText className="w-6 h-6" />, color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/20' },
-                      { label: t('admin.totalRequests'), value: crm.stats.totalRequests, icon: <ClipboardList className="w-6 h-6" />, color: 'from-amber-500 to-orange-600', shadow: 'shadow-amber-500/20' },
+                      { label: t('admin.totalRequests'), value: crm.stats.totalRequests, icon: <ClipboardList className="w-6 h-6" />, color: 'from-amber-500 to-[var(--accent-hover)]', shadow: 'shadow-amber-500/20' },
                       { label: t('admin.totalRevenue'), value: crm.stats.totalRevenue, icon: <TrendingUp className="w-6 h-6" />, color: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/20' },
                       { label: t('admin.totalBookings'), value: crm.stats.totalBookings, icon: <Clock className="w-6 h-6" />, color: 'from-cyan-500 to-sky-600', shadow: 'shadow-cyan-500/20' },
                       { label: t('admin.totalRentals'), value: crm.stats.totalRentals, icon: <CheckCircle className="w-6 h-6" />, color: 'from-teal-500 to-green-600', shadow: 'shadow-teal-500/20' },
@@ -656,7 +656,7 @@ export default function AdminPage() {
                     ].map((card) => (
                       <div key={card.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
-                          <div className="w-12 h-12 rounded-xl bg-[#FF6B35]/10 flex items-center justify-center text-[#FF6B35]">
+                          <div className="w-12 h-12 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center text-[var(--accent)]">
                             {card.icon}
                           </div>
                           <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
@@ -833,14 +833,14 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition w-64"
+                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
 
               {usersLoading ? (
                 <div className="flex justify-center py-16">
-                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
                 <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
@@ -867,7 +867,7 @@ export default function AdminPage() {
                                 {u.avatar_url ? (
                                   <img src={u.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover" />
                                 ) : (
-                                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white text-xs font-semibold">
+                                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--accent)] to-[#1A1A2E] flex items-center justify-center text-white text-xs font-semibold">
                                     {(u.display_name || u.email).charAt(0)}
                                   </div>
                                 )}
@@ -948,14 +948,14 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition w-64"
+                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
 
               {listingsLoading ? (
                 <div className="flex justify-center py-16">
-                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
                 <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
@@ -1050,14 +1050,14 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition w-64"
+                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
 
               {requestsLoading ? (
                 <div className="flex justify-center py-16">
-                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
                 <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
@@ -1114,7 +1114,7 @@ export default function AdminPage() {
                 </div>
                 <button
                   onClick={() => { setEditingCategory(null); setCategoryName(''); setShowCategoryModal(true); }}
-                  className="flex items-center gap-2 bg-[#FF6B35] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e55a2b] transition shadow-lg shadow-[#FF6B35]/20"
+                  className="flex items-center gap-2 bg-[var(--accent)] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]"
                 >
                   <Plus className="w-4 h-4" />
                   {t('admin.add')}
@@ -1123,7 +1123,7 @@ export default function AdminPage() {
 
               {categoriesLoading ? (
                 <div className="flex justify-center py-16">
-                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
                 <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
@@ -1143,7 +1143,7 @@ export default function AdminPage() {
                               <div className="flex items-center justify-end gap-1">
                                 <button
                                   onClick={() => openEditCategory(cat)}
-                                  className="p-2 rounded-lg text-[#FF6B35] hover:bg-[#FF6B35]/10 transition"
+                                  className="p-2 rounded-lg text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] transition"
                                   title={t('admin.editCategory')}
                                 >
                                   <FileText className="w-4 h-4" />
@@ -1187,14 +1187,14 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition w-64"
+                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
 
               {postsLoading ? (
                 <div className="flex justify-center py-16">
-                  <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
                 <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
@@ -1301,7 +1301,7 @@ export default function AdminPage() {
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   placeholder={t('admin.namePlaceholder')}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35] transition"
+                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
                 />
               </div>
               <div className="flex gap-3 pt-2">
@@ -1314,7 +1314,7 @@ export default function AdminPage() {
                 <button
                   onClick={handleSaveCategory}
                   disabled={saveCategoryMutation.isPending}
-                  className="flex-1 py-2.5 bg-[#FF6B35] text-white rounded-xl text-sm font-semibold hover:bg-[#e55a2b] disabled:opacity-50 transition shadow-lg shadow-[#FF6B35]/20"
+                  className="flex-1 py-2.5 bg-[var(--accent)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] disabled:opacity-50 transition shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]"
                 >
                   {saveCategoryMutation.isPending ? t('admin.saving') : t('admin.save')}
                 </button>
@@ -1337,7 +1337,7 @@ export default function AdminPage() {
               {profileUser.avatar_url ? (
                 <img src={profileUser.avatar_url} alt="" className="w-16 h-16 rounded-2xl object-cover border border-gray-200 dark:border-white/10" />
               ) : (
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white text-xl font-bold shrink-0">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[#1A1A2E] flex items-center justify-center text-white text-xl font-bold shrink-0">
                   {(profileUser.display_name || profileUser.email).charAt(0).toUpperCase()}
                 </div>
               )}
@@ -1406,7 +1406,7 @@ export default function AdminPage() {
               ) : (
                 <button
                   onClick={() => { unblockMutation.mutate(profileUser.id); setProfileUser(null); }}
-                  className="flex-1 py-2.5 bg-[#FF6B35] text-white rounded-xl text-sm font-semibold hover:bg-[#e55a2b] transition flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 bg-[var(--accent)] text-white rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition flex items-center justify-center gap-1.5"
                 >
                   <Shield className="w-4 h-4" /> {t('admin.unblockUser')}
                 </button>

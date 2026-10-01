@@ -99,7 +99,7 @@ export default function UsersPage() {
                   {editingUser?.id === user.id ? (
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20 shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] shrink-0">
                           <span className="text-white text-sm font-bold">{getInitials(editName || user.email)}</span>
                         </div>
                         <div className="flex-1">
@@ -108,7 +108,7 @@ export default function UsersPage() {
                             type="text"
                             value={editName}
                             onChange={(e) => setEditName(e.target.value)}
-                            className="w-full mt-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition"
+                            className="w-full mt-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.5)] focus:border-[rgb(var(--accent-rgb)/0.5)] transition"
                             placeholder={t('users.namePlaceholder')}
                             autoFocus
                           />
@@ -118,7 +118,7 @@ export default function UsersPage() {
                           <select
                             value={editRole}
                             onChange={(e) => setEditRole(e.target.value)}
-                            className="mt-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition"
+                            className="mt-1 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.5)] focus:border-[rgb(var(--accent-rgb)/0.5)] transition"
                           >
                             <option value="CUSTOMER">{t('users.customer')}</option>
                             <option value="ADMIN">{t('users.admin')}</option>
@@ -158,7 +158,7 @@ export default function UsersPage() {
                           className="w-12 h-12 rounded-xl object-cover border border-gray-300 dark:border-white/10 shrink-0"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-brand-500/20 shrink-0">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] shrink-0">
                           <span className="text-white text-sm font-bold">{getInitials(user.display_name || user.email)}</span>
                         </div>
                       )}
@@ -171,7 +171,7 @@ export default function UsersPage() {
                       <div className="flex items-center gap-2 shrink-0">
                         <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-wider border ${
                           user.role === 'ADMIN'
-                            ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400 border-brand-500/20'
+                            ? 'bg-[rgb(var(--accent-rgb)/0.15)] text-brand-600 dark:text-brand-400 border-[rgb(var(--accent-rgb)/0.2)]'
                             : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
                         }`}>
                           {user.role === 'ADMIN' ? t('users.admin') : t('users.customer')}

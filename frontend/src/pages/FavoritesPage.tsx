@@ -33,7 +33,7 @@ export default function FavoritesPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#FF6B35]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--accent)]" />
       </div>
     );
   }
@@ -47,8 +47,8 @@ export default function FavoritesPage() {
 
         {favs.length === 0 ? (
           <div className="bg-white dark:bg-[#12121f] dark:border-white/10 rounded-2xl border border-gray-100 p-12 sm:p-16 text-center">
-            <div className="w-20 h-20 rounded-full bg-[#FF6B35]/10 flex items-center justify-center mx-auto mb-5">
-              <Heart className="w-10 h-10 text-[#FF6B35]" />
+            <div className="w-20 h-20 rounded-full bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center mx-auto mb-5">
+              <Heart className="w-10 h-10 text-[var(--accent)]" />
             </div>
             <h3 className="text-xl font-bold text-[#1A1A2E] dark:text-white mb-2">{t('favorites.empty')}</h3>
             <p className="text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">
@@ -56,7 +56,7 @@ export default function FavoritesPage() {
             </p>
             <Link
               to="/search"
-              className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[#e85d2c] transition shadow-lg shadow-[#FF6B35]/20"
+              className="inline-flex items-center gap-2 bg-[var(--accent)] text-white px-6 py-3 rounded-xl font-semibold text-sm hover:bg-[var(--accent-hover)] transition shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]"
             >
               {t('favorites.findListings')}
             </Link>
@@ -89,7 +89,7 @@ export default function FavoritesPage() {
                 <div className="p-5">
                   <Link
                     to={`/listing/${listing.id}`}
-                    className="font-bold text-[#1A1A2E] dark:text-white hover:text-[#FF6B35] transition text-lg block truncate"
+                    className="font-bold text-[#1A1A2E] dark:text-white hover:text-[var(--accent)] transition text-lg block truncate"
                   >
                     {listing.title}
                   </Link>
@@ -102,7 +102,7 @@ export default function FavoritesPage() {
                     )}
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
-                    <span className="text-xl font-bold text-[#FF6B35]">
+                    <span className="text-xl font-bold text-[var(--accent)]">
                       {listing.price.toLocaleString('ru-RU')} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}</span>
                     </span>
                   </div>

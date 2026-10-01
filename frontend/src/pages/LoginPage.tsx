@@ -230,7 +230,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'linear-gradient(135deg, #FF6B35, #e85d2c)' }}>
+            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))' }}>
             <span className="text-white font-bold text-2xl">R</span>
           </div>
           <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white">{t('auth.rentflow')}</h1>
@@ -258,18 +258,18 @@ export default function LoginPage() {
             <div className="mb-6">
               <div className="flex justify-center mb-4">
                 <div className="relative">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#e85d2c] flex items-center justify-center shadow-lg shadow-[#FF6B35]/30">
+                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]">
                     <Mail className="w-8 h-8 text-white" />
                   </div>
-                  <span className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white border-2 border-[#FF6B35] flex items-center justify-center shadow-sm">
-                    <CheckCircle2 className="w-4 h-4 text-[#FF6B35]" />
+                  <span className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white border-2 border-[var(--accent)] flex items-center justify-center shadow-sm">
+                    <CheckCircle2 className="w-4 h-4 text-[var(--accent)]" />
                   </span>
                 </div>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">{t('auth.codeSentTo')}</p>
               <div className="flex justify-center mt-1.5">
                 <span className="inline-flex items-center gap-1.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-full px-3.5 py-1.5 text-sm font-semibold text-[#1A1A2E] dark:text-white max-w-full">
-                  <Mail className="w-3.5 h-3.5 text-[#FF6B35] shrink-0" />
+                  <Mail className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
                   <span className="truncate">{email}</span>
                 </span>
               </div>
@@ -288,7 +288,7 @@ export default function LoginPage() {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder={t('auth.namePlaceholder')}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
                       required
                     />
                   </div>
@@ -304,7 +304,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('auth.emailPlaceholder')}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
                     autoFocus
                     required
                   />
@@ -321,7 +321,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={t('auth.passwordPlaceholder')}
-                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none text-sm transition"
+                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
                       required
                     />
                     <button
@@ -338,7 +338,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isSending}
-                className="w-full bg-[#FF6B35] text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-[#e85d2c] disabled:opacity-50 transition flex items-center justify-center gap-2"
+                className="w-full bg-[var(--accent)] text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-[var(--accent-hover)] disabled:opacity-50 transition flex items-center justify-center gap-2"
               >
                 {isSending ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -366,15 +366,15 @@ export default function LoginPage() {
                     onFocus={(e) => e.target.select()}
                     className={`w-11 h-14 sm:w-12 sm:h-15 text-center text-2xl font-bold rounded-2xl border-2 outline-none transition-all duration-150 ${
                       digit
-                        ? 'border-[#FF6B35] bg-white dark:bg-white/10 text-[#1A1A2E] dark:text-white shadow-sm'
+                        ? 'border-[var(--accent)] bg-white dark:bg-white/10 text-[#1A1A2E] dark:text-white shadow-sm'
                         : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white'
-                    } focus:border-[#FF6B35] focus:ring-4 focus:ring-[#FF6B35]/15 focus:bg-white dark:focus:bg-white/10`}
+                    } focus:border-[var(--accent)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)] focus:bg-white dark:focus:bg-white/10`}
                   />
                 ))}
               </div>
 
               {devCode && (
-                <div className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-gradient-to-b from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-orange-500/10 px-4 py-3 text-center">
+                <div className="rounded-2xl border border-amber-200 dark:border-amber-500/30 bg-gradient-to-b from-amber-50 to-orange-50 dark:from-amber-500/10 dark:to-[rgb(var(--accent-rgb)/0.1)] px-4 py-3 text-center">
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400">{t('auth.devMode')}</p>
                   <p className="mt-0.5 text-2xl font-mono font-bold tracking-[0.35em] text-amber-700 dark:text-amber-300">{devCode}</p>
                 </div>
@@ -393,7 +393,7 @@ export default function LoginPage() {
                 disabled={otpCode.length !== 6 || isVerifying}
                 className={`w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${
                   otpCode.length === 6
-                    ? 'bg-gradient-to-r from-[#FF6B35] to-[#e85d2c] text-white shadow-lg shadow-[#FF6B35]/25 hover:shadow-xl hover:shadow-[#FF6B35]/30 active:scale-[0.99]'
+                    ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)] hover:shadow-xl hover:shadow-[rgb(var(--accent-rgb)/0.3)] active:scale-[0.99]'
                     : 'bg-gray-100 dark:bg-white/10 text-gray-400 dark:text-white/40 cursor-not-allowed'
                 }`}
               >
@@ -418,7 +418,7 @@ export default function LoginPage() {
                   <button
                     onClick={handleResend}
                     disabled={isSending}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#FF6B35] border border-[#FF6B35]/40 rounded-full px-4 py-1.5 hover:bg-[#FF6B35]/5 transition disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent)] border border-[rgb(var(--accent-rgb)/0.4)] rounded-full px-4 py-1.5 hover:bg-[rgb(var(--accent-rgb)/0.05)] transition disabled:opacity-50"
                   >
                     {isSending && <Loader2 className="w-3 h-3 animate-spin" />}
                     {t('auth.resendOtp')}
@@ -441,7 +441,7 @@ export default function LoginPage() {
               {mode === 'login' ? t('auth.noAccount') : t('auth.hasAccount')}{' '}
               <button
                 onClick={toggleMode}
-                className="text-[#FF6B35] font-semibold hover:underline"
+                className="text-[var(--accent)] font-semibold hover:underline"
               >
                 {mode === 'login' ? t('auth.register') : t('auth.signIn')}
               </button>
@@ -455,7 +455,7 @@ export default function LoginPage() {
             <button
               onClick={() => googleLogin()}
               type="button"
-              className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 transition"
+              className="w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-200 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] transition"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path

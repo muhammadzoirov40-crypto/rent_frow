@@ -171,8 +171,8 @@ export default function AvailabilityCalendar({ listingId, startDate, endDate, on
               else if (block === 'pending')
                 cls = 'bg-amber-400/20 text-amber-700 dark:text-amber-400 font-semibold cursor-not-allowed';
               else if (isStart || isEnd)
-                cls = 'bg-[#FF6B35] text-white font-bold shadow-md shadow-[#FF6B35]/30';
-              else if (inRange) cls = 'bg-[#FF6B35]/15 text-[#FF6B35] font-semibold';
+                cls = 'bg-[var(--accent)] text-white font-bold shadow-md shadow-[rgb(var(--accent-rgb)/0.3)]';
+              else if (inRange) cls = 'bg-[rgb(var(--accent-rgb)/0.15)] text-[var(--accent)] font-semibold';
 
               return (
                 <button
@@ -181,7 +181,7 @@ export default function AvailabilityCalendar({ listingId, startDate, endDate, on
                   onClick={() => onDayClick(iso)}
                   disabled={isPast || !!block}
                   aria-label={iso}
-                  className={`h-9 sm:h-10 rounded-lg text-sm flex items-center justify-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35] ${cls}`}
+                  className={`h-9 sm:h-10 rounded-lg text-sm flex items-center justify-center transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] ${cls}`}
                 >
                   {day}
                 </button>
@@ -205,8 +205,8 @@ export default function AvailabilityCalendar({ listingId, startDate, endDate, on
       </div>
 
       {(startDate || endDate) && (
-        <div className="mt-3 flex items-center justify-between gap-2 bg-[#FF6B35]/10 border border-[#FF6B35]/25 rounded-xl px-3 py-2.5">
-          <span className="text-sm font-semibold text-[#FF6B35]">
+        <div className="mt-3 flex items-center justify-between gap-2 bg-[rgb(var(--accent-rgb)/0.1)] border border-[rgb(var(--accent-rgb)/0.25)] rounded-xl px-3 py-2.5">
+          <span className="text-sm font-semibold text-[var(--accent)]">
             {startDate ? fmt(startDate) : '—'} → {endDate ? fmt(endDate) : '…'}
             {selDays > 0 && (
               <span className="text-gray-500 dark:text-gray-400 font-normal"> · {selDays} {t('listing.days')}</span>

@@ -670,6 +670,8 @@
     "languageDesc": "Choose your preferred language",
     "languageChanged": "Language changed successfully",
     "theme": "Theme",
+    "themeColor": "Theme color",
+    "themeColorDesc": "Choose your site color. “Original” is the RentHub brand color.",
     "themeDesc": "Switch between light and dark mode",
     "notifications": {
       "unread": "Unread notifications",
@@ -1110,5 +1112,15 @@
     "yes": "Yes, cancel",
     "messageRenter": "Message renter",
     "viewListing": "View listing"
+  },
+  "accents": {
+    "original": "Original",
+    "yellow": "Yellow",
+    "red": "Red",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple",
+    "pink": "Pink",
+    "orange": "Orange"
   }
 }

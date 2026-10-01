@@ -106,7 +106,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="group block bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-[0_2px_12px_-6px_rgba(17,24,39,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[#FF6B35]/40 hover:shadow-[0_18px_40px_-18px_rgba(255,107,53,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0F1115]"
+      className="group block bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-[0_2px_12px_-6px_rgba(17,24,39,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[rgb(var(--accent-rgb)/0.4)] hover:shadow-[0_18px_40px_-18px_rgba(255,107,53,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-rgb)/0.7)] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0F1115]"
     >
       <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800 overflow-hidden">
         {imageUrl ? (
@@ -137,7 +137,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           onClick={toggleFavorite}
           aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
           aria-pressed={isFavorited}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm flex items-center justify-center shadow-md ring-1 ring-black/5 hover:scale-110 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF6B35]"
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm flex items-center justify-center shadow-md ring-1 ring-black/5 hover:scale-110 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
@@ -170,13 +170,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
       </div>
 
       <div className="p-4 flex flex-col gap-2">
-        <h3 className="font-bold text-[#1A1A2E] dark:text-white text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[#FF6B35] transition-colors">
+        <h3 className="font-bold text-[#1A1A2E] dark:text-white text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[var(--accent)] transition-colors">
           {listing.title}
         </h3>
 
         {(cityName || districtName) && (
           <div className="flex items-center gap-1.5 text-[13px] font-medium text-gray-500 dark:text-slate-400 min-w-0">
-            <MapPin className="w-3.5 h-3.5 shrink-0 text-[#FF6B35]" aria-hidden="true" />
+            <MapPin className="w-3.5 h-3.5 shrink-0 text-[var(--accent)]" aria-hidden="true" />
             <span className="truncate">
               {cityName}
               {districtName ? `, ${districtName}` : ''}
@@ -199,7 +199,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
         {hasPrice && (
           <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-[22px] font-extrabold leading-none text-[#FF6B35] tracking-tight">
+            <span className="text-[22px] font-extrabold leading-none text-[var(--accent)] tracking-tight">
               {listing.price.toLocaleString('ru-RU')}
             </span>
             <span className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500">
@@ -210,7 +210,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         )}
 
         <div className="mt-1 pt-3 border-t border-gray-100 dark:border-white/10">
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#FF6B35]">
+          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--accent)]">
             {t('common.viewDetails')}
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
           </span>

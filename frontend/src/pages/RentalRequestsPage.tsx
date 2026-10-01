@@ -86,7 +86,7 @@ export function RequestCard({
             <div className="min-w-0">
               <Link
                 to={`/listing/${req.listing_id}`}
-                className="font-bold text-[#1A1A2E] dark:text-white hover:text-[#FF6B35] transition block truncate text-base"
+                className="font-bold text-[#1A1A2E] dark:text-white hover:text-[var(--accent)] transition block truncate text-base"
               >
                 {req.listing_title || `#${req.listing_id}`}
               </Link>
@@ -107,7 +107,7 @@ export function RequestCard({
               {formatDate(req.start_date)} — {formatDate(req.end_date)}
             </span>
             {req.total_price > 0 && (
-              <span className="font-bold text-[#FF6B35]">
+              <span className="font-bold text-[var(--accent)]">
                 {req.total_price.toLocaleString('ru-RU')} {t('common.somoni')}
                 <span className="font-normal text-gray-400 dark:text-gray-500">
                   {' '}· {req.total_days} {t('listing.days')}
@@ -142,7 +142,7 @@ export function RequestCard({
               <button
                 onClick={() => onMessage(req)}
                 disabled={isMutating}
-                className="flex items-center gap-1.5 text-sm font-medium text-[#FF6B35] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
+                className="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.1)] hover:bg-[rgb(var(--accent-rgb)/0.2)] px-4 py-2 rounded-xl transition disabled:opacity-50"
               >
                 <MessageSquare className="w-4 h-4" />
                 {t('booking.messageOwner')}
@@ -152,7 +152,7 @@ export function RequestCard({
               <button
                 onClick={() => onMessage(req)}
                 disabled={isMutating}
-                className="flex items-center gap-1.5 text-sm font-medium text-[#FF6B35] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
+                className="flex items-center gap-1.5 text-sm font-medium text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.1)] hover:bg-[rgb(var(--accent-rgb)/0.2)] px-4 py-2 rounded-xl transition disabled:opacity-50"
               >
                 <MessageSquare className="w-4 h-4" />
                 {t('booking.messageRenter')}
@@ -293,7 +293,7 @@ export default function RentalRequestsPage() {
             onClick={() => setActiveTab('my-requests')}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition ${
               activeTab === 'my-requests'
-                ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FF6B35]/20'
+                ? 'bg-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
             }`}
           >
@@ -311,7 +311,7 @@ export default function RentalRequestsPage() {
             onClick={() => setActiveTab('owner-requests')}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition ${
               activeTab === 'owner-requests'
-                ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FF6B35]/20'
+                ? 'bg-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]'
                 : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
             }`}
           >
@@ -335,8 +335,8 @@ export default function RentalRequestsPage() {
                 onClick={() => setFilter(f.key)}
                 className={`px-4 py-2 rounded-xl text-sm font-semibold transition border ${
                   filter === f.key
-                    ? 'bg-[#FF6B35] text-white border-[#FF6B35] shadow-sm shadow-[#FF6B35]/25'
-                    : 'bg-white dark:bg-[#1A1A2E] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40'
+                    ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-sm shadow-[rgb(var(--accent-rgb)/0.25)]'
+                    : 'bg-white dark:bg-[#1A1A2E] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
                 }`}
               >
                 {f.label}
@@ -348,7 +348,7 @@ export default function RentalRequestsPage() {
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-[#FF6B35] mb-3" />
+            <Loader2 className="w-8 h-8 animate-spin text-[var(--accent)] mb-3" />
             <p className="text-gray-500 dark:text-gray-400 text-sm">{t('common.loading')}</p>
           </div>
         ) : requests.length === 0 ? (

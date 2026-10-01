@@ -6,16 +6,17 @@ export default {
     extend: {
       colors: {
         brand: {
-          50: '#fff4ed',
-          100: '#ffe6d4',
-          200: '#ffc8a8',
-          300: '#ffa070',
-          400: '#ff7c42',
-          500: '#FF6B35',
-          600: '#e55a2b',
-          700: '#cc4a22',
-          800: '#b33d1c',
-          900: '#99331a',
+          // Theme-color aware: driven by --accent* tokens (Original = RentHub orange)
+          50: 'rgb(var(--accent-rgb) / 0.05)',
+          100: 'rgb(var(--accent-rgb) / 0.1)',
+          200: 'rgb(var(--accent-rgb) / 0.2)',
+          300: 'rgb(var(--accent-rgb) / 0.3)',
+          400: 'var(--accent-light)',
+          500: 'var(--accent)',
+          600: 'var(--accent-hover)',
+          700: 'var(--accent-dark)',
+          800: 'var(--accent-dark)',
+          900: 'var(--accent-dark)',
         },
         navy: {
           50: '#e8e8ec',

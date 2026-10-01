@@ -124,7 +124,7 @@ export default function EquipmentPage() {
   return (
     <div className="space-y-8">
       {/* Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-900 via-brand-700 to-blue-600 text-white p-8 md:p-10 shadow-xl shadow-brand-900/20">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-900 via-brand-700 to-blue-600 text-white p-8 md:p-10 shadow-xl shadow-[rgb(var(--accent-rgb)/0.2)]">
         <div className="relative z-10 max-w-2xl">
           <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-white/15 backdrop-blur-md text-white/90 border border-white/20 mb-4">
             {t('equipment.heroTag')}
@@ -171,7 +171,7 @@ export default function EquipmentPage() {
           onClick={() => setSelectedCategory(null)}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition ${
             selectedCategory === null
-              ? 'bg-brand-600 text-white shadow-md shadow-brand-500/25'
+              ? 'bg-brand-600 text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.25)]'
               : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-white/10 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400'
           }`}
         >
@@ -183,7 +183,7 @@ export default function EquipmentPage() {
             onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition ${
               selectedCategory === cat.id
-                ? 'bg-brand-600 text-white shadow-md shadow-brand-500/25'
+                ? 'bg-brand-600 text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.25)]'
                 : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-slate-300 border border-gray-200 dark:border-white/10 hover:border-brand-300 dark:hover:border-brand-500 hover:text-brand-600 dark:hover:text-brand-400'
             }`}
           >
@@ -203,7 +203,7 @@ export default function EquipmentPage() {
         </div>
         <button
           onClick={loadEquipment}
-          className="self-start sm:self-auto inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 hover:bg-brand-100 dark:hover:bg-brand-500/20 px-3.5 py-1.5 rounded-lg transition"
+          className="self-start sm:self-auto inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] hover:bg-brand-100 dark:hover:bg-[rgb(var(--accent-rgb)/0.2)] px-3.5 py-1.5 rounded-lg transition"
         >
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -248,7 +248,7 @@ export default function EquipmentPage() {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-500/10 dark:to-brand-500/5">
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-brand-50 to-brand-100 dark:from-[rgb(var(--accent-rgb)/0.1)] dark:to-[rgb(var(--accent-rgb)/0.05)]">
                     <span className="text-5xl">{CATEGORY_ICONS[item.category_name || ''] || '📦'}</span>
                   </div>
                 )}
@@ -302,7 +302,7 @@ export default function EquipmentPage() {
                   onClick={() => openBookingModal(item)}
                   className={`mt-4 w-full py-2.5 px-4 rounded-xl font-semibold text-sm transition-all duration-200 ${
                     item.status === 'AVAILABLE'
-                      ? 'bg-brand-600 text-white hover:bg-brand-700 shadow-md shadow-brand-500/20 active:scale-[0.98]'
+                      ? 'bg-brand-600 text-white hover:bg-brand-700 shadow-md shadow-[rgb(var(--accent-rgb)/0.2)] active:scale-[0.98]'
                       : 'bg-gray-100 dark:bg-white/5 text-gray-400 dark:text-slate-500 cursor-not-allowed'
                   }`}
                 >
@@ -411,7 +411,7 @@ export default function EquipmentPage() {
                   <button
                     type="submit"
                     disabled={bookingLoading}
-                    className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition shadow-md shadow-brand-500/20"
+                    className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]"
                   >
                     {bookingLoading ? t('equipment.booking') : t('equipment.confirmBooking')}
                   </button>

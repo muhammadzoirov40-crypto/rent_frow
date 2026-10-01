@@ -4,8 +4,16 @@
 
 @layer base {
   :root {
-    --color-primary: #FF6B35;
-    --color-primary-dark: #e55a28;
+    /* ===== Accent / theme color tokens (Original = RentHub brand) ===== */
+    --accent: #ff6b35;
+    --accent-hover: #e55a2b;
+    --accent-light: #ff8552;
+    --accent-dark: #cc4a22;
+    --accent-foreground: #ffffff;
+    --accent-rgb: 255 107 53;
+
+    --color-primary: var(--accent);
+    --color-primary-dark: var(--accent-hover);
     --color-secondary: #1A1A2E;
     --color-secondary-light: #2d2d44;
     --bg-page: #f9fafb;
@@ -19,6 +27,36 @@
     --border-page: #e5e7eb;
     --border-card: #f3f4f6;
     --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  /* ===== Theme color options (Settings → Appearance → Theme Color) ===== */
+  html[data-accent="yellow"] {
+    --accent: #eab308; --accent-hover: #ca8a04; --accent-light: #facc15; --accent-dark: #a16207;
+    --accent-rgb: 234 179 8;
+  }
+  html[data-accent="red"] {
+    --accent: #ef4444; --accent-hover: #dc2626; --accent-light: #f87171; --accent-dark: #b91c1c;
+    --accent-rgb: 239 68 68;
+  }
+  html[data-accent="green"] {
+    --accent: #22c55e; --accent-hover: #16a34a; --accent-light: #4ade80; --accent-dark: #15803d;
+    --accent-rgb: 34 197 94;
+  }
+  html[data-accent="blue"] {
+    --accent: #3b82f6; --accent-hover: #2563eb; --accent-light: #60a5fa; --accent-dark: #1d4ed8;
+    --accent-rgb: 59 130 246;
+  }
+  html[data-accent="purple"] {
+    --accent: #a855f7; --accent-hover: #9333ea; --accent-light: #c084fc; --accent-dark: #7e22ce;
+    --accent-rgb: 168 85 247;
+  }
+  html[data-accent="pink"] {
+    --accent: #ec4899; --accent-hover: #db2777; --accent-light: #f472b6; --accent-dark: #be185d;
+    --accent-rgb: 236 72 153;
+  }
+  html[data-accent="orange"] {
+    --accent: #f97316; --accent-hover: #ea580c; --accent-light: #fb923c; --accent-dark: #c2410c;
+    --accent-rgb: 249 115 22;
   }
 
   .dark {
@@ -70,7 +108,7 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-[#FF6B35] hover:bg-[#e55a28] text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
 
   .btn-secondary {
@@ -82,11 +120,11 @@
   }
 
   .btn-outline {
-    @apply border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B35] focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all duration-200;
     background-color: var(--bg-input);
     border-color: var(--border-page);
     color: var(--text-page);

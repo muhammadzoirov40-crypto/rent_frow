@@ -80,7 +80,7 @@ export function CalendarSection() {
               setStart('');
               setEnd('');
             }}
-            className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-white/5 border border-transparent focus:border-[#FF6B35]/50 text-sm outline-none cursor-pointer"
+            className="px-3 py-2 rounded-xl bg-gray-100 dark:bg-white/5 border border-transparent focus:border-[rgb(var(--accent-rgb)/0.5)] text-sm outline-none cursor-pointer"
           >
             {items.map((l) => (
               <option key={l.id} value={l.id}>
@@ -121,7 +121,7 @@ export function MessagesSection() {
         </p>
         <Link
           to="/messages"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[#FF6B35] hover:bg-[#e55a2b] transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition"
         >
           <MessageSquare className="w-4 h-4" />
           {t('dashboard.sec.openMessages')}
@@ -131,7 +131,7 @@ export function MessagesSection() {
 
       {isLoading ? (
         <div className="flex min-h-[200px] items-center justify-center">
-          <Loader2 className="h-7 w-7 animate-spin text-[#FF6B35]" />
+          <Loader2 className="h-7 w-7 animate-spin text-[var(--accent)]" />
         </div>
       ) : conversations.length === 0 ? (
         <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-12 text-center">
@@ -145,9 +145,9 @@ export function MessagesSection() {
               key={c.id}
               type="button"
               onClick={() => navigate(`/messages?conversation=${c.id}`)}
-              className="w-full text-left rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-4 flex items-center gap-3 hover:border-[#FF6B35]/40 transition"
+              className="w-full text-left rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-4 flex items-center gap-3 hover:border-[rgb(var(--accent-rgb)/0.4)] transition"
             >
-              <span className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white flex items-center justify-center text-sm font-semibold overflow-hidden shrink-0">
+              <span className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white flex items-center justify-center text-sm font-semibold overflow-hidden shrink-0">
                 {c.other_user_avatar ? (
                   <img src={c.other_user_avatar} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -158,7 +158,7 @@ export function MessagesSection() {
                 <span className="flex items-center justify-between gap-2">
                   <b className="truncate text-sm">{c.other_user_name || t('messages.user')}</b>
                   {c.unread_count > 0 && (
-                    <span className="shrink-0 min-w-5 h-5 px-1 rounded-full bg-[#FF6B35] text-white text-xs font-bold flex items-center justify-center">
+                    <span className="shrink-0 min-w-5 h-5 px-1 rounded-full bg-[var(--accent)] text-white text-xs font-bold flex items-center justify-center">
                       {c.unread_count}
                     </span>
                   )}
@@ -206,7 +206,7 @@ export function ReviewsSection() {
   if (loading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FF6B35]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" />
       </div>
     );
   }
@@ -246,7 +246,7 @@ export function ReviewsSection() {
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{r.comment || '—'}</p>
               <Link
                 to={`/listing/${r.listing_id}`}
-                className="inline-block mt-2 text-xs font-semibold text-[#FF6B35] hover:underline truncate max-w-full"
+                className="inline-block mt-2 text-xs font-semibold text-[var(--accent)] hover:underline truncate max-w-full"
               >
                 {r.listTitle}
               </Link>
@@ -282,7 +282,7 @@ export function EarningsSection() {
   if (loading || chartLoading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FF6B35]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" />
       </div>
     );
   }
@@ -315,7 +315,7 @@ export function EarningsSection() {
                 onClick={() => setPeriod(p)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
                   period === p
-                    ? 'bg-white dark:bg-[#1a1d24] text-[#FF6B35] shadow-sm'
+                    ? 'bg-white dark:bg-[#1a1d24] text-[var(--accent)] shadow-sm'
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                 }`}
               >
@@ -330,8 +330,8 @@ export function EarningsSection() {
               <AreaChart data={chart.data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="earnGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FF6B35" stopOpacity={0.35} />
-                    <stop offset="95%" stopColor="#FF6B35" stopOpacity={0} />
+                    <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
@@ -341,7 +341,7 @@ export function EarningsSection() {
                   contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '13px' }}
                   formatter={(v: any) => [som(Number(v)), t('dashboard.overview.totalRevenue')]}
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#FF6B35" strokeWidth={2} fill="url(#earnGrad)" />
+                <Area type="monotone" dataKey="revenue" stroke="var(--accent)" strokeWidth={2} fill="url(#earnGrad)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -363,7 +363,7 @@ export function ProfileSection() {
   if (isLoading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#FF6B35]" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" />
       </div>
     );
   }
@@ -373,7 +373,7 @@ export function ProfileSection() {
     <div className="space-y-4" data-testid="profile-section">
       <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-6">
         <div className="flex items-center gap-4">
-          <span className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white flex items-center justify-center text-xl font-bold overflow-hidden">
+          <span className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white flex items-center justify-center text-xl font-bold overflow-hidden">
             {u?.avatar_url ? (
               <img src={u.avatar_url} alt="" className="w-full h-full object-cover" />
             ) : (
@@ -413,7 +413,7 @@ export function ProfileSection() {
         <div className="flex flex-wrap gap-2 mt-5">
           <Link
             to="/profile"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#FF6B35]/10 text-[#FF6B35] hover:bg-[#FF6B35]/20 transition"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.2)] transition"
           >
             {t('dashboard.sec.openProfile')}
             <ArrowRight className="w-4 h-4" />
@@ -445,7 +445,7 @@ export function SettingsSection() {
     <div className="space-y-4" data-testid="settings-section">
       <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
         <h2 className="font-semibold mb-4 flex items-center gap-2">
-          <Languages className="w-4 h-4 text-[#FF6B35]" />
+          <Languages className="w-4 h-4 text-[var(--accent)]" />
           {t('dashboard.sec.language')}
         </h2>
         <div className="flex flex-wrap gap-2">
@@ -456,8 +456,8 @@ export function SettingsSection() {
               onClick={() => i18n.changeLanguage(l.key)}
               className={`px-4 py-2 rounded-xl text-sm font-semibold border transition ${
                 i18n.language === l.key
-                  ? 'bg-[#FF6B35] text-white border-[#FF6B35]'
-                  : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40'
+                  ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                  : 'bg-gray-50 dark:bg-white/5 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
               }`}
             >
               {l.label}
@@ -468,7 +468,7 @@ export function SettingsSection() {
 
       <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
         <h2 className="font-semibold mb-4 flex items-center gap-2">
-          <Globe className="w-4 h-4 text-[#FF6B35]" />
+          <Globe className="w-4 h-4 text-[var(--accent)]" />
           {t('dashboard.sec.appearance')}
         </h2>
         <button
@@ -485,7 +485,7 @@ export function SettingsSection() {
         <div className="flex flex-wrap gap-2">
           <Link
             to="/settings"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#FF6B35]/10 text-[#FF6B35] hover:bg-[#FF6B35]/20 transition"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.2)] transition"
           >
             <Settings className="w-4 h-4" />
             {t('dashboard.nav.settings')}

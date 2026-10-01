@@ -413,7 +413,7 @@ export default function MessagesPage() {
   if (convLoading) {
     return (
       <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
-        <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -430,7 +430,7 @@ export default function MessagesPage() {
               placeholder={t('messages.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 dark:bg-white/5 border border-transparent rounded-full text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-[#FF6B35]/15 focus:border-[#FF6B35]/40 transition"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 dark:bg-white/5 border border-transparent rounded-full text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)] focus:border-[rgb(var(--accent-rgb)/0.4)] transition"
             />
           </div>
         </div>
@@ -438,8 +438,8 @@ export default function MessagesPage() {
         <div className="flex-1 overflow-y-auto px-2">
           {filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6 text-center">
-              <div className="w-14 h-14 bg-[#FF6B35]/10 rounded-full flex items-center justify-center mb-3">
-                <MessageSquare className="w-7 h-7 text-[#FF6B35]" />
+              <div className="w-14 h-14 bg-[rgb(var(--accent-rgb)/0.1)] rounded-full flex items-center justify-center mb-3">
+                <MessageSquare className="w-7 h-7 text-[var(--accent)]" />
               </div>
               <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">{t('messages.noConversations')}</p>
               <p className="text-xs text-gray-500 dark:text-gray-400">{t('messages.noConversationsHint')}</p>
@@ -456,7 +456,7 @@ export default function MessagesPage() {
                   onClick={() => setSelectedId(conv.id)}
                   className={`w-full text-left my-1 px-3 py-3 rounded-2xl transition ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#FF6B35]/15 to-[#FF6B35]/5 ring-1 ring-[#FF6B35]/30 shadow-sm'
+                      ? 'bg-gradient-to-r from-[rgb(var(--accent-rgb)/0.15)] to-[rgb(var(--accent-rgb)/0.05)] ring-1 ring-[rgb(var(--accent-rgb)/0.3)] shadow-sm'
                       : 'hover:bg-gray-100/70 dark:hover:bg-white/5'
                   }`}
                 >
@@ -465,12 +465,12 @@ export default function MessagesPage() {
                       {other?.avatar_url ? (
                         <img src={other.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover" />
                       ) : (
-                        <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white font-semibold text-sm shadow-md shadow-orange-500/20">
+                        <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--accent)] to-[#1A1A2E] flex items-center justify-center text-white font-semibold text-sm shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]">
                           {other?.display_name?.charAt(0) || '?'}
                         </div>
                       )}
                       {unreadCount > 0 && (
-                        <div className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-[#FF6B35] rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-md shadow-orange-500/40">
+                        <div className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 bg-[var(--accent)] rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.4)]">
                           {unreadCount}
                         </div>
                       )}
@@ -481,7 +481,7 @@ export default function MessagesPage() {
                           {other?.display_name || t('messages.user')}
                         </span>
                         {conv.last_message_at && (
-                          <span className={`text-[11px] flex-shrink-0 ml-2 ${unreadCount > 0 ? 'text-[#FF6B35] font-semibold' : 'text-gray-400'}`}>
+                          <span className={`text-[11px] flex-shrink-0 ml-2 ${unreadCount > 0 ? 'text-[var(--accent)] font-semibold' : 'text-gray-400'}`}>
                             {timeAgo(conv.last_message_at)}
                           </span>
                         )}
@@ -503,8 +503,8 @@ export default function MessagesPage() {
       <div className={`relative flex-1 min-w-0 flex flex-col bg-white dark:bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-            <div className="w-24 h-24 bg-gradient-to-br from-[#FF6B35]/20 to-[#FF6B35]/5 rounded-[32px] border border-[#FF6B35]/15 flex items-center justify-center mb-5 shadow-xl shadow-orange-500/10">
-              <MessageSquare className="w-11 h-11 text-[#FF6B35]" />
+            <div className="w-24 h-24 bg-gradient-to-br from-[rgb(var(--accent-rgb)/0.2)] to-[rgb(var(--accent-rgb)/0.05)] rounded-[32px] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-5 shadow-xl shadow-[rgb(var(--accent-rgb)/0.1)]">
+              <MessageSquare className="w-11 h-11 text-[var(--accent)]" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{t('messages.selectConversation')}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">
@@ -527,12 +527,12 @@ export default function MessagesPage() {
             )}
 
             {pinnedMessage && (
-              <div className="flex items-center gap-3 px-4 py-2.5 border-b border-[#FF6B35]/15 bg-gradient-to-r from-orange-500/15 via-orange-500/[0.07] to-transparent backdrop-blur-sm">
-                <span className="w-8 h-8 rounded-full bg-[#FF6B35] text-white flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 px-4 py-2.5 border-b border-[rgb(var(--accent-rgb)/0.15)] bg-gradient-to-r from-[rgb(var(--accent-rgb)/0.15)] via-[rgb(var(--accent-rgb)/0.07)] to-transparent backdrop-blur-sm">
+                <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shrink-0">
                   <Pin className="w-4 h-4" />
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-semibold text-[#FF6B35]">{t('messages.pinned')}</p>
+                  <p className="text-[11px] font-semibold text-[var(--accent)]">{t('messages.pinned')}</p>
                   <p className="text-xs text-gray-600 dark:text-gray-300 truncate">
                     {previewText(pinnedMessage.content)}
                   </p>
@@ -618,7 +618,7 @@ export default function MessagesPage() {
                         }
                         className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-white/5 transition disabled:opacity-50"
                       >
-                        <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] text-white flex items-center justify-center text-sm font-semibold shrink-0">
+                        <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--accent)] to-[#1A1A2E] text-white flex items-center justify-center text-sm font-semibold shrink-0">
                           {conv.other_user_name?.charAt(0) || '?'}
                         </span>
                         <span className="min-w-0">
@@ -680,7 +680,7 @@ function ListingContextBar({ listingId }: { listingId: number }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[#1A1A2E] dark:text-white truncate">{listing.title}</p>
-        <p className="text-xs font-bold text-[#FF6B35]">
+        <p className="text-xs font-bold text-[var(--accent)]">
           {listing.price.toLocaleString('ru-RU')} {t('common.somoni')} / {t(`listing.${listing.price_unit}`)}
         </p>
       </div>

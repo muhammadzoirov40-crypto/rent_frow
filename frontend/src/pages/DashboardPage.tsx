@@ -86,7 +86,7 @@ function MetricCard({ title, value, change, icon }: MetricCardProps) {
   return (
     <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20 transition-all duration-200">
       <div className="flex items-center justify-between mb-4">
-        <span className="w-10 h-10 rounded-xl bg-[#FF6B35]/10 text-[#FF6B35] flex items-center justify-center">
+        <span className="w-10 h-10 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] flex items-center justify-center">
           {icon}
         </span>
         <span
@@ -116,7 +116,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
     <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-800">
       <p className="mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</p>
       {payload.map((entry, i) => (
-        <p key={i} className="text-[#FF6B35] font-semibold tabular-nums">
+        <p key={i} className="text-[var(--accent)] font-semibold tabular-nums">
           {Math.round(entry.value).toLocaleString('ru-RU')} {t('common.somoni')}
         </p>
       ))}
@@ -198,12 +198,12 @@ export default function DashboardPage() {
     if (!isOwnerLike) {
       return (
         <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
-          <AlertCircle className="w-12 h-12 mx-auto text-[#FF6B35] mb-4" />
+          <AlertCircle className="w-12 h-12 mx-auto text-[var(--accent)] mb-4" />
           <h2 className="text-lg font-bold mb-1">{t('dashboard.overview.ownerOnly')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 max-w-md mx-auto">{t('dashboard.overview.ownerOnlyHint')}</p>
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-semibold hover:bg-[#e55a2b] transition"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--accent)] text-white text-sm font-semibold hover:bg-[var(--accent-hover)] transition"
           >
             <Home className="w-4 h-4" />
             {t('dashboard.overview.goHome')}
@@ -215,7 +215,7 @@ export default function DashboardPage() {
     if (loading && !summary) {
       return (
         <div className="flex min-h-[400px] items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#FF6B35] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[var(--accent)] border-t-transparent" />
         </div>
       );
     }
@@ -270,7 +270,7 @@ export default function DashboardPage() {
                     onClick={() => setPeriod(p)}
                     className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
                       period === p
-                        ? 'bg-white dark:bg-[#1a1d24] text-[#FF6B35] shadow-sm'
+                        ? 'bg-white dark:bg-[#1a1d24] text-[var(--accent)] shadow-sm'
                         : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                     }`}
                   >
@@ -285,8 +285,8 @@ export default function DashboardPage() {
                   <AreaChart data={revenue.data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FF6B35" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#FF6B35" stopOpacity={0} />
+                        <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="var(--accent)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
@@ -299,7 +299,7 @@ export default function DashboardPage() {
                       tickFormatter={(v: number) => `${Math.round(v / 1000)}k`}
                     />
                     <Tooltip content={<ChartTooltip />} />
-                    <Area type="monotone" dataKey="revenue" stroke="#FF6B35" strokeWidth={2} fill="url(#revGrad)" />
+                    <Area type="monotone" dataKey="revenue" stroke="var(--accent)" strokeWidth={2} fill="url(#revGrad)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -350,7 +350,7 @@ export default function DashboardPage() {
             <button
               type="button"
               onClick={() => setActive('bookings')}
-              className="text-xs font-semibold text-[#FF6B35] hover:underline"
+              className="text-xs font-semibold text-[var(--accent)] hover:underline"
             >
               {t('dashboard.overview.viewAll')}
             </button>
@@ -371,7 +371,7 @@ export default function DashboardPage() {
                 {recent.length > 0 ? (
                   recent.map((b) => (
                     <tr key={b.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
-                      <td className="px-5 py-3.5 font-semibold text-[#FF6B35] tabular-nums">#{b.id}</td>
+                      <td className="px-5 py-3.5 font-semibold text-[var(--accent)] tabular-nums">#{b.id}</td>
                       <td className="px-5 py-3.5 font-medium">{b.customer_name}</td>
                       <td className="px-5 py-3.5 text-gray-600 dark:text-gray-300 max-w-[220px] truncate">{b.equipment_name}</td>
                       <td className="px-5 py-3.5 text-gray-500 dark:text-gray-400 whitespace-nowrap tabular-nums">
@@ -402,12 +402,12 @@ export default function DashboardPage() {
 
   const ownerOnlyPanel = (
     <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
-      <AlertCircle className="w-12 h-12 mx-auto text-[#FF6B35] mb-4" />
+      <AlertCircle className="w-12 h-12 mx-auto text-[var(--accent)] mb-4" />
       <h2 className="text-lg font-bold mb-1">{t('dashboard.overview.ownerOnly')}</h2>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 max-w-md mx-auto">{t('dashboard.overview.ownerOnlyHint')}</p>
       <Link
         to="/"
-        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-semibold hover:bg-[#e55a2b] transition"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--accent)] text-white text-sm font-semibold hover:bg-[var(--accent-hover)] transition"
       >
         <Home className="w-4 h-4" />
         {t('dashboard.overview.goHome')}

@@ -97,7 +97,7 @@ export default function BookingsPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('bookings.title')}</h1>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-0.5">{t('bookings.subtitle')}</p>
         </div>
-        <button onClick={loadBookings} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-brand-500/10 hover:bg-brand-100 dark:hover:bg-brand-500/20 px-3.5 py-1.5 rounded-lg transition">
+        <button onClick={loadBookings} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 dark:text-brand-400 bg-brand-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] hover:bg-brand-100 dark:hover:bg-[rgb(var(--accent-rgb)/0.2)] px-3.5 py-1.5 rounded-lg transition">
           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
@@ -116,14 +116,14 @@ export default function BookingsPage() {
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-white/5 p-8">
-          <div className="w-16 h-16 bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-brand-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] text-brand-600 dark:text-brand-400 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('bookings.noBookings')}</h3>
           <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">{t('bookings.noBookingsHint')}</p>
-          <Link to="/" className="inline-flex items-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-brand-700 transition shadow-md shadow-brand-500/20">
+          <Link to="/" className="inline-flex items-center gap-2 bg-brand-600 text-white px-5 py-2.5 rounded-xl font-medium text-sm hover:bg-brand-700 transition shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]">
             {t('bookings.browseEquipment')}
           </Link>
         </div>
@@ -138,7 +138,7 @@ export default function BookingsPage() {
                     {eq?.image_url ? (
                       <img src={eq.image_url} alt={eq.name} className="w-12 h-12 rounded-xl object-cover" />
                     ) : (
-                      <div className="w-12 h-12 bg-brand-50 dark:bg-brand-500/10 rounded-xl flex items-center justify-center text-lg">
+                      <div className="w-12 h-12 bg-brand-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] rounded-xl flex items-center justify-center text-lg">
                         📦
                       </div>
                     )}
@@ -254,10 +254,10 @@ export default function BookingsPage() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">{t('bookings.payment')}</label>
                   <div className="grid grid-cols-2 gap-3">
-                    <button type="button" onClick={() => setPaymentType('BOOKING')} className={`p-3 rounded-xl border text-sm font-medium text-center transition ${paymentType === 'BOOKING' ? 'border-brand-600 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400' : 'border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-slate-300'}`}>
+                    <button type="button" onClick={() => setPaymentType('BOOKING')} className={`p-3 rounded-xl border text-sm font-medium text-center transition ${paymentType === 'BOOKING' ? 'border-brand-600 bg-brand-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] text-brand-700 dark:text-brand-400' : 'border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-slate-300'}`}>
                       {t('bookings.rentalFee')}
                     </button>
-                    <button type="button" onClick={() => setPaymentType('DEPOSIT')} className={`p-3 rounded-xl border text-sm font-medium text-center transition ${paymentType === 'DEPOSIT' ? 'border-brand-600 bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400' : 'border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-slate-300'}`}>
+                    <button type="button" onClick={() => setPaymentType('DEPOSIT')} className={`p-3 rounded-xl border text-sm font-medium text-center transition ${paymentType === 'DEPOSIT' ? 'border-brand-600 bg-brand-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] text-brand-700 dark:text-brand-400' : 'border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5 text-gray-700 dark:text-slate-300'}`}>
                       {t('bookings.depositPayment')}
                     </button>
                   </div>
@@ -267,7 +267,7 @@ export default function BookingsPage() {
                   <button type="button" onClick={() => setPayingBooking(null)} className="flex-1 py-2.5 border border-gray-300 dark:border-white/10 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
                     {t('common.cancel')}
                   </button>
-                  <button type="submit" disabled={paymentLoading} className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition shadow-md shadow-brand-500/20">
+                  <button type="submit" disabled={paymentLoading} className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-medium hover:bg-brand-700 disabled:opacity-50 transition shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]">
                     {paymentLoading ? t('bookings.processing') : t('bookings.pay', { amount: payingBooking.total_price })}
                   </button>
                 </div>

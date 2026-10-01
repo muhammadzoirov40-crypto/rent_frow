@@ -114,7 +114,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, value, change, icon }) =
             <span className="text-xs text-gray-400 dark:text-gray-500">vs last period</span>
           </div>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-brand-900/20 dark:text-brand-400">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-500 dark:bg-[rgb(var(--accent-rgb)/0.2)] dark:text-brand-400">
           {icon}
         </div>
       </div>

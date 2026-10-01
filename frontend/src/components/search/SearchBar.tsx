@@ -91,7 +91,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
 
       <button
         type="submit"
-        className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-bold transition-colors shadow-lg shadow-[#FF6B35]/25"
+        className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-bold transition-colors shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]"
       >
         <Search className="w-4 h-4" />
         {t('home.find')}

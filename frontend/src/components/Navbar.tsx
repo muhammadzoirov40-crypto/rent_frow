@@ -86,7 +86,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
                   onClick={() => changeLanguage(lang.code)}
                   className={`w-full text-left px-4 py-2.5 text-sm flex items-center gap-2 transition ${
                     i18n.language === lang.code
-                      ? 'bg-brand-50 dark:bg-brand-500/10 text-brand-700 dark:text-brand-400 font-semibold'
+                      ? 'bg-brand-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] text-brand-700 dark:text-brand-400 font-semibold'
                       : 'text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5'
                   }`}
                 >
@@ -101,7 +101,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 border border-gray-200 dark:border-white/10 hover:border-brand-300 dark:hover:border-brand-500/50 hover:shadow-md"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-300 border border-gray-200 dark:border-white/10 hover:border-brand-300 dark:hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-md"
           title={theme === 'dark' ? t('theme.light') : t('theme.dark')}
         >
           <div className="relative w-10 h-5 bg-gray-300 dark:bg-brand-600 rounded-full transition-colors duration-300">
@@ -149,7 +149,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-md shadow-brand-500/20">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>
           )}

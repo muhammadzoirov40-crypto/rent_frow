@@ -194,8 +194,8 @@ export const NOTIFICATION_TYPE_STYLE: Record<string, TypeStyle> = {
   },
   listing_expired: {
     icon: <CalendarX className="w-5 h-5" />,
-    color: 'text-orange-600',
-    bgColor: 'bg-orange-100',
+    color: 'text-[var(--accent-hover)]',
+    bgColor: 'bg-[rgb(var(--accent-rgb)/0.1)]',
   },
   listing_deactivated: {
     icon: <EyeOff className="w-5 h-5" />,
@@ -209,8 +209,8 @@ export const NOTIFICATION_TYPE_STYLE: Record<string, TypeStyle> = {
   },
   default: {
     icon: <Bell className="w-5 h-5" />,
-    color: 'text-[#FF6B35]',
-    bgColor: 'bg-[#FF6B35]/10',
+    color: 'text-[var(--accent)]',
+    bgColor: 'bg-[rgb(var(--accent-rgb)/0.1)]',
   },
 };
 

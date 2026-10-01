@@ -48,7 +48,7 @@ export default function RevenloDashboard() {
 
       {/* Brand row */}
       <div className="relative z-10 flex items-center justify-between px-5 sm:px-8 pt-5 pb-4">
-        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 shadow-lg shadow-orange-500/30 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-red-500 shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] flex items-center justify-center">
           <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M13 2L4.09 12.69a1 1 0 00.77 1.64H11l-1 7.61L19.91 11a1 1 0 00-.77-1.64H13l1-7.37z" />
           </svg>

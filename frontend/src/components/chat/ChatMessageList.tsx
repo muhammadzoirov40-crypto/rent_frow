@@ -56,7 +56,7 @@ function dayKey(dateStr: string): string {
 function Avatar({ name }: { name?: string | null }) {
   const initial = (name || '?').trim().charAt(0).toUpperCase() || '?';
   return (
-    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#1A1A2E] flex items-center justify-center text-white text-[11px] font-bold shrink-0 shadow-sm">
+    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[var(--accent)] to-[#1A1A2E] flex items-center justify-center text-white text-[11px] font-bold shrink-0 shadow-sm">
       {initial}
     </div>
   );
@@ -87,7 +87,7 @@ function FileCard({ parsed, mine }: { parsed: Attachment; mine: boolean }) {
           : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10'
       }`}
     >
-      <span className="w-9 h-9 rounded-lg bg-[#FF6B35]/15 text-[#FF6B35] flex items-center justify-center shrink-0">
+      <span className="w-9 h-9 rounded-lg bg-[rgb(var(--accent-rgb)/0.15)] text-[var(--accent)] flex items-center justify-center shrink-0">
         <FileText className="w-5 h-5" />
       </span>
       <span className="min-w-0 flex-1">
@@ -109,10 +109,10 @@ function ReplyQuote({ message, mine }: { message: Message; mine: boolean }) {
       className={`mb-1.5 rounded-lg rounded-l-none px-2.5 py-1.5 border-l-[3px] backdrop-blur-sm ${
         mine
           ? 'bg-black/15 border-white/80'
-          : 'bg-black/[0.05] dark:bg-white/[0.08] border-[#FF6B35]'
+          : 'bg-black/[0.05] dark:bg-white/[0.08] border-[var(--accent)]'
       }`}
     >
-      <p className={`text-[11px] font-bold truncate ${mine ? 'text-white' : 'text-[#FF6B35]'}`}>
+      <p className={`text-[11px] font-bold truncate ${mine ? 'text-white' : 'text-[var(--accent)]'}`}>
         {message.reply_to_sender_name || t('messages.user')}
       </p>
       <p className={`text-xs truncate ${mine ? 'text-white/85' : 'text-gray-600 dark:text-gray-300'}`}>
@@ -149,10 +149,10 @@ function ReactionPills({
             }}
             className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] border shadow-sm transition hover:scale-110 active:scale-95 ${
               mineHas
-                ? 'bg-[#FF6B35] border-[#FF6B35] text-white shadow-orange-500/30'
+                ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-[rgb(var(--accent-rgb)/0.3)]'
                 : mine
                   ? 'bg-white/20 border-white/30 text-white hover:bg-white/30'
-                  : 'bg-white dark:bg-white/10 border-gray-200 dark:border-white/15 text-gray-700 dark:text-gray-200 hover:border-[#FF6B35]/60'
+                  : 'bg-white dark:bg-white/10 border-gray-200 dark:border-white/15 text-gray-700 dark:text-gray-200 hover:border-[rgb(var(--accent-rgb)/0.6)]'
             }`}
             title={users.length > 1 ? String(users.length) : undefined}
           >
@@ -221,7 +221,7 @@ export default function ChatMessageList({
   if (loading && messages.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#121418]" style={WALLPAPER}>
-        <Loader2 className="w-6 h-6 text-[#FF6B35] animate-spin" />
+        <Loader2 className="w-6 h-6 text-[var(--accent)] animate-spin" />
       </div>
     );
   }
@@ -232,7 +232,7 @@ export default function ChatMessageList({
         className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-[#121418] text-center px-6"
         style={WALLPAPER}
       >
-        <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-[#FF6B35]/20 to-[#FF6B35]/5 border border-[#FF6B35]/20 flex items-center justify-center text-3xl mb-4 shadow-lg shadow-orange-500/10">
+        <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-[rgb(var(--accent-rgb)/0.2)] to-[rgb(var(--accent-rgb)/0.05)] border border-[rgb(var(--accent-rgb)/0.2)] flex items-center justify-center text-3xl mb-4 shadow-lg shadow-[rgb(var(--accent-rgb)/0.1)]">
           💬
         </div>
         <p className="text-gray-500 dark:text-gray-400 text-sm font-medium">{t('messages.noMessages')}</p>
@@ -314,7 +314,7 @@ export default function ChatMessageList({
                         }}
                         title={t('common.more')}
                         aria-label={t('common.more')}
-                        className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-400 hover:text-[#FF6B35] hover:border-[#FF6B35]/50 transition group-hover:opacity-100 focus:opacity-100 ${
+                        className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-400 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.5)] transition group-hover:opacity-100 focus:opacity-100 ${
                           menu?.msg.id === message.id ? 'opacity-100' : 'opacity-0'
                         } shadow-md ${mine ? '-left-9' : '-right-9'}`}
                       >
@@ -324,14 +324,14 @@ export default function ChatMessageList({
                     <div
                       className={`${
                         mine
-                          ? 'rounded-[20px] rounded-br-[7px] bg-gradient-to-br from-[#FF6B35] to-[#ff8a5b] text-white shadow-[0_3px_14px_-4px_rgba(255,107,53,0.55)]'
+                          ? 'rounded-[20px] rounded-br-[7px] bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-[0_3px_14px_-4px_rgba(255,107,53,0.55)]'
                           : 'rounded-[20px] rounded-bl-[7px] bg-white dark:bg-[#1a1f28] border border-gray-200/90 dark:border-white/[0.07] text-gray-900 dark:text-white shadow-[0_2px_10px_-4px_rgba(16,24,40,0.18)]'
                       }`}
                     >
                       {message.forwarded_from_name && (
                         <div
                           className={`px-3.5 pt-2.5 text-[11px] font-semibold flex items-center gap-1 ${
-                            mine ? 'text-white/85' : 'text-[#FF6B35]'
+                            mine ? 'text-white/85' : 'text-[var(--accent)]'
                           }`}
                         >
                           <Forward className="w-3 h-3" />
@@ -405,7 +405,7 @@ export default function ChatMessageList({
                           mine ? 'ml-auto' : ''
                         }`}
                       >
-                        <span className="font-semibold text-[#FF6B35] mr-1">
+                        <span className="font-semibold text-[var(--accent)] mr-1">
                           {translatingId === message.id ? '…' : t('messages.translation')}
                         </span>
                         {translation?.text}
@@ -441,7 +441,7 @@ export default function ChatMessageList({
                     onReact?.(menuMsg.id, emoji);
                     closeMenu();
                   }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none bg-gray-50 dark:bg-white/[0.06] hover:bg-orange-500/15 hover:scale-[1.35] active:scale-95 transition shadow-sm"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none bg-gray-50 dark:bg-white/[0.06] hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:scale-[1.35] active:scale-95 transition shadow-sm"
                 >
                   {emoji}
                 </button>
@@ -554,20 +554,20 @@ function MenuButton({
       className={`group w-full flex items-center justify-center gap-2.5 px-3 py-2 rounded-2xl text-sm transition ${
         danger
           ? 'text-red-500 hover:bg-red-500/10'
-          : 'text-gray-700 dark:text-gray-200 hover:bg-orange-500/10'
+          : 'text-gray-700 dark:text-gray-200 hover:bg-[rgb(var(--accent-rgb)/0.1)]'
       }`}
     >
       <span
         className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition ${
           danger
             ? 'bg-red-500/10 text-red-500 group-hover:bg-red-500 group-hover:text-white'
-            : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-[#FF6B35] group-hover:text-white'
+            : 'bg-gray-100 dark:bg-white/10 text-gray-500 dark:text-gray-400 group-hover:bg-[var(--accent)] group-hover:text-white'
         }`}
       >
         {icon}
       </span>
       <span className="font-medium truncate">{label}</span>
-      {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-[#FF6B35]" />}
+      {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--accent)]" />}
     </button>
   );
 }

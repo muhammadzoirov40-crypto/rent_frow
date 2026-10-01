@@ -147,7 +147,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
         {/* Main Profile Card */}
         <div className="bg-white dark:bg-white/[0.03] backdrop-blur-xl border border-gray-200 dark:border-white/[0.06] rounded-2xl overflow-hidden shadow-2xl shadow-black/30">
           {/* Cover Banner */}
-          <div className="h-40 bg-gradient-to-r from-brand-600/30 via-blue-600/20 to-indigo-600/30 relative overflow-hidden">
+          <div className="h-40 bg-gradient-to-r from-[rgb(var(--accent-rgb)/0.3)] via-blue-600/20 to-indigo-600/30 relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyem0wLTRWMjhIMjR2Mmgxem0tMSA5bDktOS0xLjQtMS40TDI0IDI5LjJ2Mi44aDEydi0yLjhsLTkuNC05LjRMMTIgMjRIMHY4aDEweiIvPjwvZz48L2c+PC9zdmc+')] opacity-40" />
             <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-slate-950/60" />
           </div>
@@ -191,7 +191,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
                 </h2>
                 <p className="text-gray-500 dark:text-slate-400 text-sm mt-0.5">{profile.email}</p>
                 <div className="flex items-center gap-2 mt-2 justify-center sm:justify-start">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase tracking-wider bg-[rgb(var(--accent-rgb)/0.15)] text-brand-600 dark:text-brand-400 border border-[rgb(var(--accent-rgb)/0.2)]">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
@@ -223,7 +223,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
                     setEditingName(true)
                     setNameValue(profile.display_name || '')
                   }}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-brand-600/15 hover:bg-brand-600/25 border border-brand-500/20 rounded-xl text-sm font-medium text-brand-600 dark:text-brand-400 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-[rgb(var(--accent-rgb)/0.15)] hover:bg-[rgb(var(--accent-rgb)/0.25)] border border-[rgb(var(--accent-rgb)/0.2)] rounded-xl text-sm font-medium text-brand-600 dark:text-brand-400 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -240,7 +240,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
           {/* Personal Information Card */}
           <div className="bg-white dark:bg-white/[0.03] backdrop-blur-xl border border-gray-200 dark:border-white/[0.06] rounded-2xl p-6 shadow-xl shadow-black/10 transition-all duration-300 hover:border-gray-300 dark:hover:border-white/[0.1]">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-brand-500/15 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center">
                 <svg className="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
@@ -257,7 +257,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
                       value={nameValue}
                       onChange={(e) => setNameValue(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleNameSave()}
-                      className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500/50 focus:border-brand-500/50 transition"
+                      className="flex-1 bg-gray-50 dark:bg-white/5 border border-gray-300 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.5)] focus:border-[rgb(var(--accent-rgb)/0.5)] transition"
                       placeholder={t('profile.namePlaceholder')}
                       autoFocus
                     />
@@ -305,7 +305,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
           {/* Account Details Card */}
           <div className="bg-white dark:bg-white/[0.03] backdrop-blur-xl border border-gray-200 dark:border-white/[0.06] rounded-2xl p-6 shadow-xl shadow-black/10 transition-all duration-300 hover:border-gray-300 dark:hover:border-white/[0.1]">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-brand-500/15 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center">
                 <svg className="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
@@ -316,7 +316,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
               <div>
                 <label className="text-[11px] font-bold text-gray-400 dark:text-slate-500 uppercase tracking-wider">{t('profile.role')}</label>
                 <div className="mt-2">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-brand-500/15 text-brand-600 dark:text-brand-400 border border-brand-500/20">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider bg-[rgb(var(--accent-rgb)/0.15)] text-brand-600 dark:text-brand-400 border border-[rgb(var(--accent-rgb)/0.2)]">
                     <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
@@ -405,8 +405,8 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
                   <div
                     className={`w-32 h-32 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all duration-200 ${
                       isDragOver
-                        ? 'border-brand-500 bg-brand-500/10'
-                        : 'border-gray-300 dark:border-white/15 hover:border-brand-500/50 hover:bg-gray-50 dark:hover:bg-white/[0.03]'
+                        ? 'border-brand-500 bg-[rgb(var(--accent-rgb)/0.1)]'
+                        : 'border-gray-300 dark:border-white/15 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:bg-gray-50 dark:hover:bg-white/[0.03]'
                     }`}
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -435,7 +435,7 @@ export default function AdminProfilePage({ user, onUserUpdate }: AdminProfilePag
               <button
                 onClick={handleAvatarUpload}
                 disabled={!selectedFile || uploadingAvatar}
-                className="flex-1 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-brand-600/20"
+                className="flex-1 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]"
               >
                 {uploadingAvatar ? (
                   <>

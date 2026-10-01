@@ -157,7 +157,7 @@ export default function ProfilePage() {
   if (meLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center dark:bg-[#0a0a1a]">
-        <Loader2 className="w-8 h-8 animate-spin text-[#FF6B35]" />
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--accent)]" />
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function ProfilePage() {
                   className="w-24 h-24 rounded-2xl object-cover border-4 border-white dark:border-white/10 shadow-lg"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#e85d2c] flex items-center justify-center shadow-lg">
+                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center shadow-lg">
                   <span className="text-white text-3xl font-bold">
                     {(meUser?.display_name || meUser?.email || 'U')[0].toUpperCase()}
                   </span>
@@ -200,7 +200,7 @@ export default function ProfilePage() {
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="text-2xl font-bold text-[#1A1A2E] dark:text-white border-b-2 border-[#FF6B35] outline-none bg-transparent w-full max-w-xs"
+                  className="text-2xl font-bold text-[#1A1A2E] dark:text-white border-b-2 border-[var(--accent)] outline-none bg-transparent w-full max-w-xs"
                   placeholder={t('profile.fullName')}
                 />
               ) : (
@@ -250,7 +250,7 @@ export default function ProfilePage() {
                   <button
                     onClick={handleSaveProfile}
                     disabled={updateProfileMutation.isPending}
-                    className="flex items-center gap-1.5 bg-[#FF6B35] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#e85d2c] transition disabled:opacity-50"
+                    className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition disabled:opacity-50"
                   >
                     {updateProfileMutation.isPending ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -290,7 +290,7 @@ export default function ProfilePage() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition whitespace-nowrap flex-1 justify-center ${
                 activeTab === tab.id
-                  ? 'bg-[#FF6B35] text-white shadow-md shadow-[#FF6B35]/20'
+                  ? 'bg-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]'
                   : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5'
               }`}
             >
@@ -316,7 +316,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('profile.myListingsEmptyHint')}</p>
                 <Link
                   to="/create-listing"
-                  className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e85d2c] transition"
+                  className="inline-flex items-center gap-2 bg-[var(--accent)] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition"
                 >
                   {t('profile.createListing')}
                 </Link>
@@ -366,7 +366,7 @@ export default function ProfilePage() {
                             {listing.city_name}
                           </span>
                         )}
-                        <span className="font-bold text-[#FF6B35]">
+                        <span className="font-bold text-[var(--accent)]">
                           {listing.price.toLocaleString('ru-RU')} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
                         </span>
                       </div>
@@ -394,7 +394,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('profile.favoritesEmptyHint')}</p>
                 <Link
                   to="/search"
-                  className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e85d2c] transition"
+                  className="inline-flex items-center gap-2 bg-[var(--accent)] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition"
                 >
                   {t('profile.findListings')}
                 </Link>
@@ -424,7 +424,7 @@ export default function ProfilePage() {
                       </button>
                     </div>
                     <div className="p-4">
-                      <Link to={`/listing/${listing.id}`} className="font-semibold text-[#1A1A2E] dark:text-white hover:text-[#FF6B35] transition truncate block">
+                      <Link to={`/listing/${listing.id}`} className="font-semibold text-[#1A1A2E] dark:text-white hover:text-[var(--accent)] transition truncate block">
                         {listing.title}
                       </Link>
                       <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -434,7 +434,7 @@ export default function ProfilePage() {
                             {listing.city_name}
                           </span>
                         )}
-                        <span className="font-bold text-[#FF6B35]">
+                        <span className="font-bold text-[var(--accent)]">
                           {listing.price.toLocaleString('ru-RU')} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
                         </span>
                       </div>
@@ -455,7 +455,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('profile.requestsEmptyHint')}</p>
                 <Link
                   to="/search"
-                  className="inline-flex items-center gap-2 bg-[#FF6B35] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e85d2c] transition"
+                  className="inline-flex items-center gap-2 bg-[var(--accent)] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition"
                 >
                   {t('profile.findEquipment')}
                 </Link>
@@ -482,7 +482,7 @@ export default function ProfilePage() {
                             {formatDate(req.start_date)} — {formatDate(req.end_date)}
                           </span>
                           {req.total_price > 0 && (
-                            <span className="font-bold text-[#FF6B35]">
+                            <span className="font-bold text-[var(--accent)]">
                               {req.total_price.toLocaleString('ru-RU')} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}
@@ -541,7 +541,7 @@ export default function ProfilePage() {
                             {formatDate(req.start_date)} — {formatDate(req.end_date)}
                           </span>
                           {req.total_price > 0 && (
-                            <span className="font-bold text-[#FF6B35]">
+                            <span className="font-bold text-[var(--accent)]">
                               {req.total_price.toLocaleString('ru-RU')} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}

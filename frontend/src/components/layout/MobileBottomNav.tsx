@@ -40,7 +40,7 @@ export default function MobileBottomNav({ isAuthenticated }: MobileBottomNavProp
           if (item.isPrimary) {
             return (
               <Link key={item.to} to={to} className="relative -mt-5">
-                <div className="w-14 h-14 bg-[#FF6B35] rounded-full flex items-center justify-center shadow-lg shadow-[#FF6B35]/30 border-4 border-white dark:border-[#1A1A2E]">
+                <div className="w-14 h-14 bg-[var(--accent)] rounded-full flex items-center justify-center shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] border-4 border-white dark:border-[#1A1A2E]">
                   <Icon className="w-6 h-6 text-white" />
                 </div>
               </Link>
@@ -52,7 +52,7 @@ export default function MobileBottomNav({ isAuthenticated }: MobileBottomNavProp
               key={item.to}
               to={to}
               className={`flex flex-col items-center gap-0.5 py-2 px-3 rounded-xl transition ${
-                active ? 'text-[#FF6B35]' : 'text-gray-400 dark:text-gray-500'
+                active ? 'text-[var(--accent)]' : 'text-gray-400 dark:text-gray-500'
               }`}
             >
               <Icon className="w-5 h-5" />

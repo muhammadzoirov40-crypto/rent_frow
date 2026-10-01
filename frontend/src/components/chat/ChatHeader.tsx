@@ -29,14 +29,14 @@ export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, 
           type="button"
           onClick={onBack}
           aria-label={t('common.back')}
-          className="md:hidden p-2 -ml-1 rounded-full text-gray-500 hover:bg-orange-500/10 hover:text-[#FF6B35] dark:text-gray-400 transition"
+          className="md:hidden p-2 -ml-1 rounded-full text-gray-500 hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] dark:text-gray-400 transition"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
       )}
 
       <div className="relative shrink-0">
-        <div className="w-11 h-11 rounded-full overflow-hidden bg-gradient-to-br from-[#FF6B35] to-[#ff9162] flex items-center justify-center text-white text-sm font-semibold ring-2 ring-[#FF6B35]/25 shadow-md shadow-orange-500/20">
+        <div className="w-11 h-11 rounded-full overflow-hidden bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center text-white text-sm font-semibold ring-2 ring-[rgb(var(--accent-rgb)/0.25)] shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]">
           {avatar ? <img src={avatar} alt={name} className="w-full h-full object-cover" /> : initials || '?'}
         </div>
         <span
@@ -68,7 +68,7 @@ export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, 
           onClick={onAudioCall}
           aria-label={t('messages.audioCall')}
           title={t('messages.audioCall')}
-          className="p-2.5 rounded-full text-gray-400 hover:text-[#FF6B35] hover:bg-orange-500/10 dark:hover:bg-orange-500/15 transition"
+          className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition"
         >
           <Phone className="w-5 h-5" />
         </button>
@@ -77,7 +77,7 @@ export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, 
           onClick={onVideoCall}
           aria-label={t('messages.videoCall')}
           title={t('messages.videoCall')}
-          className="p-2.5 rounded-full text-gray-400 hover:text-[#FF6B35] hover:bg-orange-500/10 dark:hover:bg-orange-500/15 transition"
+          className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition"
         >
           <Video className="w-5 h-5" />
         </button>

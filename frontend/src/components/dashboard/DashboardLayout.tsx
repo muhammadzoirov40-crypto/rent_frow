@@ -117,7 +117,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
         <div className={`px-4 pt-4 pb-2 shrink-0 ${collapsed ? 'md:px-2' : ''}`}>
           <div className={`flex items-center gap-3 ${collapsed ? 'md:justify-center' : ''}`}>
             <span className="relative shrink-0">
-              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center overflow-hidden">
+              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white text-sm font-semibold flex items-center justify-center overflow-hidden">
                 {user?.avatar_url ? (
                   <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -140,7 +140,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t('dashboard.searchPlaceholder')}
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-xl bg-gray-100 dark:bg-white/5 border border-transparent focus:border-[#FF6B35]/50 focus:bg-white dark:focus:bg-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition"
+                className="w-full pl-9 pr-3 py-2 text-sm rounded-xl bg-gray-100 dark:bg-white/5 border border-transparent focus:border-[rgb(var(--accent-rgb)/0.5)] focus:bg-white dark:focus:bg-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition"
               />
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
                   ${collapsed ? 'md:justify-center md:px-0' : ''}
                   ${
                     isActive
-                      ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff8552] text-white shadow-lg shadow-orange-500/25'
+                      ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                   }`}
               >
@@ -193,7 +193,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
                 }}
                 className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
               >
-                <Store className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <Store className="w-4 h-4 text-[var(--accent)] shrink-0" />
                 <span className="truncate">{t('settings.rental.dashboard')}</span>
               </button>
               <Link
@@ -203,7 +203,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
               >
-                <Plus className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <Plus className="w-4 h-4 text-[var(--accent)] shrink-0" />
                 <span className="truncate">{t('settings.rental.createListing')}</span>
               </Link>
               <Link
@@ -213,7 +213,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
               >
-                <ListChecks className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <ListChecks className="w-4 h-4 text-[var(--accent)] shrink-0" />
                 <span className="truncate">{t('settings.rental.requests')}</span>
               </Link>
               <Link
@@ -223,7 +223,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
                 onClick={() => setMobileOpen(false)}
                 className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
               >
-                <MessageSquare className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <MessageSquare className="w-4 h-4 text-[var(--accent)] shrink-0" />
                 <span className="truncate">{t('settings.rental.messages')}</span>
               </Link>
             </div>
@@ -237,7 +237,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
               onClick={toggleTheme}
               title={theme === 'dark' ? t('dashboard.themeLight') : t('dashboard.themeDark')}
               aria-label={theme === 'dark' ? t('dashboard.themeLight') : t('dashboard.themeDark')}
-              className="flex-1 md:flex-none p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/10 transition"
+              className="flex-1 md:flex-none p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-gray-100 dark:hover:bg-white/10 transition"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -246,7 +246,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
               title={t('dashboard.collapse')}
               aria-label={collapsed ? t('dashboard.expand') : t('dashboard.collapse')}
               onClick={() => setCollapsed((c) => !c)}
-              className="flex-1 md:flex-none p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/10 transition hidden md:block"
+              className="flex-1 md:flex-none p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-gray-100 dark:hover:bg-white/10 transition hidden md:block"
             >
               {collapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
             </button>
@@ -293,11 +293,11 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
               type="button"
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? t('dashboard.themeLight') : t('dashboard.themeDark')}
-              className="p-2.5 rounded-xl text-gray-500 hover:text-[#FF6B35] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition"
+              className="p-2.5 rounded-xl text-gray-500 hover:text-[var(--accent)] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center overflow-hidden">
+            <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white text-sm font-semibold flex items-center justify-center overflow-hidden">
               {user?.avatar_url ? (
                 <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
               ) : (

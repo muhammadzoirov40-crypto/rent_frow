@@ -82,7 +82,7 @@ function useIsDesktop() {
 function SectionHeading({ icon: Icon, title, desc }: { icon: any; title: string; desc?: string }) {
   return (
     <div className="flex items-center gap-3 mb-5">
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF6B35] to-[#e85d2c] flex items-center justify-center shadow-lg shadow-[#FF6B35]/20">
+      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]">
         <Icon className="w-5 h-5 text-white" />
       </div>
       <div>
@@ -93,9 +93,21 @@ function SectionHeading({ icon: Icon, title, desc }: { icon: any; title: string;
   );
 }
 
+/* Theme color options — `original` keeps the exact RentHub brand color (#FF6B35) */
+const ACCENT_OPTIONS = [
+  { id: 'original', color: '#FF6B35' },
+  { id: 'yellow', color: '#EAB308' },
+  { id: 'red', color: '#EF4444' },
+  { id: 'green', color: '#22C55E' },
+  { id: 'blue', color: '#3B82F6' },
+  { id: 'purple', color: '#A855F7' },
+  { id: 'pink', color: '#EC4899' },
+  { id: 'orange', color: '#F97316' },
+] as const;
+
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, accent, setAccent } = useTheme();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, updateUser, logout } = useAuthStore();
@@ -185,7 +197,7 @@ export default function SettingsPage() {
     if (meLoading || !meUser) {
       return (
         <div className="flex min-h-[240px] items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-[#FF6B35]" />
+          <Loader2 className="h-8 w-8 animate-spin text-[var(--accent)]" />
         </div>
       );
     }
@@ -209,7 +221,7 @@ export default function SettingsPage() {
                   className="w-20 h-20 rounded-2xl object-cover border-2 border-gray-200 dark:border-white/10 shadow-lg"
                 />
               ) : (
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#e85d2c] flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center shadow-lg">
                   <span className="text-white text-2xl font-bold">
                     {(meUser.display_name || meUser.email || 'U')[0].toUpperCase()}
                   </span>
@@ -239,7 +251,7 @@ export default function SettingsPage() {
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                className="text-xl font-bold text-gray-900 dark:text-white border-b-2 border-[#FF6B35] outline-none bg-transparent w-full max-w-sm"
+                className="text-xl font-bold text-gray-900 dark:text-white border-b-2 border-[var(--accent)] outline-none bg-transparent w-full max-w-sm"
                 placeholder={t('settings.personal.fullName')}
                 data-testid="edit-name-input"
               />
@@ -265,7 +277,7 @@ export default function SettingsPage() {
                   type="button"
                   onClick={handleSaveName}
                   disabled={updateProfileMutation.isPending || !editName.trim()}
-                  className="flex items-center gap-1.5 bg-[#FF6B35] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#e85d2c] transition disabled:opacity-50"
+                  className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition disabled:opacity-50"
                   data-testid="save-profile-btn"
                 >
                   {updateProfileMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -390,7 +402,7 @@ export default function SettingsPage() {
         <SectionHeading icon={Bell} title={t('settings.nav.notifications')} desc={t('settings.notificationsDesc')} />
         <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 mb-4">
           <div className="flex items-center gap-3">
-            <div className={`w-2.5 h-2.5 rounded-full ${unread > 0 ? 'bg-[#FF6B35]' : 'bg-gray-300 dark:bg-slate-600'}`} />
+            <div className={`w-2.5 h-2.5 rounded-full ${unread > 0 ? 'bg-[var(--accent)]' : 'bg-gray-300 dark:bg-slate-600'}`} />
             <span className="text-sm font-medium text-gray-900 dark:text-white">{t('settings.notifications.unread')}</span>
           </div>
           <span className="text-sm font-bold text-gray-900 dark:text-white tabular-nums" data-testid="unread-count">
@@ -399,7 +411,7 @@ export default function SettingsPage() {
         </div>
         <Link
           to="/notifications"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[#FF6B35] text-white hover:bg-[#e85d2c] transition"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] transition"
           data-testid="open-notifications"
         >
           <Bell className="w-4 h-4" />
@@ -442,7 +454,7 @@ export default function SettingsPage() {
       <SectionHeading icon={CreditCard} title={t('settings.nav.payments')} desc={t('settings.payments.desc')} />
       {paymentsLoading ? (
         <div className="flex min-h-[180px] items-center justify-center">
-          <Loader2 className="h-7 w-7 animate-spin text-[#FF6B35]" />
+          <Loader2 className="h-7 w-7 animate-spin text-[var(--accent)]" />
         </div>
       ) : paymentsError ? (
         <div className="text-center py-10">
@@ -477,7 +489,7 @@ export default function SettingsPage() {
               <span className={`w-24 text-xs font-semibold px-2 py-1 rounded-full text-center ${PAYMENT_STATUS_STYLE[p.status] || 'bg-gray-100 text-gray-600'}`}>
                 {t(`settings.payments.statuses.${p.status}`)}
               </span>
-              <span className="w-24 text-right font-bold text-[#FF6B35] tabular-nums">
+              <span className="w-24 text-right font-bold text-[var(--accent)] tabular-nums">
                 {Math.round(p.amount).toLocaleString('ru-RU')} {t('common.somoni')}
               </span>
               <span className="w-28 text-right text-xs text-gray-400 tabular-nums">{formatDate(p.created_at)}</span>
@@ -499,8 +511,8 @@ export default function SettingsPage() {
             onClick={() => changeLanguage(lang.code)}
             className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all border ${
               i18n.language === lang.code
-                ? 'bg-[#FF6B35] text-white border-[#FF6B35] shadow-lg shadow-[#FF6B35]/25'
-                : 'bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40'
+                ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]'
+                : 'bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
             }`}
             data-testid={`lang-${lang.code}`}
           >
@@ -520,8 +532,8 @@ export default function SettingsPage() {
           onClick={() => { if (theme !== 'light') toggleTheme(); }}
           className={`flex items-center justify-center gap-3 px-4 py-4 rounded-xl text-sm font-semibold transition-all border ${
             theme === 'light'
-              ? 'bg-[#FF6B35] text-white border-[#FF6B35] shadow-lg shadow-[#FF6B35]/25'
-              : 'bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40'
+              ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]'
+              : 'bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
           }`}
           data-testid="theme-light"
         >
@@ -532,13 +544,56 @@ export default function SettingsPage() {
           onClick={() => { if (theme !== 'dark') toggleTheme(); }}
           className={`flex items-center justify-center gap-3 px-4 py-4 rounded-xl text-sm font-semibold transition-all border ${
             theme === 'dark'
-              ? 'bg-[#FF6B35] text-white border-[#FF6B35] shadow-lg shadow-[#FF6B35]/25'
-              : 'bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40'
+              ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]'
+              : 'bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-slate-300 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
           }`}
           data-testid="theme-dark"
         >
           {t('theme.dark')}
         </button>
+      </div>
+
+      <div className="mt-6 pt-5 border-t border-gray-200 dark:border-white/10">
+        <p className="text-sm font-bold text-gray-900 dark:text-white">{t('settings.themeColor')}</p>
+        <p className="text-xs text-gray-500 dark:text-slate-400 mt-0.5">{t('settings.themeColorDesc')}</p>
+        <div
+          className="mt-3 flex flex-wrap items-center gap-2.5"
+          role="radiogroup"
+          aria-label={t('settings.themeColor')}
+          data-testid="accent-picker"
+        >
+          {ACCENT_OPTIONS.map((opt) => {
+            const selected = accent === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                data-testid={`accent-${opt.id}`}
+                onClick={() => setAccent(opt.id)}
+                title={t(`accents.${opt.id}`)}
+                className={`flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border transition-all ${
+                  selected
+                    ? 'border-gray-900 dark:border-white bg-white dark:bg-white/10 shadow-md ring-2 ring-[rgb(var(--accent-rgb)/0.6)]'
+                    : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:border-gray-300 dark:hover:border-white/25 hover:bg-white dark:hover:bg-white/10'
+                }`}
+              >
+                <span
+                  className="w-6 h-6 rounded-full shadow-inner ring-1 ring-black/10 shrink-0"
+                  style={{ background: opt.color }}
+                />
+                <span
+                  className={`text-xs font-semibold whitespace-nowrap ${
+                    selected ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'
+                  }`}
+                >
+                  {t(`accents.${opt.id}`)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
@@ -653,7 +708,7 @@ export default function SettingsPage() {
         onClick={() => (mobile ? openSectionById(id) : setActive(id))}
         className={`w-full flex items-center gap-3 ${mobile ? 'px-4 py-3.5' : 'px-4 py-2.5'} rounded-xl text-sm font-semibold transition-all ${
           isActive && !mobile
-            ? 'bg-[#FF6B35] text-white shadow-lg shadow-[#FF6B35]/25'
+            ? 'bg-[var(--accent)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]'
             : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-white/[0.06]'
         }`}
         data-nav={id}
@@ -685,7 +740,7 @@ export default function SettingsPage() {
           <button
             type="button"
             onClick={() => setMobileList(true)}
-            className="flex items-center gap-1.5 text-sm font-semibold text-gray-600 dark:text-slate-300 hover:text-[#FF6B35] transition mb-4 px-2 py-1.5 -ml-2 rounded-lg"
+            className="flex items-center gap-1.5 text-sm font-semibold text-gray-600 dark:text-slate-300 hover:text-[var(--accent)] transition mb-4 px-2 py-1.5 -ml-2 rounded-lg"
             data-testid="settings-back"
           >
             <ChevronLeft className="w-4 h-4" />

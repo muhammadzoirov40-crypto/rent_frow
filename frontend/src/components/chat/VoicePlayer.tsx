@@ -70,7 +70,7 @@ export default function VoicePlayer({ url, duration, mine }: VoicePlayerProps) {
         className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition ${
           mine
             ? 'bg-white/20 text-white hover:bg-white/30'
-            : 'bg-[#FF6B35] text-white hover:bg-[#e55a2b]'
+            : 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
         }`}
       >
         {playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 translate-x-[1px]" />}
@@ -83,7 +83,7 @@ export default function VoicePlayer({ url, duration, mine }: VoicePlayerProps) {
           className={`h-1.5 rounded-full cursor-pointer ${mine ? 'bg-white/25' : 'bg-gray-200 dark:bg-white/15'}`}
         >
           <div
-            className={`h-full rounded-full transition-[width] duration-150 ${mine ? 'bg-white' : 'bg-[#FF6B35]'}`}
+            className={`h-full rounded-full transition-[width] duration-150 ${mine ? 'bg-white' : 'bg-[var(--accent)]'}`}
             style={{ width: `${progress}%` }}
           />
         </div>

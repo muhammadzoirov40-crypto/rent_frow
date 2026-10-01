@@ -13,6 +13,13 @@
       html.light body { background-color: #f8fafc; color: #1e293b; }
       html.dark body { background-color: #020617; color: #e2e8f0; }
     </style>
+    <script>
+      // Apply saved theme color before first paint (avoids flash of default accent)
+      try {
+        var a = localStorage.getItem('accent');
+        if (a && a !== 'original') document.documentElement.setAttribute('data-accent', a);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

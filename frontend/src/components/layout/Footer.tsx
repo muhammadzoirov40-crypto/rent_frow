@@ -50,7 +50,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {CATEGORIES.map((cat) => (
                 <li key={cat.to}>
-                  <Link to={cat.to} className="text-sm text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] transition">
+                  <Link to={cat.to} className="text-sm text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] transition">
                     {cat.label}
                   </Link>
                 </li>
@@ -63,7 +63,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {CITIES.map((city) => (
                 <li key={city.to}>
-                  <Link to={city.to} className="text-sm text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] transition">
+                  <Link to={city.to} className="text-sm text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] transition">
                     {city.label}
                   </Link>
                 </li>

@@ -35,7 +35,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
       collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
     } ${
       isActive(to)
-        ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff9162] text-white shadow-lg shadow-[#FF6B35]/30'
+        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
     }`;
 
@@ -65,13 +65,13 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
             collapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-4 flex items-center gap-3'
           }`}
         >
-          <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[#FF6B35]/20 rounded-full blur-2xl" />
+          <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[rgb(var(--accent-rgb)/0.2)] rounded-full blur-2xl" />
           {isAuthenticated ? (
-            <Link to="/profile" className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center shrink-0 shadow-lg shadow-[#FF6B35]/25">
+            <Link to="/profile" className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white text-sm font-semibold flex items-center justify-center shrink-0 shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]">
               {(user?.display_name || user?.email || '?').charAt(0).toUpperCase()}
             </Link>
           ) : (
-            <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-[#FF6B35] to-[#ff9a66] flex items-center justify-center shrink-0 shadow-lg shadow-[#FF6B35]/30">
+            <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[#ff9a66] flex items-center justify-center shrink-0 shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]">
               <User className="w-5 h-5 text-white" />
             </div>
           )}
@@ -90,7 +90,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
             onClick={onToggle}
             aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
             title={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-            className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/10 transition ${
+            className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/10 transition ${
               collapsed ? '' : 'shrink-0'
             }`}
           >
@@ -112,8 +112,8 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
                 collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
               } ${
                 isActive('/dashboard')
-                  ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff9162] text-white shadow-lg shadow-[#FF6B35]/30'
-                  : 'text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-[#FF6B35]/10'
+                  ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
+                  : 'text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-[rgb(var(--accent-rgb)/0.1)]'
               }`}
             >
               <span className="shrink-0">

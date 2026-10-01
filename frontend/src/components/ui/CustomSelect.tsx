@@ -16,8 +16,8 @@ interface CustomSelectProps {
 }
 
 const DEFAULT_BUTTON_CLS = `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm text-left transition
-          border border-gray-200 dark:border-[#FF6B35]/30 bg-white dark:bg-[#2A2A3E] text-gray-900 dark:text-white
-          hover:border-[#FF6B35]/60 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/50
+          border border-gray-200 dark:border-[rgb(var(--accent-rgb)/0.3)] bg-white dark:bg-[#2A2A3E] text-gray-900 dark:text-white
+          hover:border-[rgb(var(--accent-rgb)/0.6)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.5)]
           disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:disabled:bg-white/5`;
 
 export default function CustomSelect({
@@ -50,7 +50,7 @@ export default function CustomSelect({
         disabled={disabled}
         onClick={() => setIsOpen(!isOpen)}
         className={`${buttonClassName ?? DEFAULT_BUTTON_CLS} ${
-          isOpen ? 'border-[#FF6B35] ring-2 ring-[#FF6B35]/40' : ''
+          isOpen ? 'border-[var(--accent)] ring-2 ring-[rgb(var(--accent-rgb)/0.4)]' : ''
         }`}
       >
         <span className={`truncate ${!value ? 'text-gray-400 dark:text-gray-500' : ''}`}>{selectedLabel}</span>
@@ -73,8 +73,8 @@ export default function CustomSelect({
                 }}
                 className={`w-full flex items-center justify-between gap-2 text-left px-3.5 py-2.5 rounded-xl text-sm transition ${
                   active
-                    ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff8a5b] text-white font-semibold shadow-sm shadow-orange-500/30'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-[#FF6B35]/10 dark:hover:bg-[#FF6B35]/15 hover:text-[#FF6B35] dark:hover:text-white'
+                    ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white font-semibold shadow-sm shadow-[rgb(var(--accent-rgb)/0.3)]'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:text-[var(--accent)] dark:hover:text-white'
                 }`}
               >
                 <span className="truncate">{option.label}</span>

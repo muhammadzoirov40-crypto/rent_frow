@@ -38,7 +38,7 @@ function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
         <Star
           key={i}
           size={size}
-          className={i <= rating ? 'fill-[#FF6B35] text-[#FF6B35]' : 'fill-gray-200 text-gray-200'}
+          className={i <= rating ? 'fill-[var(--accent)] text-[var(--accent)]' : 'fill-gray-200 text-gray-200'}
         />
       ))}
     </div>
@@ -228,7 +228,7 @@ export default function ListingPage() {
   if (listingLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center dark:bg-[#0a0a1a]">
-        <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -238,7 +238,7 @@ export default function ListingPage() {
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 dark:bg-[#0a0a1a]">
         <AlertTriangle size={48} className="text-gray-400" />
         <h2 className="text-xl font-bold text-[#1A1A2E] dark:text-white">{t('common.error')}</h2>
-        <Link to="/" className="text-[#FF6B35] hover:underline font-medium">
+        <Link to="/" className="text-[var(--accent)] hover:underline font-medium">
           {t('common.back')}
         </Link>
       </div>
@@ -336,7 +336,7 @@ export default function ListingPage() {
                         aria-label={`${i + 1}/${images.length}`}
                         className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${
                           i === currentImageIndex
-                            ? 'border-[#FF6B35] ring-2 ring-[#FF6B35]/30'
+                            ? 'border-[var(--accent)] ring-2 ring-[rgb(var(--accent-rgb)/0.3)]'
                             : 'border-gray-200 dark:border-white/10 opacity-60 hover:opacity-100'
                         }`}
                       >
@@ -354,7 +354,7 @@ export default function ListingPage() {
 
             <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-3">
-                <FileText size={20} className="text-[#FF6B35]" />
+                <FileText size={20} className="text-[var(--accent)]" />
                 {t('listing.description')}
               </h2>
               <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-line">
@@ -364,7 +364,7 @@ export default function ListingPage() {
 
             <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
-                <Tag size={20} className="text-[#FF6B35]" />
+                <Tag size={20} className="text-[var(--accent)]" />
                 {t('listing.characteristics')}
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -425,7 +425,7 @@ export default function ListingPage() {
 
                 {(listing.city_name || listing.district_name) && (
                   <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-3">
-                    <MapPin className="w-4 h-4 shrink-0 text-[#FF6B35]" />
+                    <MapPin className="w-4 h-4 shrink-0 text-[var(--accent)]" />
                     <span className="truncate">
                       {listing.city_name}
                       {listing.district_name ? `, ${listing.district_name}` : ''}
@@ -434,7 +434,7 @@ export default function ListingPage() {
                 )}
 
                 <div className="mb-4">
-                  <span className="text-3xl font-extrabold text-[#FF6B35]">{listing.price.toLocaleString('ru-RU')}</span>
+                  <span className="text-3xl font-extrabold text-[var(--accent)]">{listing.price.toLocaleString('ru-RU')}</span>
                   <span className="text-gray-500 dark:text-gray-400 text-sm ml-1">
                     {t('common.somoni')} / {t('listing.' + listing.price_unit)}
                   </span>
@@ -450,7 +450,7 @@ export default function ListingPage() {
                     <div className="space-y-2">
                       <button
                         onClick={() => navigate('/rental-requests')}
-                        className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-[#FF6B35]/20 flex items-center justify-center gap-2"
+                        className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] flex items-center justify-center gap-2"
                       >
                         <Calendar className="w-4 h-4" />
                         {t('booking.viewBooking')}
@@ -525,7 +525,7 @@ export default function ListingPage() {
                     )}
                     <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-white/10">
                       <span className="font-bold text-[#1A1A2E] dark:text-white">{t('booking.total')}</span>
-                      <span className="text-lg font-extrabold text-[#FF6B35]">
+                      <span className="text-lg font-extrabold text-[var(--accent)]">
                         {total.toLocaleString('ru-RU')} {t('common.somoni')}
                       </span>
                     </div>
@@ -536,7 +536,7 @@ export default function ListingPage() {
                   <div className="space-y-2">
                     <button
                       onClick={() => navigate(`/create-listing?edit=${listing.id}`)}
-                      className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                      className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] active:scale-[0.98] flex items-center justify-center gap-2"
                     >
                       <Pencil size={16} />
                       {t('listing.editListing')}
@@ -550,7 +550,7 @@ export default function ListingPage() {
                     <button
                       onClick={requestRental}
                       disabled={rentalMutation.isPending || listing.status !== 'ACTIVE'}
-                      className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20 active:scale-[0.98]"
+                      className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] active:scale-[0.98]"
                     >
                       {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
                     </button>
@@ -584,9 +584,9 @@ export default function ListingPage() {
                     }
                     favoriteMutation.mutate();
                   }}
-                  className="w-full mt-2 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-[#FF6B35] hover:text-[#FF6B35] font-medium py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                  className="w-full mt-2 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-[var(--accent)] hover:text-[var(--accent)] font-medium py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
                 >
-                  <Heart size={18} className={isFavorited ? 'fill-[#FF6B35] text-[#FF6B35]' : ''} />
+                  <Heart size={18} className={isFavorited ? 'fill-[var(--accent)] text-[var(--accent)]' : ''} />
                   {isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
                 </button>
               </div>
@@ -594,11 +594,11 @@ export default function ListingPage() {
               {listing.owner && (
                 <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-[#FF6B35]/10 flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 rounded-full bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center overflow-hidden">
                       {listing.owner.avatar_url ? (
                         <img src={listing.owner.avatar_url} alt="" className="w-full h-full object-cover" />
                       ) : (
-                        <span className="text-lg font-bold text-[#FF6B35]">
+                        <span className="text-lg font-bold text-[var(--accent)]">
                           {listing.owner.display_name?.[0] || 'U'}
                         </span>
                       )}
@@ -606,7 +606,7 @@ export default function ListingPage() {
                     <div>
                       <div className="flex items-center gap-1.5">
                         <span className="font-semibold text-[#1A1A2E] dark:text-white text-sm">{listing.owner.display_name}</span>
-                        {listing.owner.is_verified && <BadgeCheck size={16} className="text-[#FF6B35]" />}
+                        {listing.owner.is_verified && <BadgeCheck size={16} className="text-[var(--accent)]" />}
                       </div>
                       <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                         <Calendar size={12} />
@@ -636,13 +636,13 @@ export default function ListingPage() {
         <div className="mt-12">
           <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
             <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-6">
-              <Star size={20} className="text-[#FF6B35]" />
+              <Star size={20} className="text-[var(--accent)]" />
               {t('listing.reviews')} ({listingReviews.length})
             </h2>
 
             {listingReviews.length > 0 && (
               <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
-                <span className="text-4xl font-extrabold text-[#FF6B35]">{avgRating}</span>
+                <span className="text-4xl font-extrabold text-[var(--accent)]">{avgRating}</span>
                 <div>
                   <StarRating rating={avgRating} size={20} />
                   <span className="text-sm text-gray-500 dark:text-gray-400 mt-1 block">{listingReviews.length} {t('profile.reviews')}</span>
@@ -701,7 +701,7 @@ export default function ListingPage() {
                 {!showReviewForm ? (
                   <button
                     onClick={() => setShowReviewForm(true)}
-                    className="text-[#FF6B35] hover:text-[#e55a2b] font-medium text-sm transition-colors"
+                    className="text-[var(--accent)] hover:text-[var(--accent-hover)] font-medium text-sm transition-colors"
                   >
                     {t('listing.leaveReview')}
                   </button>
@@ -715,7 +715,7 @@ export default function ListingPage() {
                             <Star
                               size={24}
                               className={`cursor-pointer transition-colors ${
-                                r <= reviewRating ? 'fill-[#FF6B35] text-[#FF6B35]' : 'fill-gray-200 text-gray-200 hover:fill-gray-300'
+                                r <= reviewRating ? 'fill-[var(--accent)] text-[var(--accent)]' : 'fill-gray-200 text-gray-200 hover:fill-gray-300'
                               }`}
                             />
                           </button>
@@ -727,7 +727,7 @@ export default function ListingPage() {
                       onChange={(e) => setReviewComment(e.target.value)}
                       placeholder={t('listing.reviewPlaceholder')}
                       rows={3}
-                      className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition resize-none"
+                      className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
                     />
                     <div className="flex gap-2">
                       <button
@@ -739,7 +739,7 @@ export default function ListingPage() {
                           reviewMutation.mutate();
                         }}
                         disabled={reviewMutation.isPending}
-                        className="bg-[#FF6B35] hover:bg-[#e55a2b] text-white text-sm font-semibold py-2 px-4 rounded-xl transition disabled:opacity-50"
+                        className="bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-semibold py-2 px-4 rounded-xl transition disabled:opacity-50"
                       >
                         {reviewMutation.isPending ? t('listing.sending') : t('listing.sendReview')}
                       </button>
@@ -781,14 +781,14 @@ export default function ListingPage() {
                     )}
                   </div>
                   <div className="p-3">
-                    <h3 className="font-semibold text-sm text-[#1A1A2E] dark:text-white truncate group-hover:text-[#FF6B35] transition-colors">
+                    <h3 className="font-semibold text-sm text-[#1A1A2E] dark:text-white truncate group-hover:text-[var(--accent)] transition-colors">
                       {item.title}
                     </h3>
                     <div className="flex items-center gap-1 mt-1">
                       <MapPin size={12} className="text-gray-400" />
                       <span className="text-xs text-gray-500 dark:text-gray-400">{item.city_name}</span>
                     </div>
-                    <span className="block mt-2 text-lg font-bold text-[#FF6B35]">{item.price} сом</span>
+                    <span className="block mt-2 text-lg font-bold text-[var(--accent)]">{item.price} сом</span>
                   </div>
                 </Link>
               ))}
@@ -833,7 +833,7 @@ export default function ListingPage() {
               </div>
               <div className="flex justify-between gap-4 pt-1.5 border-t border-gray-200 dark:border-white/10">
                 <span className="font-bold text-[#1A1A2E] dark:text-white">{t('booking.total')}</span>
-                <span className="font-extrabold text-[#FF6B35]">
+                <span className="font-extrabold text-[var(--accent)]">
                   {total.toLocaleString('ru-RU')} {t('common.somoni')}
                 </span>
               </div>
@@ -851,7 +851,7 @@ export default function ListingPage() {
                 type="button"
                 onClick={() => rentalMutation.mutate()}
                 disabled={rentalMutation.isPending}
-                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#FF6B35] hover:bg-[#e55a2b] disabled:opacity-60 transition flex items-center gap-2"
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-60 transition flex items-center gap-2"
               >
                 {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.confirm')}
               </button>
@@ -920,7 +920,7 @@ export default function ListingPage() {
         <div className="lg:hidden fixed left-0 right-0 bottom-20 z-40 px-4">
           <div className="bg-white dark:bg-[#151528] border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/10 px-3 py-2.5 flex items-center gap-3">
             <div className="min-w-0">
-              <div className="text-lg font-extrabold text-[#FF6B35] leading-none">
+              <div className="text-lg font-extrabold text-[var(--accent)] leading-none">
                 {listing.price.toLocaleString('ru-RU')}
               </div>
               <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
@@ -930,7 +930,7 @@ export default function ListingPage() {
             <button
               onClick={requestRental}
               disabled={rentalMutation.isPending}
-              className="flex-1 bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white text-sm font-semibold py-3 rounded-xl transition active:scale-[0.98]"
+              className="flex-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white text-sm font-semibold py-3 rounded-xl transition active:scale-[0.98]"
             >
               {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
             </button>

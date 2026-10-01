@@ -150,7 +150,7 @@ export default function Header() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('header.searchPlaceholder')}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
               />
             </div>
           </form>
@@ -158,7 +158,7 @@ export default function Header() {
           <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition"
+              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition"
               aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -167,7 +167,7 @@ export default function Header() {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition text-sm font-medium"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition text-sm font-medium"
               >
                 <Globe className="w-4 h-4" />
                 <span>{currentLang.code.toUpperCase()}</span>
@@ -180,7 +180,7 @@ export default function Header() {
                       onClick={() => changeLanguage(lang.code)}
                       className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition ${
                         i18n.language === lang.code
-                          ? 'bg-[#FF6B35]/10 text-[#FF6B35] font-semibold'
+                          ? 'bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] font-semibold'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5'
                       }`}
                     >
@@ -196,14 +196,14 @@ export default function Header() {
               <>
                 <Link
                   to="/favorites"
-                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <Heart className="w-5 h-5" />
                 </Link>
 
                 <Link
                   to="/messages"
-                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <MessageSquare className="w-5 h-5" />
                 </Link>
@@ -211,7 +211,7 @@ export default function Header() {
                 <div className="relative" ref={notifRef}>
                   <button
                     onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false) }}
-                    className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
+                    className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (
@@ -225,7 +225,7 @@ export default function Header() {
                     <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
                       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10">
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('header.notifications')}</h3>
-                        <Link to="/notifications" onClick={() => setNotifOpen(false)} className="text-xs text-[#FF6B35] hover:text-[#e55a2b] font-medium">
+                        <Link to="/notifications" onClick={() => setNotifOpen(false)} className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] font-medium">
                           {t('header.all')}
                         </Link>
                       </div>
@@ -258,7 +258,7 @@ export default function Header() {
                                     <p className={`text-sm leading-snug ${n.is_read ? 'text-gray-600 dark:text-gray-300' : 'text-gray-900 dark:text-white font-semibold'}`}>
                                       {title}
                                     </p>
-                                    {!n.is_read && <span className="w-2 h-2 rounded-full bg-[#FF6B35] shrink-0 mt-1.5" />}
+                                    {!n.is_read && <span className="w-2 h-2 rounded-full bg-[var(--accent)] shrink-0 mt-1.5" />}
                                   </div>
                                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{summary}</p>
                                   <p className="text-[11px] text-gray-400 mt-1.5">{timeAgo(n.created_at)}</p>
@@ -273,7 +273,7 @@ export default function Header() {
                         <div className="border-t border-gray-100 dark:border-white/10 px-4 py-2.5">
                           <button
                             onClick={() => notifAllReadMutation.mutate()}
-                            className="w-full text-center text-xs text-[#FF6B35] hover:underline font-medium"
+                            className="w-full text-center text-xs text-[var(--accent)] hover:underline font-medium"
                           >
                             {t('notifications.markAllRead', 'Прочитать все')}
                           </button>
@@ -291,7 +291,7 @@ export default function Header() {
                     {user.avatar_url ? (
                       <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
                     ) : (
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF6B35] to-[#e55a2b] flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center">
                         <span className="text-white text-xs font-bold">
                           {(user.display_name || user.email || 'U').charAt(0).toUpperCase()}
                         </span>
@@ -324,7 +324,7 @@ export default function Header() {
                           {t('header.settings')}
                         </Link>
                         {user?.role === 'ADMIN' && (
-                          <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#FF6B35] font-semibold hover:bg-orange-50 dark:hover:bg-[#FF6B35]/10 transition">
+                          <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--accent)] font-semibold hover:bg-orange-50 dark:hover:bg-[rgb(var(--accent-rgb)/0.1)] transition">
                             <Shield className="w-4 h-4" />
                             {t('nav.adminDashboard')}
                           </Link>
@@ -353,7 +353,7 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/register"
-                  className="hidden sm:block px-4 py-2.5 text-sm font-semibold bg-[#FF6B35] hover:bg-[#e55a2b] text-white rounded-xl transition shadow-sm shadow-[#FF6B35]/20 whitespace-nowrap"
+                  className="hidden sm:block px-4 py-2.5 text-sm font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-xl transition shadow-sm shadow-[rgb(var(--accent-rgb)/0.2)] whitespace-nowrap"
                 >
                   {t('header.register')}
                 </Link>
@@ -378,7 +378,7 @@ export default function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('header.searchPlaceholder')}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] transition"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
             />
           </div>
         </form>

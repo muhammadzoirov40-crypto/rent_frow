@@ -254,8 +254,8 @@ export default function CreateListingPage() {
           <div className="flex items-center gap-1 mb-2">
             {STEPS.map((label, i) => (
               <div key={i} className="flex-1">
-                <div className={`h-1.5 rounded-full transition-colors ${i <= step ? 'bg-[#FF6B35]' : 'bg-gray-200 dark:bg-white/10'}`} />
-                <span className={`text-[10px] mt-1 block text-center ${i === step ? 'text-[#FF6B35] font-semibold' : 'text-gray-400 dark:text-gray-400'}`}>
+                <div className={`h-1.5 rounded-full transition-colors ${i <= step ? 'bg-[var(--accent)]' : 'bg-gray-200 dark:bg-white/10'}`} />
+                <span className={`text-[10px] mt-1 block text-center ${i === step ? 'text-[var(--accent)] font-semibold' : 'text-gray-400 dark:text-gray-400'}`}>
                   {label}
                 </span>
               </div>
@@ -267,7 +267,7 @@ export default function CreateListingPage() {
           {step === 0 && (
             <div>
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
-                <Tag size={20} className="text-[#FF6B35]" />
+                <Tag size={20} className="text-[var(--accent)]" />
                 {t('createListing.selectCategory')}
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -277,7 +277,7 @@ export default function CreateListingPage() {
                     onClick={() => updateForm({ category_id: cat.id })}
                     className={`p-4 rounded-xl border-2 text-left transition-all ${
                       form.category_id === cat.id
-                        ? 'border-[#FF6B35] bg-[#FF6B35]/5 shadow-md shadow-[#FF6B35]/10'
+                        ? 'border-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.05)] shadow-md shadow-[rgb(var(--accent-rgb)/0.1)]'
                         : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5'
                     }`}
                   >
@@ -292,7 +292,7 @@ export default function CreateListingPage() {
           {step === 1 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
-                <FileText size={20} className="text-[#FF6B35]" />
+                <FileText size={20} className="text-[var(--accent)]" />
                 {t('createListing.info')}
               </h2>
               <div>
@@ -302,7 +302,7 @@ export default function CreateListingPage() {
                   value={form.title}
                   onChange={(e) => updateForm({ title: e.target.value })}
                   placeholder={t('createListing.titlePlaceholder')}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
+                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                 />
               </div>
               <div>
@@ -312,7 +312,7 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ description: e.target.value })}
                   rows={5}
                   placeholder={t('createListing.descriptionPlaceholder')}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition resize-none"
+                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -323,7 +323,7 @@ export default function CreateListingPage() {
                     value={form.contact_name}
                     onChange={(e) => updateForm({ contact_name: e.target.value })}
                     placeholder={t('createListing.contactNamePlaceholder')}
-                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
+                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                   />
                 </div>
                 <div>
@@ -333,7 +333,7 @@ export default function CreateListingPage() {
                     value={form.contact_phone}
                     onChange={(e) => updateForm({ contact_phone: e.target.value })}
                     placeholder={t('createListing.contactPhonePlaceholder')}
-                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
+                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                   />
                 </div>
               </div>
@@ -343,7 +343,7 @@ export default function CreateListingPage() {
           {step === 2 && (
             <div>
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
-                <Camera size={20} className="text-[#FF6B35]" />
+                <Camera size={20} className="text-[var(--accent)]" />
                 {t('createListing.photos', { count: form.image_urls.length + previews.length })}
               </h2>
 
@@ -353,7 +353,7 @@ export default function CreateListingPage() {
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-                  dragOver ? 'border-[#FF6B35] bg-[#FF6B35]/5' : 'border-gray-300 dark:border-white/20 hover:border-[#FF6B35] dark:hover:border-[#FF6B35] hover:bg-gray-50 dark:hover:bg-white/5'
+                  dragOver ? 'border-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.05)]' : 'border-gray-300 dark:border-white/20 hover:border-[var(--accent)] dark:hover:border-[var(--accent)] hover:bg-gray-50 dark:hover:bg-white/5'
                 }`}
               >
                 <input
@@ -364,7 +364,7 @@ export default function CreateListingPage() {
                   className="hidden"
                   onChange={(e) => e.target.files && handleImageUpload(e.target.files)}
                 />
-                <Upload size={32} className={`mx-auto mb-3 ${dragOver ? 'text-[#FF6B35]' : 'text-gray-400'}`} />
+                <Upload size={32} className={`mx-auto mb-3 ${dragOver ? 'text-[var(--accent)]' : 'text-gray-400'}`} />
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                   {uploadingImages
                     ? `${t('createListing.uploading')}${uploadProgress ? ` ${uploadProgress.done}/${uploadProgress.total}` : ''}`
@@ -387,14 +387,14 @@ export default function CreateListingPage() {
                         </button>
                       </div>
                       {i === 0 && (
-                        <div className="absolute top-1 left-1 bg-[#FF6B35] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                        <div className="absolute top-1 left-1 bg-[var(--accent)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
                           {t('createListing.mainPhoto')}
                         </div>
                       )}
                     </div>
                   ))}
                   {previews.map((pv) => (
-                    <div key={pv.key} className="relative aspect-square rounded-xl overflow-hidden border border-[#FF6B35]/40 bg-gray-100 dark:bg-white/5">
+                    <div key={pv.key} className="relative aspect-square rounded-xl overflow-hidden border border-[rgb(var(--accent-rgb)/0.4)] bg-gray-100 dark:bg-white/5">
                       <img src={pv.url} alt="" className="w-full h-full object-cover opacity-70" />
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <Loader2 size={22} className="text-white animate-spin" />
@@ -409,7 +409,7 @@ export default function CreateListingPage() {
           {step === 3 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
-                <DollarSign size={20} className="text-[#FF6B35]" />
+                <DollarSign size={20} className="text-[var(--accent)]" />
                 {t('createListing.priceLabel')}
               </h2>
               <div className="grid grid-cols-2 gap-4">
@@ -421,7 +421,7 @@ export default function CreateListingPage() {
                     onChange={(e) => updateForm({ price: e.target.value })}
                     placeholder="0"
                     min="0"
-                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
+                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                   />
                 </div>
                 <div>
@@ -441,7 +441,7 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ deposit: e.target.value })}
                   placeholder={t('createListing.depositPlaceholder')}
                   min="0"
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
+                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                 />
               </div>
               <p className="text-xs text-gray-400">{t('createListing.currencyNote')}</p>
@@ -451,7 +451,7 @@ export default function CreateListingPage() {
           {step === 4 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
-                <MapPin size={20} className="text-[#FF6B35]" />
+                <MapPin size={20} className="text-[var(--accent)]" />
                 {t('createListing.location')}
               </h2>
               <div>
@@ -488,7 +488,7 @@ export default function CreateListingPage() {
                   value={form.address}
                   onChange={(e) => updateForm({ address: e.target.value })}
                   placeholder={t('createListing.addressPlaceholder')}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition"
+                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                 />
               </div>
             </div>
@@ -497,7 +497,7 @@ export default function CreateListingPage() {
           {step === 5 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
-                <Gavel size={20} className="text-[#FF6B35]" />
+                <Gavel size={20} className="text-[var(--accent)]" />
                 {t('createListing.rules')}
               </h2>
               <div>
@@ -507,7 +507,7 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ rules: e.target.value })}
                   rows={5}
                   placeholder={t('createListing.rulesPlaceholder')}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition resize-none"
+                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
                 />
               </div>
             </div>
@@ -526,7 +526,7 @@ export default function CreateListingPage() {
               <button
                 onClick={() => setStep(step + 1)}
                 disabled={!canProceed()}
-                className="flex items-center gap-2 bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20"
+                className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]"
               >
                 {t('common.next')}
                 <ChevronRight size={16} />
@@ -535,7 +535,7 @@ export default function CreateListingPage() {
               <button
                 onClick={() => createMutation.mutate(form)}
                 disabled={createMutation.isPending}
-                className="flex items-center gap-2 bg-[#FF6B35] hover:bg-[#e55a2b] disabled:bg-gray-300 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-[#FF6B35]/20"
+                className="flex items-center gap-2 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]"
               >
                 {createMutation.isPending ? (
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />

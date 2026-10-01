@@ -63,7 +63,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const linkClass = (to: string) =>
     `w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
       isActive(to)
-        ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff8552] text-white shadow-lg shadow-orange-500/25'
+        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]'
         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
     }`;
 
@@ -115,9 +115,9 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
         <div className="px-4 pt-4 pb-2 shrink-0">
           {isAuthenticated ? (
-            <Link to="/profile" onClick={onClose} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 hover:border-[#FF6B35]/40 transition">
+            <Link to="/profile" onClick={onClose} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)] transition">
               <span className="relative shrink-0">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center">
+                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white text-sm font-semibold flex items-center justify-center">
                   {(user?.display_name || user?.email || '?').charAt(0).toUpperCase()}
                 </span>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#1a1d24]" />
@@ -143,7 +143,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               <Link
                 to="/register"
                 onClick={onClose}
-                className="block w-full text-center px-4 py-2.5 bg-[#FF6B35] text-white text-sm font-semibold rounded-xl shadow-lg shadow-orange-500/25 hover:bg-[#e55a2b] transition"
+                className="block w-full text-center px-4 py-2.5 bg-[var(--accent)] text-white text-sm font-semibold rounded-xl shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)] hover:bg-[var(--accent-hover)] transition"
               >
                 {t('header.register')}
               </Link>
@@ -153,7 +153,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             <Link
               to="/dashboard"
               onClick={onClose}
-              className="mt-2 flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-orange-50 dark:bg-[#FF6B35]/10 border border-[#FF6B35]/25 text-[#FF6B35] text-sm font-semibold hover:bg-orange-100 dark:hover:bg-[#FF6B35]/15 transition"
+              className="mt-2 flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-orange-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] border border-[rgb(var(--accent-rgb)/0.25)] text-[var(--accent)] text-sm font-semibold hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition"
             >
               <LayoutDashboard size={18} />
               <span>{t('nav.dashboard')}</span>
@@ -196,7 +196,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               type="button"
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
-              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/10 transition"
+              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-gray-100 dark:hover:bg-white/10 transition"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
@@ -210,7 +210,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                   aria-label={lang.label}
                   className={`px-2 py-1.5 rounded-lg text-sm transition ${
                     i18n.language === lang.code
-                      ? 'bg-[#FF6B35] text-white shadow shadow-orange-500/30'
+                      ? 'bg-[var(--accent)] text-white shadow shadow-[rgb(var(--accent-rgb)/0.3)]'
                       : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10'
                   }`}
                 >
@@ -223,7 +223,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               to="/create-listing"
               onClick={onClose}
               aria-label={t('nav.createListing')}
-              className="p-2.5 rounded-xl bg-[#FF6B35] text-white hover:bg-[#e55a2b] shadow-lg shadow-orange-500/25 transition"
+              className="p-2.5 rounded-xl bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)] transition"
             >
               <PlusCircle className="w-5 h-5" />
             </Link>

@@ -224,10 +224,10 @@ export default function ChatInput({
       />
 
       {(replyTo || editing) && (
-        <div className="mb-2 flex items-start gap-3 pl-3 pr-2 py-2.5 rounded-2xl bg-orange-500/[0.07] dark:bg-orange-500/10 border border-[#FF6B35]/25 shadow-sm">
-          <span className="w-1 self-stretch rounded-full bg-gradient-to-b from-[#FF6B35] to-[#ff9162] shrink-0" />
+        <div className="mb-2 flex items-start gap-3 pl-3 pr-2 py-2.5 rounded-2xl bg-[rgb(var(--accent-rgb)/0.07)] dark:bg-[rgb(var(--accent-rgb)/0.1)] border border-[rgb(var(--accent-rgb)/0.25)] shadow-sm">
+          <span className="w-1 self-stretch rounded-full bg-gradient-to-b from-[var(--accent)] to-[var(--accent-light)] shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-[#FF6B35]">
+            <p className="text-xs font-bold text-[var(--accent)]">
               {editing ? t('messages.editing') : t('messages.replyingTo')}
             </p>
             <p className="text-xs text-gray-600 dark:text-gray-300 truncate">
@@ -270,7 +270,7 @@ export default function ChatInput({
             type="button"
             onClick={() => stopRecording(true)}
             aria-label={t('messages.send')}
-            className="p-2.5 rounded-xl bg-[#FF6B35] text-white hover:bg-[#e55a2b] transition shadow-lg shadow-orange-500/25"
+            className="p-2.5 rounded-xl bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] transition shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]"
           >
             <Send className="w-5 h-5" />
           </button>
@@ -283,7 +283,7 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.attachFile')}
             title={t('messages.attachFile')}
-            className="p-2.5 rounded-full text-gray-400 hover:text-[#FF6B35] hover:bg-orange-500/10 dark:hover:bg-orange-500/15 transition disabled:opacity-40"
+            className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
             <Paperclip className="w-5 h-5" />
           </button>
@@ -293,7 +293,7 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.attachImage')}
             title={t('messages.attachImage')}
-            className="p-2.5 rounded-full text-gray-400 hover:text-[#FF6B35] hover:bg-orange-500/10 dark:hover:bg-orange-500/15 transition disabled:opacity-40"
+            className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
             <ImageIcon className="w-5 h-5" />
           </button>
@@ -305,8 +305,8 @@ export default function ChatInput({
             title={t('messages.emoji')}
             className={`p-2.5 rounded-full transition disabled:opacity-40 ${
               emojiOpen
-                ? 'text-[#FF6B35] bg-orange-500/15'
-                : 'text-gray-400 hover:text-[#FF6B35] hover:bg-orange-500/10 dark:hover:bg-orange-500/15'
+                ? 'text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.15)]'
+                : 'text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)]'
             }`}
           >
             <Smile className="w-5 h-5" />
@@ -320,7 +320,7 @@ export default function ChatInput({
             onKeyDown={handleKeyDown}
             placeholder={t('messages.typeMessage')}
             disabled={disabled}
-            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] border border-transparent bg-gray-100/90 dark:bg-white/[0.06] px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[#FF6B35]/40 focus:bg-white dark:focus:bg-white/[0.09] focus:ring-4 focus:ring-[#FF6B35]/10 transition"
+            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] border border-transparent bg-gray-100/90 dark:bg-white/[0.06] px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:bg-white dark:focus:bg-white/[0.09] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
           />
 
           <button
@@ -329,7 +329,7 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.recordVoice')}
             title={t('messages.recordVoice')}
-            className="p-2.5 rounded-full text-gray-400 hover:text-[#FF6B35] hover:bg-orange-500/10 dark:hover:bg-orange-500/15 transition disabled:opacity-40"
+            className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
             <Mic className="w-5 h-5" />
           </button>
@@ -340,7 +340,7 @@ export default function ChatInput({
             disabled={!canSend}
             aria-label={t('messages.send')}
             title={t('messages.send')}
-            className="p-3 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#ff8a5b] text-white shadow-lg shadow-orange-500/30 hover:scale-105 hover:shadow-orange-500/40 active:scale-95 transition disabled:opacity-40 disabled:shadow-none disabled:scale-100"
+            className="p-3 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] hover:scale-105 hover:shadow-[rgb(var(--accent-rgb)/0.4)] active:scale-95 transition disabled:opacity-40 disabled:shadow-none disabled:scale-100"
           >
             <Send className="w-5 h-5" />
           </button>

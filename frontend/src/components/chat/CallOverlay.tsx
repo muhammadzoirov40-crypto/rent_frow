@@ -42,13 +42,13 @@ export default function CallOverlay({ type, name, avatar, onClose }: CallOverlay
   return (
     <div className="fixed inset-0 z-[95] flex flex-col bg-gradient-to-b from-[#121418] via-[#15171d] to-[#0d0e12]">
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[480px] h-[480px] rounded-full bg-[#FF6B35]/15 blur-[120px]" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[420px] h-[240px] rounded-full bg-[#FF6B35]/10 blur-[100px]" />
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[480px] h-[480px] rounded-full bg-[rgb(var(--accent-rgb)/0.15)] blur-[120px]" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[420px] h-[240px] rounded-full bg-[rgb(var(--accent-rgb)/0.1)] blur-[100px]" />
       </div>
 
       <div className="relative flex items-center justify-between px-5 sm:px-8 h-16 shrink-0">
         <span className="flex items-center gap-2 text-sm font-semibold text-white/90">
-          <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#FF6B35] to-[#ff9162] text-white text-xs font-bold flex items-center justify-center">
+          <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white text-xs font-bold flex items-center justify-center">
             R
           </span>
           RentHub
@@ -61,10 +61,10 @@ export default function CallOverlay({ type, name, avatar, onClose }: CallOverlay
       <div className="relative flex-1 flex flex-col items-center justify-center gap-5 px-6 text-center">
         <div className="relative w-36 h-36 sm:w-44 sm:h-44">
           {!connected && (
-            <span className="absolute inset-0 rounded-full bg-[#FF6B35]/30 animate-ping" />
+            <span className="absolute inset-0 rounded-full bg-[rgb(var(--accent-rgb)/0.3)] animate-ping" />
           )}
           <span
-            className={`absolute inset-2 rounded-full overflow-hidden bg-gradient-to-br from-[#FF6B35] to-[#ff9162] flex items-center justify-center text-white text-5xl sm:text-6xl font-bold ring-4 ring-[#FF6B35]/40 shadow-2xl shadow-orange-500/20 ${
+            className={`absolute inset-2 rounded-full overflow-hidden bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] flex items-center justify-center text-white text-5xl sm:text-6xl font-bold ring-4 ring-[rgb(var(--accent-rgb)/0.4)] shadow-2xl shadow-[rgb(var(--accent-rgb)/0.2)] ${
               connected ? '' : 'animate-pulse'
             }`}
           >

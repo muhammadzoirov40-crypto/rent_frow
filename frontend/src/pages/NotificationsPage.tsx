@@ -72,7 +72,7 @@ export default function NotificationsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
-        <div className="w-10 h-10 border-4 border-[#FF6B35] border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function NotificationsPage() {
             <button
               onClick={() => markAllMutation.mutate()}
               disabled={markAllMutation.isPending}
-              className="flex items-center gap-2 text-sm font-semibold text-[#FF6B35] hover:text-[#e55a2b] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/15 px-4 py-2.5 rounded-xl transition disabled:opacity-50"
+              className="flex items-center gap-2 text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)] bg-[rgb(var(--accent-rgb)/0.1)] hover:bg-[rgb(var(--accent-rgb)/0.15)] px-4 py-2.5 rounded-xl transition disabled:opacity-50"
             >
               <CheckCheck className="w-4 h-4" />
               {t('notifications.markAllRead')}
@@ -118,7 +118,7 @@ export default function NotificationsPage() {
                   key={notif.id}
                   onClick={() => handleClick(notif)}
                   className={`w-full text-left bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-4 hover:shadow-md transition flex items-start gap-4 ${
-                    !notif.is_read ? 'border-l-4 border-l-[#FF6B35] bg-[#FF6B35]/[0.02]' : ''
+                    !notif.is_read ? 'border-l-4 border-l-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.02)]' : ''
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-xl ${config.bgColor} flex items-center justify-center flex-shrink-0 ${config.color}`}>
@@ -130,7 +130,7 @@ export default function NotificationsPage() {
                         {title}
                       </p>
                       {!notif.is_read && (
-                        <div className="w-2.5 h-2.5 bg-[#FF6B35] rounded-full flex-shrink-0 mt-1" />
+                        <div className="w-2.5 h-2.5 bg-[var(--accent)] rounded-full flex-shrink-0 mt-1" />
                       )}
                     </div>
                     {body && (

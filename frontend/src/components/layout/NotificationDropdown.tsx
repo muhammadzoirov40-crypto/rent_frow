@@ -121,7 +121,7 @@ export default function NotificationDropdown({ isOpen, onClose }: NotificationDr
             key={n.id}
             onClick={() => markRead(n.id)}
             className={`w-full text-left px-5 py-3.5 hover:bg-gray-50 dark:hover:bg-white/5 transition ${
-              !n.read ? 'bg-brand-50/20 dark:bg-brand-500/10' : ''
+              !n.read ? 'bg-brand-50/20 dark:bg-[rgb(var(--accent-rgb)/0.1)]' : ''
             }`}
           >
             <div className="flex items-start gap-3">

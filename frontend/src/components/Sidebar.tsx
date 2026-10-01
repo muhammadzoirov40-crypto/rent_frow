@@ -31,7 +31,7 @@ interface NavItem {
 }
 
 const iconBtn =
-  'p-2.5 rounded-xl text-gray-500 dark:text-slate-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/5 transition flex items-center justify-center shrink-0'
+  'p-2.5 rounded-xl text-gray-500 dark:text-slate-400 hover:text-[var(--accent)] hover:bg-gray-100 dark:hover:bg-white/5 transition flex items-center justify-center shrink-0'
 
 export default function Sidebar() {
   const { t } = useTranslation()
@@ -97,19 +97,19 @@ export default function Sidebar() {
           open ? 'gap-3 px-3 py-2.5' : 'justify-center px-0 py-2.5'
         } ${
           active
-            ? 'bg-[#FF6B35]/10 text-[#FF6B35]'
+            ? 'bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)]'
             : 'text-gray-600 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5'
         }`}
       >
         <span className="relative shrink-0">
           {item.icon}
           {hasBadge && !open && (
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[#FF6B35] ring-2 ring-white dark:ring-[#12122a]" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-[var(--accent)] ring-2 ring-white dark:ring-[#12122a]" />
           )}
         </span>
         {open && <span className="flex-1 truncate">{item.label}</span>}
         {open && hasBadge && (
-          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#FF6B35] text-white text-[10px] font-bold flex items-center justify-center">
+          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--accent)] text-white text-[10px] font-bold flex items-center justify-center">
             {item.badge}
           </span>
         )}
@@ -134,7 +134,7 @@ export default function Sidebar() {
               onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#FF6B35] to-[#e55a2b] flex items-center justify-center shadow-md shadow-[#FF6B35]/20 shrink-0">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center shadow-md shadow-[rgb(var(--accent-rgb)/0.2)] shrink-0">
               <span className="text-white text-xs font-bold">{initials}</span>
             </div>
           )}
@@ -166,7 +166,7 @@ export default function Sidebar() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('header.searchPlaceholder')}
-              className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/20 focus:border-[#FF6B35] transition"
+              className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
             />
           </div>
         </form>
