@@ -19,7 +19,6 @@ import {
   Globe,
   Settings,
   Shield,
-  LayoutDashboard,
 } from 'lucide-react'
 import MobileSidebar from './MobileSidebar'
 import useAuthStore from '../../store/authStore'
@@ -308,12 +307,6 @@ export default function Header() {
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
                       </div>
                       <div className="py-1">
-                        {(user?.role === 'OWNER' || user?.role === 'ADMIN') && (
-                          <Link to="/dashboard" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#FF6B35] font-semibold hover:bg-orange-50 dark:hover:bg-[#FF6B35]/10 transition">
-                            <LayoutDashboard className="w-4 h-4" />
-                            {t('nav.dashboard')}
-                          </Link>
-                        )}
                         <Link to="/profile" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
                           <User className="w-4 h-4 text-gray-400" />
                           {t('header.profile')}

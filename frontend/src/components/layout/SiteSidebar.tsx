@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Heart,
   Home,
+  LayoutDashboard,
   LogOut,
   MessageSquare,
   PanelLeft,
@@ -102,6 +103,24 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
             <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500">
               {t('admin.menu')}
             </p>
+          )}
+          {isAuthenticated && (user?.role === 'OWNER' || user?.role === 'ADMIN') && (
+            <Link
+              to="/dashboard"
+              title={collapsed ? t('nav.dashboard') : undefined}
+              className={`w-full flex items-center rounded-2xl text-sm font-semibold transition-all duration-200 ${
+                collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
+              } ${
+                isActive('/dashboard')
+                  ? 'bg-gradient-to-r from-[#FF6B35] to-[#ff9162] text-white shadow-lg shadow-[#FF6B35]/30'
+                  : 'text-[#FF6B35] hover:bg-orange-50 dark:hover:bg-[#FF6B35]/10'
+              }`}
+            >
+              <span className="shrink-0">
+                <LayoutDashboard className="w-5 h-5" />
+              </span>
+              {!collapsed && <span className="truncate">{t('nav.dashboard')}</span>}
+            </Link>
           )}
           {items
             .filter((item) => item.show)
