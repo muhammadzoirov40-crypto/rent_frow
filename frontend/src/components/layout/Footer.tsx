@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Logo from '../Logo'
 import { useTranslation } from 'react-i18next'
 import { Mail, Phone, MapPin, Globe, MessageCircle, Send } from 'lucide-react'
 
@@ -27,12 +28,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-7">
           <div>
-            <Link to="/" className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">R</span>
-              </div>
-              <span className="text-xl font-bold text-[#1A1A2E] dark:text-white">RentHub</span>
-            </Link>
+            <div className="mb-3 inline-block"><Logo size="sm" /></div>
             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
               {t('footer.aboutText')}
             </p>

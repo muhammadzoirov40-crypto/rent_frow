@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import useAuthStore from '../../store/authStore';
+import Logo from '../Logo';
 
 export type DashboardSection =
   | 'dashboard'
@@ -93,12 +94,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
         <div className={`flex items-center gap-3 h-16 px-4 border-b border-gray-200 dark:border-white/10 shrink-0 ${collapsed ? 'md:justify-center md:px-2' : ''}`}>
-          <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF6B35] to-[#ff9162] text-white flex items-center justify-center font-bold shadow-lg shadow-orange-500/25 shrink-0">
-            R
-          </span>
-          <span className={`font-bold text-lg tracking-tight transition-opacity duration-200 ${collapsed ? 'md:hidden' : ''}`}>
-            RentHub
-          </span>
+          <Logo size="md" to="/dashboard" showWord={!collapsed} />
           <button
             type="button"
             onClick={() => setMobileOpen(false)}

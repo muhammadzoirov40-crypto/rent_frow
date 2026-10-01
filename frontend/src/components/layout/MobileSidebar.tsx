@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import Logo from '../Logo';
 import { useTranslation } from 'react-i18next';
 import {
   Bell,
   ClipboardList,
   Heart,
   Home,
+  LayoutDashboard,
   LogOut,
   MessageSquare,
   Moon,
@@ -75,6 +77,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     { to: '/messages', label: t('nav.messages'), icon: MessageSquare, show: isAuthenticated },
     { to: '/notifications', label: t('nav.notifications'), icon: Bell, show: isAuthenticated },
     { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList, show: isAuthenticated },
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: isAuthenticated && (user?.role === 'OWNER' || user?.role === 'ADMIN') },
     { to: '/create-listing', label: t('nav.createListing'), icon: PlusCircle, show: isAuthenticated },
     { to: '/profile', label: t('nav.profile'), icon: User, show: isAuthenticated },
     { to: '/settings', label: t('nav.settings'), icon: Settings, show: isAuthenticated },
@@ -99,12 +102,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-white/10 shrink-0">
-          <Link to="/" onClick={onClose} className="flex items-center gap-2.5">
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#FF6B35] to-[#ff9162] text-white flex items-center justify-center font-bold shadow-lg shadow-orange-500/25">
-              R
-            </span>
-            <span className="font-bold text-lg tracking-tight text-gray-900 dark:text-white">RentHub</span>
-          </Link>
+          <Logo onClick={onClose} />
           <button
             type="button"
             onClick={onClose}
