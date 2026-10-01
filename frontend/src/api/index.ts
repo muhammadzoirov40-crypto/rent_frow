@@ -418,6 +418,13 @@ export const notifications = {
     client.patch<APIResponse<null>>('/notifications/read-all'),
 };
 
+export const payments = {
+  listMine: (skip = 0, limit = 20) =>
+    client
+      .get<PaginatedResponse<PaymentRecord>>('/payments', { params: { skip, limit } })
+      .then(unwrapPaginated),
+};
+
 export const reviews = {
   getReviews: (listingId: number) =>
     client.get<APIResponse<Review[]>>(`/listings/${listingId}/reviews`).then(unwrap),

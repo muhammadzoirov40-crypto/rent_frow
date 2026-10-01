@@ -670,11 +670,136 @@
     "languageChanged": "Language changed successfully",
     "theme": "Theme",
     "themeDesc": "Switch between light and dark mode",
-    "notifications": "Notifications",
+    "notifications": {
+      "unread": "Unread notifications",
+      "open": "Open notifications"
+    },
     "notificationsDesc": "Manage your notification preferences",
     "enableNotifications": "Enable notifications",
     "notificationsEnabled": "Notifications enabled",
-    "notificationsDisabled": "Notifications disabled"
+    "notificationsDisabled": "Notifications disabled",
+    "nav": {
+      "personal": "Personal Information",
+      "security": "Security",
+      "notifications": "Notifications",
+      "privacy": "Privacy",
+      "payments": "Payments",
+      "rental": "Rental Settings",
+      "language": "Language",
+      "appearance": "Appearance",
+      "help": "Help & Support",
+      "legal": "Legal",
+      "account": "Account"
+    },
+    "backToList": "Back to list",
+    "appearance": "Appearance",
+    "appearanceDesc": "Switch between light and dark mode",
+    "personal": {
+      "desc": "Photo, name and core account details",
+      "fullName": "Full name",
+      "notSet": "Not set",
+      "changePhoto": "Change photo",
+      "save": "Save",
+      "cancel": "Cancel",
+      "saved": "Profile updated successfully",
+      "failed": "Update failed",
+      "avatarSaved": "Photo updated successfully",
+      "editProfile": "Edit profile",
+      "verification": "Account verification",
+      "verified": "Verified",
+      "notVerified": "Not verified",
+      "memberSince": "Member since",
+      "rating": "Rating",
+      "noRating": "No reviews yet",
+      "role": "Role",
+      "roles": {
+        "CUSTOMER": "Customer",
+        "OWNER": "Owner",
+        "ADMIN": "Administrator"
+      }
+    },
+    "security": {
+      "desc": "Information about your account protection",
+      "loginMethod": "Sign-in method",
+      "loginMethodDesc": "One-time code sent to your email",
+      "otp": "OTP code",
+      "accountStatus": "Account status",
+      "accountStatusDesc": "Current state of your account",
+      "active": "Active",
+      "inactive": "Inactive",
+      "verificationDesc": "Overall account verification",
+      "lastUpdated": "Last updated",
+      "lastUpdatedDesc": "Date of your last profile change"
+    },
+    "privacy": {
+      "desc": "Which of your data is visible to others",
+      "publicTitle": "Visible to everyone",
+      "publicName": "Display name",
+      "publicAvatar": "Profile photo",
+      "publicListings": "Your listings",
+      "publicRating": "Rating and reviews",
+      "privateTitle": "Stays private",
+      "privateBookings": "Rental requests",
+      "privateMessages": "Private messages",
+      "privateEmail": "Email address",
+      "privatePhone": "Phone number",
+      "hint": "We never share your data with third parties."
+    },
+    "payments": {
+      "desc": "Your payment history",
+      "empty": "No payments yet",
+      "emptyHint": "Payments will appear here after your bookings",
+      "customerOnly": "Customers only",
+      "customerOnlyHint": "This section is for customer accounts",
+      "typeLabel": "Type",
+      "statusLabel": "Status",
+      "amount": "Amount",
+      "date": "Date",
+      "types": {
+        "BOOKING": "Rental",
+        "DEPOSIT": "Deposit",
+        "DAMAGE": "Damage",
+        "LATE_FEE": "Late fee",
+        "REFUND": "Refund"
+      },
+      "statuses": {
+        "PENDING": "Pending",
+        "PAID": "Paid",
+        "FAILED": "Failed",
+        "REFUNDED": "Refunded"
+      }
+    },
+    "rental": {
+      "desc": "Quick links to manage your rentals",
+      "dashboard": "Owner dashboard",
+      "createListing": "New listing",
+      "requests": "Rental requests",
+      "messages": "Conversations"
+    },
+    "help": {
+      "desc": "Answers to common questions",
+      "q1": "How do I create a listing?",
+      "a1": "After signing in, use \"New listing\" and enter the equipment, price and dates.",
+      "q2": "How do I rent something?",
+      "a2": "Choose a listing, pick your dates and send a request. The owner will confirm it.",
+      "q3": "How does payment work?",
+      "a3": "Payment happens after the request is confirmed. Amounts appear in the Payments section."
+    },
+    "legal": {
+      "desc": "Terms and privacy policy",
+      "termsTitle": "Terms of Use",
+      "termsBody": "RentHub connects equipment owners and customers. By using the platform you agree to provide accurate information and follow the rules.",
+      "privacyTitle": "Privacy Policy",
+      "privacyBody": "We only collect the data needed to run the platform: email, name, photo and rental details. Your data is never shared with third parties."
+    },
+    "account": {
+      "desc": "Account summary and sign out",
+      "email": "Email",
+      "role": "Role",
+      "listings": "Listings",
+      "memberSince": "Member since",
+      "signOut": "Sign out"
+    }
   },
   "theme": {
     "light": "Light",
