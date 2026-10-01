@@ -15,6 +15,8 @@ import {
   Cell,
 } from 'recharts';
 import DashboardLayout, { type DashboardSection } from '../components/dashboard/DashboardLayout';
+import ListingsSection from '../components/dashboard/ListingsSection';
+import BookingsSection from '../components/dashboard/BookingsSection';
 import useAuthStore from '../store/authStore';
 import {
   dashboardApi,
@@ -390,8 +392,25 @@ export default function DashboardPage() {
     );
   };
 
+  const ownerOnlyPanel = (
+    <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
+      <AlertCircle className="w-12 h-12 mx-auto text-[#FF6B35] mb-4" />
+      <h2 className="text-lg font-bold mb-1">{t('dashboard.overview.ownerOnly')}</h2>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 max-w-md mx-auto">{t('dashboard.overview.ownerOnlyHint')}</p>
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#FF6B35] text-white text-sm font-semibold hover:bg-[#e55a2b] transition"
+      >
+        <Home className="w-4 h-4" />
+        {t('dashboard.overview.goHome')}
+      </Link>
+    </div>
+  );
+
   const renderSection = () => {
     if (active === 'dashboard') return renderOverview();
+    if (active === 'listings') return isOwnerLike ? <ListingsSection /> : ownerOnlyPanel;
+    if (active === 'bookings') return isOwnerLike ? <BookingsSection /> : ownerOnlyPanel;
     return (
       <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-10 text-center" data-testid={`section-${active}`}>
         <h2 className="text-lg font-bold mb-1">{t(`dashboard.nav.${active}`)}</h2>

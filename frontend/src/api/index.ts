@@ -262,7 +262,7 @@ export const listings = {
   create: (data: ListingCreateData) =>
     client.post<APIResponse<Listing>>('/listings', data).then(unwrap),
 
-  update: (id: number, data: Partial<ListingCreateData>) =>
+  update: (id: number, data: Partial<ListingCreateData> & { status?: string; available?: boolean }) =>
     client.patch<APIResponse<Listing>>(`/listings/${id}`, data).then(unwrap),
 
   delete: (id: number) =>
@@ -270,6 +270,9 @@ export const listings = {
 
   deleteListing: (id: number) =>
     client.delete(`/listings/${id}`),
+
+  submitForVerification: (id: number) =>
+    client.post<APIResponse<Listing>>(`/listings/${id}/submit-for-verification`).then(unwrap),
 
   toggleFavorite: (id: number) =>
     client.post<APIResponse<{ is_favorited: boolean }>>(`/listings/${id}/favorite`).then(unwrap),

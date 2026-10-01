@@ -25,7 +25,7 @@ function bucketOf(r: RentalRequest): Filter {
   return 'pending';
 }
 
-function RequestCard({
+export function RequestCard({
   req,
   type,
   onCancel,
