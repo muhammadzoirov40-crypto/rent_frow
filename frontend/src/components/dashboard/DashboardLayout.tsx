@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -15,6 +16,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Search,
+  Store,
+  Plus,
+  ListChecks,
   Sun,
   X,
 } from 'lucide-react';
@@ -168,6 +172,57 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
               </button>
             );
           })}
+
+          {!collapsed && (
+            <div className="mt-4 pt-3 border-t border-gray-200 dark:border-white/10" data-testid="rental-quick-links">
+              <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                {t('settings.nav.rental')}
+              </p>
+              <button
+                type="button"
+                title={t('settings.rental.dashboard')}
+                data-testid="ql-dashboard"
+                onClick={() => {
+                  onNavigate('dashboard');
+                  setMobileOpen(false);
+                }}
+                className="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                <Store className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <span className="truncate">{t('settings.rental.dashboard')}</span>
+              </button>
+              <Link
+                to="/create-listing"
+                title={t('settings.rental.createListing')}
+                data-testid="ql-create"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                <Plus className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <span className="truncate">{t('settings.rental.createListing')}</span>
+              </Link>
+              <Link
+                to="/rental-requests"
+                title={t('settings.rental.requests')}
+                data-testid="ql-requests"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                <ListChecks className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <span className="truncate">{t('settings.rental.requests')}</span>
+              </Link>
+              <Link
+                to="/messages"
+                title={t('settings.rental.messages')}
+                data-testid="ql-messages"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                <MessageSquare className="w-4 h-4 text-[#FF6B35] shrink-0" />
+                <span className="truncate">{t('settings.rental.messages')}</span>
+              </Link>
+            </div>
+          )}
         </nav>
 
         <div className={`border-t border-gray-200 dark:border-white/10 p-3 shrink-0 ${collapsed ? 'md:px-2' : ''}`}>

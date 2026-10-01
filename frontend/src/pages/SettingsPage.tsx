@@ -8,7 +8,6 @@ import {
   Bell,
   Lock,
   CreditCard,
-  Store,
   Globe,
   Palette,
   LifeBuoy,
@@ -48,7 +47,6 @@ const SECTIONS = [
   { id: 'notifications', icon: Bell },
   { id: 'privacy', icon: Lock },
   { id: 'payments', icon: CreditCard },
-  { id: 'rental', icon: Store },
   { id: 'language', icon: Globe },
   { id: 'appearance', icon: Palette },
   { id: 'help', icon: LifeBuoy },
@@ -490,33 +488,6 @@ export default function SettingsPage() {
     </div>
   );
 
-  const renderRental = () => {
-    const links: { to: string; label: string; icon: any }[] = [
-      { to: '/dashboard', label: t('settings.rental.dashboard'), icon: Store },
-      { to: '/create-listing', label: t('settings.rental.createListing'), icon: Edit2 },
-      { to: '/rental-requests', label: t('settings.rental.requests'), icon: Bell },
-      { to: '/messages', label: t('settings.rental.messages'), icon: ChevronRight },
-    ];
-    return (
-      <div className={CARD} data-testid="section-rental">
-        <SectionHeading icon={Store} title={t('settings.nav.rental')} desc={t('settings.rental.desc')} />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {links.map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40 transition text-sm font-medium text-gray-900 dark:text-white"
-            >
-              <l.icon className="w-4 h-4 text-[#FF6B35]" />
-              {l.label}
-              <ChevronRight className="w-4 h-4 ml-auto text-gray-400" />
-            </Link>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   const renderLanguage = () => (
     <div className={CARD} data-testid="section-language">
       <SectionHeading icon={Globe} title={t('settings.language')} desc={t('settings.languageDesc')} />
@@ -653,7 +624,6 @@ export default function SettingsPage() {
       case 'notifications': return renderNotifications();
       case 'privacy': return renderPrivacy();
       case 'payments': return renderPayments();
-      case 'rental': return renderRental();
       case 'language': return renderLanguage();
       case 'appearance': return renderAppearance();
       case 'help': return renderHelp();
