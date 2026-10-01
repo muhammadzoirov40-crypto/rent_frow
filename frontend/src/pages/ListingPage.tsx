@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { listings, reviews, rentalRequests, messages } from '../api';
@@ -28,6 +28,7 @@ import {
   Check,
 } from 'lucide-react';
 import { formatDate } from '../utils/dates';
+import { previousPath } from '../utils/navHistory';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
@@ -48,6 +49,7 @@ export default function ListingPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const { user, isAuthenticated } = useAuthStore();
 
@@ -261,7 +263,7 @@ export default function ListingPage() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-6 px-4 sm:px-6 lg:px-8 pb-24 lg:pb-6">
       <div className="max-w-7xl mx-auto">
-        <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#1A1A2E] dark:hover:text-white mb-6 transition-colors">
+        <button onClick={() => navigate(previousPath(location.pathname) || '/')} className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#1A1A2E] dark:hover:text-white mb-6 transition-colors">
           <ChevronLeft size={16} />
           {t('listing.back')}
         </button>

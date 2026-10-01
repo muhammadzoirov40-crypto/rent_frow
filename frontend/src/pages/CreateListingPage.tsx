@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listings, categories, cities, upload } from '../api';
 import { compressImage } from '../utils/compressImage';
+import { previousPath } from '../utils/navHistory';
 import CustomSelect from '../components/ui/CustomSelect';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -55,6 +56,7 @@ const initialFormData: FormData = {
 
 export default function CreateListingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const editId = Number(searchParams.get('edit')) || null;
   const queryClient = useQueryClient();
@@ -240,7 +242,7 @@ export default function CreateListingPage() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <button
-          onClick={() => (step === 0 ? navigate(-1) : setStep(step - 1))}
+          onClick={() => (step === 0 ? navigate(previousPath(location.pathname) || '/') : setStep(step - 1))}
           className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-[#1A1A2E] dark:hover:text-white mb-6 transition-colors"
         >
           <ChevronLeft size={16} />
@@ -513,7 +515,7 @@ export default function CreateListingPage() {
 
           <div className="flex justify-between mt-8 pt-6 border-t border-gray-100 dark:border-white/10">
             <button
-              onClick={() => step === 0 ? navigate(-1) : setStep(step - 1)}
+              onClick={() => step === 0 ? navigate(previousPath(location.pathname) || '/') : setStep(step - 1)}
               className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-[#1A1A2E] transition-colors"
             >
               <ChevronLeft size={16} />

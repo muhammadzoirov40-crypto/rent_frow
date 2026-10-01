@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -21,9 +21,11 @@ import {
   ListChecks,
   Sun,
   X,
+  ArrowLeft,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import useAuthStore from '../../store/authStore';
+import { previousPath } from '../../utils/navHistory';
 import Logo from '../Logo';
 
 export type DashboardSection =
@@ -53,9 +55,16 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
   const user = useAuthStore((s) => s.user);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [query, setQuery] = useState('');
+
+  const goBack = () => {
+    const prev = previousPath(location.pathname);
+    navigate(prev && prev !== location.pathname && prev !== '/dashboard' ? prev : '/');
+  };
 
   const displayName = user?.display_name || user?.email || '—';
   const initial = (displayName || 'R').trim().charAt(0).toUpperCase();
@@ -249,6 +258,16 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
         <header className="sticky top-0 z-30 h-16 flex items-center gap-3 px-4 sm:px-6 bg-white/80 dark:bg-[#121418]/80 backdrop-blur border-b border-gray-200 dark:border-white/10 transition-colors duration-300">
           <button
             type="button"
+            onClick={goBack}
+            aria-label={t('common.back')}
+            title={t('common.back')}
+            data-testid="dashboard-back"
+            className="p-2 -ml-1 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
             onClick={() => {
               if (window.matchMedia('(min-width: 768px)').matches) {
                 setCollapsed((c) => !c);
@@ -257,7 +276,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
               }
             }}
             aria-label={t('dashboard.menu')}
-            className="p-2 -ml-1 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition"
+            className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition"
           >
             <Menu className="w-5 h-5" />
           </button>

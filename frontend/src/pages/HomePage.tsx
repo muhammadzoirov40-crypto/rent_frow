@@ -132,7 +132,6 @@ export default function HomePage() {
             </span>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#1A1A2E] dark:text-white leading-[1.08]">
               <span className="block">{t('home.heroTitle')}</span>
-              <span className="block text-[#FF6B35]">{t('home.heroLine2')}</span>
             </h1>
             <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
               {t('home.heroSubtitle')}
