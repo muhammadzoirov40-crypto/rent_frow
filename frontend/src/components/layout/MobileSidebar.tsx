@@ -149,6 +149,16 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               </Link>
             </div>
           )}
+          {isAuthenticated && (user?.role === 'OWNER' || user?.role === 'ADMIN') && (
+            <Link
+              to="/dashboard"
+              onClick={onClose}
+              className="mt-2 flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-orange-50 dark:bg-[#FF6B35]/10 border border-[#FF6B35]/25 text-[#FF6B35] text-sm font-semibold hover:bg-orange-100 dark:hover:bg-[#FF6B35]/15 transition"
+            >
+              <LayoutDashboard size={18} />
+              <span>{t('nav.dashboard')}</span>
+            </Link>
+          )}
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">

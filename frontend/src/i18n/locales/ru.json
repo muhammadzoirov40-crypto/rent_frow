@@ -334,7 +334,8 @@
     "updated": "Объявление обновлено",
     "failedToPublish": "Не удалось опубликовать",
     "maxPhotos": "Максимум 8 фотографий",
-    "uploadError": "Ошибка загрузки изображения"
+    "uploadError": "Ошибка загрузки изображения",
+    "uploadFormatHint": "PNG, JPG, WebP · каждый файл до 10MB"
   },
   "favorites": {
     "title": "Избранное",

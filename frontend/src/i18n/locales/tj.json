@@ -335,7 +335,8 @@
     "updated": "Эълон навсозӣ шуд",
     "failedToPublish": "Нашр кардан ноком шуд",
     "maxPhotos": "Ҳадди аксар 8 акс",
-    "uploadError": "Хатогӣ дар боргирии акс"
+    "uploadError": "Хатогӣ дар боргирии акс",
+    "uploadFormatHint": "PNG, JPG, WebP · ҳар як акс то 10MB"
   },
   "favorites": {
     "title": "Дӯстдоштаҳо",

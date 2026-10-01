@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { listings, categories, cities, upload } from '../api';
+import { compressImage } from '../utils/compressImage';
 import CustomSelect from '../components/ui/CustomSelect';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ import {
   DollarSign,
   Gavel,
   Check,
+  Loader2,
 } from 'lucide-react';
 
 interface FormData {
@@ -63,6 +65,8 @@ export default function CreateListingPage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormData>(initialFormData);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null);
+  const [previews, setPreviews] = useState<{ key: string; url: string }[]>([]);
   const [dragOver, setDragOver] = useState(false);
 
   const STEPS = [
@@ -167,25 +171,44 @@ export default function CreateListingPage() {
   const updateForm = (patch: Partial<FormData>) => setForm((prev) => ({ ...prev, ...patch }));
 
   const handleImageUpload = async (files: FileList | File[]) => {
-    const remaining = 8 - form.image_urls.length;
+    const remaining = 8 - form.image_urls.length - previews.length;
     if (remaining <= 0) {
       toast.error(t('createListing.maxPhotos'));
       return;
     }
     const toUpload = Array.from(files).slice(0, remaining);
+    const locals = toUpload.map((f) => ({
+      key: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      url: URL.createObjectURL(f),
+    }));
+    setPreviews((p) => [...p, ...locals]);
     setUploadingImages(true);
+    setUploadProgress({ done: 0, total: toUpload.length });
     try {
+      const prepared = await Promise.all(toUpload.map((f) => compressImage(f)));
+      let done = 0;
       const urls = await Promise.all(
-        toUpload.map(async (file) => {
+        prepared.map(async (file) => {
           const result = await upload.uploadImage(file);
+          done += 1;
+          setUploadProgress({ done, total: prepared.length });
           return result.image_url;
-        })
+        }),
       );
+      setPreviews((p) => {
+        p.filter((x) => locals.some((l) => l.key === x.key)).forEach((x) => URL.revokeObjectURL(x.url));
+        return p.filter((x) => !locals.some((l) => l.key === x.key));
+      });
       updateForm({ image_urls: [...form.image_urls, ...urls] });
     } catch {
+      setPreviews((p) => {
+        p.filter((x) => locals.some((l) => l.key === x.key)).forEach((x) => URL.revokeObjectURL(x.url));
+        return p.filter((x) => !locals.some((l) => l.key === x.key));
+      });
       toast.error(t('createListing.uploadError'));
     } finally {
       setUploadingImages(false);
+      setUploadProgress(null);
     }
   };
 
@@ -319,7 +342,7 @@ export default function CreateListingPage() {
             <div>
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <Camera size={20} className="text-[#FF6B35]" />
-                {t('createListing.photos', { count: form.image_urls.length })}
+                {t('createListing.photos', { count: form.image_urls.length + previews.length })}
               </h2>
 
               <div
@@ -341,12 +364,14 @@ export default function CreateListingPage() {
                 />
                 <Upload size={32} className={`mx-auto mb-3 ${dragOver ? 'text-[#FF6B35]' : 'text-gray-400'}`} />
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  {uploadingImages ? t('createListing.uploading') : t('createListing.uploadHint')}
+                  {uploadingImages
+                    ? `${t('createListing.uploading')}${uploadProgress ? ` ${uploadProgress.done}/${uploadProgress.total}` : ''}`
+                    : t('createListing.uploadHint')}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">{t('createListing.uploadFormatHint')}</p>
               </div>
 
-              {form.image_urls.length > 0 && (
+              {(form.image_urls.length > 0 || previews.length > 0) && (
                 <div className="grid grid-cols-4 gap-3 mt-4">
                   {form.image_urls.map((img, i) => (
                     <div key={i} className="relative group aspect-square rounded-xl overflow-hidden border border-gray-200 dark:border-white/10">
@@ -364,6 +389,14 @@ export default function CreateListingPage() {
                           {t('createListing.mainPhoto')}
                         </div>
                       )}
+                    </div>
+                  ))}
+                  {previews.map((pv) => (
+                    <div key={pv.key} className="relative aspect-square rounded-xl overflow-hidden border border-[#FF6B35]/40 bg-gray-100 dark:bg-white/5">
+                      <img src={pv.url} alt="" className="w-full h-full object-cover opacity-70" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <Loader2 size={22} className="text-white animate-spin" />
+                      </div>
                     </div>
                   ))}
                 </div>

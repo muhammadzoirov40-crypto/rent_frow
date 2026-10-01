@@ -335,7 +335,8 @@
     "updated": "Listing updated",
     "failedToPublish": "Failed to publish",
     "maxPhotos": "Maximum 8 photos",
-    "uploadError": "Image upload error"
+    "uploadError": "Image upload error",
+    "uploadFormatHint": "PNG, JPG, WebP · up to 10MB per file"
   },
   "favorites": {
     "title": "Favorites",
