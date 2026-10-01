@@ -836,7 +836,15 @@
       "tasks": "Вазифаҳо",
       "projects": "Лоиҳаҳо",
       "applications": "Дархостҳо",
-      "userManagement": "Идоракунии корбарон"
+      "userManagement": "Идоракунии корбарон",
+      "listings": "Эълонҳои ман",
+      "bookings": "Бронкунӣҳо",
+      "calendar": "Тақвим",
+      "messages": "Пайвастагиҳо",
+      "reviews": "Шарҳҳо",
+      "earnings": "Даромад",
+      "profile": "Профил",
+      "settings": "Танзимот"
     },
     "stats": {
       "revenue": "Даромад",
@@ -857,7 +865,37 @@
       "pending": "Дар интизор",
       "closed": "Пӯшида"
     },
-    "projectProgress": "Пешрафти лоиҳаҳо"
+    "projectProgress": "Пешрафти лоиҳаҳо",
+    "periods": {
+      "7days": "7 рӯз",
+      "30days": "30 рӯз",
+      "thismonth": "Ин моҳ",
+      "6months": "6 моҳ",
+      "lastyear": "Соли гузашта"
+    },
+    "overview": {
+      "totalRevenue": "Даромади умумӣ",
+      "totalBookings": "Ҳамаи бронкунӣҳо",
+      "activeRentals": "Иҷораҳои фаъол",
+      "occupancy": "Сатҳи истифода",
+      "vsPrev": "нисбати давраи пеш",
+      "revenueChart": "Динамикаи даромад",
+      "bookingPerformance": "Ҳолатҳои бронкунӣ",
+      "recentBookings": "Бронкунӣҳои охирин",
+      "viewAll": "Ҳама",
+      "empty": "Маълумот нест",
+      "error": "Маълумоти дашборд бор нашуд",
+      "ownerOnly": "Танҳо барои соҳибон",
+      "ownerOnlyHint": "Панель барои соҳибон ва админҳо дастрас аст.",
+      "goHome": "Ба саҳифаи асосӣ",
+      "bookingId": "ID",
+      "customer": "Муштарӣ",
+      "equipment": "Мол",
+      "dates": "Санаҳо",
+      "amount": "Маблағ",
+      "status": "Ҳолат",
+      "noBookings": "Бронкунӣ ҳанӯз нест"
+    }
   },
   "booking": {
     "start": "Санаи оғоз",

@@ -835,7 +835,15 @@
       "tasks": "Задачи",
       "projects": "Проекты",
       "applications": "Заявки",
-      "userManagement": "Пользователи"
+      "userManagement": "Пользователи",
+      "listings": "Мои объявления",
+      "bookings": "Бронирования",
+      "calendar": "Календарь",
+      "messages": "Сообщения",
+      "reviews": "Отзывы",
+      "earnings": "Доход",
+      "profile": "Профиль",
+      "settings": "Настройки"
     },
     "stats": {
       "revenue": "Доход",
@@ -856,7 +864,37 @@
       "pending": "Ожидает",
       "closed": "Закрыт"
     },
-    "projectProgress": "Ход проектов"
+    "projectProgress": "Ход проектов",
+    "periods": {
+      "7days": "7 дней",
+      "30days": "30 дней",
+      "thismonth": "Этот месяц",
+      "6months": "6 месяцев",
+      "lastyear": "Прошлый год"
+    },
+    "overview": {
+      "totalRevenue": "Общий доход",
+      "totalBookings": "Всего бронирований",
+      "activeRentals": "Активные аренды",
+      "occupancy": "Загрузка",
+      "vsPrev": "к прошлому периоду",
+      "revenueChart": "Динамика дохода",
+      "bookingPerformance": "Статусы бронирований",
+      "recentBookings": "Последние бронирования",
+      "viewAll": "Все",
+      "empty": "Нет данных",
+      "error": "Не удалось загрузить данные дашборда",
+      "ownerOnly": "Доступ только для владельцев",
+      "ownerOnlyHint": "Панель доступна владельцам и администраторам.",
+      "goHome": "На главную",
+      "bookingId": "ID",
+      "customer": "Клиент",
+      "equipment": "Объект",
+      "dates": "Даты",
+      "amount": "Сумма",
+      "status": "Статус",
+      "noBookings": "Бронирований пока нет"
+    }
   },
   "booking": {
     "start": "Дата начала",

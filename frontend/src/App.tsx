@@ -101,10 +101,14 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        {/* Standalone SaaS dashboard demo — full-screen, outside site Layout */}
+        {/* Owner dashboard — full-screen, outside site Layout */}
         <Route
           path="/dashboard"
-          element={<SuspenseWrapper><DashboardPage /></SuspenseWrapper>}
+          element={
+            <ProtectedRoute>
+              <SuspenseWrapper><DashboardPage /></SuspenseWrapper>
+            </ProtectedRoute>
+          }
         />
         <Route element={<SiteLayout />}>
           <Route path="/" element={<HomePage />} />

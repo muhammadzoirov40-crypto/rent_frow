@@ -836,7 +836,15 @@
       "tasks": "Tasks",
       "projects": "Projects",
       "applications": "Applications",
-      "userManagement": "User Management"
+      "userManagement": "User Management",
+      "listings": "My Listings",
+      "bookings": "Bookings",
+      "calendar": "Calendar",
+      "messages": "Messages",
+      "reviews": "Reviews",
+      "earnings": "Earnings",
+      "profile": "Profile",
+      "settings": "Settings"
     },
     "stats": {
       "revenue": "Revenue",
@@ -857,7 +865,37 @@
       "pending": "Pending",
       "closed": "Closed"
     },
-    "projectProgress": "Project progress"
+    "projectProgress": "Project progress",
+    "periods": {
+      "7days": "7 days",
+      "30days": "30 days",
+      "thismonth": "This month",
+      "6months": "6 months",
+      "lastyear": "Last year"
+    },
+    "overview": {
+      "totalRevenue": "Total revenue",
+      "totalBookings": "Total bookings",
+      "activeRentals": "Active rentals",
+      "occupancy": "Occupancy",
+      "vsPrev": "vs previous period",
+      "revenueChart": "Revenue dynamics",
+      "bookingPerformance": "Booking statuses",
+      "recentBookings": "Recent bookings",
+      "viewAll": "All",
+      "empty": "No data",
+      "error": "Failed to load dashboard data",
+      "ownerOnly": "Owners only",
+      "ownerOnlyHint": "This panel is available to owners and administrators.",
+      "goHome": "Go home",
+      "bookingId": "ID",
+      "customer": "Customer",
+      "equipment": "Listing",
+      "dates": "Dates",
+      "amount": "Amount",
+      "status": "Status",
+      "noBookings": "No bookings yet"
+    }
   },
   "booking": {
     "start": "Start date",

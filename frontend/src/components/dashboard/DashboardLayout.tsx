@@ -1,54 +1,70 @@
 import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  AppWindow,
-  CheckSquare,
-  FolderKanban,
-  Headset,
   LayoutDashboard,
-  ListChecks,
+  LayoutGrid,
+  CalendarCheck,
+  Calendar,
+  MessageSquare,
+  Star,
+  Wallet,
+  User,
+  Settings,
   Menu,
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  Plus,
   Search,
-  Settings,
   Sun,
-  Ticket,
-  UserCog,
-  Users,
   X,
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
+import useAuthStore from '../../store/authStore';
+
+export type DashboardSection =
+  | 'dashboard'
+  | 'listings'
+  | 'bookings'
+  | 'calendar'
+  | 'messages'
+  | 'reviews'
+  | 'earnings'
+  | 'profile'
+  | 'settings';
 
 interface NavItem {
-  key: string;
+  key: DashboardSection;
   label: string;
   icon: ReactNode;
 }
 
 interface DashboardLayoutProps {
   children: ReactNode;
+  active: DashboardSection;
+  onNavigate: (section: DashboardSection) => void;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({ children, active, onNavigate }: DashboardLayoutProps) {
   const { t } = useTranslation();
   const { theme, toggleTheme } = useTheme();
+  const user = useAuthStore((s) => s.user);
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [active, setActive] = useState('dashboard');
   const [query, setQuery] = useState('');
+
+  const displayName = user?.display_name || user?.email || '—';
+  const initial = (displayName || 'R').trim().charAt(0).toUpperCase();
 
   const navItems: NavItem[] = [
     { key: 'dashboard', label: t('dashboard.nav.dashboard'), icon: <LayoutDashboard className="w-5 h-5" /> },
-    { key: 'support', label: t('dashboard.nav.support'), icon: <Headset className="w-5 h-5" /> },
-    { key: 'customers', label: t('dashboard.nav.customers'), icon: <Users className="w-5 h-5" /> },
-    { key: 'tickets', label: t('dashboard.nav.tickets'), icon: <Ticket className="w-5 h-5" /> },
-    { key: 'tasks', label: t('dashboard.nav.tasks'), icon: <CheckSquare className="w-5 h-5" /> },
-    { key: 'projects', label: t('dashboard.nav.projects'), icon: <FolderKanban className="w-5 h-5" /> },
-    { key: 'applications', label: t('dashboard.nav.applications'), icon: <AppWindow className="w-5 h-5" /> },
-    { key: 'userManagement', label: t('dashboard.nav.userManagement'), icon: <UserCog className="w-5 h-5" /> },
+    { key: 'listings', label: t('dashboard.nav.listings'), icon: <LayoutGrid className="w-5 h-5" /> },
+    { key: 'bookings', label: t('dashboard.nav.bookings'), icon: <CalendarCheck className="w-5 h-5" /> },
+    { key: 'calendar', label: t('dashboard.nav.calendar'), icon: <Calendar className="w-5 h-5" /> },
+    { key: 'messages', label: t('dashboard.nav.messages'), icon: <MessageSquare className="w-5 h-5" /> },
+    { key: 'reviews', label: t('dashboard.nav.reviews'), icon: <Star className="w-5 h-5" /> },
+    { key: 'earnings', label: t('dashboard.nav.earnings'), icon: <Wallet className="w-5 h-5" /> },
+    { key: 'profile', label: t('dashboard.nav.profile'), icon: <User className="w-5 h-5" /> },
+    { key: 'settings', label: t('dashboard.nav.settings'), icon: <Settings className="w-5 h-5" /> },
   ];
 
   const visibleItems = navItems.filter((item) =>
@@ -92,14 +108,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <div className={`px-4 pt-4 pb-2 shrink-0 ${collapsed ? 'md:px-2' : ''}`}>
           <div className={`flex items-center gap-3 ${collapsed ? 'md:justify-center' : ''}`}>
             <span className="relative shrink-0">
-              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center">
-                A
+              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center overflow-hidden">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  initial
+                )}
               </span>
               <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#1a1d24]" />
             </span>
             <span className={`min-w-0 transition-opacity duration-200 ${collapsed ? 'md:hidden' : ''}`}>
-              <span className="block text-sm font-semibold truncate">Admin</span>
-              <span className="block text-xs text-gray-400 dark:text-gray-500 truncate">admin@renthub.tj</span>
+              <span className="block text-sm font-semibold truncate">{displayName}</span>
+              <span className="block text-xs text-gray-400 dark:text-gray-500 truncate">{user?.email || ''}</span>
             </span>
           </div>
 
@@ -128,8 +148,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 key={item.key}
                 type="button"
                 title={item.label}
+                data-nav={item.key}
                 onClick={() => {
-                  setActive(item.key);
+                  onNavigate(item.key);
                   setMobileOpen(false);
                 }}
                 className={`relative w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition
@@ -162,25 +183,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
             <button
               type="button"
-              title={t('dashboard.settings')}
-              aria-label={t('dashboard.settings')}
-              className="flex-1 md:flex-none p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/10 transition"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              title={t('dashboard.add')}
-              aria-label={t('dashboard.add')}
-              className="flex-1 md:flex-none p-2.5 rounded-xl bg-[#FF6B35] text-white hover:bg-[#e55a2b] shadow-lg shadow-orange-500/25 transition"
-            >
-              <Plus className="w-5 h-5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setCollapsed((c) => !c)}
-              title={collapsed ? t('dashboard.expand') : t('dashboard.collapse')}
+              title={t('dashboard.collapse')}
               aria-label={collapsed ? t('dashboard.expand') : t('dashboard.collapse')}
+              onClick={() => setCollapsed((c) => !c)}
               className="flex-1 md:flex-none p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[#FF6B35] hover:bg-gray-100 dark:hover:bg-white/10 transition hidden md:block"
             >
               {collapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
@@ -199,21 +204,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           >
             <Menu className="w-5 h-5" />
           </button>
-          <button
-            type="button"
-            onClick={() => setCollapsed((c) => !c)}
-            aria-label={collapsed ? t('dashboard.expand') : t('dashboard.collapse')}
-            title={collapsed ? t('dashboard.expand') : t('dashboard.collapse')}
-            className="hidden md:flex p-2 -ml-1 rounded-xl text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition"
-          >
-            {collapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
-          </button>
 
           <div className="min-w-0">
-            <h1 className="text-base sm:text-lg font-bold truncate">
-              {t(`dashboard.nav.${active}`)}
-            </h1>
-            <p className="hidden sm:block text-xs text-gray-400 dark:text-gray-500">{t('dashboard.greeting')}, Admin</p>
+            <h1 className="text-base sm:text-lg font-bold truncate">{t(`dashboard.nav.${active}`)}</h1>
+            <p className="hidden sm:block text-xs text-gray-400 dark:text-gray-500 truncate">
+              {t('dashboard.greeting')}, {displayName}
+            </p>
           </div>
 
           <div className="ml-auto flex items-center gap-2">
@@ -221,12 +217,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               type="button"
               onClick={toggleTheme}
               aria-label={theme === 'dark' ? t('dashboard.themeLight') : t('dashboard.themeDark')}
-              className="p-2.5 rounded-xl text-gray-500 hover:text-[#FF6B35] hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/10 transition"
+              className="p-2.5 rounded-xl text-gray-500 hover:text-[#FF6B35] dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 transition"
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
-            <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center">
-              A
+            <span className="w-9 h-9 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#FF6B35] text-white text-sm font-semibold flex items-center justify-center overflow-hidden">
+              {user?.avatar_url ? (
+                <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+              ) : (
+                initial
+              )}
             </span>
           </div>
         </header>
