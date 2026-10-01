@@ -858,5 +858,33 @@
       "closed": "Closed"
     },
     "projectProgress": "Project progress"
+  },
+  "booking": {
+    "start": "Start date",
+    "end": "End date",
+    "duration": "Duration",
+    "deposit": "Deposit (refundable)",
+    "total": "Total",
+    "confirmTitle": "Confirm booking?",
+    "confirmText": "Your booking request will be sent to the owner.",
+    "confirm": "Confirm booking",
+    "successTitle": "Booking request sent",
+    "successText": "Your booking request has been sent to the owner.",
+    "viewBooking": "View booking",
+    "messageOwner": "Message owner",
+    "upcoming": "Upcoming",
+    "pending": "Pending",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "confirmed": "Confirmed",
+    "rejected": "Rejected",
+    "view": "View",
+    "empty": "No bookings yet",
+    "emptyHint": "Pick a listing and dates to make a booking.",
+    "cancelConfirmTitle": "Cancel booking?",
+    "cancelConfirmText": "This action cannot be undone.",
+    "yes": "Yes, cancel",
+    "messageRenter": "Message renter",
+    "viewListing": "View listing"
   }
 }

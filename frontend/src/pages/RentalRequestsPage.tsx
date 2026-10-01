@@ -1,18 +1,29 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Calendar, Clock, Check, X, Loader2, ListChecks,
-  ChevronRight, MessageSquare, Package, User, AlertCircle
+  ChevronRight, MessageSquare, Package, User, AlertCircle, Eye
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { rentalRequests } from '../api';
+import { rentalRequests, listings, messages } from '../api';
 import type { RentalRequest } from '../api';
 import BackButton from '../components/ui/BackButton';
 import { formatDate } from '../utils/dates';
 
 type Tab = 'my-requests' | 'owner-requests';
+type Filter = 'upcoming' | 'pending' | 'completed' | 'cancelled';
+
+function bucketOf(r: RentalRequest): Filter {
+  const s = (r.status || 'PENDING').toUpperCase();
+  const today = new Date();
+  const todayISO = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  if (s === 'COMPLETED' || (s === 'ACCEPTED' && r.end_date < todayISO)) return 'completed';
+  if (s === 'CANCELLED' || s === 'REJECTED') return 'cancelled';
+  if (s === 'ACCEPTED') return 'upcoming';
+  return 'pending';
+}
 
 function RequestCard({
   req,
@@ -20,6 +31,7 @@ function RequestCard({
   onCancel,
   onAccept,
   onReject,
+  onMessage,
   isMutating,
   t,
 }: {
@@ -28,26 +40,46 @@ function RequestCard({
   onCancel?: (id: number) => void;
   onAccept?: (id: number) => void;
   onReject?: (id: number) => void;
+  onMessage?: (req: RentalRequest) => void;
   isMutating?: boolean;
   t: (key: string) => string;
 }) {
+  const { data: listingInfo } = useQuery({
+    queryKey: ['listing-mini', req.listing_id],
+    queryFn: () => listings.getOne(req.listing_id),
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+
+  const image = listingInfo?.images?.[0]?.image_url ?? null;
+  const dayPrice = listingInfo ? `${listingInfo.price.toLocaleString('ru-RU')} ${t('common.somoni')} / ${t('listing.' + listingInfo.price_unit)}` : null;
+
   const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string }> = {
-    pending: { label: t('admin.pending'), bg: 'bg-amber-50 dark:bg-amber-500/10', text: 'text-amber-700 dark:text-amber-400', dot: 'bg-amber-400' },
-    accepted: { label: t('admin.accepted'), bg: 'bg-emerald-50 dark:bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-400' },
-    rejected: { label: t('admin.rejected'), bg: 'bg-red-50 dark:bg-red-500/10', text: 'text-red-700 dark:text-red-400', dot: 'bg-red-400' },
-    cancelled: { label: t('admin.cancelled'), bg: 'bg-gray-100 dark:bg-white/5', text: 'text-gray-600 dark:text-gray-400', dot: 'bg-gray-400' },
-    completed: { label: t('admin.completed'), bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', dot: 'bg-blue-400' },
+    PENDING: { label: t('booking.pending'), bg: 'bg-amber-50 dark:bg-amber-500/10', text: 'text-amber-700 dark:text-amber-400', dot: 'bg-amber-400' },
+    ACCEPTED: { label: t('booking.confirmed'), bg: 'bg-emerald-50 dark:bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-400' },
+    REJECTED: { label: t('booking.rejected'), bg: 'bg-red-50 dark:bg-red-500/10', text: 'text-red-700 dark:text-red-400', dot: 'bg-red-400' },
+    CANCELLED: { label: t('booking.cancelled'), bg: 'bg-gray-100 dark:bg-white/5', text: 'text-gray-600 dark:text-gray-400', dot: 'bg-gray-400' },
+    COMPLETED: { label: t('booking.completed'), bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', dot: 'bg-blue-400' },
   };
 
-  const statusKey = (req.status || 'pending').toLowerCase();
-  const status = statusConfig[statusKey] || statusConfig.pending;
+  const statusKey = (req.status || 'PENDING').toUpperCase();
+  const status = statusConfig[statusKey] || statusConfig.PENDING;
+  const canManage = statusKey === 'PENDING' || statusKey === 'ACCEPTED';
 
   return (
-    <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-5 sm:p-6 shadow-sm hover:shadow-md transition">
+    <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:shadow-md transition">
       <div className="flex items-start gap-4">
-        <div className="w-14 h-14 rounded-xl bg-gray-100 dark:bg-white/5 overflow-hidden flex-shrink-0 flex items-center justify-center">
-          <Package className="w-6 h-6 text-gray-300 dark:text-gray-600" />
-        </div>
+        <Link
+          to={`/listing/${req.listing_id}`}
+          className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-100 dark:bg-white/5 overflow-hidden flex-shrink-0 flex items-center justify-center"
+          aria-label={t('booking.view')}
+        >
+          {image ? (
+            <img src={image} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <Package className="w-6 h-6 text-gray-300 dark:text-gray-600" />
+          )}
+        </Link>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-3">
@@ -58,18 +90,10 @@ function RequestCard({
               >
                 {req.listing_title || `#${req.listing_id}`}
               </Link>
-              {type === 'owner' && req.renter_name && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5" />
-                  {req.renter_name}
-                </p>
-              )}
-              {type === 'renter' && req.owner_name && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5">
-                  <User className="w-3.5 h-3.5" />
-                  {t('rentalRequests.owner')} {req.owner_name}
-                </p>
-              )}
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5 truncate">
+                <User className="w-3.5 h-3.5 shrink-0" />
+                {type === 'owner' ? req.renter_name : req.owner_name}
+              </p>
             </div>
             <span className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold flex-shrink-0 ${status.bg} ${status.text}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
@@ -84,13 +108,18 @@ function RequestCard({
             </span>
             {req.total_price > 0 && (
               <span className="font-bold text-[#FF6B35]">
-                {req.total_price.toLocaleString('ru-RU')} сом / {req.total_days} {t('common.days')}
+                {req.total_price.toLocaleString('ru-RU')} {t('common.somoni')}
+                <span className="font-normal text-gray-400 dark:text-gray-500">
+                  {' '}· {req.total_days} {t('listing.days')}
+                </span>
               </span>
             )}
-            <span className="flex items-center gap-1.5 text-gray-400">
-              <Clock className="w-3.5 h-3.5" />
-              {formatDate(req.created_at)}
-            </span>
+            {dayPrice && (
+              <span className="flex items-center gap-1.5 text-gray-400 dark:text-gray-500">
+                <Clock className="w-3.5 h-3.5" />
+                {dayPrice}
+              </span>
+            )}
           </div>
 
           {req.message && (
@@ -100,40 +129,68 @@ function RequestCard({
             </div>
           )}
 
-          {statusKey === 'pending' && (
-            <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
-              {type === 'renter' && onCancel && (
+          <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
+            <Link
+              to={`/listing/${req.listing_id}`}
+              className="flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 px-4 py-2 rounded-xl transition"
+            >
+              <Eye className="w-4 h-4" />
+              {t('booking.view')}
+            </Link>
+
+            {type === 'renter' && onMessage && (
+              <button
+                onClick={() => onMessage(req)}
+                disabled={isMutating}
+                className="flex items-center gap-1.5 text-sm font-medium text-[#FF6B35] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
+              >
+                <MessageSquare className="w-4 h-4" />
+                {t('booking.messageOwner')}
+              </button>
+            )}
+            {type === 'owner' && onMessage && (
+              <button
+                onClick={() => onMessage(req)}
+                disabled={isMutating}
+                className="flex items-center gap-1.5 text-sm font-medium text-[#FF6B35] bg-[#FF6B35]/10 hover:bg-[#FF6B35]/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
+              >
+                <MessageSquare className="w-4 h-4" />
+                {t('booking.messageRenter')}
+              </button>
+            )}
+
+            {type === 'renter' && onCancel && canManage && (
+              <button
+                onClick={() => onCancel(req.id)}
+                disabled={isMutating}
+                className="flex items-center gap-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
+              >
+                <X className="w-4 h-4" />
+                {t('rentalRequests.cancelRequest')}
+              </button>
+            )}
+
+            {type === 'owner' && statusKey === 'PENDING' && onAccept && onReject && (
+              <>
                 <button
-                  onClick={() => onCancel(req.id)}
+                  onClick={() => onAccept(req.id)}
+                  disabled={isMutating}
+                  className="flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-500/20 disabled:opacity-50"
+                >
+                  <Check className="w-4 h-4" />
+                  {t('rentalRequests.accept')}
+                </button>
+                <button
+                  onClick={() => onReject(req.id)}
                   disabled={isMutating}
                   className="flex items-center gap-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
                 >
                   <X className="w-4 h-4" />
-                  {t('rentalRequests.cancelRequest')}
+                  {t('rentalRequests.reject')}
                 </button>
-              )}
-              {type === 'owner' && onAccept && onReject && (
-                <>
-                  <button
-                    onClick={() => onAccept(req.id)}
-                    disabled={isMutating}
-                    className="flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-500/20 disabled:opacity-50"
-                  >
-                    <Check className="w-4 h-4" />
-                    {t('rentalRequests.accept')}
-                  </button>
-                  <button
-                    onClick={() => onReject(req.id)}
-                    disabled={isMutating}
-                    className="flex items-center gap-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
-                  >
-                    <X className="w-4 h-4" />
-                    {t('rentalRequests.reject')}
-                  </button>
-                </>
-              )}
-            </div>
-          )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -142,8 +199,12 @@ function RequestCard({
 
 export default function RentalRequestsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState<Tab>('my-requests');
+  const [filter, setFilter] = useState<Filter>('upcoming');
+  const [cancelTarget, setCancelTarget] = useState<number | null>(null);
+  const [rejectTarget, setRejectTarget] = useState<number | null>(null);
 
   const { data: myRequests = [], isLoading: myLoading } = useQuery({
     queryKey: ['my-requests'],
@@ -155,10 +216,16 @@ export default function RentalRequestsPage() {
     queryFn: () => rentalRequests.getOwnerRequests().then((r) => r.items),
   });
 
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: ['my-requests'] });
+    queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
+  };
+
   const cancelMutation = useMutation({
     mutationFn: rentalRequests.cancel,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
+      invalidate();
+      setCancelTarget(null);
       toast.success(t('rentalRequests.requestCancelled'));
     },
     onError: () => toast.error(t('rentalRequests.failedCancel')),
@@ -167,7 +234,7 @@ export default function RentalRequestsPage() {
   const acceptMutation = useMutation({
     mutationFn: rentalRequests.accept,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
+      invalidate();
       toast.success(t('rentalRequests.requestAccepted'));
     },
     onError: () => toast.error(t('rentalRequests.failedAccept')),
@@ -176,15 +243,41 @@ export default function RentalRequestsPage() {
   const rejectMutation = useMutation({
     mutationFn: rentalRequests.reject,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
+      invalidate();
+      setRejectTarget(null);
       toast.success(t('rentalRequests.requestRejected'));
     },
     onError: () => toast.error(t('rentalRequests.failedReject')),
   });
 
+  const messageParty = async (req: RentalRequest, partyId: number) => {
+    try {
+      const conv = await messages.createConversation({
+        user_id: partyId,
+        listing_id: req.listing_id,
+      });
+      navigate(`/messages?conversation=${conv.id}`);
+    } catch {
+      toast.error(t('listing.failedToCreate'));
+    }
+  };
+
+  const counts: Record<Filter, number> = {
+    upcoming: 0, pending: 0, completed: 0, cancelled: 0,
+  };
+  myRequests.forEach((r) => { counts[bucketOf(r)] += 1; });
+  const filteredMine = myRequests.filter((r) => bucketOf(r) === filter);
+
   const isLoading = activeTab === 'my-requests' ? myLoading : ownerLoading;
-  const requests = activeTab === 'my-requests' ? myRequests : ownerRequests;
+  const requests = activeTab === 'my-requests' ? filteredMine : ownerRequests;
   const isMutating = cancelMutation.isPending || acceptMutation.isPending || rejectMutation.isPending;
+
+  const filters: { key: Filter; label: string }[] = [
+    { key: 'upcoming', label: t('booking.upcoming') },
+    { key: 'pending', label: t('booking.pending') },
+    { key: 'completed', label: t('booking.completed') },
+    { key: 'cancelled', label: t('booking.cancelled') },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
@@ -195,7 +288,7 @@ export default function RentalRequestsPage() {
           <p className="text-gray-500 dark:text-gray-400 mt-1">{t('rentalRequests.subtitle')}</p>
         </div>
 
-        <div className="flex flex-wrap gap-1 bg-white dark:bg-[#1A1A2E] rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/10 mb-6">
+        <div className="flex flex-wrap gap-1 bg-white dark:bg-[#1A1A2E] rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/10 mb-4">
           <button
             onClick={() => setActiveTab('my-requests')}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition ${
@@ -234,6 +327,25 @@ export default function RentalRequestsPage() {
           </button>
         </div>
 
+        {activeTab === 'my-requests' && (
+          <div className="flex flex-wrap gap-2 mb-6" data-testid="booking-filters">
+            {filters.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition border ${
+                  filter === f.key
+                    ? 'bg-[#FF6B35] text-white border-[#FF6B35] shadow-sm shadow-[#FF6B35]/25'
+                    : 'bg-white dark:bg-[#1A1A2E] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-[#FF6B35]/40'
+                }`}
+              >
+                {f.label}
+                <span className="ml-1.5 text-xs opacity-75">{counts[f.key]}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin text-[#FF6B35] mb-3" />
@@ -243,11 +355,11 @@ export default function RentalRequestsPage() {
           <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-16 text-center">
             <AlertCircle className="w-14 h-14 text-gray-200 dark:text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
-              {activeTab === 'my-requests' ? t('rentalRequests.emptyMy') : t('rentalRequests.emptyOwner')}
+              {activeTab === 'my-requests' ? t('booking.empty') : t('rentalRequests.emptyOwner')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400 text-sm max-w-sm mx-auto">
               {activeTab === 'my-requests'
-                ? t('rentalRequests.emptyMyHint')
+                ? t('booking.emptyHint')
                 : t('rentalRequests.emptyOwnerHint')}
             </p>
           </div>
@@ -258,9 +370,12 @@ export default function RentalRequestsPage() {
                 key={req.id}
                 req={req}
                 type={activeTab === 'my-requests' ? 'renter' : 'owner'}
-                onCancel={(id) => cancelMutation.mutate(id)}
+                onCancel={(id) => setCancelTarget(id)}
                 onAccept={(id) => acceptMutation.mutate(id)}
-                onReject={(id) => rejectMutation.mutate(id)}
+                onReject={(id) => setRejectTarget(id)}
+                onMessage={(r) =>
+                  messageParty(r, activeTab === 'my-requests' ? r.owner_id : r.renter_id)
+                }
                 isMutating={isMutating}
                 t={t}
               />
@@ -268,6 +383,57 @@ export default function RentalRequestsPage() {
           </div>
         )}
       </div>
+
+      {(cancelTarget !== null || rejectTarget !== null) && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => {
+            if (!cancelMutation.isPending && !rejectMutation.isPending) {
+              setCancelTarget(null);
+              setRejectTarget(null);
+            }
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            data-testid="confirm-modal"
+            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
+              {cancelTarget !== null ? t('booking.cancelConfirmTitle') : t('rentalRequests.reject')}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+              {cancelTarget !== null ? t('booking.cancelConfirmText') : t('rentalRequests.subtitle')}
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setCancelTarget(null);
+                  setRejectTarget(null);
+                }}
+                disabled={cancelMutation.isPending || rejectMutation.isPending}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition disabled:opacity-50"
+              >
+                {t('common.back')}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (cancelTarget !== null) cancelMutation.mutate(cancelTarget);
+                  else if (rejectTarget !== null) rejectMutation.mutate(rejectTarget);
+                }}
+                disabled={cancelMutation.isPending || rejectMutation.isPending}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 disabled:opacity-60 transition flex items-center gap-2"
+              >
+                {cancelTarget !== null ? t('booking.yes') : t('rentalRequests.reject')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

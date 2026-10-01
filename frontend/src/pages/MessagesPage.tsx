@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, MessageSquare, Pin, X } from 'lucide-react';
+import { Search, MessageSquare, Pin, X, Package, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { messages, upload } from '../api';
+import { messages, upload, listings } from '../api';
 import type { Conversation, Message } from '../api';
 import useAuthStore from '../store/authStore';
 import ChatHeader from '../components/chat/ChatHeader';
@@ -57,6 +58,17 @@ export default function MessagesPage() {
     queryFn: messages.getConversations,
     refetchInterval: 5000,
   });
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const c = searchParams.get('conversation');
+    if (!c) return;
+    const id = Number(c);
+    if (conversations.some((conv) => conv.id === id)) {
+      setSelectedId(id);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, conversations, setSearchParams]);
 
   const { data: chatMessages = [], isLoading: msgLoading } = useQuery<Message[]>({
     queryKey: ['messages', selectedId],
@@ -510,6 +522,10 @@ export default function MessagesPage() {
               onClear={handleClearConversation}
             />
 
+            {selectedConversation?.listing_id != null && (
+              <ListingContextBar listingId={selectedConversation.listing_id} />
+            )}
+
             {pinnedMessage && (
               <div className="flex items-center gap-3 px-4 py-2.5 border-b border-[#FF6B35]/15 bg-gradient-to-r from-orange-500/15 via-orange-500/[0.07] to-transparent backdrop-blur-sm">
                 <span className="w-8 h-8 rounded-full bg-[#FF6B35] text-white flex items-center justify-center shrink-0">
@@ -634,5 +650,44 @@ export default function MessagesPage() {
         <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
       </div>
     </div>
+  );
+}
+
+function ListingContextBar({ listingId }: { listingId: number }) {
+  const { t } = useTranslation();
+  const { data: listing } = useQuery({
+    queryKey: ['listing-mini-chat', listingId],
+    queryFn: () => listings.getOne(listingId),
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+
+  if (!listing) return null;
+  const img = listing.images?.[0]?.image_url ?? null;
+
+  return (
+    <Link
+      to={`/listing/${listingId}`}
+      data-testid="chat-listing-card"
+      className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/[0.03] hover:bg-gray-100 dark:hover:bg-white/5 transition"
+    >
+      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 dark:bg-white/10 flex-shrink-0 flex items-center justify-center">
+        {img ? (
+          <img src={img} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <Package className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-[#1A1A2E] dark:text-white truncate">{listing.title}</p>
+        <p className="text-xs font-bold text-[#FF6B35]">
+          {listing.price.toLocaleString('ru-RU')} {t('common.somoni')} / {t(`listing.${listing.price_unit}`)}
+        </p>
+      </div>
+      <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1 shrink-0">
+        {t('booking.viewListing')}
+        <ChevronRight className="w-3.5 h-3.5" />
+      </span>
+    </Link>
   );
 }

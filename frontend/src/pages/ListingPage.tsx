@@ -25,6 +25,7 @@ import {
   Pencil,
   Maximize2,
   X,
+  Check,
 } from 'lucide-react';
 import { formatDate } from '../utils/dates';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
@@ -60,6 +61,8 @@ export default function ListingPage() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [isFavorited, setIsFavorited] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   const { data: listing, isLoading: listingLoading } = useQuery({
     queryKey: ['listing', id],
@@ -126,10 +129,13 @@ export default function ListingPage() {
       toast.success(t('listing.rentalRequestSent'));
       setStartDate('');
       setEndDate('');
+      setBookingSuccess(true);
+      setShowConfirm(false);
       queryClient.invalidateQueries({ queryKey: ['my-requests'] });
       queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
     },
     onError: (error: any) => {
+      setShowConfirm(false);
       const detail = error?.response?.data?.detail;
       const messages: Record<string, string> = {
         'Cannot rent your own listing': t('listing.ownListing'),
@@ -159,7 +165,7 @@ export default function ListingPage() {
       toast.error(t('listing.selectDatesRequired'));
       return;
     }
-    rentalMutation.mutate();
+    setShowConfirm(true);
   };
 
   const reviewMutation = useMutation({
@@ -241,7 +247,14 @@ export default function ListingPage() {
     ? listing.images.map((img) => typeof img === 'string' ? img : img.image_url)
     : [];
   const days = startDate && endDate ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000)) : 1;
-  const total = days * listing.price;
+  const subtotal = (() => {
+    const u = listing.price_unit;
+    if (u === 'per_hour') return listing.price * days * 24;
+    if (u === 'per_week') return listing.price * (days / 7);
+    if (u === 'per_month') return listing.price * (days / 30);
+    return listing.price * days;
+  })();
+  const total = Math.round(subtotal);
   const isOwner = isAuthenticated && user?.id === listing.owner_id;
   const avgRating = listingReviews.length > 0 ? Math.round(listingReviews.reduce((s, r) => s + r.rating, 0) / listingReviews.length) : 0;
 
@@ -425,6 +438,39 @@ export default function ListingPage() {
                   </span>
                 </div>
 
+                {bookingSuccess && !isOwner && user?.role !== 'ADMIN' ? (
+                  <div className="text-center py-4" data-testid="booking-success">
+                    <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-500/15 flex items-center justify-center mb-3">
+                      <Check className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <h3 className="font-bold text-[#1A1A2E] dark:text-white mb-1">{t('booking.successTitle')}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('booking.successText')}</p>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => navigate('/rental-requests')}
+                        className="w-full bg-[#FF6B35] hover:bg-[#e55a2b] text-white font-semibold py-3 px-4 rounded-xl transition shadow-lg shadow-[#FF6B35]/20 flex items-center justify-center gap-2"
+                      >
+                        <Calendar className="w-4 h-4" />
+                        {t('booking.viewBooking')}
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            navigate('/login');
+                            return;
+                          }
+                          messageMutation.mutate();
+                        }}
+                        disabled={messageMutation.isPending}
+                        className="w-full border-2 border-[#1A1A2E] dark:border-white/10 text-[#1A1A2E] dark:text-white hover:bg-[#1A1A2E] hover:text-white font-semibold py-3 px-4 rounded-xl transition flex items-center justify-center gap-2 disabled:opacity-60"
+                      >
+                        <MessageSquare size={16} />
+                        {t('booking.messageOwner')}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
                 <div className="mb-4">
                   <AvailabilityCalendar
                     listingId={Number(id)}
@@ -438,11 +484,49 @@ export default function ListingPage() {
                 </div>
 
                 {startDate && endDate && (
-                  <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3 mb-4">
-                    <span className="text-sm text-gray-500 dark:text-gray-300">
-                      {days} {t('listing.days')} x {listing.price} сом ={' '}
-                      <span className="font-bold text-[#FF6B35]">{total} сом</span>
-                    </span>
+                  <div className="rounded-xl border border-gray-200 dark:border-white/10 p-4 mb-4 space-y-2 text-sm" data-testid="booking-summary">
+                    <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-100 dark:border-white/10">
+                      <span className="font-bold text-[#1A1A2E] dark:text-white truncate">{listing.title}</span>
+                      {listing.owner?.display_name && (
+                        <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{listing.owner.display_name}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                      <span>{t('booking.start')}</span>
+                      <span className="font-semibold text-[#1A1A2E] dark:text-white">{formatDate(startDate)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                      <span>{t('booking.end')}</span>
+                      <span className="font-semibold text-[#1A1A2E] dark:text-white">{formatDate(endDate)}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                      <span>{t('booking.duration')}</span>
+                      <span className="font-semibold text-[#1A1A2E] dark:text-white">
+                        {days} {t('listing.days')}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-white/10">
+                      <span>
+                        {listing.price.toLocaleString('ru-RU')} {t('common.somoni')} × {days}
+                      </span>
+                      <span className="font-semibold text-[#1A1A2E] dark:text-white">
+                        {Math.round(subtotal).toLocaleString('ru-RU')} {t('common.somoni')}
+                      </span>
+                    </div>
+                    {(listing.deposit ?? 0) > 0 && (
+                      <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
+                        <span>{t('booking.deposit')}</span>
+                        <span className="font-semibold text-[#1A1A2E] dark:text-white">
+                          {listing.deposit.toLocaleString('ru-RU')} {t('common.somoni')}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-white/10">
+                      <span className="font-bold text-[#1A1A2E] dark:text-white">{t('booking.total')}</span>
+                      <span className="text-lg font-extrabold text-[#FF6B35]">
+                        {total.toLocaleString('ru-RU')} {t('common.somoni')}
+                      </span>
+                    </div>
                   </div>
                 )}
 
@@ -484,6 +568,8 @@ export default function ListingPage() {
                       <MessageSquare size={18} />
                       {t('listing.sendMessage')}
                     </button>
+                  </>
+                )}
                   </>
                 )}
 
@@ -708,6 +794,69 @@ export default function ListingPage() {
           </div>
         )}
       </div>
+
+      {showConfirm && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => {
+            if (!rentalMutation.isPending) setShowConfirm(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-booking-title"
+            data-testid="confirm-booking-modal"
+            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 id="confirm-booking-title" className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
+              {t('booking.confirmTitle')}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('booking.confirmText')}</p>
+            <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4 space-y-1.5 text-sm mb-5">
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-500 dark:text-gray-400">{t('booking.start')}</span>
+                <span className="font-semibold text-[#1A1A2E] dark:text-white">{formatDate(startDate)}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-500 dark:text-gray-400">{t('booking.end')}</span>
+                <span className="font-semibold text-[#1A1A2E] dark:text-white">{formatDate(endDate)}</span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span className="text-gray-500 dark:text-gray-400">{t('booking.duration')}</span>
+                <span className="font-semibold text-[#1A1A2E] dark:text-white">
+                  {days} {t('listing.days')}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4 pt-1.5 border-t border-gray-200 dark:border-white/10">
+                <span className="font-bold text-[#1A1A2E] dark:text-white">{t('booking.total')}</span>
+                <span className="font-extrabold text-[#FF6B35]">
+                  {total.toLocaleString('ru-RU')} {t('common.somoni')}
+                </span>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                disabled={rentalMutation.isPending}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition disabled:opacity-50"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={() => rentalMutation.mutate()}
+                disabled={rentalMutation.isPending}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#FF6B35] hover:bg-[#e55a2b] disabled:opacity-60 transition flex items-center gap-2"
+              >
+                {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {fullscreen && images.length > 0 && (
         <div
