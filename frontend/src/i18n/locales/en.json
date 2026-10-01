@@ -934,6 +934,27 @@
       "emptyHint": "When clients send requests for your listings, they will appear here.",
       "rejectTitle": "Reject request?",
       "rejectText": "The client will be notified about the rejection."
+    },
+    "sec": {
+      "pickListing": "Select a listing",
+      "convCount": "Conversations",
+      "openMessages": "Open messages",
+      "noConv": "No conversations",
+      "noMessages": "No messages",
+      "totalReviews": "Total reviews",
+      "noReviews": "No reviews yet",
+      "noReviewsHint": "Client reviews will appear here.",
+      "phone": "Phone",
+      "roleLabel": "Role",
+      "listings": "Listings",
+      "openProfile": "Open profile",
+      "language": "Language",
+      "appearance": "Appearance",
+      "roles": {
+        "OWNER": "Owner",
+        "ADMIN": "Administrator",
+        "CUSTOMER": "Customer"
+      }
     }
   },
   "booking": {

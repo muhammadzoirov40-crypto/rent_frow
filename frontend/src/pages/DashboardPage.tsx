@@ -17,6 +17,14 @@ import {
 import DashboardLayout, { type DashboardSection } from '../components/dashboard/DashboardLayout';
 import ListingsSection from '../components/dashboard/ListingsSection';
 import BookingsSection from '../components/dashboard/BookingsSection';
+import {
+  CalendarSection,
+  MessagesSection,
+  ReviewsSection,
+  EarningsSection,
+  ProfileSection,
+  SettingsSection,
+} from '../components/dashboard/SecondarySections';
 import useAuthStore from '../store/authStore';
 import {
   dashboardApi,
@@ -411,6 +419,12 @@ export default function DashboardPage() {
     if (active === 'dashboard') return renderOverview();
     if (active === 'listings') return isOwnerLike ? <ListingsSection /> : ownerOnlyPanel;
     if (active === 'bookings') return isOwnerLike ? <BookingsSection /> : ownerOnlyPanel;
+    if (active === 'earnings') return isOwnerLike ? <EarningsSection /> : ownerOnlyPanel;
+    if (active === 'calendar') return isOwnerLike ? <CalendarSection /> : ownerOnlyPanel;
+    if (active === 'reviews') return isOwnerLike ? <ReviewsSection /> : ownerOnlyPanel;
+    if (active === 'messages') return <MessagesSection />;
+    if (active === 'profile') return <ProfileSection />;
+    if (active === 'settings') return <SettingsSection />;
     return (
       <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-10 text-center" data-testid={`section-${active}`}>
         <h2 className="text-lg font-bold mb-1">{t(`dashboard.nav.${active}`)}</h2>
