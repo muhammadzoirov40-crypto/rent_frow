@@ -28,8 +28,10 @@ async def lifespan(app: FastAPI):
         print(f"Schema migrations skipped: {e}")
     UPLOAD_DIR.mkdir(exist_ok=True)
     try:
-        from app.seed_data import seed_database
+        from app.seed_data import seed_database, sync_categories, sync_cities
         await seed_database()
+        await sync_cities()
+        await sync_categories()
     except Exception as e:
         print(f"Seed skipped: {e}")
 

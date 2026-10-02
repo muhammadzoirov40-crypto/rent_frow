@@ -36,17 +36,18 @@ def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 
+# (name, name_tj, latitude, longitude) — used for map centring and geolocation.
 CITIES_DATA = [
-    ("Душанбе", "Душанбе"),
-    ("Хуҷанд", "Хуҷанд"),
-    ("Бохтар", "Бохтар"),
-    ("Кӯлоб", "Кӯлоб"),
-    ("Ваҳдат", "Ваҳдат"),
-    ("Турсунзода", "Турсунзода"),
-    ("Истаравшан", "Истаравшан"),
-    ("Конибодом", "Конибодом"),
-    ("Панҷакент", "Панҷакент"),
-    ("Қурғонтеппа", "Қурғонтеппа"),
+    ("Душанбе", "Душанбе", 38.5598, 68.7870),
+    ("Хуҷанд", "Хуҷанд", 40.2850, 69.6200),
+    ("Бохтар", "Бохтар", 37.8380, 68.7760),
+    ("Кӯлоб", "Кӯлоб", 37.9500, 69.8000),
+    ("Ваҳдат", "Ваҳдат", 38.5500, 69.0500),
+    ("Турсунзода", "Турсунзода", 38.5167, 68.2167),
+    ("Истаравшан", "Истаравшан", 40.1150, 69.2100),
+    ("Конибодом", "Конибодом", 40.2833, 69.9333),
+    ("Панҷакент", "Панҷакент", 39.5000, 67.6167),
+    ("Қурғонтеппа", "Қурғонтеппа", 37.8500, 68.7800),
 ]
 
 DISTRICTS_DATA = {
@@ -57,50 +58,124 @@ DISTRICTS_DATA = {
 CATEGORIES_DATA = [
     {
         "name": "Недвижимость",
-        "name_tj": "Идоракунии амвол",
+        "name_tj": "Моликият",
+        "name_en": "Property",
         "icon": "home",
-        "subcategories": ["Квартиры", "Дома", "Комнаты", "Офисы", "Помещения", "Дачи", "Гаражи"],
+        "group": "property",
+        "subcategories": [
+            {"name": "Квартиры", "name_tj": "Ижораи квартира", "name_en": "Apartment"},
+            {"name": "Дома", "name_tj": "Ижораи хона", "name_en": "House"},
+            {"name": "Виллы", "name_tj": "Вилла", "name_en": "Villa"},
+            {"name": "Комнаты", "name_tj": "Ижораи утофта", "name_en": "Room"},
+            {"name": "Офисы", "name_tj": "Идора", "name_en": "Office"},
+            {"name": "Помещения", "name_tj": "Ғайриистеъмалиҳо", "name_en": "Commercial space"},
+            {"name": "Дачи", "name_tj": "Дохил", "name_en": "Summer house"},
+            {"name": "Гаражи", "name_tj": "Гараж", "name_en": "Garage"},
+        ],
     },
     {
         "name": "Транспорт",
         "name_tj": "Нақлиёт",
+        "name_en": "Transport",
         "icon": "car",
-        "subcategories": ["Автомобили", "Мотоциклы", "Велосипеды", "Самокаты", "Спецтехника"],
-    },
-    {
-        "name": "Электроника",
-        "name_tj": "Электроника",
-        "icon": "laptop",
-        "subcategories": ["Ноутбуки", "Телефоны", "Камеры", "Проекторы", "Игровые устройства"],
-    },
-    {
-        "name": "Для мероприятий",
-        "name_tj": "Барои чорабиниҳо",
-        "icon": "calendar",
-        "subcategories": ["Колонки", "Микрофоны", "Свет", "Столы", "Стулья", "Декорации"],
-    },
-    {
-        "name": "Одежда",
-        "name_tj": "Либос",
-        "icon": "shirt",
-        "subcategories": ["Платья", "Костюмы", "Национальная одежда", "Обувь"],
+        "group": "transport",
+        "subcategories": [
+            {"name": "Автомобили", "name_tj": "Автомобил", "name_en": "Car"},
+            {"name": "Мотоциклы", "name_tj": "Мотоцикл", "name_en": "Motorcycle"},
+            {"name": "Велосипеды", "name_tj": "Велосипед", "name_en": "Bicycle"},
+            {"name": "Самокаты", "name_tj": "Самокат", "name_en": "Scooter"},
+            {"name": "Спецтехника", "name_tj": "Махсус техника", "name_en": "Special machinery"},
+        ],
     },
     {
         "name": "Инструменты",
         "name_tj": "Асбобҳо",
+        "name_en": "Tools & Equipment",
         "icon": "wrench",
-        "subcategories": ["Дрели", "Перфораторы", "Генераторы", "Строительное оборудование"],
+        "group": "equipment",
+        "subcategories": [
+            {"name": "Дрели", "name_tj": "Дрил", "name_en": "Drills"},
+            {"name": "Перфораторы", "name_tj": "Перфоратор", "name_en": "Rotary hammers"},
+            {"name": "Генераторы", "name_tj": "Генератор", "name_en": "Generators"},
+            {"name": "Строительное оборудование", "name_tj": "Таҷҳизоти сохтмонӣ", "name_en": "Construction equipment"},
+            {"name": "Садовая техника", "name_tj": "Техникаи боғдорӣ", "name_en": "Garden equipment"},
+            {"name": "Ручной инструмент", "name_tj": "Асбоби дастӣ", "name_en": "Hand tools"},
+        ],
+    },
+    {
+        "name": "Для мероприятий",
+        "name_tj": "Барои чорабиниҳо",
+        "name_en": "Events",
+        "icon": "calendar",
+        "group": "events",
+        "subcategories": [
+            {"name": "Колонки", "name_tj": "Колонкаҳо", "name_en": "Speakers"},
+            {"name": "Микрофоны", "name_tj": "Микрофонҳо", "name_en": "Microphones"},
+            {"name": "Свет", "name_tj": "Равшанӣ", "name_en": "Lighting"},
+            {"name": "Столы", "name_tj": "Мизҳо", "name_en": "Tables"},
+            {"name": "Стулья", "name_tj": "Курсиҳо", "name_en": "Chairs"},
+            {"name": "Декорации", "name_tj": "Ороишҳо", "name_en": "Decorations"},
+            {"name": "Навесы и шатры", "name_tj": "Сангилаҳо", "name_en": "Tents & canopies"},
+        ],
+    },
+    {
+        "name": "Электроника",
+        "name_tj": "Электроника",
+        "name_en": "Electronics",
+        "icon": "laptop",
+        "group": "other",
+        "subcategories": [
+            {"name": "Ноутбуки", "name_tj": "Ноутбукҳо", "name_en": "Laptops"},
+            {"name": "Телефоны", "name_tj": "Телефонҳо", "name_en": "Phones"},
+            {"name": "Камеры", "name_tj": "Камераҳо", "name_en": "Cameras"},
+            {"name": "Проекторы", "name_tj": "Проекторҳо", "name_en": "Projectors"},
+            {"name": "Игровые устройства", "name_tj": "Дастгоҳҳои бозӣ", "name_en": "Gaming devices"},
+        ],
+    },
+    {
+        "name": "Одежда",
+        "name_tj": "Либос",
+        "name_en": "Clothing",
+        "icon": "shirt",
+        "group": "other",
+        "subcategories": [
+            {"name": "Платья", "name_tj": "Платьяҳо", "name_en": "Dresses"},
+            {"name": "Костюмы", "name_tj": "Костюмҳо", "name_en": "Suits"},
+            {"name": "Национальная одежда", "name_tj": "Либоси миллӣ", "name_en": "National clothing"},
+            {"name": "Обувь", "name_tj": "Пойафзол", "name_en": "Footwear"},
+        ],
     },
     {
         "name": "Спорт",
         "name_tj": "Варзиш",
+        "name_en": "Sports",
         "icon": "dumbbell",
-        "subcategories": ["Велосипеды", "Лыжи", "Тренажеры", "Спортивный инвентарь"],
+        "group": "other",
+        "subcategories": [
+            {"name": "Лыжи", "name_tj": "Скиҳо", "name_en": "Skis"},
+            {"name": "Тренажеры", "name_tj": "Тренажёрҳо", "name_en": "Gym machines"},
+            {"name": "Спортивный инвентарь", "name_tj": "Лавозимоти варзишӣ", "name_en": "Sports gear"},
+            {"name": "Палатки и туризм", "name_tj": "Хаймаҳо ва сайёҳӣ", "name_en": "Camping & hiking"},
+        ],
+    },
+    {
+        "name": "Бытовая техника",
+        "name_tj": "Техникаи хонагӣ",
+        "name_en": "Home appliances",
+        "icon": "washing-machine",
+        "group": "other",
+        "subcategories": [
+            {"name": "Кондиционеры", "name_tj": "Климат conditionerҳо", "name_en": "Air conditioners"},
+            {"name": "Обогреватели", "name_tj": "Гармкунандаҳо", "name_en": "Heaters"},
+            {"name": "Пылесосы", "name_tj": "Ҷамъкунандаҳо", "name_en": "Vacuum cleaners"},
+        ],
     },
     {
         "name": "Другое",
         "name_tj": "Дигар",
+        "name_en": "Other",
         "icon": "ellipsis",
+        "group": "other",
         "subcategories": [],
     },
 ]
@@ -820,6 +895,12 @@ RENTAL_REQUESTS_DATA = [
     },
 ]
 
+# Tajik strings the original seed shipped with. Matching values are safe to
+# refresh because they were never chosen by a human.
+LEGACY_CATEGORY_TJ: dict[str, set[str]] = {
+    "Недвижимость": {"Идоракунии амвол"},
+}
+
 
 async def seed_database():
     async with engine.begin() as conn:
@@ -835,8 +916,8 @@ async def seed_database():
 
         print("Creating cities...")
         city_map: dict[str, City] = {}
-        for name, name_tj in CITIES_DATA:
-            city = City(name=name, name_tj=name_tj)
+        for name, name_tj, lat, lng in CITIES_DATA:
+            city = City(name=name, name_tj=name_tj, latitude=lat, longitude=lng)
             session.add(city)
             await session.flush()
             city_map[name] = city
@@ -856,22 +937,30 @@ async def seed_database():
         print("Creating categories and subcategories...")
         category_map: dict[str, Category] = {}
         subcategory_map: dict[str, SubCategory] = {}
-        for cat_data in CATEGORIES_DATA:
+        for sort_order, cat_data in enumerate(CATEGORIES_DATA):
             cat = Category(
                 name=cat_data["name"],
                 name_tj=cat_data.get("name_tj"),
+                name_en=cat_data.get("name_en"),
+                category_group=cat_data.get("group", "other"),
                 icon=cat_data.get("icon"),
+                sort_order=sort_order,
             )
             session.add(cat)
             await session.flush()
             category_map[cat_data["name"]] = cat
             print(f"  + Category: {cat_data['name']} (id={cat.id})")
-            for sub_name in cat_data.get("subcategories", []):
-                sub = SubCategory(category_id=cat.id, name=sub_name)
+            for sub_data in cat_data.get("subcategories", []):
+                sub = SubCategory(
+                    category_id=cat.id,
+                    name=sub_data["name"],
+                    name_tj=sub_data.get("name_tj"),
+                    name_en=sub_data.get("name_en"),
+                )
                 session.add(sub)
                 await session.flush()
-                subcategory_map[f"{cat_data['name']}:{sub_name}"] = sub
-                print(f"    + Subcategory: {sub_name}")
+                subcategory_map[f"{cat_data['name']}:{sub_data['name']}"] = sub
+                print(f"    + Subcategory: {sub_data['name']}")
 
         print("Creating users...")
         hashed = hash_password(DEFAULT_PASSWORD)
@@ -1035,6 +1124,164 @@ async def seed_database():
 
 async def seed_data():
     return
+
+
+async def sync_cities() -> dict:
+    """Backfill map coordinates for cities seeded before they existed.
+
+    Coordinates are only written when missing — an admin's manual override wins.
+    """
+    backfilled: list[str] = []
+    coords = {name: (lat, lng) for name, _tj, lat, lng in CITIES_DATA}
+    names_tj = {name: tj for name, tj, _lat, _lng in CITIES_DATA}
+
+    async with async_session_factory() as session:
+        result = await session.execute(select(City))
+        for city in result.scalars().all():
+            changed = False
+            pair = coords.get(city.name)
+            if pair and (city.latitude is None or city.longitude is None):
+                city.latitude, city.longitude = pair
+                changed = True
+            if not city.name_tj and names_tj.get(city.name):
+                city.name_tj = names_tj[city.name]
+                changed = True
+            if changed:
+                backfilled.append(city.name)
+
+        await session.commit()
+
+    if backfilled:
+        print(f"City coordinates backfilled: {', '.join(backfilled)}")
+    return {"cities": backfilled}
+
+
+async def sync_categories() -> dict:
+    """Idempotently top up the rental taxonomy on an existing database.
+
+    Never deletes or renames what an owner already created — only fills in
+    missing categories/subcategories and the locale/group metadata.
+    """
+    added_categories: list[str] = []
+    added_subcategories: list[str] = []
+    removed_duplicates: list[str] = []
+
+    async with async_session_factory() as session:
+        result = await session.execute(select(Category))
+        existing = {c.name: c for c in result.scalars().all()}
+
+        for sort_order, cat_data in enumerate(CATEGORIES_DATA):
+            cat = existing.get(cat_data["name"])
+            if cat is None:
+                cat = Category(
+                    name=cat_data["name"],
+                    name_tj=cat_data.get("name_tj"),
+                    name_en=cat_data.get("name_en"),
+                    category_group=cat_data.get("group", "other"),
+                    icon=cat_data.get("icon"),
+                    sort_order=sort_order,
+                )
+                session.add(cat)
+                await session.flush()
+                existing[cat.name] = cat
+                added_categories.append(cat.name)
+                print(f"  + Category: {cat.name} (id={cat.id})")
+            else:
+                # Backfill metadata on rows created before this schema. A value
+                # is only overwritten when it is still empty or still holds a
+                # legacy seed string — hand-edited values are left alone.
+                changed = False
+                if cat_data.get("name_tj") and (
+                    not cat.name_tj or cat.name_tj in LEGACY_CATEGORY_TJ.get(cat.name, set())
+                ):
+                    cat.name_tj = cat_data["name_tj"]
+                    changed = True
+                if not cat.name_en and cat_data.get("name_en"):
+                    cat.name_en = cat_data["name_en"]
+                    changed = True
+                if (not cat.category_group or cat.category_group == "other") and cat_data.get("group") != "other":
+                    cat.category_group = cat_data["group"]
+                    changed = True
+                if not cat.icon and cat_data.get("icon"):
+                    cat.icon = cat_data["icon"]
+                    changed = True
+                if not cat.sort_order and sort_order:
+                    cat.sort_order = sort_order
+                    changed = True
+                if changed:
+                    added_categories.append(cat.name)
+
+        await session.flush()
+
+        sub_result = await session.execute(select(SubCategory))
+        # cat_id -> category name -> all rows with that name (duplicates included)
+        subs_by_cat: dict[int, dict[str, list[SubCategory]]] = {}
+        for s in sub_result.scalars().all():
+            subs_by_cat.setdefault(s.category_id, {}).setdefault(s.name, []).append(s)
+
+        def ensure_subcategory(cat: Category, sub_data: dict) -> None:
+            known = subs_by_cat.setdefault(cat.id, {})
+            rows = known.get(sub_data["name"])
+            if rows:
+                sub = rows[0]
+                if not sub.name_tj and sub_data.get("name_tj"):
+                    sub.name_tj = sub_data["name_tj"]
+                if not sub.name_en and sub_data.get("name_en"):
+                    sub.name_en = sub_data["name_en"]
+                return
+            sub = SubCategory(
+                category_id=cat.id,
+                name=sub_data["name"],
+                name_tj=sub_data.get("name_tj"),
+                name_en=sub_data.get("name_en"),
+            )
+            session.add(sub)
+            # Register it immediately so a second pass cannot insert a duplicate.
+            known[sub_data["name"]] = [sub]
+            added_subcategories.append(f"{cat.name}/{sub_data['name']}")
+
+        for cat_data in CATEGORIES_DATA:
+            cat = existing.get(cat_data["name"])
+            if not cat:
+                continue
+            for sub_data in cat_data.get("subcategories", []):
+                ensure_subcategory(cat, sub_data)
+
+        # Merge exact duplicates left behind by earlier sync runs. Rows that
+        # still have listings attached are kept untouched.
+        for by_name in list(subs_by_cat.values()):
+            for name, rows in by_name.items():
+                if len(rows) < 2:
+                    continue
+                rows.sort(key=lambda s: s.id or 0)
+                _keeper, *dupes = rows
+                for dupe in dupes:
+                    if dupe.id is None:
+                        continue
+                    attached = await session.execute(
+                        select(func.count()).select_from(Listing).where(Listing.subcategory_id == dupe.id)
+                    )
+                    if (attached.scalar_one_or_none() or 0) > 0:
+                        continue
+                    await session.delete(dupe)
+                    removed_duplicates.append(f"{name} (id={dupe.id})")
+
+        await session.commit()
+
+    if added_categories or added_subcategories or removed_duplicates:
+        print("Category taxonomy synced.")
+        for name in added_categories:
+            print(f"  ~ Category: {name}")
+        for name in added_subcategories:
+            print(f"  + Subcategory: {name}")
+        for name in removed_duplicates:
+            print(f"  - Duplicate removed: {name}")
+    return {
+        "categories": added_categories,
+        "subcategories": added_subcategories,
+        "duplicates_removed": removed_duplicates,
+    }
+
 
 if __name__ == "__main__":
     asyncio.run(seed_database())

@@ -10,6 +10,8 @@ class SubCategory(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("categories.id"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+    name_tj: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    name_en: Mapped[str | None] = mapped_column(String(255), nullable=True)
     icon: Mapped[str | None] = mapped_column(String(100), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 

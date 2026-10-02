@@ -9,12 +9,16 @@ class SubCategoryResponse(BaseModel):
     id: int
     category_id: int
     name: str
+    name_tj: Optional[str] = None
+    name_en: Optional[str] = None
     icon: Optional[str] = None
 
 
 class CategoryCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     name_tj: Optional[str] = None
+    name_en: Optional[str] = None
+    category_group: str = Field("other", max_length=32)
     description: Optional[str] = None
     icon: Optional[str] = None
     image_url: Optional[str] = None
@@ -25,6 +29,8 @@ class CategoryCreate(BaseModel):
 class CategoryUpdate(BaseModel):
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     name_tj: Optional[str] = None
+    name_en: Optional[str] = None
+    category_group: Optional[str] = Field(None, max_length=32)
     description: Optional[str] = None
     icon: Optional[str] = None
     image_url: Optional[str] = None
@@ -38,6 +44,8 @@ class CategoryResponse(BaseModel):
     id: int
     name: str
     name_tj: Optional[str] = None
+    name_en: Optional[str] = None
+    category_group: str = "other"
     description: Optional[str] = None
     icon: Optional[str] = None
     image_url: Optional[str] = None

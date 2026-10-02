@@ -10,6 +10,9 @@ class Category(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), unique=True, index=True, nullable=False)
     name_tj: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    name_en: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Rental taxonomy group: property | transport | equipment | events | other
+    category_group: Mapped[str] = mapped_column(String(32), default="other", nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     icon: Mapped[str | None] = mapped_column(String(100), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)

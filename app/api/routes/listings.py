@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_auth, CurrentUser
+from app.core.enums import PriceUnit, PropertyType, VerificationStatus
 from app.schemas.listing import (
     ListingCreate, ListingUpdate, ListingResponse,
     ListingListResponse, NearbyListingResponse, ListingImageResponse, ListingOwnerResponse,
@@ -13,6 +14,16 @@ from app.services.favorite import FavoriteService
 from app.utils.s3 import get_presigned_url
 
 router = APIRouter(prefix="/listings", tags=["Listings"])
+
+
+def _as_float(value) -> float | None:
+    """NUMERIC columns come back as Decimal from asyncpg — normalise for JSON."""
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def _resolve_image_url(img_url: str | None) -> str | None:
@@ -128,6 +139,17 @@ def _listing_to_list_response(listing, is_favorited: bool = False) -> ListingLis
         is_verified=listing.is_verified,
         created_at=listing.created_at,
         is_favorited=is_favorited,
+        latitude=_as_float(listing.latitude) if listing.latitude is not None else (
+            _as_float(listing.city_rel.latitude)
+            if listing.city_rel is not None and listing.city_rel.latitude is not None
+            else None
+        ),
+        longitude=_as_float(listing.longitude) if listing.longitude is not None else (
+            _as_float(listing.city_rel.longitude)
+            if listing.city_rel is not None and listing.city_rel.longitude is not None
+            else None
+        ),
+        city_id=listing.city_id,
     )
 
 
@@ -147,10 +169,10 @@ async def search_listings(
     district_id: int = Query(None),
     price_min: float = Query(None),
     price_max: float = Query(None),
-    price_unit: str = Query(None),
+    price_unit: PriceUnit = Query(None),
     is_verified: bool = Query(None),
-    verification_status: str = Query(None),
-    property_type: str = Query(None),
+    verification_status: VerificationStatus = Query(None),
+    property_type: PropertyType = Query(None),
     rooms_min: int = Query(None, ge=0),
     rooms_max: int = Query(None, ge=0),
     bathrooms_min: int = Query(None, ge=0),
@@ -221,8 +243,8 @@ async def get_nearby_listings(
     district_id: int = Query(None),
     price_min: float = Query(None),
     price_max: float = Query(None),
-    price_unit: str = Query(None),
-    property_type: str = Query(None),
+    price_unit: PriceUnit = Query(None),
+    property_type: PropertyType = Query(None),
     rooms_min: int = Query(None, ge=0),
     rooms_max: int = Query(None, ge=0),
     furnished: bool = Query(None),

@@ -9,6 +9,8 @@ class CityResponse(BaseModel):
     id: int
     name: str
     name_tj: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     is_active: bool
 
 

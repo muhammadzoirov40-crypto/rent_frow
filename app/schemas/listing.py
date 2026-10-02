@@ -143,6 +143,10 @@ class ListingListResponse(BaseModel):
     is_verified: bool = False
     created_at: datetime
     is_favorited: bool = False
+    # Map position: the listing's own pin, or the city centroid as fallback.
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    city_id: Optional[int] = None
 
 
 class NearbyListingResponse(ListingListResponse):
