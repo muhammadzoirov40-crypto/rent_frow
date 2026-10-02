@@ -13,15 +13,9 @@ import useAuthStore from '../store/authStore';
 import BackButton from '../components/ui/BackButton';
 import type { Listing, ListingListItem, RentalRequest } from '../api';
 import { formatDate } from '../utils/dates';
+import { formatPrice, formatPriceUnit, formatAmount } from '../utils/format';
 
 type Tab = 'listings' | 'favorites' | 'my-requests' | 'owner-requests' | 'settings';
-
-const PRICE_UNIT_LABELS: Record<string, string> = {
-  per_hour: '/час',
-  per_day: '/день',
-  per_week: '/неделю',
-  per_month: '/месяц',
-};
 
 const statusConfig: Record<string, { label: string; bg: string; text: string }> = {
   pending: { label: 'pending', bg: 'bg-amber-100', text: 'text-amber-700' },
@@ -32,7 +26,7 @@ const statusConfig: Record<string, { label: string; bg: string; text: string }> 
 };
 
 export default function ProfilePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, updateUser, logout } = useAuthStore();
@@ -367,7 +361,7 @@ export default function ProfilePage() {
                           </span>
                         )}
                         <span className="font-bold text-[var(--accent)]">
-                          {listing.price.toLocaleString('ru-RU')} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
+                          {formatPrice(listing.price, t, i18n.language)} {formatPriceUnit(t, listing.price_unit)}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-3">
@@ -435,7 +429,7 @@ export default function ProfilePage() {
                           </span>
                         )}
                         <span className="font-bold text-[var(--accent)]">
-                          {listing.price.toLocaleString('ru-RU')} сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}
+                          {formatPrice(listing.price, t, i18n.language)} {formatPriceUnit(t, listing.price_unit)}
                         </span>
                       </div>
                     </div>
@@ -483,7 +477,7 @@ export default function ProfilePage() {
                           </span>
                           {req.total_price > 0 && (
                             <span className="font-bold text-[var(--accent)]">
-                              {req.total_price.toLocaleString('ru-RU')} {t('common.currency')}/{t('common.days')}
+                              {formatAmount(req.total_price)} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}
                         </div>
@@ -542,7 +536,7 @@ export default function ProfilePage() {
                           </span>
                           {req.total_price > 0 && (
                             <span className="font-bold text-[var(--accent)]">
-                              {req.total_price.toLocaleString('ru-RU')} {t('common.currency')}/{t('common.days')}
+                              {formatAmount(req.total_price)} {t('common.currency')}/{t('common.days')}
                             </span>
                           )}
                         </div>

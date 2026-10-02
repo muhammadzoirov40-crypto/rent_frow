@@ -11,6 +11,8 @@ import FavoritesPage from './pages/FavoritesPage';
 import RentalRequestsPage from './pages/RentalRequestsPage';
 import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
+import NotFoundPage from './pages/NotFoundPage';
+import LegalPage from './pages/LegalPage';
 const ListingPage = React.lazy(() => import('./pages/ListingPage'));
 const CreateListingPage = React.lazy(() => import('./pages/CreateListingPage'));
 const MessagesPage = React.lazy(() => import('./pages/MessagesPage'));
@@ -180,7 +182,9 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/terms" element={<LegalPage kind="terms" />} />
+          <Route path="/privacy" element={<LegalPage kind="privacy" />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </>

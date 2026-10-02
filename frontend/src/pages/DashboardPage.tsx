@@ -26,6 +26,7 @@ import {
   SettingsSection,
 } from '../components/dashboard/SecondarySections';
 import useAuthStore from '../store/authStore';
+import { formatAmount } from '../utils/format';
 import {
   dashboardApi,
   type DashboardSummary,
@@ -117,7 +118,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
       <p className="mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-[var(--accent)] font-semibold tabular-nums">
-          {Math.round(entry.value).toLocaleString('ru-RU')} {t('common.somoni')}
+          {formatAmount(Math.round(entry.value))} {t('common.somoni')}
         </p>
       ))}
     </div>
@@ -182,7 +183,7 @@ export default function DashboardPage() {
     };
   }, [isOwnerLike, period, t]);
 
-  const som = (n: number) => `${Math.round(n).toLocaleString('ru-RU')} ${t('common.somoni')}`;
+  const som = (n: number) => `${formatAmount(Math.round(n))} ${t('common.somoni')}`;
 
   const pieData = perf
     ? [
@@ -427,7 +428,7 @@ export default function DashboardPage() {
     if (active === 'settings') return <SettingsSection />;
     return (
       <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-10 text-center" data-testid={`section-${active}`}>
-        <h2 className="text-lg font-bold mb-1">{t(`dashboard.nav.${active}`)}</h2>
+        <h2 className="text-lg font-bold mb-1">{t(`dashboard.nav.${active}`, { defaultValue: active })}</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.overview.empty')}</p>
       </div>
     );

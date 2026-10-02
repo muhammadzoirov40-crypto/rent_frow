@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import type { ComponentType } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +35,8 @@ import useAuthStore from '../store/authStore';
 import Toast from '../components/Toast';
 import BackButton from '../components/ui/BackButton';
 import { formatDate } from '../utils/dates';
-
+import { formatAmount } from '../utils/format';
+import { isCustomAccent } from '../utils/accent';
 const LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'ru', label: 'Русский' },
@@ -104,6 +106,52 @@ const ACCENT_OPTIONS = [
   { id: 'pink', color: '#EC4899' },
   { id: 'orange', color: '#F97316' },
 ] as const;
+
+/** Shown until a colour is picked — hints that any colour is allowed. */
+const CUSTOM_SWATCH =
+  'conic-gradient(from 180deg, #ff6b35, #eab308, #22c55e, #3b82f6, #a855f7, #ec4899, #ff6b35)';
+
+/**
+ * Final pill in the accent row. Wraps a native colour input so the user can
+ * choose literally any colour instead of being limited to the eight presets;
+ * `ThemeContext` expands it into the full `--accent*` token set.
+ */
+function CustomAccentButton({ value, onSelect }: { value: string; onSelect: (hex: string) => void }) {
+  const { t } = useTranslation();
+  const selected = isCustomAccent(value);
+  const hex = selected ? value : '#ff6b35';
+
+  return (
+    <label
+      title={t('accents.custom')}
+      data-testid="accent-custom"
+      className={`relative flex items-center gap-2 pl-1.5 pr-3 py-1.5 rounded-full border transition-all cursor-pointer ${
+        selected
+          ? 'border-gray-900 dark:border-white bg-white dark:bg-white/10 shadow-md ring-2 ring-[rgb(var(--accent-rgb)/0.6)]'
+          : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:border-gray-300 dark:hover:border-white/25 hover:bg-white dark:hover:bg-white/10'
+      }`}
+    >
+      <span
+        className="w-6 h-6 rounded-full shadow-inner ring-1 ring-black/10 shrink-0"
+        style={{ background: selected ? hex : CUSTOM_SWATCH }}
+      />
+      <span
+        className={`text-xs font-semibold whitespace-nowrap tabular-nums ${
+          selected ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'
+        }`}
+      >
+        {selected ? hex.toUpperCase() : t('accents.custom')}
+      </span>
+      <input
+        type="color"
+        aria-label={t('accents.custom')}
+        value={hex}
+        onChange={(e) => onSelect(e.target.value)}
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+      />
+    </label>
+  );
+}
 
 export default function SettingsPage() {
   const { t, i18n } = useTranslation();
@@ -490,7 +538,7 @@ export default function SettingsPage() {
                 {t(`settings.payments.statuses.${p.status}`)}
               </span>
               <span className="w-24 text-right font-bold text-[var(--accent)] tabular-nums">
-                {Math.round(p.amount).toLocaleString('ru-RU')} {t('common.somoni')}
+                {formatAmount(Math.round(p.amount))} {t('common.somoni')}
               </span>
               <span className="w-28 text-right text-xs text-gray-400 tabular-nums">{formatDate(p.created_at)}</span>
             </div>
@@ -593,7 +641,11 @@ export default function SettingsPage() {
               </button>
             );
           })}
+          <CustomAccentButton value={accent} onSelect={setAccent} />
         </div>
+        <p className="mt-2 text-[11px] text-gray-400 dark:text-slate-500">
+          {t('accents.customHint')}
+        </p>
       </div>
     </div>
   );
@@ -699,7 +751,7 @@ export default function SettingsPage() {
     </div>
   );
 
-  const navButton = (id: SectionId, icon: any, label: string, mobile = false) => {
+  const navButton = (id: SectionId, Icon: ComponentType<{ className?: string }>, label: string, mobile = false) => {
     const isActive = active === id;
     return (
       <button
@@ -714,7 +766,7 @@ export default function SettingsPage() {
         data-nav={id}
         data-testid={`nav-${id}`}
       >
-        {icon && <icon className="w-4 h-4 shrink-0" />}
+        {Icon && <Icon className="w-4 h-4 shrink-0" />}
         <span className="truncate">{label}</span>
       </button>
     );

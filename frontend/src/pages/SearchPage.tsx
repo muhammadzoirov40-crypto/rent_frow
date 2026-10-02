@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   SlidersHorizontal,
@@ -9,25 +9,26 @@ import {
   ChevronRight,
   Grid3X3,
   List,
+  Map as MapIcon,
   MapPin,
   Star,
-  RotateCcw,
   AlertTriangle,
+  Package,
 } from 'lucide-react';
 import SearchBar from '../components/search/SearchBar';
+import FilterSidebar from '../components/search/FilterSidebar';
+import ActiveFilterChips from '../components/search/ActiveFilterChips';
+import RecentSearches from '../components/search/RecentSearches';
 import EmptyState from '../components/ui/EmptyState';
-import {
-  listings,
-  categories,
-  cities,
-  type ListingListItem,
-  type Category,
-  type City,
-  type District,
-} from '../api/index';
+import { listings, categories, cities, type ListingListItem } from '../api/index';
 import ListingGrid from '../components/listings/ListingGrid';
 import CustomSelect from '../components/ui/CustomSelect';
 import BackButton from '../components/ui/BackButton';
+import { rememberSearch } from '../utils/recentSearches';
+
+// Leaflet (~140 kB) is only needed once the user switches to the map view,
+// so it must not sit in the entry bundle.
+const MapView = lazy(() => import('../components/search/MapView'));
 
 const SORT_OPTIONS = [
   { value: 'relevance', labelKey: 'search.sortRelevance' },
@@ -37,196 +38,10 @@ const SORT_OPTIONS = [
   { value: 'rating', labelKey: 'search.sortRating' },
 ];
 
-const PRICE_UNITS = [
-  { value: '', labelKey: 'search.allUnits' },
-  { value: 'per_hour', labelKey: 'search.perHour' },
-  { value: 'per_day', labelKey: 'search.perDay' },
-  { value: 'per_week', labelKey: 'search.perWeek' },
-  { value: 'per_month', labelKey: 'search.perMonth' },
-];
-
 const ITEMS_PER_PAGE = 12;
 
-function FilterSidebar({
-  citiesList,
-  categoriesList,
-  districts,
-  filters,
-  onFilterChange,
-  onFilterPatch,
-  onReset,
-  loadingDistricts,
-}: {
-  citiesList: City[];
-  categoriesList: Category[];
-  districts: District[];
-  filters: Record<string, string>;
-  onFilterChange: (key: string, value: string) => void;
-  onFilterPatch: (patch: Record<string, string>) => void;
-  onReset: () => void;
-  loadingDistricts: boolean;
-}) {
-  const { t } = useTranslation();
-
-  const cityOptions = [
-    { value: '', label: t('search.allCities') },
-    ...citiesList.map((c) => ({ value: String(c.id), label: c.name })),
-  ];
-
-  const districtOptions = [
-    { value: '', label: t('search.allDistricts') },
-    ...districts.map((d) => ({ value: String(d.id), label: d.name })),
-  ];
-
-  const categoryOptions = [
-    { value: '', label: t('search.allCategories') },
-    ...categoriesList.map((c) => ({ value: String(c.id), label: c.name })),
-  ];
-
-  const labelCls =
-    'block text-[11px] font-bold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2';
-  const sectionCls =
-    'pb-4 mb-4 border-b border-gray-100 dark:border-white/[0.07] last:border-0 last:mb-0 last:pb-0';
-  const inputCls =
-    'w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.4)] focus:border-[rgb(var(--accent-rgb)/0.5)] transition';
-
-  return (
-    <div>
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.city')}</label>
-        <CustomSelect
-          options={cityOptions}
-          value={filters.city_id || ''}
-          onChange={(val) => onFilterPatch({ city_id: val, district_id: '' })}
-        />
-      </div>
-
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.district')}</label>
-        <CustomSelect
-          options={districtOptions}
-          value={filters.district_id || ''}
-          onChange={(val) => onFilterChange('district_id', val)}
-          disabled={!filters.city_id || loadingDistricts}
-        />
-      </div>
-
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.price')}</label>
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder={t('search.priceFrom')}
-            value={filters.price_min || ''}
-            onChange={(e) => onFilterChange('price_min', e.target.value)}
-            className={inputCls}
-          />
-          <span className="text-gray-300 dark:text-gray-600">&mdash;</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder={t('search.priceTo')}
-            value={filters.price_max || ''}
-            onChange={(e) => onFilterChange('price_max', e.target.value)}
-            className={inputCls}
-          />
-        </div>
-      </div>
-
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.priceUnit')}</label>
-        <CustomSelect
-          options={PRICE_UNITS.map((u) => ({ value: u.value, label: t(u.labelKey) }))}
-          value={filters.price_unit || ''}
-          onChange={(val) => onFilterChange('price_unit', val)}
-        />
-      </div>
-
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.category')}</label>
-        <CustomSelect
-          options={categoryOptions}
-          value={filters.category_id || ''}
-          onChange={(val) => onFilterChange('category_id', val)}
-        />
-      </div>
-
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.dates')}</label>
-        <div className="grid grid-cols-2 gap-2">
-          <input
-            type="date"
-            value={filters.start_date || ''}
-            onChange={(e) => onFilterChange('start_date', e.target.value)}
-            aria-label={t('search.dateFrom')}
-            className={inputCls}
-          />
-          <input
-            type="date"
-            value={filters.end_date || ''}
-            min={filters.start_date || undefined}
-            onChange={(e) => onFilterChange('end_date', e.target.value)}
-            aria-label={t('search.dateTo')}
-            className={inputCls}
-          />
-        </div>
-      </div>
-
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.ratingLabel')}</label>
-        <CustomSelect
-          options={[
-            { value: '', label: t('search.ratingAny') },
-            { value: '4', label: '4+' },
-            { value: '3', label: '3+' },
-            { value: '2', label: '2+' },
-          ]}
-          value={filters.min_rating || ''}
-          onChange={(val) => onFilterChange('min_rating', val)}
-        />
-      </div>
-
-      <div className={sectionCls}>
-        <label className={labelCls}>{t('search.availability')}</label>
-        <label className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/[0.07] px-3.5 py-3 cursor-pointer select-none hover:border-[rgb(var(--accent-rgb)/0.4)] hover:bg-[rgb(var(--accent-rgb)/0.05)] transition">
-          <input
-            type="checkbox"
-            checked={filters.available === 'true'}
-            onChange={(e) => onFilterChange('available', e.target.checked ? 'true' : '')}
-            className="peer sr-only"
-          />
-          <span className="w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent)] peer-focus-visible:ring-2 peer-focus-visible:ring-[rgb(var(--accent-rgb)/0.4)] transition" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('search.availableOnly')}</span>
-        </label>
-      </div>
-
-      <div className={sectionCls}>
-        <label className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/[0.07] px-3.5 py-3 cursor-pointer select-none hover:border-[rgb(var(--accent-rgb)/0.4)] hover:bg-[rgb(var(--accent-rgb)/0.05)] transition">
-          <input
-            type="checkbox"
-            checked={filters.is_verified === 'true'}
-            onChange={(e) => onFilterChange('is_verified', e.target.checked ? 'true' : '')}
-            className="peer sr-only"
-          />
-          <span className="w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent)] peer-focus-visible:ring-2 peer-focus-visible:ring-[rgb(var(--accent-rgb)/0.4)] transition" />
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('search.verifiedOnly')}</span>
-        </label>
-      </div>
-
-      <button
-        onClick={onReset}
-        className="w-full inline-flex items-center justify-center gap-2 py-3 rounded-xl border border-[rgb(var(--accent-rgb)/0.3)] bg-[rgb(var(--accent-rgb)/0.06)] text-sm font-bold text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:border-[rgb(var(--accent-rgb)/0.5)] transition"
-      >
-        <RotateCcw className="w-4 h-4" />
-        {t('search.resetFilters')}
-      </button>
-    </div>
-  );
-}
-
 export default function SearchPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
@@ -294,6 +109,7 @@ export default function SearchPage() {
     if (filters.city_id) p.city_id = filters.city_id;
     if (filters.district_id) p.district_id = filters.district_id;
     if (filters.category_id) p.category_id = filters.category_id;
+    if (filters.subcategory_id) p.subcategory_id = filters.subcategory_id;
     if (filters.price_min) p.price_min = filters.price_min;
     if (filters.price_max) p.price_max = filters.price_max;
     if (filters.price_unit) p.price_unit = filters.price_unit;
@@ -302,6 +118,12 @@ export default function SearchPage() {
     if (filters.available) p.available = filters.available === 'true';
     if (filters.start_date) p.start_date = filters.start_date;
     if (filters.end_date) p.end_date = filters.end_date;
+    if (filters.property_type) p.property_type = filters.property_type;
+    if (filters.rooms_min) p.rooms_min = filters.rooms_min;
+    if (filters.bathrooms_min) p.bathrooms_min = filters.bathrooms_min;
+    if (filters.furnished) p.furnished = filters.furnished === 'true';
+    if (filters.parking) p.parking = filters.parking === 'true';
+    if (filters.wifi_included) p.wifi_included = filters.wifi_included === 'true';
     if (currentSort !== 'relevance') p.sort_by = currentSort;
     return p;
   }, [filters, currentPage, currentSort]);
@@ -316,7 +138,15 @@ export default function SearchPage() {
   const totalItems: number = data?.total || 0;
   const totalPages: number = data?.pages || 1;
 
-  const [view, setView] = useState<'grid' | 'list'>('grid');
+  const [view, setView] = useState<'grid' | 'list' | 'map'>('grid');
+
+  const mapFocus = useMemo(() => {
+    const city = (citiesData || []).find((c) => String(c.id) === (filters.city_id || ''));
+    if (city && typeof city.latitude === 'number' && typeof city.longitude === 'number') {
+      return { lat: city.latitude, lng: city.longitude };
+    }
+    return null;
+  }, [citiesData, filters.city_id]);
 
   const paginationRange = useMemo(() => {
     const range: (number | string)[] = [];
@@ -348,13 +178,24 @@ export default function SearchPage() {
       <BackButton className="mb-4" />
       <div className="mb-6">
         <SearchBar
-          key={`${filters.q || ''}|${filters.city_id || ''}|${filters.start_date || ''}|${filters.end_date || ''}`}
+          key={[
+            filters.q || '',
+            filters.city_id || '',
+            filters.category_id || '',
+            filters.start_date || '',
+            filters.end_date || '',
+            filters.price_min || '',
+            filters.price_max || '',
+          ].join('|')}
           compact
           initial={{
             q: filters.q || '',
+            category_id: filters.category_id || '',
             city_id: filters.city_id || '',
             start_date: filters.start_date || '',
             end_date: filters.end_date || '',
+            price_min: filters.price_min || '',
+            price_max: filters.price_max || '',
           }}
           onSubmit={(values) => {
             const next = new URLSearchParams(searchParams);
@@ -363,15 +204,38 @@ export default function SearchPage() {
               else next.delete(key);
             };
             apply('q', values.q);
+            apply('category_id', values.category_id);
             apply('city_id', values.city_id);
             if (values.city_id !== (filters.city_id || '')) next.delete('district_id');
             apply('start_date', values.start_date);
             apply('end_date', values.end_date);
+            apply('price_min', values.price_min);
+            apply('price_max', values.price_max);
+            next.delete('page');
+            setSearchParams(next, { replace: true });
+            rememberSearch(values.q);
+          }}
+        />
+        <RecentSearches
+          visible={!filters.q}
+          onSelect={(term) => {
+            const next = new URLSearchParams(searchParams);
+            next.set('q', term);
             next.delete('page');
             setSearchParams(next, { replace: true });
           }}
         />
       </div>
+
+      <ActiveFilterChips
+        filters={filters}
+        citiesList={citiesData || []}
+        categoriesList={categoriesData?.items || []}
+        districts={districtsData || []}
+        onRemove={(key) => onFilterChange(key, '')}
+        onClearAll={onReset}
+      />
+
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-white/[0.07]">
         <div>
           <h1 className="text-[22px] font-extrabold tracking-tight text-[#1A1A2E] dark:text-white">
@@ -388,7 +252,7 @@ export default function SearchPage() {
             />
           </div>
 
-          <div className="hidden sm:flex items-center gap-1 border border-gray-200 dark:border-white/10 rounded-xl p-1 bg-white dark:bg-white/[0.03]">
+          <div className="flex items-center gap-1 border border-gray-200 dark:border-white/10 rounded-xl p-1 bg-white dark:bg-white/[0.03]">
             <button
               onClick={() => setView('grid')}
               className={`p-2 rounded-lg transition ${
@@ -404,6 +268,15 @@ export default function SearchPage() {
               }`}
             >
               <List className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setView('map')}
+              aria-label={t('search.mapView')}
+              className={`p-2 rounded-lg transition ${
+                view === 'map' ? 'bg-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.3)]' : 'text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5'
+              }`}
+            >
+              <MapIcon className="w-4 h-4" />
             </button>
           </div>
 
@@ -447,10 +320,19 @@ export default function SearchPage() {
               onAction={() => refetch()}
             />
           ) : view === 'list' ? (
+            listingsList.length === 0 && !isLoading ? (
+              <EmptyState
+                icon={Package}
+                title={t('search.emptyTitle')}
+                description={t('search.emptyText')}
+                actionLabel={t('common.reset')}
+                onAction={onReset}
+              />
+            ) : (
             <div className="flex flex-col gap-4">
               {listingsList.map((listing) => (
                 <div key={listing.id} className="w-full">
-                  <a href={`/listing/${listing.id}`} className="block">
+                  <Link to={`/listing/${listing.id}`} className="block">
                     <div className="bg-white dark:bg-[#1A1A2E] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden flex hover:shadow-lg transition-all">
                       <div className="w-56 flex-shrink-0 relative bg-gray-100">
                         {listing.primary_image ? (
@@ -474,9 +356,9 @@ export default function SearchPage() {
                         </h3>
                         <div className="mt-1 flex items-baseline gap-1">
                           <span className="text-lg font-extrabold text-[var(--accent)]">
-                            {listing.price.toLocaleString('ru-RU')}
+                            {listing.price.toLocaleString(i18n.language === 'en' ? 'en-US' : 'ru-RU')}
                           </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">сом</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">{t('common.somoni')}</span>
                         </div>
                         <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
                           <span className="flex items-center gap-1">
@@ -492,10 +374,37 @@ export default function SearchPage() {
                         </div>
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>
+            )
+          ) : view === 'map' ? (
+            isLoading ? (
+              <div
+                className="w-full rounded-2xl border border-gray-200 dark:border-white/10 animate-skeleton bg-gray-100 dark:bg-white/5"
+                style={{ height: '28rem' }}
+              />
+            ) : listingsList.length === 0 ? (
+              <EmptyState
+                icon={Package}
+                title={t('search.emptyTitle')}
+                description={t('search.emptyText')}
+                actionLabel={t('common.reset')}
+                onAction={onReset}
+              />
+            ) : (
+              <Suspense
+                fallback={
+                  <div
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 animate-skeleton bg-gray-100 dark:bg-white/5"
+                    style={{ height: '28rem' }}
+                  />
+                }
+              >
+                <MapView items={listingsList} focus={mapFocus} />
+              </Suspense>
+            )
           ) : (
             <ListingGrid listings={listingsList} loading={isLoading} />
           )}

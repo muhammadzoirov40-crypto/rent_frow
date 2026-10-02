@@ -14,10 +14,22 @@
       html.dark body { background-color: #020617; color: #e2e8f0; }
     </style>
     <script>
-      // Apply saved theme color before first paint (avoids flash of default accent)
+      // Restore the saved theme colour before first paint (no flash of the default accent).
+      // Presets are stylesheet rules toggled via `data-accent`; a custom colour is restored
+      // from the token set that src/utils/accent.ts already computed — so no colour maths
+      // is duplicated here.
       try {
         var a = localStorage.getItem('accent');
-        if (a && a !== 'original') document.documentElement.setAttribute('data-accent', a);
+        var isCustom = a && /^#[0-9a-f]{6}$/i.test(a);
+        if (isCustom) {
+          var vars = JSON.parse(localStorage.getItem('accentVars') || '{}');
+          if (vars && vars['--accent']) {
+            var style = document.documentElement.style;
+            for (var key in vars) style.setProperty(key, vars[key]);
+          }
+        } else if (a && a !== 'original') {
+          document.documentElement.setAttribute('data-accent', a);
+        }
       } catch (e) {}
     </script>
   </head>

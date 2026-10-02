@@ -17,6 +17,7 @@ import {
 import toast from 'react-hot-toast';
 import { listings } from '../../api';
 import type { Listing } from '../../api';
+import { formatAmount } from '../../utils/format';
 
 type StatusFilter = 'all' | 'ACTIVE' | 'PAUSED';
 
@@ -152,7 +153,7 @@ export default function ListingsSection() {
                         {l.title}
                       </Link>
                       <p className="text-sm font-semibold text-[var(--accent)] mt-0.5 tabular-nums">
-                        {l.price.toLocaleString('ru-RU')} {t('common.somoni')} / {t(`listing.${l.price_unit}`)}
+                        {formatAmount(l.price)} {t('common.somoni')} / {t(`listing.${l.price_unit}`)}
                       </p>
                     </div>
                     <div className="flex flex-col items-end gap-1.5 shrink-0">

@@ -5,16 +5,10 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { favorites, listings, type ListingListItem } from '../api';
 import BackButton from '../components/ui/BackButton';
-
-const PRICE_UNIT_LABELS: Record<string, string> = {
-  per_hour: '/час',
-  per_day: '/день',
-  per_week: '/неделю',
-  per_month: '/месяц',
-};
+import { formatPrice, formatPriceUnit } from '../utils/format';
 
 export default function FavoritesPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: favs = [], isLoading } = useQuery<ListingListItem[]>({
@@ -103,7 +97,10 @@ export default function FavoritesPage() {
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
                     <span className="text-xl font-bold text-[var(--accent)]">
-                      {listing.price.toLocaleString('ru-RU')} <span className="text-sm font-normal text-gray-500 dark:text-gray-400">сом{PRICE_UNIT_LABELS[listing.price_unit] || ''}</span>
+                      {formatPrice(listing.price, t, i18n.language)}{' '}
+                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        {formatPriceUnit(t, listing.price_unit)}
+                      </span>
                     </span>
                   </div>
                 </div>

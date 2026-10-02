@@ -11,21 +11,7 @@ import {
   getNotificationRoute,
   getTypeStyle,
 } from '../utils/notifications';
-import { parseDate, formatDate } from '../utils/dates';
-
-function timeAgo(dateStr: string): string {
-  const now = Date.now();
-  const then = parseDate(dateStr).getTime();
-  const seconds = Math.floor((now - then) / 1000);
-  if (seconds < 60) return 'только что';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} мин. назад`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ч. назад`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} дн. назад`;
-  return formatDate(dateStr);
-}
+import { timeAgo } from '../utils/timeAgo';
 
 export default function NotificationsPage() {
   const { t } = useTranslation();
@@ -71,14 +57,14 @@ export default function NotificationsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[calc(100vh-4rem)]">
+      <div className="flex items-center justify-center min-h-[calc(100vh_-_var(--header-h))]">
         <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-[calc(100vh_-_var(--header-h))] bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-2xl mx-auto">
         <BackButton className="mb-4" />
         <div className="flex items-center justify-between mb-8">
@@ -154,7 +140,7 @@ export default function NotificationsPage() {
                     )}
                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {timeAgo(notif.created_at)}
+                      {timeAgo(notif.created_at, t)}
                     </p>
                   </div>
                 </button>

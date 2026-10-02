@@ -23,6 +23,7 @@ export interface User {
   phone?: string;
   external_user_id: string;
   is_verified: boolean;
+  is_active: boolean;
   rating_sum: number;
   rating_count: number;
   listing_count: number;
@@ -95,12 +96,18 @@ export interface ListingListItem {
   is_verified?: boolean;
   created_at: string;
   is_favorited: boolean;
+  latitude?: number | null;
+  longitude?: number | null;
+  city_id?: number | null;
+  distance_km?: number | null;
 }
 
 export interface SubCategory {
   id: number;
   category_id: number;
   name: string;
+  name_tj?: string | null;
+  name_en?: string | null;
   icon: string | null;
 }
 
@@ -108,6 +115,8 @@ export interface Category {
   id: number;
   name: string;
   name_tj: string | null;
+  name_en?: string | null;
+  category_group?: string;
   description: string | null;
   icon: string | null;
   image_url: string | null;
@@ -121,6 +130,8 @@ export interface City {
   id: number;
   name: string;
   name_tj: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   is_active: boolean;
 }
 
@@ -205,6 +216,17 @@ export interface RentalRequest {
   owner_name: string | null;
 }
 
+export interface PaymentRecord {
+  id: number;
+  booking_id: number;
+  customer_id: number;
+  amount: number;
+  payment_type: 'BOOKING' | 'DEPOSIT' | 'DAMAGE' | 'LATE_FEE' | 'REFUND';
+  status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
+  transaction_id: string | null;
+  created_at: string;
+}
+
 const unwrap = <T>(response: { data: APIResponse<T> }): T => response.data.data;
 const unwrapPaginated = <T>(response: { data: PaginatedResponse<T> }): { items: T[]; total: number; page: number; pages: number } => ({
   items: response.data.data || [],
@@ -247,6 +269,9 @@ export const auth = {
 export const listings = {
   search: (params: Record<string, unknown>) =>
     client.get<PaginatedResponse<ListingListItem>>('/listings', { params }).then(unwrapPaginated),
+
+  nearby: (params: { lat: number; lng: number; radius?: number; limit?: number } & Record<string, unknown>) =>
+    client.get<APIResponse<(ListingListItem & { distance_km?: number | null })[]>>('/listings/nearby', { params }).then(unwrap),
 
   getOne: (id: number) =>
     client.get<APIResponse<Listing>>(`/listings/${id}`).then(unwrap),

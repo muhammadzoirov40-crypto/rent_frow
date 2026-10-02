@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
+import { formatAmount } from '../../utils/format'
 
 const monthlyData = [
   { name: 'Jan', revenue: 28000 },
@@ -22,7 +23,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-xs font-medium text-gray-500 mb-0.5">{label}-Apr 2025</p>
         <p className="text-[11px] text-gray-400 mb-1">Total Revenue</p>
         <p className="text-sm font-bold text-gray-900">
-          -${payload[0].value.toLocaleString('ru-RU')}
+          {formatAmount(payload[0].value)}
         </p>
       </div>
     )

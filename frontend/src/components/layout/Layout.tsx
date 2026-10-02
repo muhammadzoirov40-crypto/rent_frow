@@ -46,7 +46,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="flex flex-1 min-h-0">
         {!isAuthPage && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
         <div className="flex-1 min-w-0 flex flex-col">
-          <main className={`flex-1 pt-16 ${isAuthPage ? '' : 'pb-20'} md:pb-0`}>
+          <main className={`flex-1 pt-[var(--header-h)] ${isAuthPage ? '' : 'pb-20'} md:pb-0`}>
             {children}
           </main>
           {pathname === '/' && <Footer />}

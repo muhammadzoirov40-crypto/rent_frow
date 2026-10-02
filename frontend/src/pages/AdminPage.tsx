@@ -15,6 +15,7 @@ import {
 import client from '../api/client';
 import type { User, Listing, RentalRequest, Category } from '../api';
 import { formatDate } from '../utils/dates';
+import { formatAmount } from '../utils/format';
 
 interface AdminStats {
   totalUsers: number;
@@ -178,42 +179,6 @@ const adminApi = {
   deleteCategory: (id: number) => client.delete(`/categories/${id}`).then((r) => r.data),
 };
 
-const fallbackStats: AdminStats = {
-  totalUsers: 1284,
-  activeListings: 367,
-  rentalRequests: 89,
-  completedRentals: 2453,
-};
-
-const fallbackUsers: User[] = [
-  { id: 1, email: 'ali@example.com', role: 'ADMIN', display_name: 'Алишер Сатторов', avatar_url: '', created_at: '2025-01-15T10:00:00Z' } as any,
-  { id: 2, email: 'farhod@example.com', role: 'CUSTOMER', display_name: 'Фарход Назаров', avatar_url: '', created_at: '2025-03-20T14:30:00Z' } as any,
-  { id: 3, email: 'dilshod@example.com', role: 'CUSTOMER', display_name: 'Дилшод Раҳимов', avatar_url: '', created_at: '2025-06-10T08:15:00Z' } as any,
-  { id: 4, email: 'nikolay@example.com', role: 'CUSTOMER', display_name: 'Николай Петров', avatar_url: '', created_at: '2025-07-05T11:45:00Z' } as any,
-  { id: 5, email: 'maria@example.com', role: 'CUSTOMER', display_name: 'Мария Иванова', avatar_url: '', created_at: '2025-08-01T09:20:00Z' } as any,
-];
-
-const fallbackListings: Listing[] = [
-  { id: 1, title: 'Квартира в центре Душанбе', description: '', price: 800, price_unit: 'per_day', category_id: 1, city_id: 1, district_id: 1, owner_id: 2, images: [], status: 'ACTIVE', is_verified: true, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-10T10:00:00Z', updated_at: '2025-08-10T10:00:00Z' } as any,
-  { id: 2, title: 'Toyota Camry 2023', description: '', price: 150, price_unit: 'per_day', category_id: 2, city_id: 1, district_id: 2, owner_id: 3, images: [], status: 'ACTIVE', is_verified: true, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-12T14:30:00Z', updated_at: '2025-08-12T14:30:00Z' } as any,
-  { id: 3, title: 'Перфоратор Makita', description: '', price: 80, price_unit: 'per_day', category_id: 3, city_id: 2, district_id: 1, owner_id: 4, images: [], status: 'PAUSED', is_verified: false, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-15T08:00:00Z', updated_at: '2025-08-15T08:00:00Z' } as any,
-  { id: 4, title: 'Зал для мероприятий', description: '', price: 500, price_unit: 'per_day', category_id: 4, city_id: 1, district_id: 3, owner_id: 5, images: [], status: 'ACTIVE', is_verified: true, views_count: 0, rating_sum: 0, rating_count: 0, created_at: '2025-08-20T16:00:00Z', updated_at: '2025-08-20T16:00:00Z' } as any,
-];
-
-const fallbackRequests: RentalRequest[] = [
-  { id: 1, listing_id: 1, renter_id: 3, owner_id: 2, status: 'PENDING', start_date: '2025-09-01', end_date: '2025-09-30', total_days: 29, total_price: 23200, deposit_amount: 0, message: null, owner_response: null, created_at: '2025-08-25T10:00:00Z', updated_at: '2025-08-25T10:00:00Z', listing_title: null, renter_name: null, owner_name: null },
-  { id: 2, listing_id: 2, renter_id: 4, owner_id: 3, status: 'ACCEPTED', start_date: '2025-09-05', end_date: '2025-09-12', total_days: 7, total_price: 1050, deposit_amount: 0, message: null, owner_response: null, created_at: '2025-08-22T14:00:00Z', updated_at: '2025-08-22T14:00:00Z', listing_title: null, renter_name: null, owner_name: null },
-  { id: 3, listing_id: 3, renter_id: 5, owner_id: 4, status: 'REJECTED', start_date: '2025-09-10', end_date: '2025-09-15', total_days: 5, total_price: 400, deposit_amount: 0, message: null, owner_response: null, created_at: '2025-08-20T09:00:00Z', updated_at: '2025-08-20T09:00:00Z', listing_title: null, renter_name: null, owner_name: null },
-];
-
-const fallbackCategories: Category[] = [
-  { id: 1, name: 'Недвижимость', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
-  { id: 2, name: 'Транспорт', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
-  { id: 3, name: 'Инструменты', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
-  { id: 4, name: 'Мероприятия', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
-  { id: 5, name: 'Электроника', name_tj: null, description: null, icon: null, image_url: null, is_active: true, sort_order: 0, created_at: '2025-01-01T00:00:00Z', subcategories: [] },
-];
-
 type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'categories' | 'posts';
 
 function StatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
@@ -245,7 +210,7 @@ function StatusBadge({ status, t }: { status: string; t: (key: string) => string
 }
 
 export default function AdminPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
   const [adminSidebarCollapsed, setAdminSidebarCollapsed] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -258,8 +223,6 @@ export default function AdminPage() {
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
     queryKey: ['admin-stats'],
     queryFn: adminApi.getStats,
-    placeholderData: fallbackStats,
-    meta: { usePlaceholder: true },
   });
 
   const { data: chartData } = useQuery({
@@ -268,29 +231,29 @@ export default function AdminPage() {
     refetchInterval: 60000,
   });
 
-  const { data: users = fallbackUsers, isLoading: usersLoading } = useQuery({
+  const { data: users = [], isLoading: usersLoading, isError: usersError } = useQuery({
     queryKey: ['admin-users'],
     queryFn: adminApi.getUsers,
-    placeholderData: fallbackUsers,
   });
 
-  const { data: listings = fallbackListings, isLoading: listingsLoading } = useQuery({
+  const { data: listings = [], isLoading: listingsLoading, isError: listingsError } = useQuery({
     queryKey: ['admin-listings'],
     queryFn: adminApi.getListings,
-    placeholderData: fallbackListings,
   });
 
-  const { data: requests = fallbackRequests, isLoading: requestsLoading } = useQuery({
+  const { data: requests = [], isLoading: requestsLoading, isError: requestsError } = useQuery({
     queryKey: ['admin-requests'],
     queryFn: adminApi.getRequests,
-    placeholderData: fallbackRequests,
   });
 
-  const { data: categories = fallbackCategories, isLoading: categoriesLoading } = useQuery({
+  const { data: categories = [], isLoading: categoriesLoading, isError: categoriesError } = useQuery({
     queryKey: ['admin-categories'],
     queryFn: adminApi.getCategories,
-    placeholderData: fallbackCategories,
   });
+
+  // When the admin API itself is unreachable, say so instead of pretending
+  // the lists are simply empty.
+  const adminApiDown = usersError || listingsError || requestsError || categoriesError;
 
   const { data: crm, isLoading: crmLoading } = useQuery({
     queryKey: ['admin-crm'],
@@ -455,7 +418,7 @@ export default function AdminPage() {
         <aside
           className={`${
             adminSidebarCollapsed ? 'w-[76px]' : 'w-64'
-          } flex-shrink-0 bg-white dark:bg-gradient-to-b dark:from-[#1A1A2E] dark:via-[#171730] dark:to-[#12122a] border-r border-gray-200 dark:border-white/10 min-h-[calc(100vh-4rem)] sticky top-16 transition-[width] duration-300 ease-out overflow-hidden`}
+          } flex-shrink-0 bg-white dark:bg-gradient-to-b dark:from-[#1A1A2E] dark:via-[#171730] dark:to-[#12122a] border-r border-gray-200 dark:border-white/10 min-h-[calc(100vh_-_var(--header-h))] sticky top-[var(--header-h)] transition-[width] duration-300 ease-out overflow-hidden`}
         >
           <div className={adminSidebarCollapsed ? 'p-3' : 'p-4'}>
             <div
@@ -527,7 +490,7 @@ export default function AdminPage() {
                       </div>
                       <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
                     </div>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value.toLocaleString('ru-RU')}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatAmount(card.value)}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
                   </div>
                 ))}
@@ -662,7 +625,9 @@ export default function AdminPage() {
                           <BarChart3 className="w-4 h-4 text-gray-300 dark:text-gray-600" />
                         </div>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {card.label === t('admin.totalRevenue') ? `${card.value.toLocaleString('ru-RU')} сом` : card.value.toLocaleString('ru-RU')}
+                          {card.label === t('admin.totalRevenue')
+                            ? `${formatAmount(card.value, i18n.language)} ${t('common.somoni')}`
+                            : formatAmount(card.value, i18n.language)}
                         </p>
                         <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
                       </div>
@@ -693,7 +658,7 @@ export default function AdminPage() {
                               </div>
                               <p className="text-xs text-gray-400 mt-0.5">
                                 {t(`admin.crmType_${item.type}`)} · {item.user || '—'}
-                                {item.amount != null ? ` · ${item.amount.toLocaleString('ru-RU')} сом` : ''}
+                                {item.amount != null ? ` · ${formatAmount(item.amount, i18n.language)} ${t('common.somoni')}` : ''}
                               </p>
                             </div>
                             <p className="text-xs text-gray-400 whitespace-nowrap">
@@ -731,7 +696,7 @@ export default function AdminPage() {
                                 <td className="px-6 py-3 text-sm text-gray-500">{r.renter_name || '—'}</td>
                                 <td className="px-6 py-3 text-sm text-gray-500">{r.start_date} — {r.end_date}</td>
                                 <td className="px-6 py-3"><StatusBadge status={r.status.toLowerCase()} t={t} /></td>
-                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{r.total_price.toLocaleString('ru-RU')} сом</td>
+                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{formatAmount(r.total_price, i18n.language)} {t('common.somoni')}</td>
                                 <td className="px-6 py-3 text-sm text-gray-400">{formatDate(r.created_at)}</td>
                               </tr>
                             ))}
@@ -764,7 +729,7 @@ export default function AdminPage() {
                               <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
                                 <td className="px-6 py-3 text-sm text-gray-900 dark:text-white">#{p.id}</td>
                                 <td className="px-6 py-3 text-sm text-gray-500">{p.customer_name || '—'}</td>
-                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{p.amount.toLocaleString('ru-RU')} сом</td>
+                                <td className="px-6 py-3 text-sm font-semibold text-gray-900 dark:text-white">{formatAmount(p.amount, i18n.language)} {t('common.somoni')}</td>
                                 <td className="px-6 py-3"><StatusBadge status={p.status.toLowerCase()} t={t} /></td>
                                 <td className="px-6 py-3 text-sm text-gray-400">{formatDate(p.created_at)}</td>
                               </tr>
@@ -927,7 +892,7 @@ export default function AdminPage() {
                     </table>
                   </div>
                   {filteredUsers.length === 0 && (
-                    <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
                   )}
                 </div>
               )}
@@ -988,7 +953,7 @@ export default function AdminPage() {
                               </div>
                             </td>
                             <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white">
-                              {l.price} сом
+                              {formatAmount(l.price, i18n.language)} {t('common.somoni')}
                             </td>
                             <td className="px-6 py-4">
                               <StatusBadge status={l.status === 'ACTIVE' ? 'active' : l.status === 'PAUSED' ? 'inactive' : 'pending'} t={t} />
@@ -1029,7 +994,7 @@ export default function AdminPage() {
                     </table>
                   </div>
                   {filteredListings.length === 0 && (
-                    <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
                   )}
                 </div>
               )}
@@ -1098,7 +1063,7 @@ export default function AdminPage() {
                     </table>
                   </div>
                   {filteredRequests.length === 0 && (
-                    <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
                   )}
                 </div>
               )}
@@ -1167,7 +1132,7 @@ export default function AdminPage() {
                     </table>
                   </div>
                   {categories.length === 0 && (
-                    <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
                   )}
                 </div>
               )}
@@ -1273,7 +1238,7 @@ export default function AdminPage() {
                     </table>
                   </div>
                   {filteredPosts.length === 0 && (
-                    <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                    <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
                   )}
                 </div>
               )}

@@ -14,22 +14,9 @@ import Lightbox from '../components/chat/Lightbox';
 import CallOverlay, { type CallType } from '../components/chat/CallOverlay';
 import useChatSocket from '../components/chat/useChatSocket';
 import { parseContent } from '../components/chat/messageContent';
-import { parseDate, formatDate } from '../utils/dates';
+import { timeAgo } from '../utils/timeAgo';
 
-function timeAgo(dateStr: string): string {
-  const now = Date.now();
-  const then = parseDate(dateStr).getTime();
-  const seconds = Math.floor((now - then) / 1000);
-  if (seconds < 60) return 'только что';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes} мин. назад`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ч. назад`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} дн. назад`;
-  return formatDate(dateStr);
-}
-
+import { formatAmount } from '../utils/format';
 function voiceExt(mimeType: string): string {
   if (mimeType.includes('ogg')) return 'ogg';
   if (mimeType.includes('mp4')) return 'm4a';
@@ -326,7 +313,8 @@ export default function MessagesPage() {
   const handleEdit = (msg: Message) => {
     setReplyTo(null);
     setEditing(msg);
-    setInputText(parseContent(msg.content || '').kind === 'text' ? parseContent(msg.content).text : msg.content);
+    const parsed = parseContent(msg.content || '');
+    setInputText(parsed.kind === 'text' ? parsed.text : msg.content);
   };
 
   const handleReact = (id: number, emoji: string) => {
@@ -412,7 +400,7 @@ export default function MessagesPage() {
 
   if (convLoading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
+      <div className="flex items-center justify-center h-[calc(100vh_-_var(--header-h))]">
         <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -482,7 +470,7 @@ export default function MessagesPage() {
                         </span>
                         {conv.last_message_at && (
                           <span className={`text-[11px] flex-shrink-0 ml-2 ${unreadCount > 0 ? 'text-[var(--accent)] font-semibold' : 'text-gray-400'}`}>
-                            {timeAgo(conv.last_message_at)}
+                            {timeAgo(conv.last_message_at, t)}
                           </span>
                         )}
                       </div>
@@ -681,7 +669,7 @@ function ListingContextBar({ listingId }: { listingId: number }) {
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[#1A1A2E] dark:text-white truncate">{listing.title}</p>
         <p className="text-xs font-bold text-[var(--accent)]">
-          {listing.price.toLocaleString('ru-RU')} {t('common.somoni')} / {t(`listing.${listing.price_unit}`)}
+          {formatAmount(listing.price)} {t('common.somoni')} / {t(`listing.${listing.price_unit}`)}
         </p>
       </div>
       <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1 shrink-0">

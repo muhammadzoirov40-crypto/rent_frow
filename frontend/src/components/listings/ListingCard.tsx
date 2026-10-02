@@ -4,6 +4,7 @@ import { listings, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { formatAmount } from '../../utils/format';
 
 type ListingCardData = (Listing | ListingListItem) & {
   images?: { id: number; image_url: string }[];
@@ -200,7 +201,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         {hasPrice && (
           <div className="flex items-baseline gap-1.5 flex-wrap">
             <span className="text-[22px] font-extrabold leading-none text-[var(--accent)] tracking-tight">
-              {listing.price.toLocaleString('ru-RU')}
+              {formatAmount(listing.price)}
             </span>
             <span className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500">
               {t('common.somoni')}

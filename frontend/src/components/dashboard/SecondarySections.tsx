@@ -30,6 +30,7 @@ import { auth, listings, messages, reviews } from '../../api';
 import AvailabilityCalendar from '../listings/AvailabilityCalendar';
 import { useTheme } from '../../contexts/ThemeContext';
 import { dashboardApi } from '../../api/dashboardApi';
+import { formatAmount } from '../../utils/format';
 
 const CHART_PERIODS = ['7days', '30days', 'thismonth', '6months', 'lastyear'] as const;
 type ChartPeriod = (typeof CHART_PERIODS)[number];
@@ -277,7 +278,7 @@ export function EarningsSection() {
     if (summary || chart) setLoading(false);
   }, [summary, chart]);
 
-  const som = (n: number) => `${Math.round(n).toLocaleString('ru-RU')} ${t('common.somoni')}`;
+  const som = (n: number) => `${formatAmount(Math.round(n))} ${t('common.somoni')}`;
 
   if (loading || chartLoading) {
     return (

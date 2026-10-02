@@ -12,6 +12,7 @@ import type { RentalRequest } from '../api';
 import BackButton from '../components/ui/BackButton';
 import { formatDate } from '../utils/dates';
 
+import { formatAmount } from '../utils/format';
 type Tab = 'my-requests' | 'owner-requests';
 type Filter = 'upcoming' | 'pending' | 'completed' | 'cancelled';
 
@@ -52,7 +53,7 @@ export function RequestCard({
   });
 
   const image = listingInfo?.images?.[0]?.image_url ?? null;
-  const dayPrice = listingInfo ? `${listingInfo.price.toLocaleString('ru-RU')} ${t('common.somoni')} / ${t('listing.' + listingInfo.price_unit)}` : null;
+  const dayPrice = listingInfo ? `${formatAmount(listingInfo.price)} ${t('common.somoni')} / ${t('listing.' + listingInfo.price_unit)}` : null;
 
   const statusConfig: Record<string, { label: string; bg: string; text: string; dot: string }> = {
     PENDING: { label: t('booking.pending'), bg: 'bg-amber-50 dark:bg-amber-500/10', text: 'text-amber-700 dark:text-amber-400', dot: 'bg-amber-400' },
@@ -108,7 +109,7 @@ export function RequestCard({
             </span>
             {req.total_price > 0 && (
               <span className="font-bold text-[var(--accent)]">
-                {req.total_price.toLocaleString('ru-RU')} {t('common.somoni')}
+                {formatAmount(req.total_price)} {t('common.somoni')}
                 <span className="font-normal text-gray-400 dark:text-gray-500">
                   {' '}· {req.total_days} {t('listing.days')}
                 </span>

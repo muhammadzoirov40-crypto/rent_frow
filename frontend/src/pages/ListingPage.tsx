@@ -29,6 +29,8 @@ import {
 } from 'lucide-react';
 import { formatDate } from '../utils/dates';
 import { previousPath } from '../utils/navHistory';
+import { rememberViewed } from '../utils/recentlyViewed';
+import { formatAmount, formatPriceUnit } from '../utils/format';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
@@ -46,7 +48,7 @@ function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
 }
 
 export default function ListingPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -75,6 +77,24 @@ export default function ListingPage() {
   useEffect(() => {
     if (listing) {
       setIsFavorited(listing.is_favorited);
+      rememberViewed({
+        id: listing.id,
+        title: listing.title,
+        price: listing.price,
+        price_unit: listing.price_unit,
+        city_name: listing.city_name,
+        district_name: listing.district_name ?? undefined,
+        primary_image: listing.images?.find((i) => i.is_primary)?.image_url
+          || listing.images?.[0]?.image_url
+          || null,
+        views_count: listing.views_count,
+        average_rating: listing.average_rating,
+        rating_count: listing.rating_count,
+        is_verified: listing.is_verified,
+        available: listing.available,
+        created_at: listing.created_at,
+        is_favorited: listing.is_favorited,
+      });
     }
   }, [listing]);
 
@@ -434,7 +454,7 @@ export default function ListingPage() {
                 )}
 
                 <div className="mb-4">
-                  <span className="text-3xl font-extrabold text-[var(--accent)]">{listing.price.toLocaleString('ru-RU')}</span>
+                  <span className="text-3xl font-extrabold text-[var(--accent)]">{formatAmount(listing.price)}</span>
                   <span className="text-gray-500 dark:text-gray-400 text-sm ml-1">
                     {t('common.somoni')} / {t('listing.' + listing.price_unit)}
                   </span>
@@ -509,24 +529,24 @@ export default function ListingPage() {
                     </div>
                     <div className="flex items-center justify-between text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-white/10">
                       <span>
-                        {listing.price.toLocaleString('ru-RU')} {t('common.somoni')} × {days}
+                        {formatAmount(listing.price)} {t('common.somoni')} × {days}
                       </span>
                       <span className="font-semibold text-[#1A1A2E] dark:text-white">
-                        {Math.round(subtotal).toLocaleString('ru-RU')} {t('common.somoni')}
+                        {formatAmount(Math.round(subtotal))} {t('common.somoni')}
                       </span>
                     </div>
                     {(listing.deposit ?? 0) > 0 && (
                       <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                         <span>{t('booking.deposit')}</span>
                         <span className="font-semibold text-[#1A1A2E] dark:text-white">
-                          {listing.deposit.toLocaleString('ru-RU')} {t('common.somoni')}
+                          {formatAmount(listing.deposit)} {t('common.somoni')}
                         </span>
                       </div>
                     )}
                     <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-white/10">
                       <span className="font-bold text-[#1A1A2E] dark:text-white">{t('booking.total')}</span>
                       <span className="text-lg font-extrabold text-[var(--accent)]">
-                        {total.toLocaleString('ru-RU')} {t('common.somoni')}
+                        {formatAmount(total)} {t('common.somoni')}
                       </span>
                     </div>
                   </div>
@@ -788,7 +808,9 @@ export default function ListingPage() {
                       <MapPin size={12} className="text-gray-400" />
                       <span className="text-xs text-gray-500 dark:text-gray-400">{item.city_name}</span>
                     </div>
-                    <span className="block mt-2 text-lg font-bold text-[var(--accent)]">{item.price} сом</span>
+                    <span className="block mt-2 text-lg font-bold text-[var(--accent)]">
+                      {formatAmount(item.price, i18n.language)} {t('common.somoni')}
+                    </span>
                   </div>
                 </Link>
               ))}
@@ -834,7 +856,7 @@ export default function ListingPage() {
               <div className="flex justify-between gap-4 pt-1.5 border-t border-gray-200 dark:border-white/10">
                 <span className="font-bold text-[#1A1A2E] dark:text-white">{t('booking.total')}</span>
                 <span className="font-extrabold text-[var(--accent)]">
-                  {total.toLocaleString('ru-RU')} {t('common.somoni')}
+                  {formatAmount(total)} {t('common.somoni')}
                 </span>
               </div>
             </div>
@@ -921,10 +943,10 @@ export default function ListingPage() {
           <div className="bg-white dark:bg-[#151528] border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/10 px-3 py-2.5 flex items-center gap-3">
             <div className="min-w-0">
               <div className="text-lg font-extrabold text-[var(--accent)] leading-none">
-                {listing.price.toLocaleString('ru-RU')}
+                {formatAmount(listing.price, i18n.language)}
               </div>
               <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                сом / {t('listing.' + listing.price_unit)}
+                {t('common.somoni')} {formatPriceUnit(t, listing.price_unit)}
               </div>
             </div>
             <button

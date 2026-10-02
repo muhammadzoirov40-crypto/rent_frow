@@ -21,6 +21,7 @@ import {
   Shield,
 } from 'lucide-react'
 import MobileSidebar from './MobileSidebar'
+import SubNavbar from './SubNavbar'
 import useAuthStore from '../../store/authStore'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -31,7 +32,7 @@ import {
   getTypeStyle,
   notificationSummary,
 } from '../../utils/notifications'
-import { parseDate, formatDate } from '../../utils/dates';
+import { timeAgo } from '../../utils/timeAgo';
 
 const LANGUAGES = [
   { code: 'tj', label: 'Тоҷикӣ', flag: '🇹🇯' },
@@ -53,6 +54,21 @@ export default function Header() {
   const notifRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
   const langRef = useRef<HTMLDivElement>(null)
+  const headerRef = useRef<HTMLElement>(null)
+
+  // The header is `fixed`, so the rest of the page must know how tall it is.
+  // The sub-navbar changes that height per breakpoint, so measure it live
+  // instead of hardcoding a padding value in Layout/SiteSidebar.
+  useEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+    const sync = () =>
+      document.documentElement.style.setProperty('--header-h', `${el.offsetHeight}px`)
+    sync()
+    const ro = new ResizeObserver(sync)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const { data: unreadData } = useQuery({
     queryKey: ['unread-count'],
@@ -89,18 +105,6 @@ export default function Header() {
 
   const notifUnread = notifList.filter((n) => !n.is_read).length
 
-  const timeAgo = (iso: string) => {
-    const diff = Date.now() - parseDate(iso).getTime()
-    const mins = Math.floor(diff / 60000)
-    if (mins < 1) return 'сейчас'
-    if (mins < 60) return `${mins} мин назад`
-    const hours = Math.floor(mins / 60)
-    if (hours < 24) return `${hours} ч назад`
-    const days = Math.floor(hours / 24)
-    if (days < 30) return `${days} дн назад`
-    return formatDate(iso)
-  }
-
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false)
@@ -135,7 +139,10 @@ export default function Header() {
   const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0]
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1A1A2E] shadow-sm border-b border-gray-100 dark:border-white/10">
+    <header
+      ref={headerRef}
+      className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1A1A2E] shadow-sm border-b border-gray-100 dark:border-white/10"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-1 shrink-0">
@@ -261,7 +268,7 @@ export default function Header() {
                                     {!n.is_read && <span className="w-2 h-2 rounded-full bg-[var(--accent)] shrink-0 mt-1.5" />}
                                   </div>
                                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{summary}</p>
-                                  <p className="text-[11px] text-gray-400 mt-1.5">{timeAgo(n.created_at)}</p>
+                                  <p className="text-[11px] text-gray-400 mt-1.5">{timeAgo(n.created_at, t)}</p>
                                 </div>
                               </div>
                             </button>
@@ -383,6 +390,8 @@ export default function Header() {
           </div>
         </form>
       </div>
+
+      <SubNavbar />
 
       <MobileSidebar open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </header>

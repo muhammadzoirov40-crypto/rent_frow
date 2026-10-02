@@ -8,7 +8,13 @@ interface AuthUser {
   display_name: string | null;
   avatar_url?: string;
   phone?: string;
+  is_verified: boolean;
+  is_active: boolean;
+  rating_sum: number;
+  rating_count: number;
+  listing_count: number;
   created_at: string;
+  updated_at: string;
 }
 
 interface JwtPayload {
@@ -28,6 +34,15 @@ interface AuthState {
   initialize: () => Promise<void>;
 }
 
+/** Neutrality defaults — populates fields the backend `UserResponse` always returns. */
+const DEFAULT_USER_FIELDS = {
+  is_verified: false,
+  is_active: true,
+  rating_sum: 0,
+  rating_count: 0,
+  listing_count: 0,
+} as const;
+
 const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   token: null,
@@ -43,7 +58,9 @@ const useAuthStore = create<AuthState>((set, get) => ({
         email: user.email,
         role: user.role as AuthUser['role'],
         display_name: null,
+        ...DEFAULT_USER_FIELDS,
         created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       },
       isAuthenticated: true,
     });
@@ -88,7 +105,9 @@ const useAuthStore = create<AuthState>((set, get) => ({
           email: '',
           role: jwtRole,
           display_name: null,
+          ...DEFAULT_USER_FIELDS,
           created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         },
       });
 
@@ -99,15 +118,22 @@ const useAuthStore = create<AuthState>((set, get) => ({
       if (res.ok) {
         const json = await res.json();
         if (json.data) {
+          const me = json.data;
           set({
             user: {
-              id: json.data.id,
-              email: json.data.email,
-              role: json.data.role,
-              display_name: json.data.display_name,
-              avatar_url: json.data.avatar_url,
-              phone: json.data.phone,
-              created_at: json.data.created_at,
+              id: me.id,
+              email: me.email,
+              role: me.role,
+              display_name: me.display_name,
+              avatar_url: me.avatar_url,
+              phone: me.phone,
+              is_verified: me.is_verified ?? false,
+              is_active: me.is_active ?? true,
+              rating_sum: me.rating_sum ?? 0,
+              rating_count: me.rating_count ?? 0,
+              listing_count: me.listing_count ?? 0,
+              created_at: me.created_at,
+              updated_at: me.updated_at ?? me.created_at,
             },
           });
         }
