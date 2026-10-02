@@ -45,6 +45,17 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"
     CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
 
+    # --- AI assistant (Google Gemini) -------------------------------------
+    # The key is read server-side only and is never exposed to the browser.
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-2.0-flash"
+    GEMINI_TIMEOUT_SECONDS: float = 30.0
+    # Hard caps so a chat cannot loop on tools forever or burn quota.
+    AI_MAX_TOOL_STEPS: int = 6
+    AI_RATE_LIMIT_PER_MINUTE: int = 20
+    AI_MAX_MESSAGE_CHARS: int = 2000
+    AI_MAX_HISTORY: int = 30
+
     CORS_ORIGINS: list[str] = ["*"]
 
     model_config = {"env_file": ".env", "extra": "ignore"}

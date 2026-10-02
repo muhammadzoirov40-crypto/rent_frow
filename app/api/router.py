@@ -1,5 +1,6 @@
 from fastapi import APIRouter, WebSocket, Query
 from app.api.routes import (
+    ai,
     auth,
     equipment,
     categories,
@@ -29,6 +30,7 @@ from app.utils.websocket import websocket_endpoint
 api_router = APIRouter(prefix="/api/v1")
 
 api_router.include_router(auth.router)
+api_router.include_router(ai.router)
 api_router.include_router(equipment.router)
 api_router.include_router(categories.router)
 api_router.include_router(bookings.router)
