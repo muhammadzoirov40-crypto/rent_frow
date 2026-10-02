@@ -9,31 +9,73 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { tile: 'w-8 h-8 rounded-xl', word: 'text-lg' },
-  md: { tile: 'w-9 h-9 rounded-xl', word: 'text-lg' },
-  lg: { tile: 'w-11 h-11 rounded-2xl', word: 'text-xl' },
+  sm: { mark: 'w-8 h-8', word: 'text-lg' },
+  md: { mark: 'w-9 h-9', word: 'text-lg' },
+  lg: { mark: 'w-11 h-11', word: 'text-xl' },
 };
 
-function Mark({ className }: { className: string }) {
+/**
+ * House + handshake mark. Drawn inline (no raster asset) so it stays crisp at
+ * any size and re-tints itself with `currentColor`, which the theme wires to
+ * `var(--accent)` — every colour in the picker updates the logo for free.
+ */
+export function LogoMark({ className = '' }: { className?: string }) {
   return (
-    <span
-      className={`${className} shrink-0 flex items-center justify-center bg-gradient-to-br from-[var(--accent)] via-[var(--accent-light)] to-[var(--accent-light)] shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] ring-1 ring-inset ring-white/20`}
+    <svg
+      viewBox="0 0 64 64"
+      className={`${className} shrink-0 text-[var(--accent)]`}
+      aria-hidden="true"
+      focusable="false"
     >
-      <svg viewBox="0 0 64 64" className="w-[64%] h-[64%]" aria-hidden="true">
-        <path
-          d="M20 48V16h14.5c6.9 0 11.5 4.2 11.5 10.4 0 4.4-2.4 7.8-6.3 9.3L48 48h-7.8l-7.4-11.2H27V48h-7zm7-17.6h7.1c3.3 0 5.4-1.7 5.4-4.4s-2.1-4.4-5.4-4.4H27v8.8z"
-          fill="#fff"
-        />
-      </svg>
-    </span>
+      {/* walls, drawn first so the roof overlaps their tops cleanly */}
+      <path
+        d="M11.5 26V57h41V26"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* roof with overhanging eaves */}
+      <path
+        d="M4 31 32 7l28 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* four-pane window tucked under the right slope */}
+      <g fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
+        <rect x="37.5" y="22" width="11" height="11" rx="1.5" />
+        <path d="M43 22v11M37.5 27.5h11" />
+      </g>
+      {/* handshake — sleeves recede, the clasped hands sit in front */}
+      <g fill="none" stroke="currentColor" strokeOpacity="0.6" strokeWidth="9" strokeLinecap="round">
+        <path d="M16 53 26 46" />
+        <path d="M48 53 38 46" />
+      </g>
+      <rect x="22" y="40" width="20" height="13" rx="6" fill="currentColor" />
+      {/* thumb lying over the grip — the detail that reads as a hand, not a bar */}
+      <rect x="24" y="36" width="10" height="9" rx="4.5" fill="currentColor" />
+      {/* diagonal finger line instead of a flat one */}
+      <path
+        d="M33 50.5 39.5 44"
+        fill="none"
+        stroke="#fff"
+        strokeOpacity="0.7"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
 export default function Logo({ size = 'md', to = '/', showWord = true, hideWordOnMobile = false, onClick }: LogoProps) {
   const s = SIZES[size];
   return (
-    <Link to={to} onClick={onClick} className="flex items-center gap-2.5" data-testid="logo">
-      <Mark className={s.tile} />
+    <Link to={to} onClick={onClick} aria-label="RentHub" className="flex items-center gap-2.5" data-testid="logo">
+      <LogoMark className={s.mark} />
       {showWord && (
         <span
           className={`${s.word} font-extrabold tracking-tight ${hideWordOnMobile ? 'hidden sm:block' : ''}`}

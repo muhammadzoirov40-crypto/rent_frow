@@ -7,6 +7,7 @@ import { Mail, Lock, User, ArrowLeft, Loader2, CheckCircle2, Eye, EyeOff } from 
 import toast from 'react-hot-toast';
 import { auth } from '../api';
 import useAuthStore from '../store/authStore';
+import { LogoMark } from '../components/Logo';
 
 type AuthMode = 'login' | 'register';
 type Step = 'email' | 'otp';
@@ -229,10 +230,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#1A1A2E] px-4 transition-colors">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-            style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))' }}>
-            <span className="text-white font-bold text-2xl">R</span>
-          </div>
+          <LogoMark className="w-14 h-14 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white">{t('auth.rentflow')}</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">{t('auth.equipmentRentalMgmt')}</p>
         </div>

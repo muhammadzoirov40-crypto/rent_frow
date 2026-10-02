@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { LogoMark } from '../Logo'
 
 interface RevenloSidebarProps {
   open?: boolean
@@ -49,9 +50,7 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
         {/* Logo */}
         <div className="flex items-center justify-between px-5 h-[68px] shrink-0">
           <Link to="/revenlo" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[var(--accent)] flex items-center justify-center shadow-md shadow-[rgb(var(--accent-rgb)/0.25)]">
-              <span className="text-white font-extrabold text-base leading-none">R</span>
-            </div>
+            <LogoMark className="w-9 h-9" />
             <span className="text-lg font-extrabold text-gray-900 tracking-tight">
               RentHub <span className="text-[var(--accent)]">Admin</span>
             </span>
