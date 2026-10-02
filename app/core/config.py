@@ -48,13 +48,19 @@ class Settings(BaseSettings):
     # --- AI assistant (Google Gemini) -------------------------------------
     # The key is read server-side only and is never exposed to the browser.
     GEMINI_API_KEY: str = ""
-    # Picked empirically: 3.8 / flash-latest are capacity-throttled (503/timeouts)
-    # and the 2.5 line is retired for new keys.
-    GEMINI_MODEL: str = "gemini-3.5-flash"
-    # Tried automatically when the primary model is retired (404), overloaded
-    # (5xx) or times out, so one flaky model cannot take the assistant down.
-    GEMINI_FALLBACK_MODEL: str = "gemini-3.7-flash"
-    GEMINI_TIMEOUT_SECONDS: float = 30.0
+    # Picked empirically against this key, newest probe wins: the 2.5 line is
+    # retired for new keys (404) and flash-latest / 3.7 sit at 503 "high demand".
+    GEMINI_MODEL: str = "gemini-3.6-flash"
+    # Comma-separated fallback chain, tried in order. The free tier grants a
+    # *separate* daily quota per model (20/day on flash), so a chain multiplies
+    # usable requests instead of merely masking one flaky endpoint: once a model
+    # answers 404/429 the walker skips it for the rest of the call.
+    GEMINI_FALLBACK_MODELS: str = "gemini-3.8-flash,gemini-3.7-flash,gemini-flash-latest,gemini-3.5-flash"
+    GEMINI_TIMEOUT_SECONDS: float = 12.0
+    # Hard cap on the whole model walk for one Gemini call. Without it a chain
+    # of slow/failing models stacks its timeouts and the chat spinner sits for
+    # minutes; with it the worst case is one predictable wait for the user.
+    AI_REQUEST_BUDGET_SECONDS: float = 25.0
     # Hard caps so a chat cannot loop on tools forever or burn quota.
     AI_MAX_TOOL_STEPS: int = 6
     AI_RATE_LIMIT_PER_MINUTE: int = 20

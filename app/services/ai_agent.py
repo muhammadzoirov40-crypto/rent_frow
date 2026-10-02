@@ -20,6 +20,7 @@ import asyncio
 import json
 import logging
 import re
+import time
 from datetime import date
 from typing import Any, Awaitable, Callable
 from typing import Optional
@@ -463,11 +464,11 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
         },
     }
 
-    async def attempt(model: str):
+    async def attempt(model: str, timeout: float):
         """POST once. Returns (response, transport_error)."""
         target = f"{GEMINI_BASE}/models/{model}:generateContent"
         try:
-            async with httpx.AsyncClient(timeout=settings.GEMINI_TIMEOUT_SECONDS) as client:
+            async with httpx.AsyncClient(timeout=timeout) as client:
                 resp = await client.post(
                     target,
                     headers={"x-goog-api-key": settings.GEMINI_API_KEY},
@@ -477,48 +478,87 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
         except httpx.HTTPError as exc:
             return None, exc
 
+    # The user is watching a spinner for this entire walk, so the chain shares
+    # one deadline instead of each model claiming its own full timeout.
+    deadline = time.monotonic() + settings.AI_REQUEST_BUDGET_SECONDS
+
     resp, error = None, None
 
     # Capacity errors (5xx) are explicitly temporary at Google's side, so they
-    # get a short backoff. 429 (free-tier quota) and 404 (retired alias) are
-    # only cured by switching model — never by waiting.
+    # get one short backoff. 429 (free-tier quota) and 404 (retired alias) are
+    # only cured by the *next* model in the chain — never by waiting.
     CAPACITY = (500, 502, 503, 529)
-    SWITCHABLE = (404, 429)
-    MAX_ATTEMPTS = 3
+    MODEL_DEAD = (404, 429)
+    MAX_ATTEMPTS = 10
+    BACKOFF_SECONDS = 1.5
 
+    # Build the chain in order, de-duplicated, ignoring blanks so a trailing
+    # comma in the env var cannot smuggle an empty model name into the URL.
     models = [settings.GEMINI_MODEL]
-    if settings.GEMINI_FALLBACK_MODEL and settings.GEMINI_FALLBACK_MODEL != settings.GEMINI_MODEL:
-        models.append(settings.GEMINI_FALLBACK_MODEL)
+    for raw in settings.GEMINI_FALLBACK_MODELS.split(","):
+        name = raw.strip()
+        if name and name not in models:
+            models.append(name)
 
-    for i in range(MAX_ATTEMPTS):
-        model = models[i % len(models)]
-        resp, error = await attempt(model)
+    dead: set[str] = set()                       # answered 404/429 — quota spent
+    # 2 = the first try plus one backoff retry before walking down the chain.
+    capacity_budget = {m: 2 for m in models}
+    resp, error = None, None
+    i = 0
+
+    while i < MAX_ATTEMPTS:
+        # The first still-live model: not quota-dead, retry budget left.
+        live = [m for m in models if m not in dead and capacity_budget[m] > 0]
+        if not live:
+            break
+
+        model = live[0]
+        remaining = deadline - time.monotonic()
+        if remaining <= 1.0:
+            logger.warning("Gemini budget spent after %d attempt(s)", i)
+            break
+
+        i += 1
+        resp, error = await attempt(model, min(settings.GEMINI_TIMEOUT_SECONDS, remaining))
         if error is None and resp.status_code < 400:
             return resp.json()
 
         code = 0 if resp is None else resp.status_code
-        capacity = code in CAPACITY
-        retryable = error is not None or capacity
-        switchable = code in SWITCHABLE and len(models) > 1 and model == models[0]
 
-        if i == MAX_ATTEMPTS - 1 or not (retryable or switchable):
-            break
-        if switchable and not capacity:
-            logger.warning("Gemini model %s unavailable (%s), switching", model, code)
-        else:
+        if error is not None or code in CAPACITY:
+            capacity_budget[model] -= 1
             logger.warning(
-                "Gemini model %s -> %s, attempt %d of %d",
+                "Gemini %s -> %s, attempt %d of %d",
                 model,
                 code or type(error).__name__,
-                i + 1,
+                i,
                 MAX_ATTEMPTS,
             )
-            await asyncio.sleep(1.5 * (i + 1))
+            # Never sleep past the deadline: if the budget is nearly spent the
+            # next loop pass stops immediately instead of adding 1.5s first.
+            await asyncio.sleep(max(0.0, min(BACKOFF_SECONDS, deadline - time.monotonic())))
+            continue
+
+        if code in MODEL_DEAD:
+            dead.add(model)
+            logger.warning(
+                "Gemini model %s unavailable (%s), moving down the chain",
+                model,
+                code,
+            )
+            continue
+
+        break  # 400/401/403: switching models cannot fix a bad key or request
 
     if error is not None:
         raise AIAgentError(f"Gemini request failed: {error}", status_code=502) from error
+    if resp is None:
+        # Budget ran out before any model answered — nothing to report upstream.
+        raise AIAgentError("Gemini budget spent before any model answered", status_code=502)
     # Upstream quota exhaustion is a rate limit, not a broken provider —
     # surfacing 429 lets the client show its translated "wait a minute".
+    # Every other terminal failure is "unavailable" (502), never 503: the
+    # client reserves 503 for "GEMINI_API_KEY is not configured".
     raise AIAgentError(
         f"Gemini returned {resp.status_code}: {resp.text[:300]}",
         status_code=429 if resp.status_code == 429 else 502,
