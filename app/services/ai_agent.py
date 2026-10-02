@@ -21,7 +21,7 @@ import json
 import logging
 import re
 import time
-from datetime import date
+from datetime import date, datetime
 from typing import Any, Awaitable, Callable
 from typing import Optional
 
@@ -653,7 +653,7 @@ _CYR_TO_LAT = str.maketrans({
     "ф": "f", "х": "h", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "sch",
     "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
     # Tajik alphabet
-    "ғ": "g", "қ": "q", "ҳ": "h", "ӯ": "u", "ҷ": "j",
+    "ғ": "g", "қ": "q", "ҳ": "h", "ӯ": "u", "ҷ": "j", "ӣ": "i",
 })
 
 # Extra spellings users type for a city whose stored name transliterates
@@ -736,6 +736,151 @@ def _price_ceiling(message: str) -> int | None:
         if 0 < value <= 10_000_000:
             ceiling = max(ceiling, value)
     return ceiling or None
+
+
+# Canned answers for the questions visitors ask most often. They are reached
+# only when the model is unavailable (free-tier quota), so they are the
+# standing answer rather than the first choice — when Gemini is up it replies
+# in its own words. Every screen these texts point at exists in this app.
+_TJ_WEEKDAYS = (
+    "душанбе", "сешанбе", "чоршанбе", "панҷшанбе", "ҷумъа", "шанбе", "якшанбе",
+)
+_TJ_MONTHS = (
+    "январ", "феврал", "март", "апрел", "май", "июн",
+    "июл", "август", "сентябр", "октябр", "ноябр", "декабр",
+)
+
+_DATE_ASK = re.compile(
+    r"(чандумаст|chandumast|chandumust|\bдата\b|\bsana\b|"
+    r"имруз.{0,15}(чанд|кай)|imruz.{0,15}(chand|kay)|"
+    r"what'?s the (date|day)|what day)",
+    re.IGNORECASE,
+)
+
+_KNOWLEDGE: tuple[tuple[tuple[str, ...], str], ...] = (
+    (
+        ("кӯмак", "юмад", "help me", "помог", "что ты умеешь", "чӣ тавр истифода"),
+        "Ман ёвари AI-и RentHub ҳастам.\n"
+        "• Аз эълонҳои воқеии база ҷустуҷӯ мекунам — бипурсед: "
+        "«дар Душанбе квартира то 1500 сомонӣ» ё «арзонтарин велосипед».\n"
+        "• Дар бораи иҷора гирифтан, эълон гузоридан ва ҳисобатон савол диҳед.",
+    ),
+    (
+        ("чӣ тавр иҷора", "чӣ тавр бигирам", "как арендовать", "арендовать",
+         "how to rent", "how do i rent", "qanday ijara", "ijara olmoq"),
+        "Иҷора гирифтан:\n"
+        "1. Эълонро аз ҷустуҷӯ кушоед.\n"
+        "2. Агар ҳисоб надошта бошед — «Ворид шудан» ё «Ба қайд гирифтан» "
+        "(рӯи рости боло).\n"
+        "3. Дар саҳифаи эълон санаҳоро нишон диҳед ва дархост фиристед.\n"
+        "4. Ҷавоби соҳиб дар панели корӣ → «Дархостҳои ман» меояд.",
+    ),
+    (
+        ("эълон гузор", "эълон додан", "эълон эҷод", "разместить", "выставить",
+         "how to list", "how do i post", "объявление"),
+        "Эълон гузоридан:\n"
+        "1. Тугмаи «Эълон додан»-ро дар навигар пахш кунед.\n"
+        "2. Унвон, нарх, шаҳр ва суратҳоро ворид кунед.\n"
+        "3. Нашр кунед — эълон дар ҷустуҷӯ ва категорияҳо пайдо мешавад.\n"
+        "Эълонҳои худро дар панели корӣ мебинед.",
+    ),
+    (
+        ("чаро гарон", "почему дорого", "why expensive", "too expensive",
+         "гарон шуда", "дорого ст"),
+        "Нархро соҳиби эълон мегузорад, на RentHub.\n"
+        "Барои арзон ёфтан: филтри «Нарх»-ро истифода баред ё бипурсед "
+        "«арзонтарин вариантҳоро нишон деҳ» — ман арзонтаринҳоро аз база меёбам.",
+    ),
+    (
+        ("пардохт", "оплат", "payment", "стоимость", "чӣ қадар аст", "how much",
+         "қанчи туф"),
+        "Нарх дар саҳифаи эълон навишта шудааст — бо сомонӣ, барои рӯз, ҳафта ё моҳ.\n"
+        "Шартҳои пардохтро пеш аз фиристодани дархост бевосита бо соҳиби эълон "
+        "дар «Пайвастагиҳо» мувофиқа кунед.",
+    ),
+    (
+        ("ҳисоб", "ба қайд", "ворид шуд", "регистра", "аккаунт",
+         "login", "sign in", "sign up", "account"),
+        "Ҳисоб: тугмаҳои «Ворид шудан» ва «Ба қайд гирифтан» дар навигари боло.\n"
+        "Пас аз ворид шудан ҳама чиз дар панели корӣ аст: «Дӯстдоштаҳо», "
+        "«Пайвастагиҳо», «Дархостҳои ман» ва «Танзимот».",
+    ),
+    (
+        ("дӯстдошта", "фаворит", "избран", "favorites", "favorite"),
+        "Эълонҳои дӯстдошта: панели корӣ → «Дӯстдоштаҳо».\n"
+        "Дар саҳифаи эълон нуқтаи дилро пахш кунед, то он дар он ҷо ҷамъ шавад.",
+    ),
+    (
+        ("пайвастаги", "мукотиб", "как связаться", "тамос", "contact",
+         "messages", "чат"),
+        "Барои тамос бо соҳиби эълон: саҳифаи эълонро кушоед ва ба «Пайвастагиҳо» "
+        "гузаред — мукотиба дар он ҷо нигоҳ дошта мешавад.",
+    ),
+    (
+        ("дархост", "статус", "бекор", "отмен", "cancel", "рад кард"),
+        "Дархостҳо: панели корӣ → «Дархостҳои ман».\n"
+        "Дар он ҷо ҳолати ҳар дархост (дар интизорӣ, қабул шуд ё рад карда шуд) "
+        "ва санаҳояшро мебинед.",
+    ),
+    (
+        ("амният", "бехатар", "безопасн", "safety", "scam"),
+        "Барои бехатарӣ:\n"
+        "• Мукотибаро дар «Пайвастагиҳо» нигоҳ доред.\n"
+        "• Суратҳо, нарх ва рейтинги эълонро дар саҳифаи он санҷед.\n"
+        "• Шартҳои пардохтро пеш аз фиристодани дархост равшан кунед.",
+    ),
+    (
+        ("privacy", "terms", "условия", "махфият", "правила", "шартҳои истифода"),
+        "Шартҳои истифода дар саҳифаи «Шартҳо», сиёсати махфият дар саҳифаи "
+        "«Махфият» қарор доранд — онҳо дар поёни саҳифа пайваст шудаанд.",
+    ),
+)
+
+
+def _today_reply() -> str:
+    """Dushanbe wall clock, because the visitor asking is in Tajikistan."""
+    try:
+        from zoneinfo import ZoneInfo
+
+        now = datetime.now(ZoneInfo("Asia/Dushanbe"))
+    except Exception:  # missing tzdata beats a crash: UTC is better than a 500
+        now = datetime.now()
+    return (
+        f"Имрӯз {_TJ_WEEKDAYS[now.weekday()]}, {now.day} "
+        f"{_TJ_MONTHS[now.month - 1]}и {now.year}.\n\n"
+        "Ҳамчунин аз эълонҳои воқеӣ ҷустуҷӯ мекунам — бипурсед, масалан: "
+        "«дар Душанбе квартира то 1500 сомонӣ»."
+    )
+
+
+def _knowledge_answer(message: str) -> tuple[str, list, list[str]] | None:
+    """A standing answer for a common question, or None if we have nothing.
+
+    Matching runs on the folded (transliterated) text so «ҳисобам» and
+    "hisobim" hit the same rule. Needles shorter than five characters keep the
+    word boundary: a bare "login" must not match inside an unrelated word.
+    """
+    text = (message or "").strip()
+    if not text:
+        return None
+
+    if _DATE_ASK.search(text):
+        return _today_reply(), [], []
+
+    folded = _fold(text)
+    for needles, reply in _KNOWLEDGE:
+        for needle in needles:
+            token = _fold(needle)
+            if not token:
+                continue
+            hit = (
+                re.search(rf"\b{re.escape(token)}\b", folded)
+                if len(token) < 5
+                else token in folded
+            )
+            if hit:
+                return reply, [], []
+    return None
 
 
 async def _quick_answer(
@@ -859,9 +1004,10 @@ async def run_agent(
     model calls per model per day.
 
     If the model itself is unreachable — quota spent, every model at capacity,
-    budget expired — we degrade to a literal database search instead of failing,
-    so the assistant keeps answering with real listings. Only a missing API key
-    is still an error, because then there is nothing to talk to at all.
+    budget expired — we answer from what we already know (a standing reply for
+    common questions, then a literal database search) instead of failing, so the
+    assistant keeps being useful. Only a missing API key is still an error,
+    because then there is nothing to talk to at all.
     """
     settings = get_settings()
     if not settings.GEMINI_API_KEY:
@@ -877,9 +1023,12 @@ async def run_agent(
         if "not configured" in str(exc):
             raise
         logger.warning(
-            "model unavailable (HTTP %s), falling back to local search",
+            "model unavailable (HTTP %s), falling back to a local answer",
             exc.status_code,
         )
+        known = _knowledge_answer(message)
+        if known is not None:
+            return known
         return await _local_answer(db, user, message)
 
 

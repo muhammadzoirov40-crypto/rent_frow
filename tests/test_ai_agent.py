@@ -330,3 +330,81 @@ async def test_ambiguous_question_still_reaches_the_model(monkeypatch):
     assert model_calls == ["чаро нархҳо ин қадар гарон шудаанд?"]
     assert reply == "model reply"
     assert tools == ["search_listings"]
+
+
+# --------------------------------------------------------------------------
+# knowledge fallback — when the model is out of budget the visitor still
+# deserves a real answer, not a wall of unrelated cards.
+# --------------------------------------------------------------------------
+def test_knowledge_covers_the_common_questions():
+    cases = {
+        "чӣ тавр иҷора гирам?": "Иҷора гирифтан",
+        "как разместить объявление": "Эълон гузоридан",
+        "чаро нархҳо ин қадар гарон шудаанд?": "соҳиби эълон",
+        "ҳисобамро чӣ тавр кушоям": "Ворид шудан",
+        "how do i rent?": "Иҷора гирифтан",
+        "кумак": "ёвари AI",
+    }
+    for question, fragment in cases.items():
+        answer = agent._knowledge_answer(question)
+        assert answer is not None, question
+        reply, listings, tools = answer
+        assert fragment in reply, question
+        assert listings == [] and tools == []
+
+
+def test_knowledge_stays_silent_when_it_has_nothing_to_say():
+    """No invented policy: an uncovered question must fall through to the DB."""
+    assert agent._knowledge_answer("чаро дар онҷо ҳаво сард аст?") is None
+    assert agent._knowledge_answer("") is None
+    assert agent._knowledge_answer("salom") is None
+
+
+def test_date_question_gets_the_real_date():
+    answer = agent._knowledge_answer("salom imruz chandumast?")
+    assert answer is not None
+    reply, _, _ = answer
+    assert reply.startswith("Имрӯз")
+    assert any(day in reply for day in agent._TJ_WEEKDAYS)
+
+
+@pytest.mark.asyncio
+async def test_model_outage_answers_from_the_knowledge_base(monkeypatch):
+    monkeypatch.setattr(
+        agent, "get_settings", lambda: SimpleNamespace(GEMINI_API_KEY="test-key")
+    )
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    async def quota(db, user, message, history, settings):
+        raise AIAgentError("Gemini returned 429: daily quota", status_code=429)
+
+    monkeypatch.setattr(agent, "_run_with_model", quota)
+
+    reply, listings, tools = await agent.run_agent(None, None, "чӣ тавр эълон гузорам?")
+    assert reply.startswith("Эълон гузоридан")
+    assert listings == [] and tools == []
+
+
+@pytest.mark.asyncio
+async def test_model_outage_still_searches_for_an_unknown_question(monkeypatch):
+    monkeypatch.setattr(
+        agent, "get_settings", lambda: SimpleNamespace(GEMINI_API_KEY="test-key")
+    )
+
+    async def quota(db, user, message, history, settings):
+        raise AIAgentError("Gemini returned 429: daily quota", status_code=429)
+
+    monkeypatch.setattr(agent, "_run_with_model", quota)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    async def fake_tool(db, user, name, args):
+        return {"ok": True}, [object()]
+
+    monkeypatch.setattr(agent, "execute_tool", fake_tool)
+
+    reply, listings, tools = await agent.run_agent(
+        None, None, "чаро дар онҷо ҳаво сард аст?"
+    )
+    assert reply.startswith("Ҷустуҷӯи зуд")
+    assert len(listings) == 1
+    assert tools == ["search_listings"]
