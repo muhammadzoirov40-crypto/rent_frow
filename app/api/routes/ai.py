@@ -20,6 +20,7 @@ from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.dependencies import CurrentUser, get_current_user
 from app.schemas.ai import AIChatRequest, AIChatResponse, AIListingCard
+from app.schemas.base import APIResponse
 from app.services.ai_agent import AIAgentError, run_agent
 
 logger = logging.getLogger(__name__)
@@ -61,11 +62,13 @@ async def _enforce_rate_limit(key: str) -> None:
 
 def _to_card(listing) -> AIListingCard:
     resp = _listing_to_list_response(listing)
+    # PriceUnit is a str-enum; str() would render "PriceUnit.PER_DAY".
+    unit = resp.price_unit
     return AIListingCard(
         id=resp.id,
         title=resp.title,
         price=resp.price,
-        price_unit=str(resp.price_unit),
+        price_unit=getattr(unit, "value", None) or str(unit),
         rooms=resp.rooms,
         city_name=resp.city_name,
         district_name=resp.district_name,
@@ -76,7 +79,7 @@ def _to_card(listing) -> AIListingCard:
     )
 
 
-@router.post("/chat", response_model=AIChatResponse)
+@router.post("/chat", response_model=APIResponse[AIChatResponse])
 async def ai_chat(
     payload: AIChatRequest,
     request: Request,
@@ -102,10 +105,19 @@ async def ai_chat(
     except AIAgentError as exc:
         # Never leak the key or upstream body to the client.
         logger.warning("AI agent error: %s", exc)
-        raise HTTPException(status_code=502, detail="AI provider is unavailable right now.")
+        detail = (
+            "AI requests are temporarily over quota. Please try again in a minute."
+            if exc.status_code == 429
+            else "AI provider is unavailable right now."
+        )
+        raise HTTPException(status_code=exc.status_code, detail=detail)
 
-    return AIChatResponse(
-        reply=reply,
-        listings=[_to_card(l) for l in listings[:10]],
-        tools_used=tools_used,
+    return APIResponse[AIChatResponse](
+        success=True,
+        message="ok",
+        data=AIChatResponse(
+            reply=reply,
+            listings=[_to_card(l) for l in listings[:10]],
+            tools_used=tools_used,
+        ),
     )

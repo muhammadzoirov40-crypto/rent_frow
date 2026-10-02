@@ -16,6 +16,7 @@ imagination. The loop is hard-capped by ``AI_MAX_TOOL_STEPS``.
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import re
@@ -61,9 +62,11 @@ RULES
    costs, where it is, or for matching options — CALL A TOOL. Never invent a
    listing, price, city, rating, address or availability. If you did not get
    it from a tool, do not say it.
-3. After tool results, recommend 3-6 of the best options. For each: title,
-   price + period, city/district and rating if present. Then offer to open the
-   details or send a rental request.
+3. Be economical with tools: ONE well-formed search_listings call per\n\
+   question. If it already returned results, work from them — never repeat\n\
+   the same search with small variations (at most two searches per question).\n\
+   Then recommend 3-6 of the best options: title, price + period, city/district\n\
+   and rating if present. Offer to open the details or send a rental request.
 4. If a tool returns nothing, say so honestly and relax one filter (price, then
    city, then category) instead of guessing.
 5. Prices are Tajikistani somoni (СМ).
@@ -165,7 +168,16 @@ LOGIN_REQUIRED = {
 
 
 class AIAgentError(RuntimeError):
-    """Raised when the assistant cannot produce an answer (config/transport)."""
+    """Raised when the assistant cannot produce an answer (config/transport).
+
+    ``status_code`` is the HTTP status the route should surface: 429 when the
+    upstream quota is exhausted (the client has a translated message for it),
+    502 for anything else.
+    """
+
+    def __init__(self, message: str, status_code: int = 502):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 # --------------------------------------------------------------------------
@@ -450,20 +462,67 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
             "candidateCount": 1,
         },
     }
-    url = f"{GEMINI_BASE}/models/{settings.GEMINI_MODEL}:generateContent"
-    try:
-        async with httpx.AsyncClient(timeout=settings.GEMINI_TIMEOUT_SECONDS) as client:
-            resp = await client.post(
-                url,
-                headers={"x-goog-api-key": settings.GEMINI_API_KEY},
-                json=body,
-            )
-    except httpx.HTTPError as exc:
-        raise AIAgentError(f"Gemini request failed: {exc}") from exc
 
-    if resp.status_code >= 400:
-        raise AIAgentError(f"Gemini returned {resp.status_code}: {resp.text[:300]}")
-    return resp.json()
+    async def attempt(model: str):
+        """POST once. Returns (response, transport_error)."""
+        target = f"{GEMINI_BASE}/models/{model}:generateContent"
+        try:
+            async with httpx.AsyncClient(timeout=settings.GEMINI_TIMEOUT_SECONDS) as client:
+                resp = await client.post(
+                    target,
+                    headers={"x-goog-api-key": settings.GEMINI_API_KEY},
+                    json=body,
+                )
+                return resp, None
+        except httpx.HTTPError as exc:
+            return None, exc
+
+    resp, error = None, None
+
+    # Capacity errors (5xx) are explicitly temporary at Google's side, so they
+    # get a short backoff. 429 (free-tier quota) and 404 (retired alias) are
+    # only cured by switching model — never by waiting.
+    CAPACITY = (500, 502, 503, 529)
+    SWITCHABLE = (404, 429)
+    MAX_ATTEMPTS = 3
+
+    models = [settings.GEMINI_MODEL]
+    if settings.GEMINI_FALLBACK_MODEL and settings.GEMINI_FALLBACK_MODEL != settings.GEMINI_MODEL:
+        models.append(settings.GEMINI_FALLBACK_MODEL)
+
+    for i in range(MAX_ATTEMPTS):
+        model = models[i % len(models)]
+        resp, error = await attempt(model)
+        if error is None and resp.status_code < 400:
+            return resp.json()
+
+        code = 0 if resp is None else resp.status_code
+        capacity = code in CAPACITY
+        retryable = error is not None or capacity
+        switchable = code in SWITCHABLE and len(models) > 1 and model == models[0]
+
+        if i == MAX_ATTEMPTS - 1 or not (retryable or switchable):
+            break
+        if switchable and not capacity:
+            logger.warning("Gemini model %s unavailable (%s), switching", model, code)
+        else:
+            logger.warning(
+                "Gemini model %s -> %s, attempt %d of %d",
+                model,
+                code or type(error).__name__,
+                i + 1,
+                MAX_ATTEMPTS,
+            )
+            await asyncio.sleep(1.5 * (i + 1))
+
+    if error is not None:
+        raise AIAgentError(f"Gemini request failed: {error}", status_code=502) from error
+    # Upstream quota exhaustion is a rate limit, not a broken provider —
+    # surfacing 429 lets the client show its translated "wait a minute".
+    raise AIAgentError(
+        f"Gemini returned {resp.status_code}: {resp.text[:300]}",
+        status_code=429 if resp.status_code == 429 else 502,
+    )
 
 
 def _candidate_parts(data: dict) -> list[dict]:
@@ -495,6 +554,16 @@ FALLBACK_REPLY = (
     "Мушкил техникӣ пеш омад — лутфан каме баъдтар аз нав кӯшиш кунед. "
     "| Техническая ошибка — попробуйте позже. "
     "| Something went wrong, please try again in a moment."
+)
+
+# We ran out of loop steps but the tools did return matches — say so instead
+# of pretending the search failed, because the cards are rendered anyway.
+FOUND_FALLBACK_REPLY = (
+    "Ин вариантҳоро ёфтам, вале шарҳро натавонистам ба охир расонам — "
+    "карточкаҳо дар поён. "
+    "| Варианты найдены, но дописать ответ не удалось — карточки ниже. "
+    "| I found these options but ran out of steps to summarise them — "
+    "the cards are below."
 )
 
 
@@ -545,4 +614,4 @@ async def run_agent(
         contents.append({"role": "user", "parts": responses})
 
     # Step budget exhausted — be honest instead of looping further.
-    return FALLBACK_REPLY, listings, tools_used
+    return (FOUND_FALLBACK_REPLY if listings else FALLBACK_REPLY), listings, tools_used

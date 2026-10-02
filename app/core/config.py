@@ -48,7 +48,12 @@ class Settings(BaseSettings):
     # --- AI assistant (Google Gemini) -------------------------------------
     # The key is read server-side only and is never exposed to the browser.
     GEMINI_API_KEY: str = ""
-    GEMINI_MODEL: str = "gemini-2.0-flash"
+    # Picked empirically: 3.8 / flash-latest are capacity-throttled (503/timeouts)
+    # and the 2.5 line is retired for new keys.
+    GEMINI_MODEL: str = "gemini-3.5-flash"
+    # Tried automatically when the primary model is retired (404), overloaded
+    # (5xx) or times out, so one flaky model cannot take the assistant down.
+    GEMINI_FALLBACK_MODEL: str = "gemini-3.7-flash"
     GEMINI_TIMEOUT_SECONDS: float = 30.0
     # Hard caps so a chat cannot loop on tools forever or burn quota.
     AI_MAX_TOOL_STEPS: int = 6
