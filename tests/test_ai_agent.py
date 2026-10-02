@@ -224,3 +224,109 @@ async def test_rate_limit_can_be_disabled(monkeypatch):
     for _ in range(50):
         await ai_route._enforce_rate_limit(key)
     assert key not in ai_route._rate_buckets
+
+
+# --------------------------------------------------------------------------
+# quota-aware routing
+#
+# The free Gemini tier budgets 20 calls per model per day, so a lookup the
+# database can already answer must never reach the model.
+# --------------------------------------------------------------------------
+def _route_harness(monkeypatch, model_calls: list[str]):
+    """Patch settings + the model, and record every message that reaches it."""
+
+    async def fake_model(db, user, message, history, settings):
+        model_calls.append(message)
+        return "model reply", [], ["search_listings"]
+
+    monkeypatch.setattr(
+        agent, "get_settings", lambda: SimpleNamespace(GEMINI_API_KEY="test-key")
+    )
+    monkeypatch.setattr(agent, "_run_with_model", fake_model)
+
+
+@pytest.mark.asyncio
+async def test_plain_lookup_is_answered_without_the_model(monkeypatch):
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+
+    async def fake_tool(db, user, name, args):
+        return {"ok": True}, [object(), object()]
+
+    monkeypatch.setattr(agent, "execute_tool", fake_tool)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    reply, listings, tools = await agent.run_agent(
+        None, None, "дар Душанбе квартира то 1500 сомонӣ"
+    )
+    assert model_calls == [], "a plain lookup must not spend a model call"
+    assert reply.startswith("Ҷустуҷӯи зуд")
+    assert len(listings) == 2
+    assert tools == ["search_listings"]
+
+
+@pytest.mark.asyncio
+async def test_browse_request_skips_the_model(monkeypatch):
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    async def fake_tool(db, user, name, args):
+        return {"ok": True}, []
+
+    monkeypatch.setattr(agent, "execute_tool", fake_tool)
+
+    reply, _, tools = await agent.run_agent(None, None, "чӣ чизҳо барои иҷора ҳаст?")
+    assert model_calls == []
+    assert reply.startswith("Ҷустуҷӯи зуд")
+    assert tools == ["search_listings"]
+
+
+@pytest.mark.asyncio
+async def test_greeting_is_answered_without_the_model(monkeypatch):
+    """Latin and Cyrillic greetings alike are a fixed reply, not a search."""
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    for greeting in ("salom", "Салом", "salom, чӣ хабар?"):
+        reply, listings, tools = await agent.run_agent(None, None, greeting)
+        assert reply == agent._LOCAL_GREETING, greeting
+        assert listings == [] and tools == []
+
+    assert model_calls == []
+
+
+@pytest.mark.asyncio
+async def test_greeting_plus_structure_is_still_a_search(monkeypatch):
+    """The search wins over the greeting — the visitor asked for cards."""
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    async def fake_tool(db, user, name, args):
+        return {"ok": True}, [object()]
+
+    monkeypatch.setattr(agent, "execute_tool", fake_tool)
+
+    reply, listings, tools = await agent.run_agent(
+        None, None, "салом, дар Душанбе квартира то 1500"
+    )
+    assert model_calls == []
+    assert reply.startswith("Ҷустуҷӯи зуд")
+    assert len(listings) == 1
+
+
+@pytest.mark.asyncio
+async def test_ambiguous_question_still_reaches_the_model(monkeypatch):
+    """Opinion/how-to questions have no database answer — that is what the model is for."""
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    reply, _, tools = await agent.run_agent(
+        None, None, "чаро нархҳо ин қадар гарон шудаанд?"
+    )
+    assert model_calls == ["чаро нархҳо ин қадар гарон шудаанд?"]
+    assert reply == "model reply"
+    assert tools == ["search_listings"]

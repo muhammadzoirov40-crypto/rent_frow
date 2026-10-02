@@ -680,7 +680,18 @@ _QUERY_WORDS = (
     "велосипед", "камера", "либос", "инструмент", "абзор",
 )
 _GREETING = re.compile(
-    r"^(салом|assalomu|assalom|привет|hello|хайр|саломет|сайн)\b", re.IGNORECASE
+    # Latin «salom» as well: Tajik is the default language, but plenty of
+    # visitors type it in Latin, and every unmatched greeting cost a model call.
+    r"^(салом|salom|salam|assalomu|assalom|привет|hello|хайр|саломет|сайн)\b",
+    re.IGNORECASE,
+)
+
+# «Just show me what you have» phrasings. A browse like this is served by the
+# database alone, so it must not spend one of the 20 model calls a day.
+_BROWSE = re.compile(
+    r"(чӣ чизҳо|чи чизхо|что есть|нишон деҳ|нишондиҳ|покажи|показа|намоиш|"
+    r"арзонтарин|дешевле|самый дешёв|популярн|популяр|оммавӣ)",
+    re.IGNORECASE,
 )
 
 _LOCAL_GREETING = (
@@ -725,6 +736,44 @@ def _price_ceiling(message: str) -> int | None:
         if 0 < value <= 10_000_000:
             ceiling = max(ceiling, value)
     return ceiling or None
+
+
+async def _quick_answer(
+    db: AsyncSession, user, message: str
+) -> tuple[str, list, list[str]] | None:
+    """Serve an obvious rental lookup from the database, or None if the model is needed.
+
+    The free Gemini tier allows 20 calls per model per day, while the cards for
+    «apartment in Dushanbe under 1500» come out of the same SQL either way.
+    Routing the lookups the database can already answer keeps that budget for
+    the questions that genuinely need a model — comparisons, how-tos, account
+    questions, anything ambiguous.
+    """
+    text = (message or "").strip()
+    if not text:
+        return None
+
+    global _CITY_CACHE
+    if _CITY_CACHE is None:
+        _CITY_CACHE = [c.name for c in await CityRepository(db).get_all_active()]
+
+    lowered = text.casefold()
+    plain = bool(
+        _find_city(text, _CITY_CACHE)
+        or _price_ceiling(text)
+        or _BROWSE.search(text)
+        or any(word in lowered for word in _QUERY_WORDS)
+    )
+    if plain:
+        # «салом, дар Душанбе квартира» still counts as a search: the structure
+        # wins over the greeting, so the caller gets cards, not small talk.
+        return await _local_answer(db, user, text)
+
+    # Nothing structural matched. A greeting is a fixed reply the model would
+    # only retype — everything else genuinely needs a model to answer.
+    if _GREETING.match(text):
+        return _LOCAL_GREETING, [], []
+    return None
 
 
 async def _local_answer(db: AsyncSession, user, message: str) -> tuple[str, list, list[str]]:
@@ -805,6 +854,10 @@ async def run_agent(
 ) -> tuple[str, list, list[str]]:
     """Drive the Gemini ↔ tool loop. Returns (reply, listing_objects, tools_used).
 
+    Obvious lookups are answered straight from the database first: they would
+    produce the same cards as the model, and the free tier only budgets 20
+    model calls per model per day.
+
     If the model itself is unreachable — quota spent, every model at capacity,
     budget expired — we degrade to a literal database search instead of failing,
     so the assistant keeps answering with real listings. Only a missing API key
@@ -813,6 +866,10 @@ async def run_agent(
     settings = get_settings()
     if not settings.GEMINI_API_KEY:
         raise AIAgentError("GEMINI_API_KEY is not configured")
+
+    quick = await _quick_answer(db, user, message)
+    if quick is not None:
+        return quick
 
     try:
         return await _run_with_model(db, user, message, history or [], settings)
