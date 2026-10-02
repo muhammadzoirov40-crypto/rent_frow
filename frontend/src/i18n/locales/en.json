@@ -1048,5 +1048,25 @@
     "s5b": "You may access, correct, or delete your personal data at any time from your account settings. You may also object to certain processing or request a copy of your data by contacting us.",
     "s6h": "Cookies",
     "s6b": "RentHub uses cookies and local storage to keep you signed in, remember your preferences, and understand how the platform is used. You can control cookies through your browser settings."
+  },
+  "assistant": {
+    "title": "RentHub Assistant",
+    "subtitle": "AI helper · answers from real listings",
+    "welcome": "Hi! I'm the RentHub AI assistant. I can find apartments, cars, equipment and other rentals straight from the real RentHub database.\n\nTry: \"what's available in Dushanbe under 1500 somoni?\"",
+    "placeholder": "Ask about rentals...",
+    "send": "Send",
+    "close": "Close",
+    "clear": "New chat",
+    "thinking": "Searching RentHub...",
+    "error": "Something went wrong. Please try again.",
+    "notConfigured": "The assistant isn't configured yet.",
+    "unavailable": "The assistant is temporarily unavailable.",
+    "rateLimited": "Too many requests. Please wait a minute.",
+    "sugApartment": "Apartment in Dushanbe under 1500",
+    "sugCar": "Rent a car for 3 days",
+    "sugCheapest": "Show the cheapest options",
+    "sugExplore": "What can I rent in Dushanbe?",
+    "found": "Found",
+    "disclaimer": "AI answers. Always double-check the details on the listing page."
   }
 }

@@ -479,3 +479,37 @@ export const upload = {
     }).then(unwrap);
   },
 };
+
+// ---------------------------------------------------------------------------
+// In-app AI assistant (Gemini + RentHub tools)
+// ---------------------------------------------------------------------------
+
+export interface AIListingCard {
+  id: number;
+  title: string;
+  price: number;
+  price_unit: string;
+  rooms: number | null;
+  city_name: string | null;
+  district_name: string | null;
+  primary_image: string | null;
+  average_rating: number | null;
+  rating_count: number;
+  available: boolean;
+}
+
+export interface AIMessageTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface AIChatResult {
+  reply: string;
+  listings: AIListingCard[];
+  tools_used: string[];
+}
+
+export const ai = {
+  chat: (message: string, history: AIMessageTurn[]) =>
+    client.post<APIResponse<AIChatResult>>('/ai/chat', { message, history }).then(unwrap),
+};

@@ -4,6 +4,7 @@ import Header from './Header'
 import Footer from './Footer'
 import MobileBottomNav from './MobileBottomNav'
 import SiteSidebar from './SiteSidebar'
+import AssistantWidget from '../ai/AssistantWidget'
 import { useLocation } from 'react-router-dom'
 import useAuthStore from '../../store/authStore'
 import { useAuth } from '../../hooks/useAuth'
@@ -53,6 +54,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
       {!isAuthPage && <MobileBottomNav isAuthenticated={isAuthenticated} />}
+      {!isAuthPage && <AssistantWidget />}
     </div>
   )
 }
