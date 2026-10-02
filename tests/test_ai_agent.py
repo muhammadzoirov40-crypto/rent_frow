@@ -317,6 +317,33 @@ async def test_greeting_plus_structure_is_still_a_search(monkeypatch):
     assert len(listings) == 1
 
 
+def test_bare_greeting_is_distinguished_from_a_real_question():
+    assert agent._is_bare_greeting("salom")
+    assert agent._is_bare_greeting("Салом, чӣ хабар?")
+    assert agent._is_bare_greeting("hello")
+
+    # a greeting followed by something worth answering must not swallow it
+    assert not agent._is_bare_greeting("salom imruz chandumast?")
+    assert not agent._is_bare_greeting("салом, дар Душанбе квартира")
+    assert not agent._is_bare_greeting("чаро гарон аст?")
+
+
+@pytest.mark.asyncio
+async def test_date_is_answered_off_the_clock_not_with_small_talk(monkeypatch):
+    """The screenshot case: «salom imruz chandumast?» must get the date."""
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    reply, listings, tools = await agent.run_agent(
+        None, None, "salom imruz chandumast?"
+    )
+    assert model_calls == []
+    assert reply.startswith("Имрӯз")
+    assert any(day in reply for day in agent._TJ_WEEKDAYS)
+    assert listings == [] and tools == []
+
+
 @pytest.mark.asyncio
 async def test_ambiguous_question_still_reaches_the_model(monkeypatch):
     """Opinion/how-to questions have no database answer — that is what the model is for."""

@@ -682,7 +682,8 @@ _QUERY_WORDS = (
 _GREETING = re.compile(
     # Latin «salom» as well: Tajik is the default language, but plenty of
     # visitors type it in Latin, and every unmatched greeting cost a model call.
-    r"^(салом|salom|salam|assalomu|assalom|привет|hello|хайр|саломет|сайн)\b",
+    r"^(салом|salom|salam|assalomu|assalom|привет|hello|хайр|саломет|сайн|"
+    r"чӣ хабар|чи хабар|как дела)\b",
     re.IGNORECASE,
 )
 
@@ -693,6 +694,26 @@ _BROWSE = re.compile(
     r"арзонтарин|дешевле|самый дешёв|популярн|популяр|оммавӣ)",
     re.IGNORECASE,
 )
+
+# Anything past the opening hello is a real question. Without this,
+# «salom imruz chandumast?» would be swallowed by the greeting branch and the
+# visitor would get small talk instead of the answer they asked for.
+_GREETING_FILLER = re.compile(
+    r"(салом|salom|salam|assalomu|assalom|привет|hello|хайр|саломет|сайн|"
+    r"чӣ хабар|чи хабар|как дела|ҳолат|holat)",
+    re.IGNORECASE,
+)
+
+
+def _is_bare_greeting(text: str) -> bool:
+    """True for «salom» and «салом, чӣ хабар?», false for hello plus a question."""
+    if _DATE_ASK.search(text):
+        return False
+    if not _GREETING.match(text):
+        return False
+    rest = _GREETING_FILLER.sub(" ", text)
+    rest = re.sub(r"[!?,.;:]+", " ", rest)
+    return len(rest.split()) <= 2
 
 _LOCAL_GREETING = (
     "Салом! Ман ёвари AI-и RentHub ҳастам. Метавонам квартира, мошин, "
@@ -914,9 +935,14 @@ async def _quick_answer(
         # wins over the greeting, so the caller gets cards, not small talk.
         return await _local_answer(db, user, text)
 
+    # The date is a fact, not an opinion — read it off the clock here, before
+    # the greeting branch would answer «salom imruz chandumast?» with small talk.
+    if _DATE_ASK.search(text):
+        return _today_reply(), [], []
+
     # Nothing structural matched. A greeting is a fixed reply the model would
     # only retype — everything else genuinely needs a model to answer.
-    if _GREETING.match(text):
+    if _is_bare_greeting(text):
         return _LOCAL_GREETING, [], []
     return None
 
