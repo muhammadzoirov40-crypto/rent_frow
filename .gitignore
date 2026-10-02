@@ -25,3 +25,6 @@ backend.pid
 .env.*
 backups/
 nohup.out
+
+# browser-audit output: screenshots + headless Chrome profiles
+audit/
