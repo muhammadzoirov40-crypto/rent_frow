@@ -50,6 +50,10 @@ SORT_OPTIONS = {"price_asc", "price_desc", "rating", "views"}
 
 MAX_RESULTS_PER_SEARCH = 8
 
+# Whole-chain failure bookkeeping for the circuit breaker in _call_gemini().
+# A plain module dict is safe here: every access happens on the event loop.
+_CIRCUIT: dict[str, float] = {"failures": 0.0, "open_until": 0.0, "status": 502.0}
+
 
 SYSTEM_PROMPT = """\
 You are "RentHub Assistant", the built-in AI agent of RentHub — a rental
@@ -482,6 +486,16 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
     # one deadline instead of each model claiming its own full timeout.
     deadline = time.monotonic() + settings.AI_REQUEST_BUDGET_SECONDS
 
+    # Circuit breaker: the free tier fails the same way for hours, so once the
+    # whole chain has failed twice in a row we skip Google entirely and let the
+    # caller fall straight through to the local search. One probe re-opens it.
+    now = time.monotonic()
+    if now < _CIRCUIT["open_until"]:
+        raise AIAgentError(
+            "Gemini circuit open after repeated failures",
+            status_code=int(_CIRCUIT["status"]),
+        )
+
     resp, error = None, None
 
     # Capacity errors (5xx) are explicitly temporary at Google's side, so they
@@ -521,6 +535,7 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
         i += 1
         resp, error = await attempt(model, min(settings.GEMINI_TIMEOUT_SECONDS, remaining))
         if error is None and resp.status_code < 400:
+            _CIRCUIT["failures"] = 0.0
             return resp.json()
 
         code = 0 if resp is None else resp.status_code
@@ -551,18 +566,50 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
         break  # 400/401/403: switching models cannot fix a bad key or request
 
     if error is not None:
-        raise AIAgentError(f"Gemini request failed: {error}", status_code=502) from error
+        raise AIAgentError(
+            f"Gemini request failed: {error}",
+            status_code=_trip_circuit(settings, 502),
+        ) from error
     if resp is None:
         # Budget ran out before any model answered — nothing to report upstream.
-        raise AIAgentError("Gemini budget spent before any model answered", status_code=502)
+        raise AIAgentError(
+            "Gemini budget spent before any model answered",
+            status_code=_trip_circuit(settings, 502),
+        )
     # Upstream quota exhaustion is a rate limit, not a broken provider —
     # surfacing 429 lets the client show its translated "wait a minute".
     # Every other terminal failure is "unavailable" (502), never 503: the
     # client reserves 503 for "GEMINI_API_KEY is not configured".
     raise AIAgentError(
         f"Gemini returned {resp.status_code}: {resp.text[:300]}",
-        status_code=429 if resp.status_code == 429 else 502,
+        status_code=_trip_circuit(
+            settings, 429 if resp.status_code == 429 else 502
+        ),
     )
+
+
+def _trip_circuit(settings: Any, status: int) -> int:
+    """Record a whole-chain failure; open the breaker once they repeat.
+
+    The first doomed request still pays the full budget (it has to find out),
+    every request while the breaker is open fails instantly, and one probe
+    after the cooldown decides whether Google has recovered.
+
+    A 429 opens it immediately: the quota message carries its own reset time,
+    so a second full walk would only rediscover what the first one proved.
+    Transient 5xx still needs two in a row before we stop trying.
+    """
+    _CIRCUIT["failures"] += 1
+    _CIRCUIT["status"] = float(status)
+    threshold = 1 if status == 429 else 2
+    if _CIRCUIT["failures"] >= threshold:
+        cooldown = max(5.0, float(settings.AI_FAILURE_COOLDOWN_SECONDS))
+        _CIRCUIT["open_until"] = time.monotonic() + cooldown
+        _CIRCUIT["failures"] = 0.0
+        logger.warning(
+            "Gemini circuit opened for %.0fs (status %d)", cooldown, status
+        )
+    return status
 
 
 def _candidate_parts(data: dict) -> list[dict]:
@@ -590,6 +637,149 @@ def _history_contents(history: list[AIMessage]) -> list[dict]:
     return contents
 
 
+# --------------------------------------------------------------------------
+# Local fallback — used when Gemini is unreachable
+# --------------------------------------------------------------------------
+# The free tier grants ~20 requests per model per day while a single answer
+# costs several round trips, so quota really does run dry mid-day.  Instead of
+# showing an error banner we fall back to a literal keyword search: it cannot
+# parse a sentence, but every listing it returns is a real row out of
+# PostgreSQL — which is the assistant's whole promise.
+
+_CYR_TO_LAT = str.maketrans({
+    "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e",
+    "ж": "j", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+    "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+    "ф": "f", "х": "h", "ц": "ts", "ч": "ch", "ш": "sh", "щ": "sch",
+    "ъ": "", "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
+    # Tajik alphabet
+    "ғ": "g", "қ": "q", "ҳ": "h", "ӯ": "u", "ҷ": "j",
+})
+
+# Extra spellings users type for a city whose stored name transliterates
+# differently («Қурғонтеппа» -> qurgonteppe, but people write "kurganteppa").
+_CITY_ALIASES: dict[str, tuple[str, ...]] = {
+    "dushanbe": ("dushanbo",),
+    "hujand": ("khujand", "xujand"),
+    "bohtar": ("bokhtar",),
+    "qurgonteppa": ("kurgonteppa", "kurganteppa", "gurganteppa"),
+    "kulob": ("kolob",),
+}
+
+# Loaded once per process: city names never change at runtime and the lookup
+# runs on every fallback request.
+_CITY_CACHE: list[str] | None = None
+
+# Words that turn a number in the message into a price ceiling. Bounded by
+# word boundaries because bare «то»/«до» appear inside harmless words.
+_LIMIT_WORDS = ("то", "до", "gacha", "ҳад", "арзон", "дешев", "cheap",
+                "камтар", "limit")
+_QUERY_WORDS = (
+    "мошин", "автомобил", "машин", "квартира", "хона", "уй", "офис",
+    "таҷҳизот", "техника", "компьютер", "лаптоп", "стол", "кресло",
+    "велосипед", "камера", "либос", "инструмент", "абзор",
+)
+_GREETING = re.compile(
+    r"^(салом|assalomu|assalom|привет|hello|хайр|саломет|сайн)\b", re.IGNORECASE
+)
+
+_LOCAL_GREETING = (
+    "Салом! Ман ёвари AI-и RentHub ҳастам. Метавонам квартира, мошин, "
+    "таҷҳизот ва чизҳои дигарро барои иҷора аз базаи воқеии RentHub пайдо кунам.\n\n"
+    "Бипурсед: «дар Душанбе то 1500 сомонӣ чӣ чизҳо ҳаст?»"
+)
+
+
+def _fold(text: str) -> str:
+    """Lowercase and transliterate so «Душанбе» matches «dushanbe»."""
+    return (text or "").casefold().translate(_CYR_TO_LAT)
+
+
+def _find_city(message: str, cities: list[str]) -> str | None:
+    folded = _fold(message)
+    for city in cities:
+        name = _fold(city)
+        if name and name in folded:
+            return city
+        for alias in _CITY_ALIASES.get(name, ()):
+            if alias in folded:
+                return city
+    return None
+
+
+def _price_ceiling(message: str) -> int | None:
+    """The largest plausible number in the message, but only with a limit word.
+
+    Both sides go through :func:`_fold` so a Latin "to 1500" and a Cyrillic
+    «до 1500» are recognised as the same constraint.
+    """
+    folded = _fold(message)
+    if not any(re.search(rf"\b{re.escape(_fold(w))}\b", folded) for w in _LIMIT_WORDS):
+        return None
+    ceiling = 0
+    for raw in re.findall(r"\d[\d\s\u00a0]{0,12}\d|\d", message):
+        try:
+            value = int(re.sub(r"[\s\u00a0]", "", raw))
+        except ValueError:
+            continue
+        if 0 < value <= 10_000_000:
+            ceiling = max(ceiling, value)
+    return ceiling or None
+
+
+async def _local_answer(db: AsyncSession, user, message: str) -> tuple[str, list, list[str]]:
+    """Keyword-only reply that still reads the real database."""
+    text = (message or "").strip()
+    # Two-word greetings are not a search — answer them directly.
+    if len(text.split()) <= 2 and _GREETING.match(text):
+        return _LOCAL_GREETING, [], []
+
+    global _CITY_CACHE
+    if _CITY_CACHE is None:
+        _CITY_CACHE = [c.name for c in await CityRepository(db).get_all_active()]
+
+    args: dict[str, Any] = {"page": 1}
+    described: list[str] = []
+
+    city = _find_city(text, _CITY_CACHE)
+    if city:
+        args["city"] = city
+        described.append(f"шаҳр: {city}")
+
+    ceiling = _price_ceiling(text)
+    if ceiling:
+        args["price_max"] = ceiling
+        described.append(f"то {ceiling} сомонӣ")
+
+    # Only fall back to free-text when nothing structural matched: a whole
+    # sentence searched literally would match no title and return nothing.
+    if not args.keys() - {"page"}:
+        lowered = text.casefold()
+        query = next((w for w in _QUERY_WORDS if w in lowered), None)
+        if query:
+            args["query"] = query
+            described.append(f"калима: {query}")
+        else:
+            args["sort_by"] = "views"
+
+    payload, found = await execute_tool(db, user, "search_listings", args)
+    if payload.get("error"):
+        logger.warning("local fallback search failed: %s", payload.get("message"))
+
+    spec = ", ".join(described) or "ҳамаи вариантҳо"
+    if found:
+        reply = (
+            f"Ҷустуҷӯи зуд ({spec}): {len(found)} вариант ёфт шуд. "
+            f"Карточкаҳо дар поён — тафсилотро дар саҳифаи эълон бинед."
+        )
+    else:
+        reply = (
+            f"Ҷустуҷӯи зуд ({spec}): мувофиқи ин шартҳо чизе наёмад. "
+            f"Шартҳоро васеътар кунед ё дубора кӯшиш кунед."
+        )
+    return reply, found, ["search_listings"]
+
+
 FALLBACK_REPLY = (
     "Мушкил техникӣ пеш омад — лутфан каме баъдтар аз нав кӯшиш кунед. "
     "| Техническая ошибка — попробуйте позже. "
@@ -613,12 +803,37 @@ async def run_agent(
     message: str,
     history: list[AIMessage] | None = None,
 ) -> tuple[str, list, list[str]]:
-    """Drive the Gemini ↔ tool loop. Returns (reply, listing_objects, tools_used)."""
+    """Drive the Gemini ↔ tool loop. Returns (reply, listing_objects, tools_used).
+
+    If the model itself is unreachable — quota spent, every model at capacity,
+    budget expired — we degrade to a literal database search instead of failing,
+    so the assistant keeps answering with real listings. Only a missing API key
+    is still an error, because then there is nothing to talk to at all.
+    """
     settings = get_settings()
     if not settings.GEMINI_API_KEY:
         raise AIAgentError("GEMINI_API_KEY is not configured")
 
-    contents = _history_contents(history or [])
+    try:
+        return await _run_with_model(db, user, message, history or [], settings)
+    except AIAgentError as exc:
+        if "not configured" in str(exc):
+            raise
+        logger.warning(
+            "model unavailable (HTTP %s), falling back to local search",
+            exc.status_code,
+        )
+        return await _local_answer(db, user, message)
+
+
+async def _run_with_model(
+    db: AsyncSession,
+    user: CurrentUser | None,
+    message: str,
+    history: list[AIMessage],
+    settings: Any,
+) -> tuple[str, list, list[str]]:
+    contents = _history_contents(history)
     contents.append({"role": "user", "parts": [{"text": message}]})
 
     tools_used: list[str] = []

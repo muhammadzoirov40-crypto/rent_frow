@@ -60,7 +60,11 @@ class Settings(BaseSettings):
     # Hard cap on the whole model walk for one Gemini call. Without it a chain
     # of slow/failing models stacks its timeouts and the chat spinner sits for
     # minutes; with it the worst case is one predictable wait for the user.
-    AI_REQUEST_BUDGET_SECONDS: float = 25.0
+    AI_REQUEST_BUDGET_SECONDS: float = 15.0
+    # After this many whole-chain failures in a row, stop calling Google for a
+    # while instead of paying the full budget on every message just to hear the
+    # same 429 again. One probe re-opens the circuit after the cooldown.
+    AI_FAILURE_COOLDOWN_SECONDS: int = 120
     # Hard caps so a chat cannot loop on tools forever or burn quota.
     AI_MAX_TOOL_STEPS: int = 6
     AI_RATE_LIMIT_PER_MINUTE: int = 20
