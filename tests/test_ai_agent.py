@@ -45,8 +45,10 @@ def test_every_declared_tool_has_an_executor():
         "get_listing",
         "get_categories",
         "get_favorites",
+        "toggle_favorite",
         "get_user_profile",
         "create_rental_request",
+        "get_my_requests",
     }
 
 
@@ -134,7 +136,13 @@ def test_chat_request_bounds():
 def test_account_tools_refuse_anonymous_users():
     """Login-gated tools must say so instead of touching the database."""
     args = {"listing_id": 1, "start_date": "2026-01-01", "end_date": "2026-01-02"}
-    for name in ("get_favorites", "get_user_profile", "create_rental_request"):
+    for name in (
+        "get_favorites",
+        "toggle_favorite",
+        "get_user_profile",
+        "create_rental_request",
+        "get_my_requests",
+    ):
         payload, found = asyncio.run(execute_tool(None, None, name, dict(args)))
         assert payload == LOGIN_REQUIRED, name
         assert found == []
@@ -435,3 +443,68 @@ async def test_model_outage_still_searches_for_an_unknown_question(monkeypatch):
     assert reply.startswith("Ҷустуҷӯи зуд")
     assert len(listings) == 1
     assert tools == ["search_listings"]
+
+
+# --------------------------------------------------------------------------
+# account commands — the assistant must *execute* a command, and it must do so
+# even when the model has no budget left.
+# --------------------------------------------------------------------------
+@pytest.mark.asyncio
+async def test_account_command_executes_without_the_model(monkeypatch):
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+
+    seen: dict[str, object] = {}
+
+    async def fake_tool(db, user, name, args):
+        seen["tool"] = name
+        seen["user_id"] = user.user_id
+        return (
+            {
+                "total": 1,
+                "results": [
+                    {"title": "Квартира дар марказ", "price": 900, "city_name": "Душанбе"}
+                ],
+            },
+            [object()],
+        )
+
+    monkeypatch.setattr(agent, "execute_tool", fake_tool)
+    user = CurrentUser(user_id=7, role=UserRole.CUSTOMER, external_user_id="ext-7")
+
+    # «нишон деҳ» is also a browse word — the account intent must win.
+    reply, listings, tools = await agent.run_agent(
+        None, user, "дӯстдоштаҳоро нишон деҳ"
+    )
+
+    assert model_calls == [], "a command must not need the model"
+    assert seen == {"tool": "get_favorites", "user_id": 7}
+    assert reply.startswith("Дӯстдоштаҳои шумо")
+    assert "Квартира дар марказ" in reply
+    assert tools == ["get_favorites"]
+    assert len(listings) == 1
+
+
+@pytest.mark.asyncio
+async def test_account_command_without_login_asks_to_sign_in(monkeypatch):
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+
+    reply, listings, tools = await agent.run_agent(None, None, "дархостҳоро нишон деҳ")
+
+    assert model_calls == []
+    assert reply == agent._LOGIN_NUDGE
+    assert listings == [] and tools == []
+
+
+@pytest.mark.asyncio
+async def test_how_to_is_not_mistaken_for_a_command(monkeypatch):
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    message = "чӣ тавр дӯстдоштаҳоро истифода барам?"
+    reply, _, _ = await agent.run_agent(None, None, message)
+
+    assert model_calls == [message]
+    assert reply == "model reply"

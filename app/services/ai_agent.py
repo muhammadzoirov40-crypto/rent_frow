@@ -144,6 +144,18 @@ TOOLS: list[dict[str, Any]] = [
         "parameters": {"type": "OBJECT", "properties": {}},
     },
     {
+        "name": "toggle_favorite",
+        "description": "Save a listing to the current user's favorites, or remove it "
+                       "if it is already saved — the tool flips the state. Requires "
+                       "login. Use for «add this to my favorites» / «take it out of "
+                       "favorites».",
+        "parameters": {
+            "type": "OBJECT",
+            "properties": {"listing_id": {"type": "INTEGER"}},
+            "required": ["listing_id"],
+        },
+    },
+    {
         "name": "get_user_profile",
         "description": "Profile of the current user (name, role, verification). Requires login.",
         "parameters": {"type": "OBJECT", "properties": {}},
@@ -162,6 +174,14 @@ TOOLS: list[dict[str, Any]] = [
             },
             "required": ["listing_id", "start_date", "end_date"],
         },
+    },
+    {
+        "name": "get_my_requests",
+        "description": "Rental requests involving the current user: the ones they sent "
+                       "and the ones waiting on them as an owner, each with its "
+                       "status. Requires login. Use for «my requests», «what "
+                       "happened to my request», «did the owner answer».",
+        "parameters": {"type": "OBJECT", "properties": {}},
     },
 ]
 
@@ -371,6 +391,37 @@ async def _tool_get_favorites(db: AsyncSession, user, args, found: list) -> dict
     return {"total": total, "results": results}
 
 
+async def _tool_toggle_favorite(db: AsyncSession, user, args, found: list) -> dict:
+    if user is None:
+        return LOGIN_REQUIRED
+    try:
+        listing_id = int(args["listing_id"])
+    except (KeyError, TypeError, ValueError) as exc:
+        return {"ok": False, "error": "invalid_arguments", "message": str(exc)}
+
+    try:
+        listing = await ListingService(db).get_by_id(listing_id)
+    except Exception:
+        listing = None
+    if listing is None:
+        return {"error": "not_found", "listing_id": listing_id}
+
+    try:
+        added = await FavoriteService(db).toggle(user.user_id, listing_id)
+    except Exception as exc:  # ownership/visibility rules
+        logger.info("toggle_favorite refused: %s", exc)
+        return {"ok": False, "error": "rejected", "message": str(exc)}
+
+    found.append(listing)
+    return {
+        "ok": True,
+        "listing_id": listing_id,
+        "title": listing.title,
+        "favorited": bool(added),
+        "state": "added" if added else "removed",
+    }
+
+
 async def _tool_get_user_profile(db: AsyncSession, user, args, found: list) -> dict:
     if user is None:
         return LOGIN_REQUIRED
@@ -420,6 +471,50 @@ async def _tool_create_rental_request(db: AsyncSession, user, args, found: list)
     }
 
 
+async def _tool_get_my_requests(db: AsyncSession, user, args, found: list) -> dict:
+    if user is None:
+        return LOGIN_REQUIRED
+    service = RentalRequestService(db)
+
+    def _row(r, direction: str) -> dict:
+        created = getattr(r, "created_at", None)
+        return {
+            "id": r.id,
+            "listing_id": r.listing_id,
+            "direction": direction,
+            "status": str(r.status),
+            "start_date": str(r.start_date),
+            "end_date": str(r.end_date),
+            "total_days": r.total_days,
+            "total_price": float(r.total_price),
+            "created_at": created.isoformat() if created else None,
+        }
+
+    try:
+        sent, sent_total = await service.get_by_renter(user.user_id, 0, 8)
+        received, received_total = await service.get_by_owner(user.user_id, 0, 8)
+    except Exception as exc:
+        logger.info("get_my_requests failed: %s", exc)
+        return {"ok": False, "error": "failed", "message": str(exc)}
+
+    # One card per listing: a request the user sent to their own listing would
+    # otherwise render twice.
+    items = [_row(r, "sent") for r in sent] + [_row(r, "received") for r in received]
+    seen: set[int] = set()
+    for r in [*sent, *received]:
+        if r.listing_id in seen:
+            continue
+        seen.add(r.listing_id)
+        try:
+            listing = await ListingService(db).get_by_id(r.listing_id)
+        except Exception:
+            listing = None
+        if listing:
+            found.append(listing)
+
+    return {"total": sent_total + received_total, "results": items}
+
+
 EXECUTORS: dict[
     str,
     Callable[[AsyncSession, Any, dict, list], Awaitable[dict]],
@@ -429,8 +524,10 @@ EXECUTORS: dict[
     "get_categories": _tool_get_categories,
     "get_cities": _tool_get_cities,
     "get_favorites": _tool_get_favorites,
+    "toggle_favorite": _tool_toggle_favorite,
     "get_user_profile": _tool_get_user_profile,
     "create_rental_request": _tool_create_rental_request,
+    "get_my_requests": _tool_get_my_requests,
 }
 
 
@@ -874,6 +971,69 @@ def _today_reply() -> str:
     )
 
 
+# Commands that name a screen of the visitor's own account. The model would
+# call exactly these tools, so running them directly keeps the assistant an
+# agent — «show my favourites» still executes while the free tier is out of
+# budget, instead of degrading into a generic search.
+_LOGIN_NUDGE = (
+    "Ин фармон ба ҳисоби шумо вобаста аст. Аввал «Ворид шудан» ё "
+    "«Ба қайд гирифтан» кунед, баъд дубора бипурсед."
+)
+
+# «How do I…» is a question, not a command — send it to the model/knowledge.
+_HOW_TO = re.compile(r"(чӣ тавр|чи тавр|как\b|how\b)", re.IGNORECASE)
+
+_ACCOUNT_COMMANDS: tuple[tuple[re.Pattern[str], str, str], ...] = (
+    (
+        re.compile(
+            r"(дӯстдошта|дустдошта|фаворит|favorit|избранн|favorites?)",
+            re.IGNORECASE,
+        ),
+        "get_favorites",
+        "Дӯстдоштаҳои шумо",
+    ),
+    (
+        re.compile(r"(дархост|darkhost|заявк|my requests?)", re.IGNORECASE),
+        "get_my_requests",
+        "Дархостҳои шумо",
+    ),
+    (
+        re.compile(r"(профил|profil|ҳисоб|hisob)", re.IGNORECASE),
+        "get_user_profile",
+        "Профили шумо",
+    ),
+)
+
+
+def _account_reply(heading: str, tool: str, payload: dict) -> str:
+    """Render one tool payload as a short message the panel can show."""
+    results = payload.get("results")
+    if results is None:  # get_user_profile returns a flat object
+        who = payload.get("display_name") or payload.get("email") or ""
+        role = payload.get("role") or ""
+        return f"{heading}: {who}" + (f" — {role}" if role else "")
+
+    total = payload.get("total")
+    count = total if isinstance(total, int) else len(results)
+    if not results:
+        return f"{heading}: ҳоло чизе нест."
+
+    lines: list[str] = []
+    for item in results[:8]:
+        if tool == "get_my_requests":
+            lines.append(
+                f"• #{item.get('id')} — {item.get('status')} "
+                f"({item.get('start_date')} → {item.get('end_date')})"
+            )
+        else:
+            city = item.get("city_name") or ""
+            lines.append(
+                f"• {item.get('title')} — {item.get('price')} сомонӣ"
+                + (f", {city}" if city else "")
+            )
+    return f"{heading} ({count}):\n" + "\n".join(lines)
+
+
 def _knowledge_answer(message: str) -> tuple[str, list, list[str]] | None:
     """A standing answer for a common question, or None if we have nothing.
 
@@ -918,6 +1078,19 @@ async def _quick_answer(
     text = (message or "").strip()
     if not text:
         return None
+
+    # Own-account commands run straight through: this is the agent executing a
+    # command, and it must work even when the model has no budget left.
+    if not _HOW_TO.search(text):
+        for pattern, tool, heading in _ACCOUNT_COMMANDS:
+            if not pattern.search(text):
+                continue
+            if user is None:
+                return _LOGIN_NUDGE, [], []
+            payload, cards = await execute_tool(db, user, tool, {})
+            if payload.get("error"):
+                break
+            return _account_reply(heading, tool, payload), cards, [tool]
 
     global _CITY_CACHE
     if _CITY_CACHE is None:
