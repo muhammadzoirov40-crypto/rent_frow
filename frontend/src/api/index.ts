@@ -220,7 +220,8 @@ export interface RentalRequest {
 
 export interface PaymentRecord {
   id: number;
-  booking_id: number;
+  booking_id: number | null;
+  rental_request_id?: number | null;
   customer_id: number;
   amount: number;
   payment_type: 'BOOKING' | 'DEPOSIT' | 'DAMAGE' | 'LATE_FEE' | 'REFUND';
@@ -450,6 +451,24 @@ export const payments = {
     client
       .get<PaginatedResponse<PaymentRecord>>('/payments', { params: { skip, limit } })
       .then(unwrapPaginated),
+  /** What has been paid against one rental request — visible to the renter,
+   *  the owner of the listing, and admins. */
+  forRequest: (rentalRequestId: number) =>
+    client
+      .get<APIResponse<PaymentRecord[]>>(`/payments/rental-request/${rentalRequestId}`)
+      .then(unwrap),
+  /** Pay for an accepted rental request. The amount is not sent: the server
+   *  reads it off the request, so nobody can underpay from here. */
+  payForRequest: (rentalRequestId: number) =>
+    client
+      .post<APIResponse<PaymentRecord>>('/payments', {
+        rental_request_id: rentalRequestId,
+        payment_type: 'BOOKING',
+      })
+      .then(unwrap),
+  /** The owner of the listing (or an admin) marks the money as received. */
+  confirm: (paymentId: number) =>
+    client.post<APIResponse<PaymentRecord>>(`/payments/${paymentId}/confirm`).then(unwrap),
 };
 
 export const reviews = {

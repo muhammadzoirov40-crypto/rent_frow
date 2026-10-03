@@ -4,10 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Calendar, Clock, Check, X, Loader2, ListChecks,
-  ChevronRight, MessageSquare, Package, User, AlertCircle, Eye
+  ChevronRight, MessageSquare, Package, User, AlertCircle, Eye, CreditCard
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { rentalRequests, listings, messages } from '../api';
+import { rentalRequests, listings, messages, payments } from '../api';
 import type { RentalRequest } from '../api';
 import BackButton from '../components/ui/BackButton';
 import { formatDate } from '../utils/dates';
@@ -66,6 +66,45 @@ export function RequestCard({
   const statusKey = (req.status || 'PENDING').toUpperCase();
   const status = statusConfig[statusKey] || statusConfig.PENDING;
   const canManage = statusKey === 'PENDING' || statusKey === 'ACCEPTED';
+
+  // Payment lives on the accepted request itself: the renter pays once the
+  // owner has said yes, the owner then marks the money as received.
+  const queryClient = useQueryClient();
+  const payable = statusKey === 'ACCEPTED';
+
+  const { data: requestPayments = [], isLoading: paymentLoading } = useQuery({
+    queryKey: ['payment-for-request', req.id],
+    queryFn: () => payments.forRequest(req.id),
+    enabled: payable,
+    staleTime: 30_000,
+    retry: 1,
+  });
+  const payment = requestPayments[0] ?? null;
+
+  const paymentError = (error: any) => {
+    const detail = error?.response?.data?.detail;
+    return typeof detail === 'string' && detail ? detail : t('payment.failed');
+  };
+
+  const payMutation = useMutation({
+    mutationFn: () => payments.payForRequest(req.id),
+    onSuccess: () => {
+      toast.success(t('payment.created'));
+      queryClient.invalidateQueries({ queryKey: ['payment-for-request', req.id] });
+    },
+    onError: (error: any) => toast.error(paymentError(error)),
+  });
+
+  const confirmMutation = useMutation({
+    mutationFn: (paymentId: number) => payments.confirm(paymentId),
+    onSuccess: () => {
+      toast.success(t('payment.confirmed'));
+      queryClient.invalidateQueries({ queryKey: ['payment-for-request', req.id] });
+    },
+    onError: (error: any) => toast.error(paymentError(error)),
+  });
+
+  const busy = isMutating || payMutation.isPending || confirmMutation.isPending;
 
   return (
     <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:shadow-md transition">
@@ -131,6 +170,55 @@ export function RequestCard({
           )}
 
           <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
+            {payable && (
+              <span className="flex items-center" data-testid="payment-strip">
+                {paymentLoading ? (
+                  <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-xl">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    {t('payment.checking')}
+                  </span>
+                ) : payment?.status === 'PAID' ? (
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-4 py-2 rounded-xl">
+                    <Check className="w-4 h-4" />
+                    {t('payment.paid')}
+                  </span>
+                ) : payment?.status === 'PENDING' ? (
+                  <>
+                    <span className="flex items-center gap-1.5 text-sm font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-4 py-2 rounded-xl">
+                      <Clock className="w-4 h-4" />
+                      {t('payment.pending')}
+                    </span>
+                    {type === 'owner' && (
+                      <button
+                        type="button"
+                        onClick={() => confirmMutation.mutate(payment.id)}
+                        disabled={busy}
+                        className="flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-500/20 disabled:opacity-50"
+                      >
+                        <Check className="w-4 h-4" />
+                        {t('payment.confirm')}
+                      </button>
+                    )}
+                  </>
+                ) : type === 'renter' ? (
+                  <button
+                    type="button"
+                    onClick={() => payMutation.mutate()}
+                    disabled={busy}
+                    className="flex items-center gap-1.5 text-sm font-semibold text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] px-4 py-2 rounded-xl transition shadow-sm shadow-[rgb(var(--accent-rgb)/0.2)] disabled:opacity-50"
+                  >
+                    <CreditCard className="w-4 h-4" />
+                    {t('payment.pay')} · {formatAmount(req.total_price)} {t('common.somoni')}
+                  </button>
+                ) : (
+                  <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-xl">
+                    <Clock className="w-3.5 h-3.5" />
+                    {t('payment.waitingForRenter')}
+                  </span>
+                )}
+              </span>
+            )}
+
             <Link
               to={`/listing/${req.listing_id}`}
               className="flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 px-4 py-2 rounded-xl transition"

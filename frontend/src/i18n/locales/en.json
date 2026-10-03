@@ -993,6 +993,17 @@
     "messageRenter": "Message renter",
     "viewListing": "View listing"
   },
+  "payment": {
+    "pay": "Pay",
+    "pending": "Payment awaiting confirmation",
+    "paid": "Paid",
+    "confirm": "Confirm",
+    "checking": "Checking...",
+    "waitingForRenter": "Waiting for the renter to pay",
+    "created": "Payment requested — the listing owner confirms it",
+    "confirmed": "Payment confirmed",
+    "failed": "Payment failed"
+  },
   "accents": {
     "original": "Original",
     "yellow": "Yellow",
