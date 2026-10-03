@@ -49,6 +49,7 @@ def test_every_declared_tool_has_an_executor():
         "get_user_profile",
         "create_rental_request",
         "get_my_requests",
+        "create_listing",
     }
 
 
@@ -142,10 +143,139 @@ def test_account_tools_refuse_anonymous_users():
         "get_user_profile",
         "create_rental_request",
         "get_my_requests",
+        "create_listing",
     ):
         payload, found = asyncio.run(execute_tool(None, None, name, dict(args)))
         assert payload == LOGIN_REQUIRED, name
         assert found == []
+
+
+# --------------------------------------------------------------------------
+# publishing by command — «эълон эҷод кун» must become a real listing
+# --------------------------------------------------------------------------
+@pytest.mark.asyncio
+async def test_create_listing_publishes_through_the_real_service(monkeypatch):
+    seen: dict[str, object] = {}
+
+    async def fake_city(db, name):
+        return SimpleNamespace(id=3, name="Душанбе") if name == "Душанбе" else None
+
+    async def fake_category(db, name):
+        return SimpleNamespace(id=5, name="Моликият") if name == "Моликият" else None
+
+    class FakeListingService:
+        def __init__(self, db):
+            seen["db"] = db
+
+        async def create(self, owner_id, data):
+            seen["owner_id"] = owner_id
+            seen["data"] = data
+            return SimpleNamespace(
+                id=42,
+                title=data.title,
+                price=data.price,
+                price_unit=data.price_unit,
+                status="ACTIVE",
+            )
+
+    monkeypatch.setattr(agent, "_resolve_city", fake_city)
+    monkeypatch.setattr(agent, "_resolve_category", fake_category)
+    monkeypatch.setattr(agent, "ListingService", FakeListingService)
+
+    user = CurrentUser(user_id=7, role=UserRole.CUSTOMER, external_user_id="ext-7")
+    payload, found = await execute_tool(
+        None,
+        user,
+        "create_listing",
+        {
+            "title": "Квартира дар марказ",
+            "price": 700,
+            "price_unit": "day",
+            "city": "Душанбе",
+            "category": "Моликият",
+            "rooms": "2",
+            "description": "Балкон дорад",
+        },
+    )
+
+    assert payload["ok"] is True
+    assert payload["listing_id"] == 42
+    assert payload["price_unit"] == "per_day"
+    assert payload["status"] == "ACTIVE"
+    assert payload["needs_photos"] is True, "chat cannot carry photos — say so"
+    assert seen["owner_id"] == 7
+
+    data = seen["data"]
+    assert data.price == 700.0 and data.rooms == 2
+    assert data.city_id == 3 and data.category_id == 5
+    assert data.image_urls == []
+
+    # the freshly published listing comes back as a card in the reply
+    assert len(found) == 1 and found[0].title == "Квартира дар марказ"
+
+
+@pytest.mark.asyncio
+async def test_create_listing_refuses_a_price_it_cannot_take(monkeypatch):
+    async def must_not_resolve(db, name):  # pragma: no cover - guard
+        raise AssertionError("validation must happen before any lookup")
+
+    monkeypatch.setattr(agent, "_resolve_city", must_not_resolve)
+
+    user = CurrentUser(user_id=7, role=UserRole.CUSTOMER, external_user_id="ext-7")
+    for args in (
+        {"title": "", "price": 100, "city": "Душанбе", "category": "Моликият"},
+        {"title": "X", "price": 0, "city": "Душанбе", "category": "Моликият"},
+        {"title": "X", "price": "ройгон", "city": "Душанбе", "category": "Моликият"},
+    ):
+        payload, found = await execute_tool(None, user, "create_listing", dict(args))
+        assert payload["error"] == "invalid_arguments", args
+        assert found == []
+
+
+@pytest.mark.asyncio
+async def test_create_listing_returns_names_the_model_can_retry_with(monkeypatch):
+    """The prompt tells the model to call again with one of these names —
+    so the payload has to carry them."""
+    async def city_ok(db, name):
+        return SimpleNamespace(id=3, name="Душанбе") if name == "Душанбе" else None
+
+    async def category_ok(db, name):
+        return SimpleNamespace(id=5, name="Моликият") if name == "Моликият" else None
+
+    class FakeCityRepo:
+        def __init__(self, db): ...
+
+        async def get_all_active(self):
+            return [SimpleNamespace(name="Душанбе"), SimpleNamespace(name="Хуҷанд")]
+
+    class FakeCategoryRepo:
+        def __init__(self, db): ...
+
+        async def get_all_active(self):
+            return [SimpleNamespace(name="Моликият", name_tj="Моликият", name_en="Property")]
+
+    monkeypatch.setattr(agent, "_resolve_city", city_ok)
+    monkeypatch.setattr(agent, "_resolve_category", category_ok)
+    monkeypatch.setattr(agent, "CityRepository", FakeCityRepo)
+    monkeypatch.setattr(agent, "CategoryRepository", FakeCategoryRepo)
+
+    user = CurrentUser(user_id=7, role=UserRole.CUSTOMER, external_user_id="ext-7")
+
+    payload, found = await execute_tool(
+        None, user, "create_listing",
+        {"title": "X", "price": 100, "city": "Пойтахт", "category": "Моликият"},
+    )
+    assert payload["error"] == "unknown_city"
+    assert payload["available_cities"] == ["Душанбе", "Хуҷанд"]
+    assert found == []
+
+    payload, found = await execute_tool(
+        None, user, "create_listing",
+        {"title": "X", "price": 100, "city": "Душанбе", "category": "Иҷора"},
+    )
+    assert payload["error"] == "unknown_category"
+    assert payload["available_categories"] == ["Моликият", "Property"]
+    assert found == []
 
 
 # --------------------------------------------------------------------------
