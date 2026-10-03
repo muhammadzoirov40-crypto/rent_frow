@@ -1248,7 +1248,7 @@ export default function AdminPage() {
       </div>
 
       {showCategoryModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeCategoryModal}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={closeCategoryModal}>
           <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -1289,7 +1289,7 @@ export default function AdminPage() {
         </div>
       )}
       {profileUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
           <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin.userProfile')}</h2>

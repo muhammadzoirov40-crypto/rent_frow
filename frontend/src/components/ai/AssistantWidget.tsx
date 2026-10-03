@@ -145,9 +145,12 @@ export default function AssistantWidget() {
         )}
       </button>
 
-      {/* Panel */}
+      {/* Panel. Stays at z-50, same as before: the docked panel and the fixed
+          header never overlap (the header's right edge moves to the panel's
+          left edge), and staying at 50 keeps every z-[60]/z-[70] overlay — the
+          fullscreen gallery, the modals — above it. */}
       {open && (
-        <div className="fixed z-50 lg:z-[60] right-3 sm:right-6 bottom-40 lg:right-0 lg:bottom-auto lg:top-0 w-[calc(100vw-1.5rem)] sm:w-[400px] max-w-[400px] lg:max-w-none lg:w-[360px] xl:w-[400px] h-[min(560px,64vh)] lg:h-screen flex flex-col rounded-2xl lg:rounded-none overflow-hidden bg-white dark:bg-[#0f0f1e] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/30">
+        <div className="fixed z-50 right-3 sm:right-6 bottom-40 lg:right-0 lg:bottom-auto lg:top-0 w-[calc(100vw-1.5rem)] sm:w-[400px] max-w-[400px] lg:max-w-none lg:w-[360px] xl:w-[400px] h-[min(560px,64vh)] lg:h-screen flex flex-col rounded-2xl lg:rounded-none overflow-hidden bg-white dark:bg-[#0f0f1e] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/30">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-white/10 bg-[rgb(var(--accent-rgb)/0.08)]">
             <div className="w-9 h-9 shrink-0 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-md shadow-[rgb(var(--accent-rgb)/0.35)]">
