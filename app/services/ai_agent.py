@@ -683,6 +683,23 @@ def _key_start() -> int:
     return _key_offset
 
 
+# A key Google answers 401/403 with is broken, not busy: waiting will not fix
+# it and no other model will take it either — but the *next* key may be fine.
+# Remembering it keeps one bad key from ending the chain for every request
+# until the process restarts (which is exactly what a re-issued key gets).
+_dead_keys: set[str] = set()
+
+
+def _next_key(keys: list[str], cursor: int) -> tuple[int, str] | None:
+    """First key, starting at `cursor`, that has not been refused. None when
+    every configured key has been refused — the caller must stop there."""
+    for step in range(len(keys)):
+        index = (cursor + step) % len(keys)
+        if keys[index] not in _dead_keys:
+            return index, keys[index]
+    return None
+
+
 async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
     settings = get_settings()
     if not settings.GEMINI_API_KEY:
@@ -702,14 +719,14 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
         },
     }
 
-    async def attempt(model: str, timeout: float):
-        """POST once. Returns (response, transport_error)."""
+    async def attempt(model: str, timeout: float, api_key: str):
+        """POST once with one explicit key. Returns (response, transport_error)."""
         target = f"{GEMINI_BASE}/models/{model}:generateContent"
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 resp = await client.post(
                     target,
-                    headers={"x-goog-api-key": keys[key_at[0] % len(keys)]},
+                    headers={"x-goog-api-key": api_key},
                     json=body,
                 )
                 return resp, None
@@ -766,8 +783,18 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
             logger.warning("Gemini budget spent after %d attempt(s)", i)
             break
 
+        chosen = _next_key(keys, key_at[0])
+        if chosen is None:
+            raise AIAgentError(
+                "every configured Gemini API key was refused (401/403)",
+                status_code=_trip_circuit(settings, 502),
+            )
+        key_index, api_key = chosen
+
         i += 1
-        resp, error = await attempt(model, min(settings.GEMINI_TIMEOUT_SECONDS, remaining))
+        resp, error = await attempt(
+            model, min(settings.GEMINI_TIMEOUT_SECONDS, remaining), api_key
+        )
         if error is None and resp.status_code < 400:
             _CIRCUIT["failures"] = 0.0
             return resp.json()
@@ -778,6 +805,22 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
             # This key is out of budget for the day. Spend the next attempt on
             # the next key instead of re-proving that this one says no.
             key_at[0] += 1
+
+        if code in (401, 403):
+            # The *key* was refused, not the model: no other model will take it
+            # either, but the next key may be fine. Retire it and walk on — a
+            # broken key must never be what ends the chain for everyone.
+            _dead_keys.add(api_key)
+            key_at[0] += 1
+            usable = sum(1 for candidate in keys if candidate not in _dead_keys)
+            logger.warning(
+                "Gemini key %d/%d refused (%s) — %d usable key(s) left",
+                key_index + 1,
+                len(keys),
+                code,
+                usable,
+            )
+            continue
 
         if error is not None or code in CAPACITY:
             capacity_budget[model] -= 1

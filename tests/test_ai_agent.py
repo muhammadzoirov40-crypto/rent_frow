@@ -744,3 +744,169 @@ def test_each_request_starts_on_the_next_key():
     seen = {agent._key_start() for _ in range(6)}
     assert len(seen) == 6, "the cursor must move every time"
     assert min(seen) > first
+
+
+# --------------------------------------------------------------------------
+# a key Google refuses must not end the chain
+# --------------------------------------------------------------------------
+def _transport_settings(**overrides):
+    """The settings `_call_gemini` reads, with the network switched off."""
+    values = dict(
+        GEMINI_API_KEY="bad,good",
+        GEMINI_MODEL="gemini-3.6-flash",
+        GEMINI_FALLBACK_MODELS="",
+        AI_REQUEST_BUDGET_SECONDS=10.0,
+        GEMINI_TIMEOUT_SECONDS=5.0,
+        AI_FAILURE_COOLDOWN_SECONDS=120,
+    )
+    values.update(overrides)
+    return SimpleNamespace(**values)
+
+
+class _FakeResponse:
+    def __init__(self, status_code: int, payload: dict | None = None):
+        self.status_code = status_code
+        self._payload = payload or {}
+
+    def json(self):
+        return self._payload
+
+
+def _fake_async_client(responder):
+    """A stand-in for httpx.AsyncClient that never leaves the process."""
+
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, *exc):
+            return False
+
+        async def post(self, url, headers=None, json=None):
+            return responder(url, headers or {}, json or {})
+
+    return Client
+
+
+@pytest.fixture
+def key_chain():
+    """Fresh breaker, key bookkeeping and a cursor pinned to key #1, so a test
+    can say exactly which key the first attempt will use."""
+    saved = {
+        "dead": set(agent._dead_keys),
+        "circuit": dict(agent._CIRCUIT),
+        "offset": agent._key_offset,
+    }
+    agent._dead_keys.clear()
+    agent._CIRCUIT.update(failures=0.0, open_until=0.0, status=502.0)
+    agent._key_offset = 1  # so the next _key_start() is even → index 0
+    yield
+    agent._dead_keys.clear()
+    agent._dead_keys.update(saved["dead"])
+    agent._CIRCUIT.clear()
+    agent._CIRCUIT.update(saved["circuit"])
+    agent._key_offset = saved["offset"]
+
+
+def _refuses(key: str) -> bool:
+    return key == "bad"
+
+
+async def test_a_refused_key_is_walked_past_to_the_next_one(monkeypatch, key_chain):
+    """401 says THIS key is broken — no model will take it. The chain has to
+    try the next key rather than report Gemini as down."""
+    tried = []
+
+    def responder(url, headers, body):
+        key = headers.get("x-goog-api-key", "")
+        tried.append(key)
+        if _refuses(key):
+            return _FakeResponse(401, {"error": {"code": 401, "message": "nope"}})
+        return _FakeResponse(
+            200, {"candidates": [{"content": {"parts": [{"text": "ok"}]}}]}
+        )
+
+    monkeypatch.setattr(agent, "get_settings", lambda: _transport_settings())
+    monkeypatch.setattr(agent.httpx, "AsyncClient", _fake_async_client(responder))
+
+    result = await agent._call_gemini(
+        [{"role": "user", "parts": [{"text": "hi"}]}], []
+    )
+
+    assert result["candidates"][0]["content"]["parts"][0]["text"] == "ok"
+    assert tried == ["bad", "good"], "the broken key is tried once, then skipped"
+    assert "bad" in agent._dead_keys, "a refused key has to be remembered"
+
+
+async def test_a_refused_key_stays_skipped_for_the_next_request(
+    monkeypatch, key_chain
+):
+    """Remembering is the whole point: the second question must not pay for
+    the same doomed first attempt again."""
+    tried = []
+
+    def responder(url, headers, body):
+        key = headers.get("x-goog-api-key", "")
+        tried.append(key)
+        if _refuses(key):
+            return _FakeResponse(401, {"error": {"code": 401}})
+        return _FakeResponse(
+            200, {"candidates": [{"content": {"parts": [{"text": "ok"}]}}]}
+        )
+
+    monkeypatch.setattr(agent, "get_settings", lambda: _transport_settings())
+    monkeypatch.setattr(agent.httpx, "AsyncClient", _fake_async_client(responder))
+
+    await agent._call_gemini([{"role": "user", "parts": [{"text": "hi"}]}], [])
+    tried.clear()
+    agent._key_offset = 1  # start the second question on key #1 again
+    await agent._call_gemini([{"role": "user", "parts": [{"text": "hi"}]}], [])
+
+    assert tried == ["good"], "the refused key is not offered a second time"
+
+
+async def test_a_chain_whose_keys_are_all_refused_fails_once_not_forever(
+    monkeypatch, key_chain
+):
+    """With nothing usable left there is nothing to try: fail once, cleanly,
+    instead of burning the whole budget in a loop over dead keys."""
+    tried = []
+
+    def responder(url, headers, body):
+        tried.append(headers.get("x-goog-api-key", ""))
+        return _FakeResponse(401, {"error": {"code": 401}})
+
+    monkeypatch.setattr(agent, "get_settings", lambda: _transport_settings())
+    monkeypatch.setattr(agent.httpx, "AsyncClient", _fake_async_client(responder))
+
+    with pytest.raises(AIAgentError) as exc:
+        await agent._call_gemini([{"role": "user", "parts": [{"text": "hi"}]}], [])
+
+    assert exc.value.status_code == 502, "a dead provider is 502, never 503"
+    assert tried == ["bad", "good"], "every key is tried exactly once"
+    assert agent._dead_keys == {"bad", "good"}
+
+
+def test_next_key_skips_the_dead_and_says_none_when_all_are():
+    """The unit behind the three tests above: cursor order is preserved and
+    exhaustion is reported instead of silently reusing a refused key."""
+    keys = ["k1", "k2", "k3"]
+    agent._dead_keys.clear()
+
+    assert agent._next_key(keys, 0) == (0, "k1")
+    agent._dead_keys.add("k1")
+    assert agent._next_key(keys, 0) == (1, "k2"), "cursor itself is skipped"
+    assert agent._next_key(keys, 1) == (1, "k2"), "a live cursor stays put"
+    assert agent._next_key(keys, 10) == (1, "k2"), "the cursor wraps around (10 % 3)"
+
+    # wrapping must keep walking when the landing spot is also refused
+    agent._dead_keys.add("k2")
+    assert agent._next_key(keys, 10) == (2, "k3"), "wrap continues past a dead key"
+
+    agent._dead_keys.add("k3")
+    assert agent._next_key(keys, 0) is None, "all refused must be reported"
+
+    agent._dead_keys.clear()
