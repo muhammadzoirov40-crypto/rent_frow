@@ -11,6 +11,9 @@ class Conversation(Base):
     user1_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     user2_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     listing_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("listings.id"), nullable=True)
+    # Set when this conversation was opened by a rental request, so the chat can
+    # show that request's card and the owner's accept/reject actions.
+    rental_request_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     last_message_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
@@ -21,4 +24,7 @@ class Conversation(Base):
 
     __table_args__ = (
         Index("idx_conversation_users", "user1_id", "user2_id"),
+        # Same name as the one in migrations.py, so an existing database is not
+        # given a second index on the same column.
+        Index("idx_conversation_rental_request", "rental_request_id"),
     )

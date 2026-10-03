@@ -15,7 +15,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import type { Message } from '../../api';
-import { formatBytes, parseContent, type Attachment } from './messageContent';
+import { formatBytes, parseContent, isSystemMessage, stripSystemPrefix, type Attachment } from './messageContent';
 import VoicePlayer from './VoicePlayer';
 import { parseDate, formatDate } from '../../utils/dates';
 
@@ -273,15 +273,33 @@ export default function ChatMessageList({
                 next.sender_id !== message.sender_id ||
                 parseDate(next.created_at).getTime() - parseDate(message.created_at).getTime() > 5 * 60 * 1000;
 
-            return (
-              <div key={message.id}>
-                {newDay && (
-                  <div className="flex justify-center my-4">
-                    <span className="px-3 py-1 rounded-full bg-gray-100/90 dark:bg-white/10 backdrop-blur text-[11px] font-semibold text-gray-500 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 shadow-sm">
-                      {formatDate(message.created_at)}
+            const dayDivider = newDay ? (
+              <div className="flex justify-center my-4">
+                <span className="px-3 py-1 rounded-full bg-gray-100/90 dark:bg-white/10 backdrop-blur text-[11px] font-semibold text-gray-500 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 shadow-sm">
+                  {formatDate(message.created_at)}
+                </span>
+              </div>
+            ) : null;
+
+            // RentHub's own line (request sent / accepted / rejected / …) is
+            // not a person talking — it is rendered as a centred chip instead
+            // of a left/right bubble from whoever triggered it.
+            if (isSystemMessage(message.content)) {
+              return (
+                <div key={message.id}>
+                  {dayDivider}
+                  <div className="flex justify-center my-2.5" data-testid="chat-system-message">
+                    <span className="max-w-[85%] px-3 py-1.5 rounded-xl bg-gray-100/90 dark:bg-white/10 backdrop-blur text-[11px] leading-relaxed text-gray-600 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 text-center">
+                      {stripSystemPrefix(message.content)}
                     </span>
                   </div>
-                )}
+                </div>
+              );
+            }
+
+            return (
+              <div key={message.id}>
+                {dayDivider}
 
                 <div
                   onClick={(e) => e.stopPropagation()}

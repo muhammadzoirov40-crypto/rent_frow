@@ -7,6 +7,7 @@ from app.repositories.message import MessageRepository
 from app.repositories.conversation import ConversationRepository
 from app.repositories.user import UserRepository
 from app.services.notification import NotificationService
+from app.services.system_message import is_system
 from app.utils.websocket import manager
 
 
@@ -96,20 +97,24 @@ class MessageService:
             sender_name = sender.display_name or (sender.email or "").split("@")[0]
         notification_text = f"{sender_name}: {content[:110]}" if sender_name else content[:120]
 
-        await self.notif_service.create(
-            user_id=other_user_id,
-            title="New Message",
-            message=notification_text,
-            type="new_message",
-            reference_id=conversation_id,
-            reference_type="conversation",
-            data={
-                "actor_id": sender_id,
-                "actor_name": sender_name,
-                "conversation_id": conversation_id,
-                "message_preview": content[:200],
-            },
-        )
+        # A system message already comes with its own rental notification
+        # ("request sent / accepted / rejected") — a second "New Message" on
+        # top of it would only be noise.
+        if not is_system(content):
+            await self.notif_service.create(
+                user_id=other_user_id,
+                title="New Message",
+                message=notification_text,
+                type="new_message",
+                reference_id=conversation_id,
+                reference_type="conversation",
+                data={
+                    "actor_id": sender_id,
+                    "actor_name": sender_name,
+                    "conversation_id": conversation_id,
+                    "message_preview": content[:200],
+                },
+            )
 
         event = {
             "type": "message",

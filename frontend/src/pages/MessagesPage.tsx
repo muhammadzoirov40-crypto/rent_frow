@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, MessageSquare, Pin, X, Package, ChevronRight } from 'lucide-react';
+import { Search, MessageSquare, Pin, X, Package, ChevronRight, Check } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { messages, upload, listings } from '../api';
-import type { Conversation, Message } from '../api';
+import { messages, upload, listings, rentalRequests } from '../api';
+import type { Conversation, Message, RentalRequest } from '../api';
 import useAuthStore from '../store/authStore';
 import ChatHeader from '../components/chat/ChatHeader';
 import ChatMessageList from '../components/chat/ChatMessageList';
@@ -13,8 +13,9 @@ import ChatInput from '../components/chat/ChatInput';
 import Lightbox from '../components/chat/Lightbox';
 import CallOverlay, { type CallType } from '../components/chat/CallOverlay';
 import useChatSocket from '../components/chat/useChatSocket';
-import { parseContent } from '../components/chat/messageContent';
+import { parseContent, isSystemMessage, stripSystemPrefix } from '../components/chat/messageContent';
 import { timeAgo } from '../utils/timeAgo';
+import { formatDate } from '../utils/dates';
 
 import { formatAmount } from '../utils/format';
 function voiceExt(mimeType: string): string {
@@ -385,6 +386,7 @@ export default function MessagesPage() {
 
   const previewText = (content: string | null | undefined) => {
     if (!content) return '';
+    if (isSystemMessage(content)) return stripSystemPrefix(content);
     const parsed = parseContent(content);
     if (parsed.kind === 'text') return parsed.text;
     if (parsed.kind === 'image') return t('messages.previewImage');
@@ -509,6 +511,10 @@ export default function MessagesPage() {
               onVideoCall={() => setCall('video')}
               onClear={handleClearConversation}
             />
+
+            {selectedConversation?.rental_request_id != null && (
+              <RentalRequestBar requestId={selectedConversation.rental_request_id} />
+            )}
 
             {selectedConversation?.listing_id != null && (
               <ListingContextBar listingId={selectedConversation.listing_id} />
@@ -677,5 +683,190 @@ function ListingContextBar({ listingId }: { listingId: number }) {
         <ChevronRight className="w-3.5 h-3.5" />
       </span>
     </Link>
+  );
+}
+
+/**
+ * The rental request this chat is about, pinned right under the chat header.
+ *
+ * The owner gets the accept/reject actions here — the same ones that live on
+ * the rental-requests page — so a decision never has to leave the conversation.
+ */
+function RentalRequestBar({ requestId }: { requestId: number }) {
+  const { t } = useTranslation();
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [decision, setDecision] = useState<'accept' | 'reject' | null>(null);
+
+  const { data: req } = useQuery<RentalRequest>({
+    queryKey: ['chat-rental-request', requestId],
+    queryFn: () => rentalRequests.getById(requestId),
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+    retry: 1,
+  });
+
+  const decideMutation = useMutation({
+    mutationFn: (action: 'accept' | 'reject') =>
+      action === 'accept' ? rentalRequests.accept(requestId) : rentalRequests.reject(requestId),
+    onSuccess: (_data, action) => {
+      toast.success(
+        action === 'accept' ? t('rentalRequests.requestAccepted') : t('rentalRequests.requestRejected'),
+      );
+      setDecision(null);
+      queryClient.invalidateQueries({ queryKey: ['chat-rental-request', requestId] });
+      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['owner-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['messages'] });
+    },
+    onError: () => {
+      setDecision(null);
+      toast.error(t('common.error'));
+    },
+  });
+
+  if (!req) return null;
+
+  const statusKey = (req.status || 'PENDING').toUpperCase();
+  const styles: Record<string, { bg: string; text: string; dot: string }> = {
+    PENDING: { bg: 'bg-amber-50 dark:bg-amber-500/10', text: 'text-amber-700 dark:text-amber-400', dot: 'bg-amber-400' },
+    ACCEPTED: { bg: 'bg-emerald-50 dark:bg-emerald-500/10', text: 'text-emerald-700 dark:text-emerald-400', dot: 'bg-emerald-400' },
+    REJECTED: { bg: 'bg-red-50 dark:bg-red-500/10', text: 'text-red-700 dark:text-red-400', dot: 'bg-red-400' },
+    CANCELLED: { bg: 'bg-gray-100 dark:bg-white/5', text: 'text-gray-600 dark:text-gray-400', dot: 'bg-gray-400' },
+    COMPLETED: { bg: 'bg-blue-50 dark:bg-blue-500/10', text: 'text-blue-700 dark:text-blue-400', dot: 'bg-blue-400' },
+  };
+  const labels: Record<string, string> = {
+    PENDING: t('booking.pending'),
+    ACCEPTED: t('booking.confirmed'),
+    REJECTED: t('booking.rejected'),
+    CANCELLED: t('booking.cancelled'),
+    COMPLETED: t('booking.completed'),
+  };
+  const style = styles[statusKey] || styles.PENDING;
+  const statusLabel = labels[statusKey] || labels.PENDING;
+  const isOwner = user?.id === req.owner_id;
+  const isPending = statusKey === 'PENDING';
+
+  return (
+    <div
+      data-testid="chat-rental-request-card"
+      className="px-4 py-3 border-b border-gray-100 dark:border-white/5 bg-gradient-to-r from-[rgb(var(--accent-rgb)/0.12)] via-[rgb(var(--accent-rgb)/0.05)] to-transparent"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+              {t('messages.rentalRequest')}
+            </span>
+            <span
+              className={`inline-flex items-center gap-1.5 text-[11px] px-2 py-0.5 rounded-full font-semibold ${style.bg} ${style.text}`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+              {statusLabel}
+            </span>
+          </div>
+          <p className="text-sm font-semibold text-[#1A1A2E] dark:text-white truncate mt-1">
+            {req.listing_title || t('messages.rentalRequest')}
+          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            {formatDate(req.start_date)} — {formatDate(req.end_date)}
+            {' · '}
+            {req.total_days} {t('listing.days')}
+          </p>
+        </div>
+        <div className="text-right shrink-0">
+          <div className="text-sm font-extrabold text-[var(--accent)]">
+            {formatAmount(req.total_price)} {t('common.somoni')}
+          </div>
+          {(req.deposit_amount ?? 0) > 0 && (
+            <div className="text-[11px] text-gray-500 dark:text-gray-400">
+              {t('booking.deposit')}: {formatAmount(req.deposit_amount)}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {isOwner && isPending && (
+        <div className="flex gap-2 mt-2.5">
+          <button
+            type="button"
+            onClick={() => setDecision('accept')}
+            disabled={decideMutation.isPending}
+            className="flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-500/20 disabled:opacity-50"
+          >
+            <Check className="w-4 h-4" />
+            {t('rentalRequests.accept')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setDecision('reject')}
+            disabled={decideMutation.isPending}
+            className="flex items-center gap-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-500/10 dark:hover:bg-red-500/20 px-4 py-2 rounded-xl transition disabled:opacity-50"
+          >
+            <X className="w-4 h-4" />
+            {t('rentalRequests.reject')}
+          </button>
+        </div>
+      )}
+
+      {!isOwner && isPending && (
+        <p className="mt-2 text-[11px] text-gray-500 dark:text-gray-400">
+          {t('messages.waitingOwner')}
+        </p>
+      )}
+
+      {!isPending && req.owner_response && (
+        <p className="mt-2 text-xs text-gray-600 dark:text-gray-300 italic">
+          “{req.owner_response}”
+        </p>
+      )}
+
+      {decision && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => {
+            if (!decideMutation.isPending) setDecision(null);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            data-testid="confirm-chat-decision-modal"
+            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
+              {decision === 'accept' ? t('rentalRequests.confirmAcceptTitle') : t('rentalRequests.confirmRejectTitle')}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+              {decision === 'accept' ? t('rentalRequests.confirmAcceptText') : t('rentalRequests.confirmRejectText')}
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => setDecision(null)}
+                disabled={decideMutation.isPending}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition disabled:opacity-50"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={() => decideMutation.mutate(decision)}
+                disabled={decideMutation.isPending}
+                className={`px-5 py-2.5 rounded-xl text-sm font-bold text-white disabled:opacity-60 transition flex items-center gap-2 ${
+                  decision === 'accept'
+                    ? 'bg-emerald-500 hover:bg-emerald-600'
+                    : 'bg-red-500 hover:bg-red-600'
+                }`}
+              >
+                {decision === 'accept' ? t('rentalRequests.accept') : t('rentalRequests.reject')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

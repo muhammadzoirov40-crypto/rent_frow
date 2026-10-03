@@ -277,6 +277,11 @@
     "confirmDeleteReview": "Delete this review?",
     "reviewDeleted": "Review deleted",
     "failedToDeleteReview": "Failed to delete review",
+    "deleteListing": "Delete listing",
+    "confirmDeleteListing": "Delete listing?",
+    "deleteListingText": "The listing will be permanently deleted.",
+    "listingDeleted": "Listing deleted",
+    "failedToDeleteListing": "Failed to delete",
     "reviewRating": "Rating",
     "reviewPlaceholder": "Write your review...",
     "sendReview": "Send",
@@ -435,7 +440,9 @@
     "replyingTo": "Reply to",
     "editing": "Editing",
     "pinned": "Pinned",
-    "updated": "Message updated"
+    "updated": "Message updated",
+    "rentalRequest": "Rental request",
+    "waitingOwner": "Waiting for the owner's answer"
   },
   "notifications": {
     "title": "Notifications",
@@ -586,7 +593,11 @@
     "requestRejected": "Request rejected",
     "failedCancel": "Failed to cancel",
     "failedAccept": "Failed to accept",
-    "failedReject": "Failed to reject"
+    "failedReject": "Failed to reject",
+    "confirmAcceptTitle": "Accept the request?",
+    "confirmAcceptText": "The rental will be confirmed and the renter will be notified.",
+    "confirmRejectTitle": "Reject the request?",
+    "confirmRejectText": "The renter will be notified that the request was declined."
   },
   "settings": {
     "title": "Settings",
@@ -870,6 +881,7 @@
       "messages": "Messages",
       "reviews": "Reviews",
       "earnings": "Earnings",
+      "wallet": "Balance",
       "profile": "Profile",
       "settings": "Settings"
     },
@@ -970,6 +982,23 @@
       "accepted": "Accepted",
       "other": "Other requests",
       "quickActions": "Quick actions"
+    },
+    "wallet": {
+      "title": "Balance",
+      "subtitle": "Available money, what is held for your rentals, and every movement.",
+      "available": "Available",
+      "reserved": "Reserved",
+      "ownTotal": "Total",
+      "topUp": "Top up balance",
+      "topUpHint": "Manual credit — no payment gateway on the free tier.",
+      "history": "Transaction history",
+      "historyEmpty": "No transactions yet.",
+      "loading": "Loading…",
+      "type_TOPUP": "Top-up",
+      "type_HELD": "Held for rental",
+      "type_RELEASED": "Hold released",
+      "type_REFUNDED": "Refund",
+      "type_COMPLETED": "Rental completed"
     }
   },
   "booking": {
@@ -998,7 +1027,13 @@
     "cancelConfirmText": "This action cannot be undone.",
     "yes": "Yes, cancel",
     "messageRenter": "Message renter",
-    "viewListing": "View listing"
+    "viewListing": "View listing",
+    "yourBalance": "Your balance",
+    "balanceTopUp": "Top up balance",
+    "insufficientBalance": "You need {{total}} сомони, your balance is {{balance}} сомони.",
+    "heldBalance": "Reserved",
+    "insufficientFunds": "Insufficient funds",
+    "balanceToppedUp": "Balance topped up: {{balance}} сомони"
   },
   "payment": {
     "pay": "Pay",

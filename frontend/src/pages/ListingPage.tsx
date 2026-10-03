@@ -31,8 +31,24 @@ import { formatDate } from '../utils/dates';
 import { previousPath } from '../utils/navHistory';
 import { rememberViewed } from '../utils/recentlyViewed';
 import { formatAmount, formatPriceUnit } from '../utils/format';
+import { wallet, canAfford, topUpDemo } from '../utils/wallet';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 import LocationMap from '../components/search/LocationMap';
+
+/** Days between two yyyy-mm-dd dates (at least one). */
+function rentalDays(startDate: string, endDate: string): number {
+  if (!startDate || !endDate) return 1;
+  return Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000));
+}
+
+/** What the renter has to afford: price × duration, honouring the price unit. */
+function rentalSubtotal(price: number, priceUnit: string | undefined, days: number): number {
+  const p = Number(price) || 0;
+  if (priceUnit === 'per_hour') return p * days * 24;
+  if (priceUnit === 'per_week') return p * (days / 7);
+  if (priceUnit === 'per_month') return p * (days / 30);
+  return p * days;
+}
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
   return (
@@ -67,7 +83,26 @@ export default function ListingPage() {
   const [reviewComment, setReviewComment] = useState('');
   const [isFavorited, setIsFavorited] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showDeleteListing, setShowDeleteListing] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  // The backend wallet — available vs reserved. A top-up invalidates it so the
+  // panel shows the new number without reloading the page.
+  const { data: walletSummary, refetch: refetchWallet } = useQuery({
+    queryKey: ['wallet'],
+    queryFn: () => wallet.get(),
+    enabled: isAuthenticated,
+  });
+  const balance = walletSummary?.balance ?? 0;
+  const held = walletSummary?.held ?? 0;
+
+  const topUpMutation = useMutation({
+    mutationFn: () => topUpDemo(),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['wallet'] });
+      toast.success(t('booking.balanceToppedUp', { balance: formatAmount(data.balance) }));
+    },
+    onError: () => toast.error(t('common.error')),
+  });
 
   const { data: listing, isLoading: listingLoading } = useQuery({
     queryKey: ['listing', id],
@@ -178,7 +213,7 @@ export default function ListingPage() {
     },
   });
 
-  const requestRental = () => {
+  const requestRental = async () => {
     if (!isAuthenticated) {
       toast.error(t('listing.loginRequired'));
       navigate('/login');
@@ -186,6 +221,17 @@ export default function ListingPage() {
     }
     if (!startDate || !endDate) {
       toast.error(t('listing.selectDatesRequired'));
+      return;
+    }
+    if (!listing) return;
+    // Balance validation: TOTAL = price × duration. The number is read back
+    // from the backend right before deciding — the browser never decides.
+    const needed = Math.round(
+      rentalSubtotal(listing.price, listing.price_unit, rentalDays(startDate, endDate)),
+    );
+    const fresh = await refetchWallet();
+    if (!canAfford(fresh.data?.balance, needed)) {
+      toast.error(t('booking.insufficientFunds'));
       return;
     }
     setShowConfirm(true);
@@ -230,6 +276,23 @@ export default function ListingPage() {
     },
   });
 
+  // Taking the listing down. Reachable for the owner and for an admin — the
+  // backend lets an admin delete any listing, not only their own.
+  const deleteListingMutation = useMutation({
+    mutationFn: () => listings.delete(Number(id)),
+    onSuccess: () => {
+      toast.success(t('listing.listingDeleted'));
+      queryClient.invalidateQueries({ queryKey: ['listings'] });
+      queryClient.invalidateQueries({ queryKey: ['search'] });
+      queryClient.invalidateQueries({ queryKey: ['similarListings'] });
+      navigate('/dashboard');
+    },
+    onError: (error: any) => {
+      const detail = error?.response?.data?.detail;
+      toast.error(typeof detail === 'string' ? detail : t('listing.failedToDeleteListing'));
+    },
+  });
+
   const messageMutation = useMutation({
     mutationFn: () => {
       if (!listing?.owner_id) throw new Error('No owner');
@@ -269,14 +332,8 @@ export default function ListingPage() {
   const images = listing.images && listing.images.length > 0
     ? listing.images.map((img) => typeof img === 'string' ? img : img.image_url)
     : [];
-  const days = startDate && endDate ? Math.max(1, Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / 86400000)) : 1;
-  const subtotal = (() => {
-    const u = listing.price_unit;
-    if (u === 'per_hour') return listing.price * days * 24;
-    if (u === 'per_week') return listing.price * (days / 7);
-    if (u === 'per_month') return listing.price * (days / 30);
-    return listing.price * days;
-  })();
+  const days = rentalDays(startDate, endDate);
+  const subtotal = rentalSubtotal(listing.price, listing.price_unit, days);
   const total = Math.round(subtotal);
   const isOwner = isAuthenticated && user?.id === listing.owner_id;
   const avgRating = listingReviews.length > 0 ? Math.round(listingReviews.reduce((s, r) => s + r.rating, 0) / listingReviews.length) : 0;
@@ -560,6 +617,43 @@ export default function ListingPage() {
                         {formatAmount(total)} {t('common.somoni')}
                       </span>
                     </div>
+                    {isAuthenticated && (
+                      <>
+                        <div className="flex items-center justify-between pt-2 border-t border-dashed border-gray-200 dark:border-white/10">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">{t('booking.yourBalance')}</span>
+                          <span className={`text-sm font-bold ${startDate && endDate && !canAfford(balance, total) ? 'text-red-500' : 'text-[#16a34a]'}`}>
+                            {formatAmount(balance)} {t('common.somoni')}
+                          </span>
+                        </div>
+                        {held > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">{t('booking.heldBalance')}</span>
+                            <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                              {formatAmount(held)} {t('common.somoni')}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {isAuthenticated && startDate && endDate && !canAfford(balance, total) && (
+                      <div className="rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 p-3 text-xs text-red-600 dark:text-red-400">
+                        <p className="font-bold">{t('booking.insufficientFunds')}</p>
+                        <p className="mt-1">
+                          {t('booking.insufficientBalance', {
+                            balance: formatAmount(balance),
+                            total: formatAmount(total),
+                          })}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => topUpMutation.mutate()}
+                          disabled={topUpMutation.isPending}
+                          className="mt-2 w-full rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-3 transition disabled:opacity-60"
+                        >
+                          {topUpMutation.isPending ? t('common.loading') : t('booking.balanceTopUp')}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -609,6 +703,17 @@ export default function ListingPage() {
                       <Pencil size={16} />
                       {t('listing.editListing')}
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowDeleteListing(true)}
+                      disabled={deleteListingMutation.isPending}
+                      className="w-full border-2 border-red-500/50 text-red-600 dark:text-red-400 hover:bg-red-600 hover:border-red-600 hover:text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                      <Trash2 size={16} />
+                      {t('listing.deleteListing')}
+                    </button>
+
                     {isOwner && (
                       <div className="w-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 text-sm font-medium py-3 px-4 rounded-xl text-center">
                         {t('listing.ownListingHint')}
@@ -883,7 +988,42 @@ export default function ListingPage() {
                   {formatAmount(total)} {t('common.somoni')}
                 </span>
               </div>
+              <div className="flex justify-between gap-4 pt-1.5 border-t border-dashed border-gray-200 dark:border-white/10">
+                <span className="text-gray-500 dark:text-gray-400">{t('booking.yourBalance')}</span>
+                <span className={`font-bold ${canAfford(balance, total) ? 'text-[#16a34a]' : 'text-red-500'}`}>
+                  {formatAmount(balance)} {t('common.somoni')}
+                </span>
+              </div>
+              {held > 0 && (
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-500 dark:text-gray-400">{t('booking.heldBalance')}</span>
+                  <span className="font-semibold text-amber-600 dark:text-amber-400">
+                    {formatAmount(held)} {t('common.somoni')}
+                  </span>
+                </div>
+              )}
             </div>
+            {!canAfford(balance, total) && (
+              <div className="-mt-3 mb-5 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 p-3 text-sm text-red-600 dark:text-red-400">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+                  <span className="flex-1">
+                    {t('booking.insufficientBalance', {
+                      balance: formatAmount(balance),
+                      total: formatAmount(total),
+                    })}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => topUpMutation.mutate()}
+                  disabled={topUpMutation.isPending}
+                  className="mt-2 w-full rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-3 transition disabled:opacity-60"
+                >
+                  {topUpMutation.isPending ? t('common.loading') : t('booking.balanceTopUp')}
+                </button>
+              </div>
+            )}
             <div className="flex gap-2 justify-end">
               <button
                 type="button"
@@ -896,10 +1036,57 @@ export default function ListingPage() {
               <button
                 type="button"
                 onClick={() => rentalMutation.mutate()}
-                disabled={rentalMutation.isPending}
+                disabled={rentalMutation.isPending || !canAfford(balance, total)}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-60 transition flex items-center gap-2"
               >
                 {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.confirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteListing && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => {
+            if (!deleteListingMutation.isPending) setShowDeleteListing(false);
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="confirm-delete-listing-title"
+            data-testid="confirm-delete-listing-modal"
+            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3
+              id="confirm-delete-listing-title"
+              className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1"
+            >
+              {t('listing.confirmDeleteListing')}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+              {t('listing.deleteListingText')}
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                type="button"
+                onClick={() => setShowDeleteListing(false)}
+                disabled={deleteListingMutation.isPending}
+                className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition disabled:opacity-50"
+              >
+                {t('common.cancel')}
+              </button>
+              <button
+                type="button"
+                onClick={() => deleteListingMutation.mutate()}
+                disabled={deleteListingMutation.isPending}
+                className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-60 transition flex items-center gap-2"
+              >
+                <Trash2 size={15} />
+                {deleteListingMutation.isPending ? t('listing.deleteListing') : t('common.delete')}
               </button>
             </div>
           </div>

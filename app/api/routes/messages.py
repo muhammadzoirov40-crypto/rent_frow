@@ -76,6 +76,7 @@ def _conv_to_response(conv, current_user_id: int, last_message=None, unread: int
         user1_id=conv.user1_id,
         user2_id=conv.user2_id,
         listing_id=conv.listing_id,
+        rental_request_id=conv.rental_request_id,
         last_message_at=conv.last_message_at,
         created_at=conv.created_at,
         other_user_name=other_name,

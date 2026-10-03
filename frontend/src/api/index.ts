@@ -148,6 +148,9 @@ export interface Conversation {
   user1_id: number;
   user2_id: number;
   listing_id: number | null;
+  /** Set when this chat was opened by a rental request — the chat then shows
+   *  that request's card with the owner's accept/reject actions. */
+  rental_request_id: number | null;
   last_message_at: string | null;
   created_at: string;
   other_user_name: string | null;
@@ -374,6 +377,9 @@ export const rentalRequests = {
   getOwnerRequests: (page = 1, page_size = 20) =>
     client.get<PaginatedResponse<RentalRequest>>('/rental-requests/owner', { params: { page, page_size } }).then(unwrapPaginated),
 
+  getById: (id: number) =>
+    client.get<APIResponse<RentalRequest>>(`/rental-requests/${id}`).then(unwrap),
+
   accept: (id: number) =>
     client.patch<APIResponse<RentalRequest>>(`/rental-requests/${id}/accept`).then(unwrap),
 
@@ -444,6 +450,45 @@ export const notifications = {
 
   markAllRead: () =>
     client.patch<APIResponse<null>>('/notifications/read-all'),
+};
+
+export interface WalletSummary {
+  /** spendable right now */
+  balance: number;
+  /** reserved by open / accepted rental requests */
+  held: number;
+  /** balance + held — what the user actually owns */
+  total: number;
+  currency: string;
+}
+
+export interface WalletTransactionRecord {
+  id: number;
+  /** signed change to the available balance */
+  amount: number;
+  /** signed change to the reserved balance */
+  held_amount: number;
+  type: 'TOPUP' | 'HELD' | 'RELEASED' | 'REFUNDED' | 'COMPLETED';
+  rental_request_id: number | null;
+  listing_title: string | null;
+  description: string | null;
+  balance_after: number;
+  held_after: number;
+  created_at: string;
+}
+
+export const wallet = {
+  /** Available vs reserved — the backend is the source of truth. */
+  get: () => client.get<APIResponse<WalletSummary>>('/wallet').then(unwrap),
+
+  transactions: (page = 1, page_size = 20) =>
+    client
+      .get<PaginatedResponse<WalletTransactionRecord>>('/wallet/transactions', { params: { page, page_size } })
+      .then(unwrapPaginated),
+
+  /** Manual credit — there is no payment gateway on the free tier. */
+  topUp: (amount: number) =>
+    client.post<APIResponse<WalletSummary>>('/wallet/topup', { amount }).then(unwrap),
 };
 
 export const payments = {

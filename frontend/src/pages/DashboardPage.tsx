@@ -17,6 +17,7 @@ import {
 import DashboardLayout, { type DashboardSection } from '../components/dashboard/DashboardLayout';
 import ListingsSection from '../components/dashboard/ListingsSection';
 import BookingsSection from '../components/dashboard/BookingsSection';
+import WalletSection from '../components/dashboard/WalletSection';
 import {
   CalendarSection,
   MessagesSection,
@@ -507,6 +508,7 @@ export default function DashboardPage() {
     if (active === 'listings') return isOwnerLike ? <ListingsSection /> : ownerOnlyPanel;
     if (active === 'bookings') return isOwnerLike ? <BookingsSection /> : ownerOnlyPanel;
     if (active === 'earnings') return isOwnerLike ? <EarningsSection /> : ownerOnlyPanel;
+    if (active === 'wallet') return <WalletSection />;
     if (active === 'calendar') return isOwnerLike ? <CalendarSection /> : ownerOnlyPanel;
     if (active === 'reviews') return isOwnerLike ? <ReviewsSection /> : ownerOnlyPanel;
     if (active === 'messages') return <MessagesSection />;

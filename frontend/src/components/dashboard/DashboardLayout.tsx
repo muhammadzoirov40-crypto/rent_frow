@@ -36,6 +36,7 @@ export type DashboardSection =
   | 'messages'
   | 'reviews'
   | 'earnings'
+  | 'wallet'
   | 'profile'
   | 'settings';
 
@@ -79,6 +80,8 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
     { key: 'messages', label: t('dashboard.nav.messages'), icon: <MessageSquare className="w-5 h-5" /> },
     { key: 'reviews', label: t('dashboard.nav.reviews'), icon: <Star className="w-5 h-5" />, ownerOnly: true },
     { key: 'earnings', label: t('dashboard.nav.earnings'), icon: <Wallet className="w-5 h-5" />, ownerOnly: true },
+    // Balance is everybody's business — a renter needs it as much as an owner.
+    { key: 'wallet', label: t('dashboard.nav.wallet'), icon: <Wallet className="w-5 h-5" /> },
     { key: 'profile', label: t('dashboard.nav.profile'), icon: <User className="w-5 h-5" /> },
     { key: 'settings', label: t('dashboard.nav.settings'), icon: <Settings className="w-5 h-5" /> },
   ];

@@ -375,7 +375,7 @@ async def delete_listing(
     db: AsyncSession = Depends(get_db),
 ):
     service = ListingService(db)
-    await service.delete(listing_id, current_user.user_id)
+    await service.delete(listing_id, current_user.user_id, is_admin=current_user.is_admin)
     return APIResponse(message="Listing deleted successfully")
 
 

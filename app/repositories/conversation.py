@@ -36,6 +36,17 @@ class ConversationRepository(BaseRepository[Conversation]):
         await self.db.refresh(conv)
         return conv
 
+    async def get_by_rental_request(self, rental_request_id: int) -> Optional[Conversation]:
+        """The conversation a rental request was opened in."""
+        if not rental_request_id:
+            return None
+        result = await self.db.execute(
+            select(Conversation).where(
+                Conversation.rental_request_id == rental_request_id
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def get_user_conversations(self, user_id: int) -> list[Conversation]:
         result = await self.db.execute(
             select(Conversation)

@@ -70,6 +70,18 @@ async def get_owner_rental_requests(
     return PaginatedResponse(data=items, total=total, page=page, page_size=page_size)
 
 
+@router.get("/{request_id}", response_model=APIResponse[RentalRequestResponse])
+async def get_rental_request(
+    request_id: int,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Single request — used by the chat's rental-request card."""
+    service = RentalRequestService(db)
+    req = await service.get_for_user(request_id, current_user.user_id)
+    return APIResponse(data=_to_response(req))
+
+
 @router.patch("/{request_id}/accept", response_model=APIResponse[RentalRequestResponse])
 async def accept_rental_request(
     request_id: int,

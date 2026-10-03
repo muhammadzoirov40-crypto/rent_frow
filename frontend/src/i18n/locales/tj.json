@@ -277,6 +277,11 @@
     "confirmDeleteReview": "Ин шарҳро нестор кунам?",
     "reviewDeleted": "Шарҳ нестор карда шуд",
     "failedToDeleteReview": "Шарҳро нестор кардан имкон нашуд",
+    "deleteListing": "Эълонро нест кунед",
+    "confirmDeleteListing": "Эълонро нобуд кунед?",
+    "deleteListingText": "Эълон бе барқарорсозӣ нест мешавад.",
+    "listingDeleted": "Эълон нобуд карда шуд",
+    "failedToDeleteListing": "Нобуд кардан ноком шуд",
     "reviewRating": "Баҳо",
     "reviewPlaceholder": "Шарҳи худро нависед...",
     "sendReview": "Фиристодан",
@@ -435,7 +440,9 @@
     "replyingTo": "Ҷавоб ба",
     "editing": "Ислоҳ кардан",
     "pinned": "Мустаҳкамшуда",
-    "updated": "Паём ислоҳ шуд"
+    "updated": "Паём ислоҳ шуд",
+    "rentalRequest": "Дархости иҷора",
+    "waitingOwner": "Ҷавоби соҳибро интизорем"
   },
   "notifications": {
     "title": "Хабардиҳиҳо",
@@ -586,7 +593,11 @@
     "requestRejected": "Дархост рад карда шуд",
     "failedCancel": "Бекор кардан ноком шуд",
     "failedAccept": "Қабул кардан ноком шуд",
-    "failedReject": "Рад кардан ноком шуд"
+    "failedReject": "Рад кардан ноком шуд",
+    "confirmAcceptTitle": "Дархост қабул шавад?",
+    "confirmAcceptText": "Иҷора тасдиқ карда мешавад ва иҷорагир огоҳонида мешавад.",
+    "confirmRejectTitle": "Дархост рад шавад?",
+    "confirmRejectText": "Иҷорагир огоҳонида мешавад, ки дархост рад гардид."
   },
   "settings": {
     "title": "Танзимот",
@@ -870,6 +881,7 @@
       "messages": "Пайвастагиҳо",
       "reviews": "Шарҳҳо",
       "earnings": "Даромад",
+      "wallet": "Баланс",
       "profile": "Профил",
       "settings": "Танзимот"
     },
@@ -970,6 +982,23 @@
       "accepted": "Тасдиқшуда",
       "other": "Дигар дархостҳо",
       "quickActions": "Амалҳои зуд"
+    },
+    "wallet": {
+      "title": "Баланс",
+      "subtitle": "Пулҳои дастрас, барои иҷора бандшуда ва тамоми таърихи амалиётҳо.",
+      "available": "Дастрас",
+      "reserved": "Бандшуда",
+      "ownTotal": "Ҳамагӣ",
+      "topUp": "Пурра кардани баланс",
+      "topUpHint": "Бе иштироки даргоҳи пардохт — дар тароифи ройгон пардохти берунӣ нест.",
+      "history": "Таърихи амалиётҳо",
+      "historyEmpty": "Ҳанӯз амалиёт нест.",
+      "loading": "Боргирӣ…",
+      "type_TOPUP": "Пурра кардан",
+      "type_HELD": "Банд кардан барои иҷора",
+      "type_RELEASED": "Аз банд баровардан",
+      "type_REFUNDED": "Барқарорсозӣ",
+      "type_COMPLETED": "Иҷора ба охир расид"
     }
   },
   "booking": {
@@ -998,7 +1027,13 @@
     "cancelConfirmText": "Ин амал баргаштан намешавад.",
     "yes": "Ҳа, бекор кун",
     "messageRenter": "Мессаҷ ба иҷорагир",
-    "viewListing": "Кушодани эълон"
+    "viewListing": "Кушодани эълон",
+    "yourBalance": "Баланси шумо",
+    "balanceTopUp": "Пурра кардани баланс",
+    "insufficientBalance": "Ба шумо {{total}} сомони лозим аст, баланси шумо {{balance}} сомони.",
+    "heldBalance": "Банд карда шуда",
+    "insufficientFunds": "Маблағ накифа нест",
+    "balanceToppedUp": "Баланс пурра карда шуд: {{balance}} сомони"
   },
   "payment": {
     "pay": "Пардохт кунед",

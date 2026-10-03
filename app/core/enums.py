@@ -100,6 +100,27 @@ class PaymentStatus(str, enum.Enum):
     REFUNDED = "REFUNDED"
 
 
+class WalletTransactionType(str, enum.Enum):
+    """Every way money can move in a user's wallet.
+
+    TOPUP     money comes in (manual credit — there is no payment gateway on
+              the free tier, so a top-up is an explicit ledger entry).
+    HELD      available -> reserved, when a rental request is created.
+    RELEASED  reserved -> available, when a hold ends without the rent ever
+              having been collected (rejected / cancelled before payment).
+    REFUNDED  reserved -> available, when the rent HAD been collected (a PAID
+              payment exists) and is now given back.
+    COMPLETED the reserved rent is settled: it leaves the wallet for good when
+              the rental is completed.
+    """
+
+    TOPUP = "TOPUP"
+    HELD = "HELD"
+    RELEASED = "RELEASED"
+    REFUNDED = "REFUNDED"
+    COMPLETED = "COMPLETED"
+
+
 class MaintenanceStatus(str, enum.Enum):
     PENDING = "PENDING"
     IN_PROGRESS = "IN_PROGRESS"

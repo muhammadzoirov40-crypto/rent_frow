@@ -3,6 +3,11 @@ import os
 import uuid
 import pytest
 import pytest_asyncio
+
+# The rental flow sends real SMTP email. A test run must never reach out to a
+# mail server, so this is set before app settings are first loaded.
+os.environ.setdefault("EMAIL_ENABLED", "false")
+
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession

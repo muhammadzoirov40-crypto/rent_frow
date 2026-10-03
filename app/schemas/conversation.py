@@ -30,6 +30,7 @@ class ConversationResponse(BaseModel):
     user1_id: int
     user2_id: int
     listing_id: Optional[int] = None
+    rental_request_id: Optional[int] = None
     last_message_at: Optional[datetime] = None
     created_at: datetime
     other_user_name: Optional[str] = None

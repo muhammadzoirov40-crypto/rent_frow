@@ -31,6 +31,13 @@ class Settings(BaseSettings):
     SMTP_FROM: str = ""
     RESEND_API_KEY: str = ""
     EMAIL_FROM: str = "RentHub <no-reply@renthub.qobus.tj>"
+    # Used for the deep links inside outgoing emails (open request / open chat).
+    PUBLIC_BASE_URL: str = "https://renthub.qobus.tj"
+    # Turn off to keep tests/offline runs from ever touching an SMTP server.
+    EMAIL_ENABLED: bool = True
+    # Every wallet starts here (сомони) so the balance flow is usable out of
+    # the box. A real deployment would start users at 0 and top up for real.
+    WALLET_STARTING_BALANCE: float = 500.0
     OTP_EXPIRE_MINUTES: int = 10
     JWT_ALGORITHM: str = "HS256"
 

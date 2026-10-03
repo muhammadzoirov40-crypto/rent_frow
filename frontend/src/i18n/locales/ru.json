@@ -277,6 +277,11 @@
     "confirmDeleteReview": "Удалить этот отзыв?",
     "reviewDeleted": "Отзыв удалён",
     "failedToDeleteReview": "Не удалось удалить отзыв",
+    "deleteListing": "Удалить объявление",
+    "confirmDeleteListing": "Удалить объявление?",
+    "deleteListingText": "Объявление будет удалено без возможности восстановления.",
+    "listingDeleted": "Объявление удалено",
+    "failedToDeleteListing": "Не удалось удалить",
     "reviewRating": "Оценка",
     "reviewPlaceholder": "Напишите ваш отзыв...",
     "sendReview": "Отправить",
@@ -435,7 +440,9 @@
     "replyingTo": "Ответ",
     "editing": "Редактирование",
     "pinned": "Закреплённое",
-    "updated": "Сообщение изменено"
+    "updated": "Сообщение изменено",
+    "rentalRequest": "Запрос на аренду",
+    "waitingOwner": "Ожидаем ответ владельца"
   },
   "notifications": {
     "title": "Уведомления",
@@ -586,7 +593,11 @@
     "requestRejected": "Запрос отклонён",
     "failedCancel": "Не удалось отменить",
     "failedAccept": "Не удалось принять",
-    "failedReject": "Не удалось отклонить"
+    "failedReject": "Не удалось отклонить",
+    "confirmAcceptTitle": "Принять запрос?",
+    "confirmAcceptText": "Аренда будет подтверждена, арендатор получит уведомление.",
+    "confirmRejectTitle": "Отклонить запрос?",
+    "confirmRejectText": "Арендатор получит уведомление, что запрос отклонён."
   },
   "settings": {
     "title": "Настройки",
@@ -870,6 +881,7 @@
       "messages": "Сообщения",
       "reviews": "Отзывы",
       "earnings": "Доход",
+      "wallet": "Баланс",
       "profile": "Профиль",
       "settings": "Настройки"
     },
@@ -970,6 +982,23 @@
       "accepted": "Подтверждены",
       "other": "Другие заявки",
       "quickActions": "Быстрые действия"
+    },
+    "wallet": {
+      "title": "Баланс",
+      "subtitle": "Доступные средства, заблокированные под аренду и вся история операций.",
+      "available": "Доступно",
+      "reserved": "Заблокировано",
+      "ownTotal": "Всего",
+      "topUp": "Пополнить баланс",
+      "topUpHint": "Ручное зачисление — платёжного шлюза на бесплатном тарифе нет.",
+      "history": "История операций",
+      "historyEmpty": "Операций пока нет.",
+      "loading": "Загрузка…",
+      "type_TOPUP": "Пополнение",
+      "type_HELD": "Холд под аренду",
+      "type_RELEASED": "Холд снят",
+      "type_REFUNDED": "Возврат",
+      "type_COMPLETED": "Аренда завершена"
     }
   },
   "booking": {
@@ -998,7 +1027,13 @@
     "cancelConfirmText": "Это действие нельзя отменить.",
     "yes": "Да, отменить",
     "messageRenter": "Написать арендатору",
-    "viewListing": "Открыть объявление"
+    "viewListing": "Открыть объявление",
+    "yourBalance": "Ваш баланс",
+    "balanceTopUp": "Пополнить баланс",
+    "insufficientBalance": "Требуется {{total}} сомони, ваш баланс — {{balance}} сомони.",
+    "heldBalance": "Заблокировано",
+    "insufficientFunds": "Недостаточно средств",
+    "balanceToppedUp": "Баланс пополнен: {{balance}} сомони"
   },
   "payment": {
     "pay": "Оплатить",

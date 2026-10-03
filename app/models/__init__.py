@@ -13,6 +13,7 @@ from app.models.district import District
 from app.models.equipment import Equipment
 from app.models.booking import Booking
 from app.models.payment import Payment
+from app.models.wallet import Wallet, WalletTransaction
 from app.models.rental import Rental
 from app.models.review import Review
 from app.models.inspection import Inspection
@@ -40,6 +41,8 @@ __all__ = [
     "Equipment",
     "Booking",
     "Payment",
+    "Wallet",
+    "WalletTransaction",
     "Rental",
     "Review",
     "Inspection",

@@ -57,6 +57,16 @@ MESSAGE_INDEXES: list = [
     "idx_message_reply_to",
 ]
 
+CONVERSATION_COLUMNS: list = [
+    # A chat that exists because of a rental request stays tied to that request,
+    # so the conversation can show the request card and the accept/reject actions.
+    ("rental_request_id", "INTEGER"),
+]
+
+CONVERSATION_INDEXES: list = [
+    "idx_conversation_rental_request",
+]
+
 CITY_COLUMNS: list = [
     ("latitude", "NUMERIC(9, 6)"),
     ("longitude", "NUMERIC(9, 6)"),
@@ -146,6 +156,10 @@ async def _create_missing_indexes(conn, table: str, indexes: list, existing: set
         if table == "messages":
             if index_name == "idx_message_reply_to":
                 definition = "(reply_to_id)"
+
+        if table == "conversations":
+            if index_name == "idx_conversation_rental_request":
+                definition = "(rental_request_id)"
 
         if table == "payments":
             if index_name == "idx_payment_rental_request":
@@ -415,6 +429,18 @@ async def run_schema_migrations(engine: AsyncEngine) -> list:
             m_idx = await _create_missing_indexes(conn, "messages", MESSAGE_INDEXES, message_indexes)
             if m_idx:
                 applied.append(f"messages: created indexes {', '.join(m_idx)}")
+
+        if await conn.run_sync(lambda sync_conn: Inspector.from_engine(sync_conn).has_table("conversations")):
+            conversation_columns = await conn.run_sync(_get_columns, "conversations")
+            conversation_indexes = await conn.run_sync(_get_indexes, "conversations")
+
+            cv_added = await _add_missing_columns(conn, "conversations", CONVERSATION_COLUMNS, conversation_columns)
+            if cv_added:
+                applied.append(f"conversations: added columns {', '.join(cv_added)}")
+
+            cv_idx = await _create_missing_indexes(conn, "conversations", CONVERSATION_INDEXES, conversation_indexes)
+            if cv_idx:
+                applied.append(f"conversations: created indexes {', '.join(cv_idx)}")
 
         if await conn.run_sync(lambda sync_conn: Inspector.from_engine(sync_conn).has_table("cities")):
             city_columns = await conn.run_sync(_get_columns, "cities")

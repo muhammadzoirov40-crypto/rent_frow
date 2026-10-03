@@ -16,3 +16,7 @@ class ConversationService:
 
     async def get_user_conversations(self, user_id: int):
         return await self.repo.get_user_conversations(user_id)
+
+    async def get_by_rental_request(self, rental_request_id: int):
+        """The chat a rental request was opened in (None when there is none)."""
+        return await self.repo.get_by_rental_request(rental_request_id)

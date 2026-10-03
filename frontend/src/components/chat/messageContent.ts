@@ -1,5 +1,21 @@
 export type AttachmentKind = 'image' | 'file' | 'voice';
 
+/**
+ * Marker RentHub puts in front of its own lines in a chat (request sent,
+ * accepted, rejected, cancelled). Mirrors `SYSTEM_PREFIX` in
+ * `app/services/system_message.py` — keep both copies in sync.
+ */
+export const SYSTEM_PREFIX = '[system]';
+
+export function isSystemMessage(content: string | null | undefined): boolean {
+  return !!content && content.startsWith(SYSTEM_PREFIX);
+}
+
+export function stripSystemPrefix(content: string | null | undefined): string {
+  if (!content) return '';
+  return isSystemMessage(content) ? content.slice(SYSTEM_PREFIX.length).trimStart() : content;
+}
+
 export interface Attachment {
   kind: AttachmentKind;
   url: string;

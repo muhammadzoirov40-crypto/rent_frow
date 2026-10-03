@@ -94,23 +94,33 @@ class ListingService:
             )
         return updated
 
-    async def delete(self, listing_id: int, owner_id: int) -> None:
+    async def delete(self, listing_id: int, owner_id: int, *, is_admin: bool = False) -> None:
         listing = await self.repo.get_by_id(listing_id)
         if not listing:
             raise HTTPException(status_code=404, detail="Listing not found")
-        if listing.owner_id != owner_id:
+        # An admin moderates every listing, not only the ones they posted; a
+        # regular user still only their own.
+        if listing.owner_id != owner_id and not is_admin:
             raise HTTPException(status_code=403, detail="Not authorized to delete this listing")
+        # Taking down somebody else's listing is moderation, so the owner is
+        # told who did it instead of being left to think they removed it
+        # themselves.
+        moderated = listing.owner_id != owner_id
         await self.notif_service.create(
             user_id=listing.owner_id,
             title="Listing Deactivated",
-            message=f"Your listing '{listing.title}' has been removed.",
+            message=(
+                f"Your listing '{listing.title}' was removed by the administration."
+                if moderated
+                else f"Your listing '{listing.title}' has been removed."
+            ),
             type="listing_deactivated",
             reference_id=None,
             reference_type="listing",
             data={
                 "listing_id": listing.id,
                 "listing_title": listing.title,
-                "reason": "deleted_by_owner",
+                "reason": "removed_by_admin" if moderated else "deleted_by_owner",
             },
         )
         await detach_listing_conversations(self.db, listing_id)
