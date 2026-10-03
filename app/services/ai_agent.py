@@ -1098,6 +1098,22 @@ _LOGIN_NUDGE = (
 # «How do I…» is a question, not a command — send it to the model/knowledge.
 _HOW_TO = re.compile(r"(чӣ тавр|чи тавр|как\b|how\b)", re.IGNORECASE)
 
+# «Publish a listing» is a command for the model's create_listing tool. Such a
+# sentence always names a city and a price, which the plain-search branch below
+# would happily turn into a search — as it did in the first live run, where
+# «эълон эҷод кун … шаҳри Душанбе» came back with eight cards instead of a new
+# listing. Both halves are required, so «эълонҳоро нишон деҳ» (a browse) stays
+# a browse.
+_PUBLISH_CMD = re.compile(
+    r"(эълон|e'lon|elon\b|объявление|listing)",
+    re.IGNORECASE,
+)
+_PUBLISH_ACTION = re.compile(
+    r"(эҷод|эчод|соз\b|сохт|навис|ғузор|қайд|publish|create|post\b|"
+    r"размест|созда|опубл)",
+    re.IGNORECASE,
+)
+
 _ACCOUNT_COMMANDS: tuple[tuple[re.Pattern[str], str, str], ...] = (
     (
         re.compile(
@@ -1206,6 +1222,11 @@ async def _quick_answer(
             if payload.get("error"):
                 break
             return _account_reply(heading, tool, payload), cards, [tool]
+
+    # A publishing command belongs to create_listing, never to the search
+    # below — the model has to see it even though the sentence carries a city.
+    if _PUBLISH_CMD.search(text) and _PUBLISH_ACTION.search(text):
+        return None
 
     global _CITY_CACHE
     if _CITY_CACHE is None:

@@ -638,3 +638,44 @@ async def test_how_to_is_not_mistaken_for_a_command(monkeypatch):
 
     assert model_calls == [message]
     assert reply == "model reply"
+
+
+@pytest.mark.asyncio
+async def test_publish_command_reaches_the_model(monkeypatch):
+    """«Эълон эҷод кун … шаҳри Душанбе» names a city, so the plain-search
+    branch wants it — but it is a command for create_listing, and the first
+    live run proved the search wins if nobody stops it."""
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    message = (
+        "Эълон эҷод кун: Иншои иловагӣ барои иҷора — 250 сомонӣ дар рӯз, "
+        "шаҳри Душанбе, категорияи Моликият."
+    )
+    reply, listings, _tools = await agent.run_agent(None, None, message)
+
+    assert model_calls == [message], "the publishing command never reached the model"
+    assert reply == "model reply"
+    assert listings == [], "nothing was searched — the command went to the model"
+
+
+@pytest.mark.asyncio
+async def test_browsing_listings_is_still_a_plain_search(monkeypatch):
+    """«эълонҳоро нишон деҳ» shares the word «эълон» and must stay free."""
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+
+    async def fake_tool(db, user, name, args):
+        return {"ok": True}, [object()]
+
+    monkeypatch.setattr(agent, "execute_tool", fake_tool)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    reply, listings, tools = await agent.run_agent(
+        None, None, "эълонҳоро дар Душанбе нишон деҳ"
+    )
+
+    assert model_calls == [], "a browse must not spend the budget"
+    assert tools == ["search_listings"]
+    assert len(listings) == 1
