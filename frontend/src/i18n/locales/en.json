@@ -963,6 +963,13 @@
         "ADMIN": "Administrator",
         "CUSTOMER": "Customer"
       }
+    },
+    "customer": {
+      "totalRequests": "All requests",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "other": "Other requests",
+      "quickActions": "Quick actions"
     }
   },
   "booking": {

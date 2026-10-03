@@ -104,7 +104,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
               {t('admin.menu')}
             </p>
           )}
-          {isAuthenticated && (user?.role === 'OWNER' || user?.role === 'ADMIN') && (
+          {isAuthenticated && (
             <Link
               to="/dashboard"
               title={collapsed ? t('nav.dashboard') : undefined}

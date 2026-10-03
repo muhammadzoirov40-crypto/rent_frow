@@ -43,6 +43,7 @@ interface NavItem {
   key: DashboardSection;
   label: string;
   icon: ReactNode;
+  ownerOnly?: boolean;
 }
 
 interface DashboardLayoutProps {
@@ -68,21 +69,24 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
 
   const displayName = user?.display_name || user?.email || '—';
   const initial = (displayName || 'R').trim().charAt(0).toUpperCase();
+  const isOwnerLike = !!user && (user.role === 'OWNER' || user.role === 'ADMIN');
 
   const navItems: NavItem[] = [
     { key: 'dashboard', label: t('dashboard.nav.dashboard'), icon: <LayoutDashboard className="w-5 h-5" /> },
-    { key: 'listings', label: t('dashboard.nav.listings'), icon: <LayoutGrid className="w-5 h-5" /> },
-    { key: 'bookings', label: t('dashboard.nav.bookings'), icon: <CalendarCheck className="w-5 h-5" /> },
-    { key: 'calendar', label: t('dashboard.nav.calendar'), icon: <Calendar className="w-5 h-5" /> },
+    { key: 'listings', label: t('dashboard.nav.listings'), icon: <LayoutGrid className="w-5 h-5" />, ownerOnly: true },
+    { key: 'bookings', label: t('dashboard.nav.bookings'), icon: <CalendarCheck className="w-5 h-5" />, ownerOnly: true },
+    { key: 'calendar', label: t('dashboard.nav.calendar'), icon: <Calendar className="w-5 h-5" />, ownerOnly: true },
     { key: 'messages', label: t('dashboard.nav.messages'), icon: <MessageSquare className="w-5 h-5" /> },
-    { key: 'reviews', label: t('dashboard.nav.reviews'), icon: <Star className="w-5 h-5" /> },
-    { key: 'earnings', label: t('dashboard.nav.earnings'), icon: <Wallet className="w-5 h-5" /> },
+    { key: 'reviews', label: t('dashboard.nav.reviews'), icon: <Star className="w-5 h-5" />, ownerOnly: true },
+    { key: 'earnings', label: t('dashboard.nav.earnings'), icon: <Wallet className="w-5 h-5" />, ownerOnly: true },
     { key: 'profile', label: t('dashboard.nav.profile'), icon: <User className="w-5 h-5" /> },
     { key: 'settings', label: t('dashboard.nav.settings'), icon: <Settings className="w-5 h-5" /> },
   ];
 
-  const visibleItems = navItems.filter((item) =>
-    !query.trim() ? true : item.label.toLowerCase().includes(query.trim().toLowerCase())
+  const visibleItems = navItems.filter(
+    (item) =>
+      (isOwnerLike || !item.ownerOnly) &&
+      (!query.trim() ? true : item.label.toLowerCase().includes(query.trim().toLowerCase()))
   );
 
   const asideWidth = collapsed ? 'md:w-[76px]' : 'md:w-[264px]';

@@ -77,7 +77,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     { to: '/messages', label: t('nav.messages'), icon: MessageSquare, show: isAuthenticated },
     { to: '/notifications', label: t('nav.notifications'), icon: Bell, show: isAuthenticated },
     { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList, show: isAuthenticated },
-    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: isAuthenticated && (user?.role === 'OWNER' || user?.role === 'ADMIN') },
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: isAuthenticated },
     { to: '/create-listing', label: t('nav.createListing'), icon: PlusCircle, show: isAuthenticated },
     { to: '/profile', label: t('nav.profile'), icon: User, show: isAuthenticated },
     { to: '/settings', label: t('nav.settings'), icon: Settings, show: isAuthenticated },
@@ -149,7 +149,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               </Link>
             </div>
           )}
-          {isAuthenticated && (user?.role === 'OWNER' || user?.role === 'ADMIN') && (
+          {isAuthenticated && (
             <Link
               to="/dashboard"
               onClick={onClose}

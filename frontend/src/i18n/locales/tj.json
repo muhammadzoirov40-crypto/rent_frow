@@ -963,6 +963,13 @@
         "ADMIN": "Админ",
         "CUSTOMER": "Муштарӣ"
       }
+    },
+    "customer": {
+      "totalRequests": "Ҳамаи дархостҳо",
+      "pending": "Дар интизор",
+      "accepted": "Тасдиқшуда",
+      "other": "Дигар дархостҳо",
+      "quickActions": "Амалҳои зуд"
     }
   },
   "booking": {

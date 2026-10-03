@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { AlertCircle, ArrowDownRight, ArrowUpRight, CalendarCheck, DollarSign, Home, LayoutGrid, Percent, Ticket } from 'lucide-react';
+import { AlertCircle, ArrowDownRight, ArrowUpRight, CalendarCheck, CheckCircle2, ClipboardList, Clock, DollarSign, Home, Inbox, LayoutGrid, MessageSquare, Percent, PlusCircle, Ticket } from 'lucide-react';
 import {
   AreaChart,
   Area,
@@ -27,6 +27,7 @@ import {
 } from '../components/dashboard/SecondarySections';
 import useAuthStore from '../store/authStore';
 import { formatAmount } from '../utils/format';
+import { rentalRequests } from '../api';
 import {
   dashboardApi,
   type DashboardSummary,
@@ -77,34 +78,37 @@ function statusClasses(status: string): string {
 interface MetricCardProps {
   title: string;
   value: string;
-  change: number;
+  change?: number;
   icon: ReactNode;
 }
 
 function MetricCard({ title, value, change, icon }: MetricCardProps) {
   const { t } = useTranslation();
-  const up = change >= 0;
+  const hasChange = typeof change === 'number';
+  const up = hasChange && change >= 0;
   return (
     <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20 transition-all duration-200">
       <div className="flex items-center justify-between mb-4">
         <span className="w-10 h-10 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] flex items-center justify-center">
           {icon}
         </span>
-        <span
-          className={`inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-1 rounded-lg border ${
-            up
-              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
-              : 'bg-red-500/10 text-red-500 border-red-500/20'
-          }`}
-        >
-          {up ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-          {Math.abs(change).toFixed(1)}%
-        </span>
+        {hasChange && (
+          <span
+            className={`inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-1 rounded-lg border ${
+              up
+                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                : 'bg-red-500/10 text-red-500 border-red-500/20'
+            }`}
+          >
+            {up ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+            {Math.abs(change as number).toFixed(1)}%
+          </span>
+        )}
       </div>
       <p className="text-2xl font-bold tracking-tight tabular-nums">{value}</p>
       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
         {title}
-        <span className="text-gray-400 dark:text-gray-600"> · {t('dashboard.overview.vsPrev')}</span>
+        {hasChange && <span className="text-gray-400 dark:text-gray-600"> · {t('dashboard.overview.vsPrev')}</span>}
       </p>
     </div>
   );
@@ -183,6 +187,32 @@ export default function DashboardPage() {
     };
   }, [isOwnerLike, period, t]);
 
+  /* Customer overview: stats from own rental requests (no owner endpoints) */
+  const [custStats, setCustStats] = useState<{ total: number; pending: number; accepted: number; other: number } | null>(null);
+  useEffect(() => {
+    if (isOwnerLike) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await rentalRequests.getMyRequests(1, 100);
+        if (cancelled) return;
+        const items = res.items || [];
+        const st = (s: string) => (s || '').toUpperCase();
+        setCustStats({
+          total: items.length,
+          pending: items.filter((i) => st(i.status) === 'PENDING').length,
+          accepted: items.filter((i) => st(i.status) === 'ACCEPTED').length,
+          other: items.filter((i) => !['PENDING', 'ACCEPTED'].includes(st(i.status))).length,
+        });
+      } catch {
+        if (!cancelled) setCustStats({ total: 0, pending: 0, accepted: 0, other: 0 });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOwnerLike]);
+
   const som = (n: number) => `${formatAmount(Math.round(n))} ${t('common.somoni')}`;
 
   const pieData = perf
@@ -196,7 +226,7 @@ export default function DashboardPage() {
     : [];
 
   const renderOverview = () => {
-    if (!isOwnerLike) {
+    if (!user) {
       return (
         <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
           <AlertCircle className="w-12 h-12 mx-auto text-[var(--accent)] mb-4" />
@@ -209,6 +239,62 @@ export default function DashboardPage() {
             <Home className="w-4 h-4" />
             {t('dashboard.overview.goHome')}
           </Link>
+        </div>
+      );
+    }
+
+    if (!isOwnerLike) {
+      return (
+        <div className="space-y-6" data-testid="customer-overview">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <MetricCard
+              title={t('dashboard.customer.totalRequests')}
+              value={String(custStats?.total ?? 0)}
+              icon={<ClipboardList className="w-5 h-5" />}
+            />
+            <MetricCard
+              title={t('dashboard.customer.pending')}
+              value={String(custStats?.pending ?? 0)}
+              icon={<Clock className="w-5 h-5" />}
+            />
+            <MetricCard
+              title={t('dashboard.customer.accepted')}
+              value={String(custStats?.accepted ?? 0)}
+              icon={<CheckCircle2 className="w-5 h-5" />}
+            />
+            <MetricCard
+              title={t('dashboard.customer.other')}
+              value={String(custStats?.other ?? 0)}
+              icon={<Inbox className="w-5 h-5" />}
+            />
+          </div>
+
+          <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5" data-testid="customer-quick-actions">
+            <h2 className="font-semibold mb-4">{t('dashboard.customer.quickActions')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Link
+                to="/rental-requests"
+                className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
+              >
+                <CalendarCheck className="w-5 h-5 text-[var(--accent)] shrink-0" />
+                <span className="truncate">{t('rentalRequests.myRequests')}</span>
+              </Link>
+              <Link
+                to="/messages"
+                className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
+              >
+                <MessageSquare className="w-5 h-5 text-[var(--accent)] shrink-0" />
+                <span className="truncate">{t('nav.messages')}</span>
+              </Link>
+              <Link
+                to="/create-listing"
+                className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
+              >
+                <PlusCircle className="w-5 h-5 text-[var(--accent)] shrink-0" />
+                <span className="truncate">{t('nav.createListing')}</span>
+              </Link>
+            </div>
+          </div>
         </div>
       );
     }

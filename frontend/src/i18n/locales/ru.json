@@ -963,6 +963,13 @@
         "ADMIN": "Администратор",
         "CUSTOMER": "Клиент"
       }
+    },
+    "customer": {
+      "totalRequests": "Все заявки",
+      "pending": "Ожидают",
+      "accepted": "Подтверждены",
+      "other": "Другие заявки",
+      "quickActions": "Быстрые действия"
     }
   },
   "booking": {
