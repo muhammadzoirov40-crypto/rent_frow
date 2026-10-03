@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.core.dependencies import require_admin, require_customer, CurrentUser
+from app.core.dependencies import require_admin, require_auth, require_customer, CurrentUser
 from app.schemas.payment import PaymentCreate, PaymentResponse, PaymentConfirm
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.payment import PaymentService
@@ -64,6 +64,24 @@ async def get_booking_payments(
     return APIResponse(data=payments)
 
 
+@router.get(
+    "/rental-request/{rental_request_id}",
+    response_model=APIResponse[list[PaymentResponse]],
+)
+async def get_rental_request_payments(
+    rental_request_id: int,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """What has been paid against one rental request. Declared before
+    /{payment_id} so the literal path is not swallowed by the id route."""
+    service = PaymentService(db)
+    payments = await service.payments_for_request(
+        current_user.user_id, current_user.is_admin, rental_request_id
+    )
+    return APIResponse(data=payments)
+
+
 @router.get("/{payment_id}", response_model=APIResponse[PaymentResponse])
 async def get_payment(
     payment_id: int,
@@ -81,9 +99,13 @@ async def get_payment(
 @router.post("/{payment_id}/confirm", response_model=APIResponse[PaymentResponse])
 async def confirm_payment(
     payment_id: int,
-    current_user: CurrentUser = Depends(require_admin),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
+    """An admin confirms anything; the owner of the listing confirms the
+    payment made on their own rental request."""
     service = PaymentService(db)
-    payment = await service.confirm_payment(current_user.user_id, payment_id)
+    payment = await service.confirm_payment_as(
+        current_user.user_id, current_user.is_admin, payment_id
+    )
     return APIResponse(message="Payment confirmed successfully", data=payment)

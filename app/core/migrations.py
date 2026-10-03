@@ -60,6 +60,15 @@ CITY_COLUMNS: list = [
     ("longitude", "NUMERIC(9, 6)"),
 ]
 
+# A payment now belongs either to an equipment booking or to a rental request.
+PAYMENT_COLUMNS: list = [
+    ("rental_request_id", "INTEGER"),
+]
+
+PAYMENT_INDEXES: list = [
+    "idx_payment_rental_request",
+]
+
 # Columns whose ORM type is a native PostgreSQL enum, but which an older
 # migration created as VARCHAR. The mismatch makes every filtered query fail
 # with `character varying = <enum>` (HTTP 500), e.g. `GET /listings?property_type=`.
@@ -136,6 +145,10 @@ async def _create_missing_indexes(conn, table: str, indexes: list, existing: set
             if index_name == "idx_message_reply_to":
                 definition = "(reply_to_id)"
 
+        if table == "payments":
+            if index_name == "idx_payment_rental_request":
+                definition = "(rental_request_id)"
+
         if not definition:
             continue
 
@@ -206,6 +219,32 @@ async def _align_enum_columns(conn, dialect: str) -> list:
         )
         aligned.append(f"{table}.{column} -> {pg_type}")
     return aligned
+
+
+async def _allow_payment_to_be_for_a_request(conn, dialect: str) -> bool:
+    """`payments.booking_id` must accept NULL now that a payment can be for a
+    rental request instead of an equipment booking.
+
+    PostgreSQL only: SQLite cannot alter a column's nullability in place, and
+    a SQLite database never needs this — it is built from the ORM model, which
+    already declares the column nullable.
+    """
+    if dialect != "postgresql":
+        return False
+
+    row = (
+        await conn.execute(
+            text(
+                "SELECT is_nullable FROM information_schema.columns "
+                "WHERE table_name = 'payments' AND column_name = 'booking_id'"
+            )
+        )
+    ).first()
+    if row is None or row[0] == "YES":
+        return False
+
+    await conn.execute(text("ALTER TABLE payments ALTER COLUMN booking_id DROP NOT NULL"))
+    return True
 
 
 async def run_schema_migrations(engine: AsyncEngine) -> list:
@@ -293,6 +332,21 @@ async def run_schema_migrations(engine: AsyncEngine) -> list:
             cy_added = await _add_missing_columns(conn, "cities", CITY_COLUMNS, city_columns)
             if cy_added:
                 applied.append(f"cities: added columns {', '.join(cy_added)}")
+
+        if await conn.run_sync(lambda sync_conn: Inspector.from_engine(sync_conn).has_table("payments")):
+            payment_columns = await conn.run_sync(_get_columns, "payments")
+            payment_indexes = await conn.run_sync(_get_indexes, "payments")
+
+            pay_added = await _add_missing_columns(conn, "payments", PAYMENT_COLUMNS, payment_columns)
+            if pay_added:
+                applied.append(f"payments: added columns {', '.join(pay_added)}")
+
+            pay_idx = await _create_missing_indexes(conn, "payments", PAYMENT_INDEXES, payment_indexes)
+            if pay_idx:
+                applied.append(f"payments: created indexes {', '.join(pay_idx)}")
+
+            if await _allow_payment_to_be_for_a_request(conn, conn.dialect.name):
+                applied.append("payments: booking_id is now nullable")
 
         enum_aligned = await _align_enum_columns(conn, conn.dialect.name)
         if enum_aligned:

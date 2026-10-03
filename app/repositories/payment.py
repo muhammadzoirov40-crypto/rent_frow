@@ -16,6 +16,14 @@ class PaymentRepository(BaseRepository[Payment]):
         )
         return list(result.scalars().all())
 
+    async def get_by_rental_request_id(self, rental_request_id: int) -> list[Payment]:
+        result = await self.db.execute(
+            select(Payment)
+            .where(Payment.rental_request_id == rental_request_id)
+            .order_by(Payment.created_at.desc())
+        )
+        return list(result.scalars().all())
+
     async def get_customer_payments(
         self, customer_id: int, status: Optional[PaymentStatus] = None, skip: int = 0, limit: int = 20
     ) -> list[Payment]:
