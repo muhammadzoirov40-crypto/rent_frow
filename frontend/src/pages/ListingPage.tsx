@@ -31,7 +31,7 @@ import { formatDate } from '../utils/dates';
 import { previousPath } from '../utils/navHistory';
 import { rememberViewed } from '../utils/recentlyViewed';
 import { formatAmount, formatPriceUnit } from '../utils/format';
-import { wallet, canAfford, topUpDemo } from '../utils/wallet';
+import { wallet, canAfford, openTopUp, topUpFor } from '../utils/wallet';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 import LocationMap from '../components/search/LocationMap';
 
@@ -96,10 +96,13 @@ export default function ListingPage() {
   const held = walletSummary?.held ?? 0;
 
   const topUpMutation = useMutation({
-    mutationFn: () => topUpDemo(),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['wallet'] });
-      toast.success(t('booking.balanceToppedUp', { balance: formatAmount(data.balance) }));
+    // A real payment: the backend builds the DC City link for the shortfall
+    // and the browser only opens it. The balance changes when the provider
+    // calls back, never because we clicked.
+    mutationFn: () => openTopUp(topUpFor(total)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wallet-topups'] });
+      toast.success(t('dashboard.wallet.paymentOpened'));
     },
     onError: () => toast.error(t('common.error')),
   });

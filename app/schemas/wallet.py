@@ -32,3 +32,30 @@ class WalletTransactionResponse(BaseModel):
     balance_after: float
     held_after: float
     created_at: datetime
+
+
+class TopupPrepareRequest(BaseModel):
+    """How much the user wants to add — the link is built from it."""
+
+    amount: float = Field(..., gt=0, le=1_000_000)
+
+
+class TopupPrepareResponse(BaseModel):
+    reference: str
+    amount: float
+    status: str
+    provider: str = "paydc"
+    url: str
+    created_at: datetime
+
+
+class TopupIntentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    amount: float
+    reference: str
+    status: str
+    provider: str
+    created_at: datetime
+    paid_at: Optional[datetime] = None

@@ -477,6 +477,18 @@ export interface WalletTransactionRecord {
   created_at: string;
 }
 
+/** A top-up waiting for DC Wallet to confirm it — money that is on its way
+ *  but does not exist yet. `reference` is what travels in the payment link. */
+export interface TopupIntent {
+  id: number;
+  amount: number;
+  reference: string;
+  status: 'PENDING' | 'PAID' | 'FAILED';
+  provider: string;
+  created_at: string;
+  paid_at: string | null;
+}
+
 export const wallet = {
   /** Available vs reserved — the backend is the source of truth. */
   get: () => client.get<APIResponse<WalletSummary>>('/wallet').then(unwrap),
@@ -486,9 +498,21 @@ export const wallet = {
       .get<PaginatedResponse<WalletTransactionRecord>>('/wallet/transactions', { params: { page, page_size } })
       .then(unwrapPaginated),
 
-  /** Manual credit — there is no payment gateway on the free tier. */
-  topUp: (amount: number) =>
-    client.post<APIResponse<WalletSummary>>('/wallet/topup', { amount }).then(unwrap),
+  /** Build the DC City payment link for this amount. Nothing is credited
+   *  here — only a waiting row is opened, settled by the provider's callback. */
+  prepare: (amount: number) =>
+    client.post<APIResponse<TopupIntent & { url: string }>>('/wallet/topup/prepare', { amount }).then(unwrap),
+
+  /** Pending and settled top-ups, newest first. */
+  topups: (page = 1, page_size = 20) =>
+    client
+      .get<PaginatedResponse<TopupIntent>>('/wallet/topups', { params: { page, page_size } })
+      .then(unwrapPaginated),
+
+  /** Manual credit — admin only in production; the webhook is what settles a
+   *  real payment. Kept for seeding and for the admin panel. */
+  topUp: (amount: number, description?: string) =>
+    client.post<APIResponse<WalletSummary>>('/wallet/topup', { amount, description }).then(unwrap),
 };
 
 export const payments = {

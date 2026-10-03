@@ -1,11 +1,20 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.core.dependencies import require_auth, CurrentUser
 from app.schemas.base import APIResponse, PaginatedResponse
-from app.schemas.wallet import WalletSummary, WalletTopUpRequest, WalletTransactionResponse
+from app.schemas.wallet import (
+    TopupIntentResponse,
+    TopupPrepareRequest,
+    TopupPrepareResponse,
+    WalletSummary,
+    WalletTopUpRequest,
+    WalletTransactionResponse,
+)
+from app.services import topup as topup_service
 from app.services.wallet import WalletService
 from app.models.rental_request import RentalRequest
 
@@ -69,15 +78,53 @@ async def top_up_balance(
     current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
-    """Add money to the wallet.
+    """Hand a user money by hand — an admin action.
 
-    There is no payment gateway on the free tier: this is an explicit manual
-    credit, kept in one method so a real provider can replace it later without
-    touching any other part of the flow.
+    A logged-in user must never be able to post their own balance into
+    existence now that there is a real payment path: the browser asks for a
+    link via ``/topup/prepare`` and the webhook is what credits the ledger.
+    Tests flip ``WALLET_ALLOW_MANUAL_TOPUP`` to exercise the ledger directly.
     """
+    settings = get_settings()
+    if not current_user.is_admin and not settings.WALLET_ALLOW_MANUAL_TOPUP:
+        raise HTTPException(status_code=403, detail="TOPUP_ADMIN_ONLY")
+
     service = WalletService(db)
     await service.topup(current_user.user_id, payload.amount, payload.description)
     return APIResponse(
         message="Balance topped up",
         data=_summary(await service.summary(current_user.user_id)),
+    )
+
+
+@router.post("/topup/prepare", response_model=APIResponse[TopupPrepareResponse])
+async def prepare_top_up(
+    payload: TopupPrepareRequest,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Build the DC City payment link for this user and this amount.
+
+    Nothing is credited here — only a waiting row is opened, carrying the
+    reference that travels in the link's ``f3`` and comes back with the
+    callback.
+    """
+    data = await topup_service.prepare(db, current_user.user_id, payload.amount)
+    return APIResponse(message="Payment link created", data=TopupPrepareResponse(**data))
+
+
+@router.get("/topups", response_model=PaginatedResponse[TopupIntentResponse])
+async def list_top_ups(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Pending and settled top-ups, so money on its way is never invisible."""
+    rows = await topup_service.intents(db, current_user.user_id, page_size)
+    return PaginatedResponse(
+        data=[TopupIntentResponse.model_validate(r) for r in rows],
+        total=len(rows),
+        page=page,
+        page_size=page_size,
     )

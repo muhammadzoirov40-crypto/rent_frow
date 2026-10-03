@@ -38,6 +38,21 @@ class Settings(BaseSettings):
     # Every wallet starts here (сомони) so the balance flow is usable out of
     # the box. A real deployment would start users at 0 and top up for real.
     WALLET_STARTING_BALANCE: float = 500.0
+    # --- DC City / pay.dc.tj (Dushanbe City) top-ups ------------------------
+    # The payment link is public anyway - it is what the user is sent to - so
+    # the account and articul may live here. The webhook secret is different:
+    # it is the only thing that lets a request credit money, so it must come
+    # from .env and is empty until DC City registers our callback.
+    PAYDC_ENABLED: bool = True
+    PAYDC_URL: str = "https://pay.dc.tj/"
+    PAYDC_ACCOUNT: str = "9762000220865843"
+    PAYDC_ARTICUL: str = "133"
+    PAYDC_DESCRIPTION: str = "DANAT.TJ"
+    PAYDC_WEBHOOK_SECRET: str = ""
+    # Handing yourself money is an admin action. The browser may only *ask*
+    # for a payment link; the ledger is credited by the webhook, or - during
+    # tests - by this switch, never by the user's own POST.
+    WALLET_ALLOW_MANUAL_TOPUP: bool = False
     OTP_EXPIRE_MINUTES: int = 10
     JWT_ALGORITHM: str = "HS256"
 

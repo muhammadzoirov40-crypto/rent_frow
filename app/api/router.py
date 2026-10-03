@@ -25,6 +25,7 @@ from app.api.routes import (
     statistics,
     stats,
     wallet,
+    webhooks,
 )
 from app.utils.websocket import websocket_endpoint
 
@@ -55,6 +56,7 @@ api_router.include_router(upload.router)
 api_router.include_router(statistics.router)
 api_router.include_router(stats.router)
 api_router.include_router(wallet.router)
+api_router.include_router(webhooks.router)
 
 
 @api_router.websocket("/ws/{user_id}")

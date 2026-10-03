@@ -7,6 +7,9 @@ import pytest_asyncio
 # The rental flow sends real SMTP email. A test run must never reach out to a
 # mail server, so this is set before app settings are first loaded.
 os.environ.setdefault("EMAIL_ENABLED", "false")
+# Production keeps manual top-ups admin-only (the webhook is what credits a
+# real payment); tests drive the ledger directly, so they open that gate here.
+os.environ.setdefault("WALLET_ALLOW_MANUAL_TOPUP", "true")
 
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import select

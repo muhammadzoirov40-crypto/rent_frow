@@ -13,7 +13,7 @@ from app.models.district import District
 from app.models.equipment import Equipment
 from app.models.booking import Booking
 from app.models.payment import Payment
-from app.models.wallet import Wallet, WalletTransaction
+from app.models.wallet import Wallet, WalletTransaction, TopupIntent
 from app.models.rental import Rental
 from app.models.review import Review
 from app.models.inspection import Inspection
@@ -43,6 +43,7 @@ __all__ = [
     "Payment",
     "Wallet",
     "WalletTransaction",
+    "TopupIntent",
     "Rental",
     "Review",
     "Inspection",
