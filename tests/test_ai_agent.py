@@ -483,6 +483,22 @@ async def test_date_is_answered_off_the_clock_not_with_small_talk(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_tajik_date_spelling_is_answered_too(monkeypatch):
+    """«имрӯз чандум аст?» — the everyday spelling, with ё and a space — is a
+    date question. It used to match neither `чандумаст` nor `имруз` and fell
+    through to a search, which is what the live probe showed."""
+    model_calls: list[str] = []
+    _route_harness(monkeypatch, model_calls)
+    monkeypatch.setattr(agent, "_CITY_CACHE", ["Душанбе"])
+
+    reply, listings, tools = await agent.run_agent(None, None, "имрӯз чандум аст?")
+    assert model_calls == [], "the date fell through to a search instead of the clock"
+    assert reply.startswith("Имрӯз")
+    assert any(day in reply for day in agent._TJ_WEEKDAYS)
+    assert listings == [] and tools == []
+
+
+@pytest.mark.asyncio
 async def test_ambiguous_question_still_reaches_the_model(monkeypatch):
     """Opinion/how-to questions have no database answer — that is what the model is for."""
     model_calls: list[str] = []

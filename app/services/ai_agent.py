@@ -984,8 +984,10 @@ _TJ_MONTHS = (
 )
 
 _DATE_ASK = re.compile(
-    r"(чандумаст|chandumast|chandumust|\bдата\b|\bsana\b|"
-    r"имруз.{0,15}(чанд|кай)|imruz.{0,15}(chand|kay)|"
+    # «чандум аст» written with a space and «имрӯз» with the Tajik ё — the
+    # live probe used both and fell through to a search instead of the clock
+    r"(чандум\s*аст|chandum\s*ast|chandumust|\bдата\b|\bsana\b|"
+    r"имр[уӯ]з.{0,15}(чанд|кай)|imruz.{0,15}(chand|kay)|"
     r"what'?s the (date|day)|what day)",
     re.IGNORECASE,
 )

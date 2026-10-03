@@ -1,3 +1,5 @@
+import re
+
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlalchemy.engine import Inspector
@@ -225,25 +227,112 @@ async def _allow_payment_to_be_for_a_request(conn, dialect: str) -> bool:
     """`payments.booking_id` must accept NULL now that a payment can be for a
     rental request instead of an equipment booking.
 
-    PostgreSQL only: SQLite cannot alter a column's nullability in place, and
-    a SQLite database never needs this — it is built from the ORM model, which
-    already declares the column nullable.
+    PostgreSQL drops the constraint in place. SQLite has no
+    ``ALTER TABLE ... DROP NOT NULL``, so the table is recreated from its own
+    stored CREATE statement — that keeps the column types exactly as the ORM
+    defined them — the rows are copied across, and the indexes are put back.
+    Both run inside the caller's transaction, so a failure leaves the original
+    table untouched.
     """
-    if dialect != "postgresql":
-        return False
+    if dialect == "postgresql":
+        row = (
+            await conn.execute(
+                text(
+                    "SELECT is_nullable FROM information_schema.columns "
+                    "WHERE table_name = 'payments' AND column_name = 'booking_id'"
+                )
+            )
+        ).first()
+        if row is None or row[0] == "YES":
+            return False
+        await conn.execute(
+            text("ALTER TABLE payments ALTER COLUMN booking_id DROP NOT NULL")
+        )
+        return True
 
-    row = (
+    if dialect == "sqlite":
+        return await _rebuild_payments_for_sqlite(conn)
+
+    return False
+
+
+async def _rebuild_payments_for_sqlite(conn) -> bool:
+    create_sql = (
         await conn.execute(
             text(
-                "SELECT is_nullable FROM information_schema.columns "
-                "WHERE table_name = 'payments' AND column_name = 'booking_id'"
+                "SELECT sql FROM sqlite_master "
+                "WHERE type = 'table' AND name = 'payments'"
             )
         )
-    ).first()
-    if row is None or row[0] == "YES":
+    ).scalar_one_or_none()
+    if not create_sql:
         return False
 
-    await conn.execute(text("ALTER TABLE payments ALTER COLUMN booking_id DROP NOT NULL"))
+    info = {
+        row[1]: row
+        for row in await conn.execute(text("PRAGMA table_info(payments)"))
+    }
+    # nothing to do unless booking_id still refuses NULL
+    if "booking_id" not in info or info["booking_id"][3] == 0:
+        return False
+
+    new_ddl = re.sub(
+        r"(`?booking_id`?)(\s+\w+)\s+NOT NULL",
+        r"\1\2",
+        create_sql.strip(),
+        count=1,
+        flags=re.IGNORECASE,
+    )
+
+    # _add_missing_columns has normally already run, but do not assume it:
+    # the new table must carry the column either way
+    if "rental_request_id" not in create_sql:
+        end = new_ddl.rstrip().rfind(")")
+        new_ddl = new_ddl.rstrip()[:end] + ", rental_request_id INTEGER)"
+
+    new_ddl = re.sub(
+        r"^(CREATE\s+TABLE\s+)[\"`]?payments[\"`]?",
+        r"\1payments_rebuild",
+        new_ddl,
+        count=1,
+        flags=re.IGNORECASE,
+    )
+
+    index_sql = [
+        row[0]
+        for row in await conn.execute(
+            text(
+                "SELECT sql FROM sqlite_master "
+                "WHERE type = 'index' AND tbl_name = 'payments' AND sql IS NOT NULL"
+            )
+        )
+    ]
+
+    # Copy only the columns both tables really have, so the rebuild works
+    # whichever order the column and the rebuild were applied in.
+    body = new_ddl[new_ddl.find("(") + 1 : new_ddl.rstrip().rfind(")")]
+    target = [
+        re.split(r"[\s(`]", part.strip(), maxsplit=1)[0].strip('`"')
+        for part in body.split(",")
+        if part.strip()
+    ]
+    source = [name for name in info if name in target]
+    if not source:
+        return False
+    copied = ", ".join(source)
+
+    await conn.execute(text("DROP TABLE IF EXISTS payments_rebuild"))
+    await conn.execute(text(new_ddl))
+    await conn.execute(
+        text(
+            f"INSERT INTO payments_rebuild ({copied}) "
+            f"SELECT {copied} FROM payments"
+        )
+    )
+    await conn.execute(text("DROP TABLE payments"))
+    await conn.execute(text("ALTER TABLE payments_rebuild RENAME TO payments"))
+    for sql in index_sql:
+        await conn.execute(text(sql))
     return True
 
 

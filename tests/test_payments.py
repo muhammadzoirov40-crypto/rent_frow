@@ -281,3 +281,112 @@ async def test_only_the_people_on_a_request_can_read_its_payments(
     with pytest.raises(HTTPException) as exc:
         await service.payments_for_request(customer_id, False, 424242)
     assert exc.value.status_code == 404
+
+
+# --------------------------------------------------------------------------
+# the production schema itself — RentHub runs on SQLite, which has no
+# ALTER TABLE ... DROP NOT NULL, so the migration has to rebuild the table
+# --------------------------------------------------------------------------
+@pytest.mark.asyncio
+async def test_sqlite_rebuild_makes_booking_id_nullable_without_losing_anything():
+    from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import create_async_engine
+
+    from app.core.migrations import _allow_payment_to_be_for_a_request
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(text(
+                "CREATE TABLE payments ("
+                " id INTEGER NOT NULL PRIMARY KEY,"
+                " booking_id INTEGER NOT NULL,"
+                " customer_id INTEGER NOT NULL,"
+                " amount NUMERIC NOT NULL,"
+                " payment_type VARCHAR(8) NOT NULL,"
+                " status VARCHAR(8) NOT NULL,"
+                " transaction_id VARCHAR(255),"
+                " created_at TIMESTAMP NOT NULL)"
+            ))
+            await conn.execute(text(
+                "CREATE INDEX ix_payments_booking_id ON payments (booking_id)"
+            ))
+            await conn.execute(text(
+                "INSERT INTO payments VALUES "
+                "(1, 7, 3, 100, 'BOOKING', 'PAID', 'tx-1', '2026-01-01')"
+            ))
+            # what _add_missing_columns does first
+            await conn.execute(text(
+                "ALTER TABLE payments ADD COLUMN rental_request_id INTEGER"
+            ))
+
+            assert await _allow_payment_to_be_for_a_request(conn, "sqlite") is True
+
+            info = {
+                r[1]: r for r in await conn.execute(text("PRAGMA table_info(payments)"))
+            }
+            assert info["booking_id"][3] == 0, "booking_id is still NOT NULL"
+            assert "rental_request_id" in info
+
+            row = (await conn.execute(text(
+                "SELECT id, booking_id, customer_id, amount, transaction_id, "
+                "rental_request_id FROM payments"
+            ))).one()
+            assert tuple(row) == (1, 7, 3, 100, "tx-1", None), "row was lost"
+
+            idx = [
+                r[0] for r in await conn.execute(text(
+                    "SELECT name FROM sqlite_master WHERE type = 'index' "
+                    "AND tbl_name = 'payments' AND sql IS NOT NULL"
+                ))
+            ]
+            assert "ix_payments_booking_id" in idx, "indexes were not restored"
+
+            # a second start-up must not rebuild anything
+            assert (
+                await _allow_payment_to_be_for_a_request(conn, "sqlite")
+            ) is False
+    finally:
+        await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_sqlite_rebuild_handles_a_table_that_never_got_the_new_column():
+    """No ALTER first: the column is added by the rebuild itself."""
+    from sqlalchemy import text
+    from sqlalchemy.ext.asyncio import create_async_engine
+
+    from app.core.migrations import _allow_payment_to_be_for_a_request
+
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(text(
+                "CREATE TABLE payments ("
+                " id INTEGER NOT NULL PRIMARY KEY,"
+                " booking_id INTEGER NOT NULL,"
+                " customer_id INTEGER NOT NULL,"
+                " amount NUMERIC NOT NULL,"
+                " payment_type VARCHAR(8) NOT NULL,"
+                " status VARCHAR(8) NOT NULL,"
+                " transaction_id VARCHAR(255),"
+                " created_at TIMESTAMP NOT NULL)"
+            ))
+            await conn.execute(text(
+                "INSERT INTO payments VALUES "
+                "(1, 7, 3, 100, 'BOOKING', 'PAID', 'tx-1', '2026-01-01')"
+            ))
+
+            assert await _allow_payment_to_be_for_a_request(conn, "sqlite") is True
+
+            info = {
+                r[1]: r for r in await conn.execute(text("PRAGMA table_info(payments)"))
+            }
+            assert "rental_request_id" in info
+            assert info["booking_id"][3] == 0
+            row = (await conn.execute(text(
+                "SELECT booking_id, rental_request_id FROM payments"
+            ))).one()
+            assert tuple(row) == (7, None)
+    finally:
+        await engine.dispose()
