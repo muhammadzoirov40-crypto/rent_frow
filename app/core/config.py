@@ -47,6 +47,8 @@ class Settings(BaseSettings):
 
     # --- AI assistant (Google Gemini) -------------------------------------
     # The key is read server-side only and is never exposed to the browser.
+    # One key per Google Cloud project; the free quota is counted per key, so
+    # listing several (comma-separated) simply buys several quotas.
     GEMINI_API_KEY: str = ""
     # Picked empirically against this key, newest probe wins: the 2.5 line is
     # retired for new keys (404) and flash-latest / 3.7 sit at 503 "high demand".

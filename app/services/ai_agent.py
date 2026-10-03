@@ -664,10 +664,32 @@ async def execute_tool(db, user, name: str, args: dict) -> tuple[dict, list]:
 # --------------------------------------------------------------------------
 # Gemini transport
 # --------------------------------------------------------------------------
+def _gemini_keys(raw: str) -> list[str]:
+    """Split the configured key(s). The quota is counted per key, so several
+    keys — separated by commas or newlines — simply mean several quotas."""
+    keys = [part.strip() for part in (raw or "").replace("\n", ",").split(",")]
+    return [key for key in keys if key] or [""]
+
+
+# Which key the next request starts on. Alternating means that when one key is
+# spent, half the questions begin on the key that still has budget instead of
+# every one of them paying for a doomed call first.
+_key_offset = 0
+
+
+def _key_start() -> int:
+    global _key_offset
+    _key_offset += 1
+    return _key_offset
+
+
 async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
     settings = get_settings()
     if not settings.GEMINI_API_KEY:
         raise AIAgentError("GEMINI_API_KEY is not configured")
+
+    keys = _gemini_keys(settings.GEMINI_API_KEY)
+    key_at = [_key_start()]
 
     body = {
         "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
@@ -687,7 +709,7 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
             async with httpx.AsyncClient(timeout=timeout) as client:
                 resp = await client.post(
                     target,
-                    headers={"x-goog-api-key": settings.GEMINI_API_KEY},
+                    headers={"x-goog-api-key": keys[key_at[0] % len(keys)]},
                     json=body,
                 )
                 return resp, None
@@ -751,6 +773,11 @@ async def _call_gemini(contents: list[dict], tools: list[dict]) -> dict:
             return resp.json()
 
         code = 0 if resp is None else resp.status_code
+
+        if code == 429:
+            # This key is out of budget for the day. Spend the next attempt on
+            # the next key instead of re-proving that this one says no.
+            key_at[0] += 1
 
         if error is not None or code in CAPACITY:
             capacity_budget[model] -= 1
@@ -816,6 +843,13 @@ def _trip_circuit(settings: Any, status: int) -> int:
     threshold = 1 if status == 429 else 2
     if _CIRCUIT["failures"] >= threshold:
         cooldown = max(5.0, float(settings.AI_FAILURE_COOLDOWN_SECONDS))
+        if status == 429:
+            # A daily quota does not come back in two minutes. Walking the
+            # five-model chain again every other question just to watch all
+            # five answer 429 spends budget and helps nobody — the local
+            # answers keep working meanwhile, and the probe after this
+            # window catches the reset.
+            cooldown = max(cooldown, 600.0)
         _CIRCUIT["open_until"] = time.monotonic() + cooldown
         _CIRCUIT["failures"] = 0.0
         logger.warning(

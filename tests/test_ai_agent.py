@@ -695,3 +695,52 @@ async def test_browsing_listings_is_still_a_plain_search(monkeypatch):
     assert model_calls == [], "a browse must not spend the budget"
     assert tools == ["search_listings"]
     assert len(listings) == 1
+
+
+# --------------------------------------------------------------------------
+# the breaker — a quota that is gone for the day must not be hammered
+# --------------------------------------------------------------------------
+def test_a_daily_quota_holds_the_circuit_open_much_longer_than_a_blip(monkeypatch):
+    import time as _time
+
+    class _Settings:
+        AI_FAILURE_COOLDOWN_SECONDS = 120
+
+    monkeypatch.setattr(
+        agent, "_CIRCUIT", {"failures": 0.0, "open_until": 0.0, "status": 0.0}
+    )
+
+    assert agent._trip_circuit(_Settings, 429) == 429
+    held = agent._CIRCUIT["open_until"] - _time.monotonic()
+    assert 590 <= held <= 610, "the day's quota needs minutes, not two"
+
+    # a transient5xx is different: it takes two in a row and keeps the
+    # configured cooldown, so a wobbly response never locks us out for long
+    agent._CIRCUIT["failures"] = 0.0
+    agent._CIRCUIT["open_until"] = 0.0
+    agent._trip_circuit(_Settings, 502)
+    assert agent._CIRCUIT["open_until"] == 0.0, "one 5xx must not open the circuit"
+    agent._trip_circuit(_Settings, 502)
+    held = agent._CIRCUIT["open_until"] - _time.monotonic()
+    assert 100 <= held <= 130
+
+
+def test_several_gemini_keys_can_be_configured():
+    """The free quota belongs to a key, not to the app — so a second key in
+    the same setting has to be picked up, and an empty setting must still
+    count as \"not configured\"."""
+    assert agent._gemini_keys("k1,k2") == ["k1", "k2"]
+    assert agent._gemini_keys(" k1 ,\nk2 ,") == ["k1", "k2"]
+    assert agent._gemini_keys("one") == ["one"]
+    assert agent._gemini_keys("") == [""]
+    assert agent._gemini_keys(None) == [""]
+    assert agent._gemini_keys(" , ,") == [""]
+
+
+def test_each_request_starts_on_the_next_key():
+    """Alternating the starting key keeps a spent key from being the first
+    call of every single question."""
+    first = agent._key_start()
+    seen = {agent._key_start() for _ in range(6)}
+    assert len(seen) == 6, "the cursor must move every time"
+    assert min(seen) > first
