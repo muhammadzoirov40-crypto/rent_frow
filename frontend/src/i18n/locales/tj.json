@@ -319,7 +319,11 @@
     "availability": "Дастрасӣ",
     "pending": "Дар баррасӣ",
     "clearDates": "Тоза кардан",
-    "fullscreen": "Тамоми экран"
+    "fullscreen": "Тамоми экран",
+    "location": "Ҷойгиршавӣ",
+    "locationApprox": "Мақоми дақиқ ворид нашудааст — маркази шаҳр нишон дода шуд.",
+    "locationUnknown": "Мақоми дақиқ ворид нашудааст — харитаи Тоҷикистон нишон дода шуд.",
+    "openMap": "Дар OpenStreetMap кушодан"
   },
   "createListing": {
     "title": "Эълони нав",

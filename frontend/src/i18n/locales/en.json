@@ -319,7 +319,11 @@
     "availability": "Availability",
     "pending": "Pending",
     "clearDates": "Clear",
-    "fullscreen": "Fullscreen"
+    "fullscreen": "Fullscreen",
+    "location": "Location",
+    "locationApprox": "No exact coordinates — showing the city centre.",
+    "locationUnknown": "No exact coordinates — showing the map of Tajikistan.",
+    "openMap": "Open in OpenStreetMap"
   },
   "createListing": {
     "title": "New listing",

@@ -319,7 +319,11 @@
     "availability": "Доступность",
     "pending": "На рассмотрении",
     "clearDates": "Очистить",
-    "fullscreen": "На весь экран"
+    "fullscreen": "На весь экран",
+    "location": "Расположение",
+    "locationApprox": "Точные координаты не указаны — показан центр города.",
+    "locationUnknown": "Точные координаты не указаны — показана карта Таджикистана.",
+    "openMap": "Открыть в OpenStreetMap"
   },
   "createListing": {
     "title": "Новое объявление",

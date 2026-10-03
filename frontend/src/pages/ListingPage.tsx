@@ -32,6 +32,7 @@ import { previousPath } from '../utils/navHistory';
 import { rememberViewed } from '../utils/recentlyViewed';
 import { formatAmount, formatPriceUnit } from '../utils/format';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
+import LocationMap from '../components/search/LocationMap';
 
 function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
   return (
@@ -420,6 +421,16 @@ export default function ListingPage() {
                 </div>
               </div>
             </div>
+
+            <LocationMap
+              key={listing.id}
+              latitude={listing.latitude}
+              longitude={listing.longitude}
+              cityName={listing.city_name}
+              districtName={listing.district_name}
+              address={listing.address}
+              title={listing.title}
+            />
           </div>
 
           <div className="lg:w-[40%]">

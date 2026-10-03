@@ -61,6 +61,8 @@ export interface Listing {
   price_unit: string;
   deposit: number;
   address: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   status: string;
   is_verified: boolean;
   views_count: number;
