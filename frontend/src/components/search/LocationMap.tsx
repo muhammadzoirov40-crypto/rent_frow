@@ -106,10 +106,16 @@ export default function LocationMap({
         </p>
       )}
 
+      {/* z-0 + relative is what MapView already does, and it is not cosmetic:
+          Leaflet paints its panes at 400-1000 and its controls at 800-1000. In
+          a container that is `position: relative` but has no z-index of its own
+          they escape into the page's root stacking context and land on top of
+          every modal. Giving the container z-index: 0 makes it a stacking
+          context of its own, so all of Leaflet's numbers stay inside it. */}
       <div
         ref={containerRef}
         style={{ height }}
-        className="w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden bg-gray-100 dark:bg-[#12141a]"
+        className="relative z-0 w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden bg-gray-100 dark:bg-[#12141a]"
         aria-label={t('listing.location')}
       />
 
