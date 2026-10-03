@@ -471,7 +471,7 @@ export default function ListingPage() {
                   </span>
                 </div>
 
-                {bookingSuccess && !isOwner && user?.role !== 'ADMIN' ? (
+                {bookingSuccess && !isOwner ? (
                   <div className="text-center py-4" data-testid="booking-success">
                     <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-500/15 flex items-center justify-center mb-3">
                       <Check className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
@@ -563,20 +563,9 @@ export default function ListingPage() {
                   </div>
                 )}
 
-                {(isOwner || user?.role === 'ADMIN') ? (
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => navigate(`/create-listing?edit=${listing.id}`)}
-                      className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] active:scale-[0.98] flex items-center justify-center gap-2"
-                    >
-                      <Pencil size={16} />
-                      {t('listing.editListing')}
-                    </button>
-                    <div className="w-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 text-sm font-medium py-3 px-4 rounded-xl text-center">
-                      {t('listing.ownListingHint')}
-                    </div>
-                  </div>
-                ) : (
+                {/* Renting is for everyone who is not the owner — an admin who
+                    does not own this listing is a renter like anyone else. */}
+                {!isOwner && (
                   <>
                     <button
                       onClick={requestRental}
@@ -602,6 +591,30 @@ export default function ListingPage() {
                       {t('listing.sendMessage')}
                     </button>
                   </>
+                )}
+
+                {/* Editing belongs to the owner and to an admin. When an admin
+                    is here to rent rather than to manage, the rent button above
+                    keeps the accent and this one steps back to an outline. */}
+                {(isOwner || user?.role === 'ADMIN') && (
+                  <div className={`space-y-2 ${!isOwner ? 'mt-2' : ''}`}>
+                    <button
+                      onClick={() => navigate(`/create-listing?edit=${listing.id}`)}
+                      className={`w-full font-semibold py-3 px-4 rounded-xl transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2 ${
+                        isOwner
+                          ? 'bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)]'
+                          : 'border-2 border-[#1A1A2E] dark:border-white/10 text-[#1A1A2E] dark:text-white hover:bg-[#1A1A2E] hover:text-white'
+                      }`}
+                    >
+                      <Pencil size={16} />
+                      {t('listing.editListing')}
+                    </button>
+                    {isOwner && (
+                      <div className="w-full bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 text-amber-700 dark:text-amber-300 text-sm font-medium py-3 px-4 rounded-xl text-center">
+                        {t('listing.ownListingHint')}
+                      </div>
+                    )}
+                  </div>
                 )}
                   </>
                 )}

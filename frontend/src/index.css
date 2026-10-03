@@ -178,3 +178,38 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* ------------------------------------------------------------------
+   The assistant gets a real place instead of floating over the page:
+   a column docked to the right edge. It claims its own slice of the
+   window and every full-width bar steps aside, so the listings, the
+   filters and the header are never hidden behind it.
+
+   The dock starts at lg: below that the sidebar plus the panel would
+   leave no room for the listings, so the panel stays a floating card.
+   ------------------------------------------------------------------ */
+
+/* The layout makes room smoothly instead of snapping. */
+.assistant-shift {
+  transition: padding-right 0.25s ease;
+}
+.site-header {
+  transition: right 0.25s ease;
+}
+
+@media (min-width: 1024px) {
+  html.assistant-docked .assistant-shift {
+    padding-right: 360px; /* must match lg:w-[360px] on the panel */
+  }
+  html.assistant-docked .site-header {
+    right: 360px;
+  }
+}
+@media (min-width: 1280px) {
+  html.assistant-docked .assistant-shift {
+    padding-right: 400px; /* must match xl:w-[400px] on the panel */
+  }
+  html.assistant-docked .site-header {
+    right: 400px;
+  }
+}

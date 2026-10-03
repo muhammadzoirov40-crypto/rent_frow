@@ -42,7 +42,7 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] flex flex-col">
+    <div className="assistant-shift min-h-screen bg-gray-50 dark:bg-[#0a0a1a] flex flex-col">
       <Header />
       <div className="flex flex-1 min-h-0">
         {!isAuthPage && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}

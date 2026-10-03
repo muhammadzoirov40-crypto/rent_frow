@@ -64,6 +64,17 @@ export default function AssistantWidget() {
     if (open) inputRef.current?.focus();
   }, [open]);
 
+  // The panel has a real place: a column docked to the right edge. While it is
+  // open the layout gives up that slice of the window, so the listings, the
+  // filters and the header are never hidden behind it. Below lg there is no
+  // width to give up and the panel simply floats over the page as before.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (open) root.classList.add('assistant-docked');
+    else root.classList.remove('assistant-docked');
+    return () => root.classList.remove('assistant-docked');
+  }, [open]);
+
   const suggestions = [
     'assistant.sugApartment',
     'assistant.sugCar',
@@ -124,7 +135,7 @@ export default function AssistantWidget() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-label={t('assistant.title')}
-        className={`fixed z-50 right-4 sm:right-6 bottom-24 md:bottom-6 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all duration-200 shadow-xl shadow-[rgb(var(--accent-rgb)/0.35)] hover:scale-105 active:scale-95 ${
+        className={`fixed z-50 right-4 sm:right-6 ${open ? 'lg:right-[376px] xl:right-[416px]' : ''} bottom-24 md:bottom-6 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all duration-200 shadow-xl shadow-[rgb(var(--accent-rgb)/0.35)] hover:scale-105 active:scale-95 ${
           open ? 'bg-gray-700 dark:bg-white/15' : 'bg-[var(--accent)] hover:bg-[var(--accent-hover)]'
         }`}
       >
@@ -136,7 +147,7 @@ export default function AssistantWidget() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed z-50 right-3 sm:right-6 bottom-40 md:bottom-24 w-[calc(100vw-1.5rem)] sm:w-[400px] max-w-[400px] h-[min(560px,64vh)] flex flex-col rounded-2xl overflow-hidden bg-white dark:bg-[#0f0f1e] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/30">
+        <div className="fixed z-50 lg:z-[60] right-3 sm:right-6 bottom-40 lg:right-0 lg:bottom-auto lg:top-0 w-[calc(100vw-1.5rem)] sm:w-[400px] max-w-[400px] lg:max-w-none lg:w-[360px] xl:w-[400px] h-[min(560px,64vh)] lg:h-screen flex flex-col rounded-2xl lg:rounded-none overflow-hidden bg-white dark:bg-[#0f0f1e] border border-gray-200 dark:border-white/10 shadow-2xl shadow-black/30">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-white/10 bg-[rgb(var(--accent-rgb)/0.08)]">
             <div className="w-9 h-9 shrink-0 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-md shadow-[rgb(var(--accent-rgb)/0.35)]">
