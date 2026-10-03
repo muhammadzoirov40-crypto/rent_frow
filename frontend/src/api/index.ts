@@ -459,11 +459,11 @@ export const payments = {
       .then(unwrap),
   /** Pay for an accepted rental request. The amount is not sent: the server
    *  reads it off the request, so nobody can underpay from here. */
-  payForRequest: (rentalRequestId: number) =>
+  payForRequest: (rentalRequestId: number, paymentType: 'BOOKING' | 'DEPOSIT' = 'BOOKING') =>
     client
       .post<APIResponse<PaymentRecord>>('/payments', {
         rental_request_id: rentalRequestId,
-        payment_type: 'BOOKING',
+        payment_type: paymentType,
       })
       .then(unwrap),
   /** The owner of the listing (or an admin) marks the money as received. */

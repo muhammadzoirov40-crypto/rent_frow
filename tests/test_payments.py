@@ -75,6 +75,7 @@ async def _seed_accepted_request(
     owner_id: int,
     status: RentalRequestStatus = RentalRequestStatus.ACCEPTED,
     total: float = 200.0,
+    deposit: float = 0.0,
 ) -> RentalRequest:
     tag = uuid.uuid4().hex[:6]
     city = City(name=f"Тестшаҳр-{tag}")
@@ -101,6 +102,7 @@ async def _seed_accepted_request(
         end_date=start + timedelta(days=1),
         total_days=2,
         total_price=total,
+        deposit_amount=deposit,
         status=status,
     )
     db.add(request)
@@ -189,6 +191,106 @@ async def test_the_same_request_cannot_be_paid_twice(db_session: AsyncSession, c
             PaymentCreate(rental_request_id=request.id, payment_type=PaymentType.BOOKING),
         )
     assert exc.value.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_the_deposit_is_its_own_payment_line(db_session: AsyncSession, customer_id: int):
+    owner_id = await _make_user(db_session, "owner")
+    request = await _seed_accepted_request(
+        db_session, customer_id, owner_id, total=200.0, deposit=300.0
+    )
+    service = PaymentService(db_session)
+
+    rent = await service.create(
+        customer_id,
+        PaymentCreate(rental_request_id=request.id, payment_type=PaymentType.BOOKING),
+    )
+    deposit = await service.create(
+        customer_id,
+        PaymentCreate(rental_request_id=request.id, payment_type=PaymentType.DEPOSIT),
+    )
+
+    assert (float(rent.amount), rent.payment_type) == (200.0, PaymentType.BOOKING)
+    assert (float(deposit.amount), deposit.payment_type) == (300.0, PaymentType.DEPOSIT)
+    assert rent.status == deposit.status == PaymentStatus.PENDING
+    assert rent.id != deposit.id, "rent and deposit are two separate payments"
+
+
+@pytest.mark.asyncio
+async def test_paying_the_rent_does_not_lock_the_deposit_out(
+    db_session: AsyncSession, customer_id: int
+):
+    owner_id = await _make_user(db_session, "owner")
+    request = await _seed_accepted_request(
+        db_session, customer_id, owner_id, total=200.0, deposit=300.0
+    )
+    service = PaymentService(db_session)
+
+    await service.create(
+        customer_id,
+        PaymentCreate(rental_request_id=request.id, payment_type=PaymentType.BOOKING),
+    )
+    # the deposit is still open
+    deposit = await service.create(
+        customer_id,
+        PaymentCreate(rental_request_id=request.id, payment_type=PaymentType.DEPOSIT),
+    )
+    assert deposit.status == PaymentStatus.PENDING
+
+    # ...but the rent itself is still only collectable once
+    with pytest.raises(HTTPException) as exc:
+        await service.create(
+            customer_id,
+            PaymentCreate(rental_request_id=request.id, payment_type=PaymentType.BOOKING),
+        )
+    assert exc.value.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_a_deposit_cannot_be_invented_or_overridden(
+    db_session: AsyncSession, customer_id: int
+):
+    owner_id = await _make_user(db_session, "owner")
+    request = await _seed_accepted_request(db_session, customer_id, owner_id, deposit=300.0)
+
+    payment = await PaymentService(db_session).create(
+        customer_id,
+        PaymentCreate(
+            rental_request_id=request.id, amount=1.0, payment_type=PaymentType.DEPOSIT
+        ),
+    )
+    assert float(payment.amount) == 300.0, "the client does not set the deposit either"
+
+
+@pytest.mark.asyncio
+async def test_a_listing_with_no_deposit_cannot_be_charged_one(
+    db_session: AsyncSession, customer_id: int
+):
+    owner_id = await _make_user(db_session, "owner")
+    request = await _seed_accepted_request(db_session, customer_id, owner_id, deposit=0.0)
+
+    with pytest.raises(HTTPException) as exc:
+        await PaymentService(db_session).create(
+            customer_id,
+            PaymentCreate(rental_request_id=request.id, payment_type=PaymentType.DEPOSIT),
+        )
+    assert exc.value.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_a_request_is_only_payable_as_rent_or_deposit(
+    db_session: AsyncSession, customer_id: int
+):
+    owner_id = await _make_user(db_session, "owner")
+    request = await _seed_accepted_request(db_session, customer_id, owner_id, deposit=50.0)
+
+    for payment_type in (PaymentType.REFUND, PaymentType.DAMAGE, PaymentType.LATE_FEE):
+        with pytest.raises(HTTPException) as exc:
+            await PaymentService(db_session).create(
+                customer_id,
+                PaymentCreate(rental_request_id=request.id, payment_type=payment_type),
+            )
+        assert exc.value.status_code == 400, payment_type
 
 
 # --------------------------------------------------------------------------

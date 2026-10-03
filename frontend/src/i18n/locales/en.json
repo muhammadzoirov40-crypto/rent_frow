@@ -995,6 +995,8 @@
   },
   "payment": {
     "pay": "Pay",
+    "rent": "Rent",
+    "deposit": "Deposit",
     "pending": "Payment awaiting confirmation",
     "paid": "Paid",
     "confirm": "Confirm",

@@ -48,14 +48,37 @@ class PaymentService:
                 detail="Payment can only be made for an accepted rental request",
             )
 
+        if data.payment_type not in (PaymentType.BOOKING, PaymentType.DEPOSIT):
+            raise HTTPException(
+                status_code=400,
+                detail="A rental request is paid either as rent or as a deposit",
+            )
+
+        # Rent and deposit are two separate lines: the listing page shows both,
+        # so both have to be collectable — and each is guarded on its own, so
+        # paying the rent does not lock the deposit out.
+        if data.payment_type == PaymentType.DEPOSIT:
+            amount = float(request.deposit_amount)
+            if amount <= 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="This listing asks for no deposit",
+                )
+        else:
+            amount = float(request.total_price)
+
         for existing in await self.payment_repo.get_by_rental_request_id(request.id):
+            if existing.payment_type != data.payment_type:
+                continue
             if existing.status in (PaymentStatus.PENDING, PaymentStatus.PAID):
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Payment is already {existing.status.value} for this request",
+                    detail=(
+                        f"{data.payment_type.value} is already "
+                        f"{existing.status.value} for this request"
+                    ),
                 )
 
-        amount = float(request.total_price)
         payment = await self.payment_repo.create(
             booking_id=None,
             rental_request_id=request.id,
