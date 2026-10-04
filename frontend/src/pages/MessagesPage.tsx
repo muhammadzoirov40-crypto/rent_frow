@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, MessageSquare, Pin, X, Package, ChevronRight, Check } from 'lucide-react';
+import { Search, MessageSquare, Pin, X, Package, ChevronRight, Check, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { messages, upload, listings, rentalRequests } from '../api';
+import { messages, upload, listings, rentalRequests, payments } from '../api';
 import type { Conversation, Message, RentalRequest } from '../api';
 import useAuthStore from '../store/authStore';
 import ChatHeader from '../components/chat/ChatHeader';
 import ChatMessageList from '../components/chat/ChatMessageList';
 import ChatInput from '../components/chat/ChatInput';
+import PaymentLine from '../components/payments/PaymentLine';
 import Lightbox from '../components/chat/Lightbox';
 import CallOverlay, { type CallType } from '../components/chat/CallOverlay';
 import useChatSocket from '../components/chat/useChatSocket';
@@ -726,6 +727,40 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
     },
   });
 
+  // Money sits on the accepted request, and this bar is where both sides
+  // meet: the renter opens a payment here and the owner marks it received
+  // here. The amount comes from the request — the browser never names one.
+  const { data: requestPayments = [], isLoading: paymentLoading } = useQuery({
+    queryKey: ['payment-for-request', requestId],
+    queryFn: () => payments.forRequest(requestId),
+    enabled: !!req && (req.status || '').toUpperCase() === 'ACCEPTED',
+    staleTime: 30_000,
+    retry: 1,
+  });
+
+  const paymentError = (error: any) => {
+    const detail = error?.response?.data?.detail;
+    return typeof detail === 'string' && detail ? detail : t('payment.failed');
+  };
+
+  const payMutation = useMutation({
+    mutationFn: (kind: 'BOOKING' | 'DEPOSIT') => payments.payForRequest(requestId, kind),
+    onSuccess: () => {
+      toast.success(t('payment.created'));
+      queryClient.invalidateQueries({ queryKey: ['payment-for-request', requestId] });
+    },
+    onError: (error: any) => toast.error(paymentError(error)),
+  });
+
+  const confirmPayMutation = useMutation({
+    mutationFn: (paymentId: number) => payments.confirm(paymentId),
+    onSuccess: () => {
+      toast.success(t('payment.confirmed'));
+      queryClient.invalidateQueries({ queryKey: ['payment-for-request', requestId] });
+    },
+    onError: (error: any) => toast.error(paymentError(error)),
+  });
+
   if (!req) return null;
 
   const statusKey = (req.status || 'PENDING').toUpperCase();
@@ -747,6 +782,18 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
   const statusLabel = labels[statusKey] || labels.PENDING;
   const isOwner = user?.id === req.owner_id;
   const isPending = statusKey === 'PENDING';
+
+  // Rent and the refundable deposit are two separate lines, each keeping its
+  // own status: paying the rent does not lock the deposit out.
+  const depositAmount = Number(req.deposit_amount ?? 0);
+  const paymentLines: { kind: 'BOOKING' | 'DEPOSIT'; label: string; amount: number }[] = [
+    { kind: 'BOOKING', label: t('payment.rent'), amount: Number(req.total_price ?? 0) },
+    ...(depositAmount > 0
+      ? [{ kind: 'DEPOSIT' as const, label: t('payment.deposit'), amount: depositAmount }]
+      : []),
+  ];
+  const linePayment = (kind: 'BOOKING' | 'DEPOSIT') =>
+    requestPayments.find((p) => (p.payment_type ?? 'BOOKING') === kind) ?? null;
 
   return (
     <div
@@ -786,6 +833,31 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
           )}
         </div>
       </div>
+
+      {statusKey === 'ACCEPTED' && (
+        <span className="flex flex-wrap items-center gap-2 mt-2.5" data-testid="chat-payment-strip">
+          {paymentLoading ? (
+            <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-xl">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              {t('payment.checking')}
+            </span>
+          ) : (
+            paymentLines.map((line) => (
+              <PaymentLine
+                key={line.kind}
+                label={line.label}
+                amount={line.amount}
+                payment={linePayment(line.kind)}
+                role={isOwner ? 'owner' : 'renter'}
+                busy={payMutation.isPending || confirmPayMutation.isPending}
+                onPay={() => payMutation.mutate(line.kind)}
+                onConfirm={(paymentId) => confirmPayMutation.mutate(paymentId)}
+                t={t}
+              />
+            ))
+          )}
+        </span>
+      )}
 
       {isOwner && isPending && (
         <div className="flex gap-2 mt-2.5">
