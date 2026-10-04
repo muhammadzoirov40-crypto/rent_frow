@@ -13,10 +13,25 @@ interface LayoutProps {
   children: React.ReactNode
 }
 
+// The left rail is the signed-in app's navigation. The marketing and browsing
+// pages keep the whole width — the header already carries their navigation
+// there, and a rail beside the hero just steals the room the hero needs.
+const APP_ROUTES = [
+  '/create-listing',
+  '/favorites',
+  '/messages',
+  '/profile',
+  '/rental-requests',
+  '/notifications',
+  '/settings',
+  '/admin',
+]
+
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const isAuthPage = pathname === '/login' || pathname === '/register'
+  const showSidebar = !isAuthPage && APP_ROUTES.some((route) => pathname.startsWith(route))
   const { isAuthenticated } = useAuthStore()
   const { isLoading } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
@@ -45,7 +60,7 @@ export default function Layout({ children }: LayoutProps) {
     <div className="assistant-shift min-h-screen bg-gray-50 dark:bg-[#0a0a1a] flex flex-col">
       <Header />
       <div className="flex flex-1 min-h-0">
-        {!isAuthPage && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
+        {showSidebar && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
         <div className="flex-1 min-w-0 flex flex-col">
           <main className={`flex-1 pt-[var(--header-h)] ${isAuthPage ? '' : 'pb-20'} md:pb-0`}>
             {children}

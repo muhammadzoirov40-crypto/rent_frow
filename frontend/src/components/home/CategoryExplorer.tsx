@@ -89,7 +89,7 @@ export default function CategoryExplorer() {
       onAction={() => navigate('/search')}
     >
       {hasGroups && (
-        <div className="flex flex-wrap gap-2 mb-5">
+        <div className="flex flex-wrap justify-center gap-2 mb-5">
           <button
             onClick={() => setActiveGroup('')}
             className={`px-3.5 py-2 rounded-xl text-sm font-semibold border transition ${
@@ -124,9 +124,9 @@ export default function CategoryExplorer() {
             <button
               key={cat.id}
               onClick={() => navigate(`/search?category_id=${cat.id}`)}
-              className="group text-left bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 rounded-2xl p-4.5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[0_14px_30px_-10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_14px_30px_-10px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1"
+              className="group h-full flex flex-col items-center justify-center text-center bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 rounded-2xl p-5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[0_14px_30px_-10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_14px_30px_-10px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-300">
+              <div className="w-12 h-12 shrink-0 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-300">
                 {cat.image_url ? (
                   <img src={cat.image_url} alt="" className="w-6 h-6 object-contain" loading="lazy" />
                 ) : (
@@ -136,7 +136,7 @@ export default function CategoryExplorer() {
               <h3 className="font-semibold text-sm text-[#1A1A2E] dark:text-white group-hover:text-[var(--accent)] transition-colors leading-snug">
                 {localizeCategoryName(cat, i18n.language)}
               </h3>
-              <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+              <p className="mt-1 text-xs font-medium text-gray-500 dark:text-gray-400">
                 {t('home.listingsCount', { count: count ?? 0 })}
               </p>
             </button>
