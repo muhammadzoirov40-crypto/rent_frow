@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.core.dependencies import require_auth, CurrentUser
+from app.core.dependencies import require_admin, require_auth, CurrentUser
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.schemas.wallet import (
     TopupIntentResponse,
@@ -128,3 +128,38 @@ async def list_top_ups(
         page=page,
         page_size=page_size,
     )
+
+
+@router.post("/topups/{reference}/confirm", response_model=APIResponse[TopupIntentResponse])
+async def confirm_top_up(
+    reference: str,
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Close a top-up whose payment is already visible in the statement.
+
+    DC City publishes no status API to ask, so until they register the
+    callback this is the other way money on its way becomes money in the
+    wallet: the operator finds the reference (``f3``) in the DC Wallet
+    statement and confirms it here. It runs through the very same idempotent
+    settle the callback uses, so a second confirmation — or the callback
+    arriving later — credits nothing extra.
+
+    Admin only: a customer must never be able to stamp their own payment as
+    paid.
+    """
+    row = await topup_service.find(db, reference)
+    if row is None:
+        raise HTTPException(status_code=404, detail="TOPUP_NOT_FOUND")
+
+    credited, reason = await topup_service.settle(
+        db,
+        reference=reference,
+        amount=None,
+        raw={"by": current_user.user_id, "via": "admin"},
+    )
+    if not credited and reason != "ALREADY_PAID":
+        # the row is still PENDING, so the operator can simply try again
+        raise HTTPException(status_code=400, detail=reason)
+
+    return APIResponse(message=reason, data=TopupIntentResponse.model_validate(row))

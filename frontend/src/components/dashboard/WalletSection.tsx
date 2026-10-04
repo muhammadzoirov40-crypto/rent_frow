@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import { wallet, type TopupIntent, type WalletTransactionRecord } from '../../api';
 import { formatAmount } from '../../utils/format';
 import { DEFAULT_TOPUP, openTopUp } from '../../utils/wallet';
+import useAuthStore from '../../store/authStore';
 
 const PAGE_SIZE = 20;
 
@@ -26,6 +27,7 @@ const TYPE_ICON: Record<WalletTransactionRecord['type'], ReactNode> = {
 export default function WalletSection() {
   const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
+  const user = useAuthStore((s) => s.user);
   const [page, setPage] = useState(1);
   const [showTopUp, setShowTopUp] = useState(false);
   const [amount, setAmount] = useState<string>(String(DEFAULT_TOPUP));
@@ -62,6 +64,22 @@ export default function WalletSection() {
     queryClient.invalidateQueries({ queryKey: ['wallet-transactions'] });
   };
 
+  // DC Wallet has no status API to ask, so until DC City registers the
+  // callback an operator closes a top-up by hand — through the same
+  // idempotent settle the callback uses, which is why pressing twice is safe.
+  const confirmTopUp = useMutation({
+    mutationFn: (reference: string) => wallet.confirmTopup(reference),
+    onSuccess: (response) => {
+      refresh();
+      toast.success(
+        response.message === 'ALREADY_PAID'
+          ? t('dashboard.wallet.alreadyPaid')
+          : t('dashboard.wallet.confirmed'),
+      );
+    },
+    onError: () => toast.error(t('common.error')),
+  });
+
   if (isLoading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
@@ -78,6 +96,7 @@ export default function WalletSection() {
   const canPrev = page > 1;
   const canNext = page * PAGE_SIZE < totalRows;
   const pendingRows = (topups?.items ?? []).filter((row) => row.status === 'PENDING');
+  const isAdmin = user?.role === 'ADMIN';
 
   return (
     <div className="space-y-4" data-testid="wallet-section">
@@ -146,6 +165,16 @@ export default function WalletSection() {
               <p className="text-xs text-amber-700/80 dark:text-amber-300/80 mt-1">
                 {t('dashboard.wallet.pendingHint')}
               </p>
+              {/* Only an admin sees this: it says who closes the top-up while
+                  DC City's callback is not connected yet. */}
+              {isAdmin && (
+                <p
+                  className="text-xs text-amber-700/80 dark:text-amber-300/80 mt-1"
+                  data-testid="wallet-topup-admin-hint"
+                >
+                  {t('dashboard.wallet.adminHint')}
+                </p>
+              )}
             </div>
             <button
               type="button"
@@ -166,8 +195,21 @@ export default function WalletSection() {
                 <span className="text-amber-700 dark:text-amber-300 font-semibold tabular-nums">
                   +{formatAmount(row.amount, i18n.language)} {t('common.somoni')}
                 </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {new Date(row.created_at).toLocaleString(i18n.language)}
+                <span className="flex min-w-0 items-center gap-2">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    {new Date(row.created_at).toLocaleString(i18n.language)}
+                  </span>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      data-testid="wallet-topup-confirm"
+                      onClick={() => confirmTopUp.mutate(row.reference)}
+                      disabled={confirmTopUp.isPending}
+                      className="shrink-0 rounded-lg bg-[var(--accent)] px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-[var(--accent-hover)] transition disabled:opacity-60"
+                    >
+                      {t('common.confirm')}
+                    </button>
+                  )}
                 </span>
               </li>
             ))}

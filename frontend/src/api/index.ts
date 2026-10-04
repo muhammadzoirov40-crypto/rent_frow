@@ -509,6 +509,16 @@ export const wallet = {
       .get<PaginatedResponse<TopupIntent>>('/wallet/topups', { params: { page, page_size } })
       .then(unwrapPaginated),
 
+  /** An operator closes a top-up by hand. DC City exposes no status API, so
+   *  until their callback is registered the payment is matched by reference
+   *  in the statement and confirmed here — through the very same idempotent
+   *  settle the callback uses. Admin only. Returns the whole envelope so the
+   *  caller can tell CREDITED from ALREADY_PAID. */
+  confirmTopup: (reference: string) =>
+    client
+      .post<APIResponse<TopupIntent>>(`/wallet/topups/${encodeURIComponent(reference)}/confirm`)
+      .then((response) => response.data),
+
   /** Manual credit — admin only in production; the webhook is what settles a
    *  real payment. Kept for seeding and for the admin panel. */
   topUp: (amount: number, description?: string) =>

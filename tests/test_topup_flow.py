@@ -4,7 +4,9 @@ The three properties that matter:
 
 * the link is built for *this* user (``f2``) and *this* amount (``s``),
 * nothing can be credited without the shared secret,
-* a callback credits the ledger exactly once, no matter how it is replayed.
+* a callback credits the ledger exactly once, no matter how it is replayed,
+* while DC City has no callback registered yet, an operator can close a
+  top-up by hand — through the same settle, so it too credits once.
 """
 
 import pytest
@@ -196,3 +198,45 @@ async def test_an_admin_can_still_credit_by_hand(admin_client: AsyncClient):
         )
         assert resp.status_code == 200, resp.text
     assert await _balance(admin_client) == before + 40
+
+
+# ------------------------------------ closing a top-up before the callback exists
+@pytest.mark.asyncio
+async def test_only_an_admin_may_confirm_a_top_up_and_it_credits_exactly_once(
+    customer_client: AsyncClient, admin_client: AsyncClient
+):
+    intent = await _prepare(customer_client, 75)
+    ref = intent["reference"]
+
+    # a customer must not be able to stamp their own payment as paid
+    denied = await customer_client.post(f"/api/v1/wallet/topups/{ref}/confirm")
+    assert denied.status_code == 403, denied.text
+    # ...nor ask for a reference that was never opened
+    missing = await admin_client.post("/api/v1/wallet/topups/NOSUCHREFERENCE/confirm")
+    assert missing.status_code == 404, missing.text
+    assert await _balance(customer_client) == START
+
+    first = await admin_client.post(f"/api/v1/wallet/topups/{ref}/confirm")
+    assert first.status_code == 200, first.text
+    assert first.json()["message"] == "CREDITED"
+    assert first.json()["data"]["status"] == "PAID"
+    assert first.json()["data"]["paid_at"] is not None
+    assert await _balance(customer_client) == START + 75
+
+    # the operator clicks twice, or DC City's callback turns up afterwards —
+    # either way the wallet is printed only the once
+    again = await admin_client.post(f"/api/v1/wallet/topups/{ref}/confirm")
+    assert again.status_code == 200, again.text
+    assert again.json()["message"] == "ALREADY_PAID"
+    assert await _balance(customer_client) == START + 75
+    assert (await _types(customer_client)).count("TOPUP") == 1
+
+    with _Settings(PAYDC_WEBHOOK_SECRET=SECRET):
+        late = await _callback(customer_client, secret=SECRET, f3=ref, s="75.00")
+    assert late["credited"] is False, late
+    assert late["reason"] == "ALREADY_PAID"
+    assert await _balance(customer_client) == START + 75
+
+    # it credited *the customer's* wallet, not the admin's
+    admin_resp = await admin_client.get("/api/v1/wallet")
+    assert float(admin_resp.json()["data"]["balance"]) == START

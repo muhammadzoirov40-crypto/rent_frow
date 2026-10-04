@@ -4,7 +4,11 @@ The two halves never meet in the browser:
 
 * :func:`prepare` turns an amount into a payment link plus one waiting row,
 * :func:`settle` is what the webhook calls once the payment actually went
-  through.
+  through — and, until DC City registers that webhook, what an operator
+  calls from the wallet after seeing the payment in their statement.
+
+Both ways in share one function, so a top-up is credited exactly once no
+matter which of them gets there first.
 
 The link carries a random ``reference`` in ``f3`` and the renter's id in
 ``f2``, so a callback can always be matched to the exact top-up it belongs
@@ -77,6 +81,16 @@ async def prepare(db: AsyncSession, user_id: int, amount: float) -> dict:
     }
 
 
+async def find(db: AsyncSession, reference: str) -> TopupIntent | None:
+    """The one top-up a reference points at — the lookup shared by the
+    callback, an operator confirming by hand, and anyone asking what a
+    reference means."""
+    result = await db.execute(
+        select(TopupIntent).where(TopupIntent.reference == str(reference))
+    )
+    return result.scalar_one_or_none()
+
+
 async def intents(db: AsyncSession, user_id: int, limit: int = 20) -> list[TopupIntent]:
     """The user's own top-ups, newest first — pending ones included, so the
     wallet can show what is still on its way."""
@@ -105,28 +119,26 @@ async def settle(
     if not reference:
         return False, "NO_REFERENCE"
 
-    intent = (
-        await db.execute(select(TopupIntent).where(TopupIntent.reference == str(reference)))
-    ).scalar_one_or_none()
-    if intent is None:
+    row = await find(db, reference)
+    if row is None:
         return False, "UNKNOWN_REFERENCE"
-    if intent.status == "PAID":
+    if row.status == "PAID":
         return False, "ALREADY_PAID"
-    if amount is not None and abs(money(amount) - money(intent.amount)) > TOLERANCE:
+    if amount is not None and abs(money(amount) - money(row.amount)) > TOLERANCE:
         # keep it PENDING: a corrected retry must still be able to settle it
         return False, "AMOUNT_MISMATCH"
 
     try:
         await WalletService(db).topup(
-            intent.user_id,
-            money(intent.amount),
-            description="Пополнение — DC Wallet (%s)" % intent.reference,
+            row.user_id,
+            money(row.amount),
+            description="Пополнение — DC Wallet (%s)" % row.reference,
         )
     except HTTPException as exc:  # noqa: BLE001
         return False, str(getattr(exc, "detail", "TOPUP_FAILED"))
 
-    intent.status = "PAID"
-    intent.paid_at = datetime.utcnow()
-    intent.raw_response = json.dumps(raw, ensure_ascii=False)[:4000] if raw else None
+    row.status = "PAID"
+    row.paid_at = datetime.utcnow()
+    row.raw_response = json.dumps(raw, ensure_ascii=False)[:4000] if raw else None
     await db.flush()
     return True, "CREDITED"
