@@ -10,6 +10,7 @@ import {
   Star,
   Users,
   PlusCircle,
+  FileCheck2,
 } from 'lucide-react';
 import { stats } from '../api/index';
 import CategoryExplorer from '../components/home/CategoryExplorer';
@@ -123,29 +124,99 @@ function StatsSection({
   siteStats?: { listings: number; users: number; cities: number; avg_rating: number };
 }) {
   const { t } = useTranslation();
+
+  const benefits = [
+    {
+      icon: ShieldCheck,
+      title: t('home.why1Title'),
+      desc: t('home.why1Desc'),
+      badge: '01',
+      color: 'from-emerald-500/20 to-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/30',
+      accentGlow: 'hover:border-emerald-500/40 hover:shadow-emerald-500/10',
+      dotColor: 'bg-emerald-500',
+    },
+    {
+      icon: Zap,
+      title: t('home.why2Title'),
+      desc: t('home.why2Desc'),
+      badge: '02',
+      color: 'from-amber-500/20 to-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/30',
+      accentGlow: 'hover:border-amber-500/40 hover:shadow-amber-500/10',
+      dotColor: 'bg-amber-500',
+    },
+    {
+      icon: FileCheck2,
+      title: t('home.why3Title'),
+      desc: t('home.why3Desc'),
+      badge: '03',
+      color: 'from-blue-500/20 to-blue-500/5 text-blue-600 dark:text-blue-400 border-blue-500/30',
+      accentGlow: 'hover:border-blue-500/40 hover:shadow-blue-500/10',
+      dotColor: 'bg-blue-500',
+    },
+    {
+      icon: Headset,
+      title: t('home.why4Title'),
+      desc: t('home.why4Desc'),
+      badge: '04',
+      color: 'from-[rgb(var(--accent-rgb)/0.25)] to-[rgb(var(--accent-rgb)/0.05)] text-[var(--accent)] border-[rgb(var(--accent-rgb)/0.3)]',
+      accentGlow: 'hover:border-[var(--accent)]/50 hover:shadow-[rgb(var(--accent-rgb)/0.15)]',
+      dotColor: 'bg-[var(--accent)]',
+    },
+  ];
+
   return (
     <Section title={t('home.whyTitle')} hint={t('home.whySubtitle')}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { icon: ShieldCheck, title: t('home.why1Title'), desc: t('home.why1Desc') },
-          { icon: Zap, title: t('home.why2Title'), desc: t('home.why2Desc') },
-          { icon: Headset, title: t('home.why3Title'), desc: t('home.why3Desc') },
-          { icon: Star, title: t('home.why4Title'), desc: t('home.why4Desc') },
-        ].map((item) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {benefits.map((item) => (
           <div
             key={item.title}
-            className="rounded-2xl bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 p-5.5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+            className={`group relative overflow-hidden rounded-3xl bg-white/95 dark:bg-[#111827]/90 backdrop-blur-md border border-gray-200/80 dark:border-white/10 p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl dark:hover:shadow-[0_20px_45px_-12px_rgba(0,0,0,0.7)] ${item.accentGlow}`}
           >
-            <div className="w-11 h-11 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center mb-3">
-              <item.icon className="w-5 h-5 text-[var(--accent)]" />
+            {/* Top gradient accent line on hover */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+            {/* Decorative background watermark icon */}
+            <item.icon
+              aria-hidden="true"
+              className="absolute -right-3 -bottom-3 w-28 h-28 text-gray-900/[0.03] dark:text-white/[0.04] group-hover:scale-110 group-hover:text-[var(--accent)]/10 transition-all duration-500 pointer-events-none"
+            />
+
+            <div>
+              {/* Header row: Icon + Step Badge */}
+              <div className="flex items-center justify-between mb-5">
+                <div
+                  className={`w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br ${item.color} border flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300`}
+                >
+                  <item.icon className="w-6 h-6 sm:w-7 sm:h-7" />
+                </div>
+                <span className="text-2xl font-black text-gray-200 dark:text-slate-700/60 font-mono tracking-wider group-hover:text-[var(--accent)]/40 transition-colors">
+                  {item.badge}
+                </span>
+              </div>
+
+              {/* Title */}
+              <h3 className="font-bold text-base sm:text-[17px] text-slate-900 dark:text-white mb-2 leading-snug group-hover:text-[var(--accent)] transition-colors">
+                {item.title}
+              </h3>
+
+              {/* Description */}
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-normal">
+                {item.desc}
+              </p>
             </div>
-            <h3 className="font-bold text-sm text-[#1A1A2E] dark:text-white mb-1.5">{item.title}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{item.desc}</p>
+
+            {/* Bottom active pill */}
+            <div className="mt-5 pt-4 border-t border-gray-100 dark:border-white/5 flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${item.dotColor} animate-pulse`} />
+              <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">
+                RentHub Verified
+              </span>
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mt-7">
         {[
           { value: siteStats ? String(siteStats.listings) : '—', label: t('home.statsListings'), icon: Star },
           { value: siteStats ? String(siteStats.users) : '—', label: t('home.statsUsers'), icon: Users },
@@ -154,10 +225,17 @@ function StatsSection({
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-2xl bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 p-5 text-center shadow-sm"
+            className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white/95 dark:bg-[#111827]/90 backdrop-blur-md border border-gray-200/80 dark:border-white/10 p-5 sm:p-6 text-center shadow-sm hover:shadow-lg dark:hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.6)] hover:border-[var(--accent)]/40 transition-all duration-300 hover:-translate-y-1"
           >
-            <div className="text-3xl font-extrabold text-[var(--accent)] tracking-tight">{stat.value}</div>
-            <div className="mt-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{stat.label}</div>
+            <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] mb-2 group-hover:scale-110 transition-transform">
+              <stat.icon className="w-5 h-5" />
+            </div>
+            <div className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight group-hover:text-[var(--accent)] transition-colors">
+              {stat.value}
+            </div>
+            <div className="mt-1 text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {stat.label}
+            </div>
           </div>
         ))}
       </div>
