@@ -340,6 +340,12 @@ export default function ListingPage() {
   const total = Math.round(subtotal);
   const isOwner = isAuthenticated && user?.id === listing.owner_id;
   const avgRating = listingReviews.length > 0 ? Math.round(listingReviews.reduce((s, r) => s + r.rating, 0) / listingReviews.length) : 0;
+  // Not enough balance -> the request cannot go through, so the button that
+  // would send one steps back and the red block above it says why. Only a
+  // signed-in renter is judged: a visitor has no balance yet and this button
+  // still has to carry them to the login screen.
+  const shortOnBalance =
+    isAuthenticated && !!startDate && !!endDate && !canAfford(balance, total);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-6 px-4 sm:px-6 lg:px-8 pb-24 lg:pb-6">
@@ -666,7 +672,7 @@ export default function ListingPage() {
                   <>
                     <button
                       onClick={requestRental}
-                      disabled={rentalMutation.isPending || listing.status !== 'ACTIVE'}
+                      disabled={rentalMutation.isPending || shortOnBalance || listing.status !== 'ACTIVE'}
                       className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] active:scale-[0.98]"
                     >
                       {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
@@ -1165,7 +1171,7 @@ export default function ListingPage() {
             </div>
             <button
               onClick={requestRental}
-              disabled={rentalMutation.isPending}
+              disabled={rentalMutation.isPending || shortOnBalance}
               className="flex-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white text-sm font-semibold py-3 rounded-xl transition active:scale-[0.98]"
             >
               {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
