@@ -14,19 +14,20 @@
 
     --color-primary: var(--accent);
     --color-primary-dark: var(--accent-hover);
-    --color-secondary: #1A1A2E;
-    --color-secondary-light: #2d2d44;
-    --bg-page: #f9fafb;
+    --color-secondary: #0f172a;
+    --color-secondary-light: #1e293b;
+    --bg-page: #f8fafc;
     --bg-card: #ffffff;
-    --bg-card-hover: #f3f4f6;
-    --bg-input: #f9fafb;
-    --text-page: #111827;
-    --text-card: #111827;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
-    --border-page: #e5e7eb;
-    --border-card: #f3f4f6;
-    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --bg-card-hover: #f1f5f9;
+    --bg-input: #ffffff;
+    --text-page: #0f172a;
+    --text-card: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-page: #e2e8f0;
+    --border-card: #f1f5f9;
+    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 12px 28px -6px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.04);
 
     /* Height of the fixed header (main row + sub-navbar). Header.tsx keeps
        this in sync with the real DOM height; the values below are fallbacks
@@ -50,16 +51,16 @@
     --accent-rgb: 239 68 68;
   }
   html[data-accent="green"] {
-    --accent: #22c55e; --accent-hover: #16a34a; --accent-light: #4ade80; --accent-dark: #15803d;
-    --accent-rgb: 34 197 94;
+    --accent: #10b981; --accent-hover: #059669; --accent-light: #34d399; --accent-dark: #047857;
+    --accent-rgb: 16 185 129;
   }
   html[data-accent="blue"] {
-    --accent: #3b82f6; --accent-hover: #2563eb; --accent-light: #60a5fa; --accent-dark: #1d4ed8;
-    --accent-rgb: 59 130 246;
+    --accent: #2563eb; --accent-hover: #1d4ed8; --accent-light: #60a5fa; --accent-dark: #1e40af;
+    --accent-rgb: 37 99 235;
   }
   html[data-accent="purple"] {
-    --accent: #a855f7; --accent-hover: #9333ea; --accent-light: #c084fc; --accent-dark: #7e22ce;
-    --accent-rgb: 168 85 247;
+    --accent: #8b5cf6; --accent-hover: #7c3aed; --accent-light: #a78bfa; --accent-dark: #6d28d9;
+    --accent-rgb: 139 92 246;
   }
   html[data-accent="pink"] {
     --accent: #ec4899; --accent-hover: #db2777; --accent-light: #f472b6; --accent-dark: #be185d;
@@ -71,83 +72,97 @@
   }
 
   .dark {
-    --bg-page: #0f0f23;
-    --bg-card: #1A1A2E;
-    --bg-card-hover: #24243e;
+    --bg-page: #0b0f19;
+    --bg-card: #111827;
+    --bg-card-hover: #1e293b;
     --bg-input: rgba(255, 255, 255, 0.05);
-    --text-page: #f3f4f6;
-    --text-card: #f3f4f6;
-    --text-secondary: #9ca3af;
-    --text-muted: #6b7280;
-    --border-page: rgba(255, 255, 255, 0.1);
+    --text-page: #f8fafc;
+    --text-card: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-page: rgba(255, 255, 255, 0.08);
     --border-card: rgba(255, 255, 255, 0.06);
-    --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
+    --shadow-card-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.55);
   }
 
   body {
-    @apply antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    @apply antialiased selection:bg-[rgb(var(--accent-rgb)/0.2)] selection:text-[var(--accent)];
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-page);
     color: var(--text-page);
+    letter-spacing: -0.012em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--bg-page);
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
-  }
-
-  .dark ::-webkit-scrollbar-thumb {
-    @apply bg-gray-600;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
-  }
-
-  .dark ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-500;
+    @apply bg-gray-300 dark:bg-gray-700/80 rounded-full hover:bg-gray-400 dark:hover:bg-gray-600 transition;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2 font-semibold py-2.5 px-5 rounded-xl text-white transition-all duration-200 shadow-sm active:scale-[0.98];
+    background-color: var(--accent);
+    box-shadow: 0 4px 14px 0 rgb(var(--accent-rgb) / 0.28);
+  }
+  .btn-primary:hover {
+    background-color: var(--accent-hover);
+    box-shadow: 0 6px 20px 0 rgb(var(--accent-rgb) / 0.38);
+    transform: translateY(-1px);
   }
 
   .btn-secondary {
-    @apply bg-[#1A1A2E] hover:bg-[#2d2d44] text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2 font-semibold py-2.5 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-all duration-200 shadow-sm active:scale-[0.98];
   }
 
   .dark .btn-secondary {
-    @apply bg-white/10 hover:bg-white/15;
+    @apply bg-white/10 hover:bg-white/15 text-white border border-white/10;
   }
 
   .btn-outline {
-    @apply border-2 border-[var(--accent)] text-[var(--accent)] hover:bg-[var(--accent)] hover:text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2 font-semibold py-2.5 px-5 rounded-xl border border-gray-300 dark:border-white/15 text-gray-700 dark:text-gray-200 hover:border-[var(--accent)] hover:text-[var(--accent)] bg-white/50 dark:bg-white/5 backdrop-blur-sm transition-all duration-200 active:scale-[0.98];
   }
 
   .input-field {
-    @apply w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-2.5 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)];
     background-color: var(--bg-input);
     border-color: var(--border-page);
     color: var(--text-page);
   }
 
   .card {
-    @apply rounded-xl overflow-hidden;
+    @apply rounded-2xl overflow-hidden transition-all duration-300;
     background-color: var(--bg-card);
-    border-color: var(--border-card);
-    border-width: 1px;
-    border-style: solid;
+    border: 1px solid var(--border-card);
     box-shadow: var(--shadow-card);
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .glass-card {
+    @apply rounded-2xl border backdrop-blur-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark .glass-card {
+    background: rgba(17, 24, 39, 0.75);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -157,17 +172,17 @@
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes skeleton-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  50% { opacity: 0.45; }
 }
 
-.animate-fadeIn { animation: fadeIn 0.3s ease-in-out; }
-.animate-slideUp { animation: slideUp 0.4s ease-out; }
+.animate-fadeIn { animation: fadeIn 0.25s ease-in-out; }
+.animate-slideUp { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
 .animate-skeleton { animation: skeleton-pulse 1.5s ease-in-out infinite; }
 
 /* Horizontal category strip in the sub-navbar: scrollable but visually clean. */

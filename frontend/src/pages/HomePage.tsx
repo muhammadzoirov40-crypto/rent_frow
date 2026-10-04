@@ -33,9 +33,9 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0a0a1a]">
+    <div className="min-h-screen bg-[var(--bg-page)]">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#0f1218]">
+      <section className="relative overflow-hidden border-b border-gray-200/80 dark:border-white/10 bg-gradient-to-b from-gray-50/80 via-white to-gray-50/30 dark:from-[#0d1321] dark:via-[#0b0f19] dark:to-[#0b0f19]">
         {/* Soft accent gradient backdrop — follows the theme colour (--accent-rgb) */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <div className="absolute -top-44 -left-40 h-[34rem] w-[34rem] rounded-full bg-[rgb(var(--accent-rgb)/0.2)] blur-[110px]" />
@@ -134,9 +134,9 @@ function StatsSection({
         ].map((item) => (
           <div
             key={item.title}
-            className="rounded-xl bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 p-5 hover:border-[rgb(var(--accent-rgb)/0.4)] transition"
+            className="rounded-2xl bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 p-5.5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
           >
-            <div className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center mb-3">
+            <div className="w-11 h-11 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center mb-3">
               <item.icon className="w-5 h-5 text-[var(--accent)]" />
             </div>
             <h3 className="font-bold text-sm text-[#1A1A2E] dark:text-white mb-1.5">{item.title}</h3>
@@ -154,10 +154,10 @@ function StatsSection({
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-4 text-center"
+            className="rounded-2xl bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 p-5 text-center shadow-sm"
           >
-            <div className="text-2xl font-extrabold text-[var(--accent)]">{stat.value}</div>
-            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">{stat.label}</div>
+            <div className="text-3xl font-extrabold text-[var(--accent)] tracking-tight">{stat.value}</div>
+            <div className="mt-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">{stat.label}</div>
           </div>
         ))}
       </div>
@@ -169,15 +169,16 @@ function PromoSection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="rounded-2xl bg-[#1A1A2E] dark:bg-[#12141a] border border-gray-800 dark:border-white/10 p-6 sm:p-8 lg:p-10 flex flex-col md:flex-row items-center gap-6">
-        <div className="flex-1 text-center md:text-left">
-          <h3 className="text-xl sm:text-2xl font-extrabold text-white">{t('home.promoTitle')}</h3>
-          <p className="mt-2 text-sm sm:text-base text-gray-300 max-w-2xl">{t('home.promoText')}</p>
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-[#111827] to-slate-900 border border-slate-800 dark:border-white/10 p-8 sm:p-10 lg:p-12 flex flex-col md:flex-row items-center gap-6 shadow-2xl">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-20 w-80 h-80 rounded-full bg-[rgb(var(--accent-rgb)/0.2)] blur-[80px]" />
+        <div className="relative flex-1 text-center md:text-left">
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{t('home.promoTitle')}</h3>
+          <p className="mt-2.5 text-sm sm:text-base text-gray-300 max-w-2xl leading-relaxed">{t('home.promoText')}</p>
         </div>
         <button
           onClick={() => navigate('/create-listing')}
-          className="shrink-0 inline-flex items-center gap-2 px-6 py-3 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold rounded-xl transition shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]"
+          className="relative shrink-0 inline-flex items-center gap-2 px-6 py-3.5 bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold rounded-xl transition shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] hover:scale-[1.02] active:scale-95"
         >
           <PlusCircle className="w-5 h-5" />
           {t('home.promoBtn')}

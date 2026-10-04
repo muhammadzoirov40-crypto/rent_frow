@@ -107,7 +107,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="group block bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-[0_2px_12px_-6px_rgba(17,24,39,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-[rgb(var(--accent-rgb)/0.4)] hover:shadow-[0_18px_40px_-18px_rgba(255,107,53,0.45)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-rgb)/0.7)] focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0F1115]"
+      className="group block bg-white dark:bg-[#111827] rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_20px_-6px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.6)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
     >
       <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800 overflow-hidden">
         {imageUrl ? (

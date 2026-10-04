@@ -55,8 +55,8 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   return (
     <aside
       className={`hidden md:flex flex-col shrink-0 sticky top-[var(--header-h)] h-[calc(100vh_-_var(--header-h))] overflow-y-auto
-        bg-white dark:bg-gradient-to-b dark:from-[#1A1A2E] dark:via-[#171730] dark:to-[#12122a]
-        border-r border-gray-200 dark:border-white/10
+        bg-white dark:bg-[#0f172a]
+        border-r border-gray-200/80 dark:border-white/10
         transition-[width] duration-300 ease-out ${collapsed ? 'w-[76px]' : 'w-64'}`}
     >
       <div className={collapsed ? 'p-3' : 'p-4'}>

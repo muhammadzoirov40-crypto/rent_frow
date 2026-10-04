@@ -124,9 +124,9 @@ export default function CategoryExplorer() {
             <button
               key={cat.id}
               onClick={() => navigate(`/search?category_id=${cat.id}`)}
-              className="group text-left bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 rounded-xl p-4 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[0_10px_30px_-18px_rgba(255,107,53,0.55)] transition"
+              className="group text-left bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 rounded-2xl p-4.5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[0_14px_30px_-10px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_14px_30px_-10px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="w-11 h-11 rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] transition">
+              <div className="w-12 h-12 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-300">
                 {cat.image_url ? (
                   <img src={cat.image_url} alt="" className="w-6 h-6 object-contain" loading="lazy" />
                 ) : (

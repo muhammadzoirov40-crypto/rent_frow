@@ -32,7 +32,7 @@ export function HowItWorksSection() {
         {STEPS.map((step, idx) => (
           <div
             key={step.titleKey}
-            className="rounded-xl bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 p-5 hover:border-[rgb(var(--accent-rgb)/0.4)] transition"
+            className="rounded-2xl bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 p-5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
           >
             <div className="flex items-center gap-3 mb-3">
               <span className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center">
@@ -87,8 +87,8 @@ export function BecomeSection() {
             key={card.to}
             className={`rounded-2xl border p-6 flex flex-col gap-4 ${
               card.primary
-                ? 'bg-[#1A1A2E] dark:bg-[#12141a] border-gray-800 dark:border-white/10'
-                : 'bg-white dark:bg-[#12141a] border-gray-200 dark:border-white/10'
+                ? 'bg-[#0f172a] dark:bg-[#111827] border-gray-800 dark:border-white/10 text-white shadow-xl shadow-slate-900/10'
+                : 'bg-white dark:bg-[#111827] border-gray-200/80 dark:border-white/10 shadow-sm'
             }`}
           >
             <span

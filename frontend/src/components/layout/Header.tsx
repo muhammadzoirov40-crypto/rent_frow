@@ -19,6 +19,7 @@ import {
   Globe,
   Settings,
   Shield,
+  PlusCircle,
 } from 'lucide-react'
 import MobileSidebar from './MobileSidebar'
 import SubNavbar from './SubNavbar'
@@ -141,7 +142,7 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className="site-header fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1A1A2E] shadow-sm border-b border-gray-100 dark:border-white/10"
+      className="site-header fixed top-0 left-0 right-0 z-50 bg-white/85 dark:bg-[#0b0f19]/85 backdrop-blur-xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] border-b border-gray-200/70 dark:border-white/10 transition-colors"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
@@ -201,6 +202,14 @@ export default function Header() {
 
             {isAuthenticated && user ? (
               <>
+                <Link
+                  to="/create-listing"
+                  className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-sm shadow-[rgb(var(--accent-rgb)/0.25)] transition-all hover:-translate-y-0.5 active:scale-95 whitespace-nowrap ml-1 mr-1"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>{t('nav.createListing')}</span>
+                </Link>
+
                 <Link
                   to="/favorites"
                   className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"

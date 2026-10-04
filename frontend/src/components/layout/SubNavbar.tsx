@@ -22,7 +22,7 @@ import { PRICE_PRESETS } from '../../utils/searchPresets';
 type PanelId = 'mega' | 'city' | 'price';
 
 const panelCls =
-  'absolute top-full mt-2 bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 z-50 overflow-hidden';
+  'absolute top-full mt-2 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-gray-200/70 dark:border-white/10 z-50 overflow-hidden';
 
 const dropdownBtnCls = (open: boolean) =>
   `h-8 md:h-9 px-2.5 inline-flex items-center gap-1.5 rounded-xl border text-[13px] font-bold whitespace-nowrap transition ${
