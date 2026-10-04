@@ -777,13 +777,19 @@ export default function ListingPage() {
                     <span className="text-sm text-gray-500 dark:text-gray-400">({listingReviews.length})</span>
                   </div>
                   {listing.owner.phone && (
-                    <button
-                      onClick={() => setShowPhone(!showPhone)}
-                      className="w-full border border-gray-200 dark:border-white/10 text-[#1A1A2E] dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 font-medium py-2.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
+                    <a
+                      href={`tel:${listing.owner.phone.replace(/[^+\d]/g, '')}`}
+                      onClick={() => setShowPhone(true)}
+                      title={t('listing.callOwner')}
+                      className="w-full border border-[rgb(var(--accent-rgb)/0.45)] text-[var(--accent)] hover:bg-[var(--accent)] hover:border-[var(--accent)] hover:text-white font-semibold py-2.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm"
                     >
                       <Phone size={16} />
-                      {showPhone ? listing.owner.phone : t('listing.showPhone')}
-                    </button>
+                      {showPhone ? (
+                        <span dir="ltr" className="tabular-nums">{listing.owner.phone}</span>
+                      ) : (
+                        t('listing.callOwner')
+                      )}
+                    </a>
                   )}
                 </div>
               )}
