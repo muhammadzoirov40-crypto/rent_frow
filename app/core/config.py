@@ -38,6 +38,11 @@ class Settings(BaseSettings):
     # Every wallet starts here (сомони) so the balance flow is usable out of
     # the box. A real deployment would start users at 0 and top up for real.
     WALLET_STARTING_BALANCE: float = 500.0
+    # The balance ships switched OFF: the visitor never sees a balance, a
+    # rental request never reserves money, and no top-up can be prepared.
+    # The whole money layer stays in the code - flip this one switch (and the
+    # matching frontend/src/config/features.ts) to bring it back.
+    WALLET_ENABLED: bool = True
     # --- DC City / pay.dc.tj (Dushanbe City) top-ups ------------------------
     # The payment link is public anyway - it is what the user is sent to - so
     # the account and articul may live here. The webhook secret is different:

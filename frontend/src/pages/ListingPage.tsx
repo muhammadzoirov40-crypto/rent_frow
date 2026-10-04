@@ -32,6 +32,7 @@ import { previousPath } from '../utils/navHistory';
 import { rememberViewed } from '../utils/recentlyViewed';
 import { formatAmount, formatPriceUnit } from '../utils/format';
 import { wallet, canAfford, openTopUp, topUpFor } from '../utils/wallet';
+import { WALLET_ENABLED } from '../config/features';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 import LocationMap from '../components/search/LocationMap';
 
@@ -90,7 +91,7 @@ export default function ListingPage() {
   const { data: walletSummary, refetch: refetchWallet } = useQuery({
     queryKey: ['wallet'],
     queryFn: () => wallet.get(),
-    enabled: isAuthenticated,
+    enabled: isAuthenticated && WALLET_ENABLED,
   });
   const balance = walletSummary?.balance ?? 0;
   const held = walletSummary?.held ?? 0;
@@ -229,13 +230,17 @@ export default function ListingPage() {
     if (!listing) return;
     // Balance validation: TOTAL = price × duration. The number is read back
     // from the backend right before deciding — the browser never decides.
-    const needed = Math.round(
-      rentalSubtotal(listing.price, listing.price_unit, rentalDays(startDate, endDate)),
-    );
-    const fresh = await refetchWallet();
-    if (!canAfford(fresh.data?.balance, needed)) {
-      toast.error(t('booking.insufficientFunds'));
-      return;
+    // With the balance switched off there is nothing to read and nobody to
+    // judge, so the dialog opens straight away.
+    if (WALLET_ENABLED) {
+      const needed = Math.round(
+        rentalSubtotal(listing.price, listing.price_unit, rentalDays(startDate, endDate)),
+      );
+      const fresh = await refetchWallet();
+      if (!canAfford(fresh.data?.balance, needed)) {
+        toast.error(t('booking.insufficientFunds'));
+        return;
+      }
     }
     setShowConfirm(true);
   };
@@ -343,8 +348,10 @@ export default function ListingPage() {
   // Not enough balance -> the request cannot go through, so the button that
   // would send one steps back and the red block above it says why. Only a
   // signed-in renter is judged: a visitor has no balance yet and this button
-  // still has to carry them to the login screen.
+  // still has to carry them to the login screen. With the balance switched
+  // off nobody is judged at all.
   const shortOnBalance =
+    WALLET_ENABLED &&
     isAuthenticated && !!startDate && !!endDate && !canAfford(balance, total);
 
   return (
@@ -626,7 +633,7 @@ export default function ListingPage() {
                         {formatAmount(total)} {t('common.somoni')}
                       </span>
                     </div>
-                    {isAuthenticated && (
+                    {WALLET_ENABLED && isAuthenticated && (
                       <>
                         <div className="flex items-center justify-between pt-2 border-t border-dashed border-gray-200 dark:border-white/10">
                           <span className="text-sm text-gray-500 dark:text-gray-400">{t('booking.yourBalance')}</span>
@@ -644,7 +651,7 @@ export default function ListingPage() {
                         )}
                       </>
                     )}
-                    {isAuthenticated && startDate && endDate && !canAfford(balance, total) && (
+                    {WALLET_ENABLED && isAuthenticated && startDate && endDate && !canAfford(balance, total) && (
                       <div className="rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 p-3 text-xs text-red-600 dark:text-red-400">
                         <p className="font-bold">{t('booking.insufficientFunds')}</p>
                         <p className="mt-1">
@@ -1003,13 +1010,15 @@ export default function ListingPage() {
                   {formatAmount(total)} {t('common.somoni')}
                 </span>
               </div>
-              <div className="flex justify-between gap-4 pt-1.5 border-t border-dashed border-gray-200 dark:border-white/10">
-                <span className="text-gray-500 dark:text-gray-400">{t('booking.yourBalance')}</span>
-                <span className={`font-bold ${canAfford(balance, total) ? 'text-[#16a34a]' : 'text-red-500'}`}>
-                  {formatAmount(balance)} {t('common.somoni')}
-                </span>
-              </div>
-              {held > 0 && (
+              {WALLET_ENABLED && (
+                <div className="flex justify-between gap-4 pt-1.5 border-t border-dashed border-gray-200 dark:border-white/10">
+                  <span className="text-gray-500 dark:text-gray-400">{t('booking.yourBalance')}</span>
+                  <span className={`font-bold ${canAfford(balance, total) ? 'text-[#16a34a]' : 'text-red-500'}`}>
+                    {formatAmount(balance)} {t('common.somoni')}
+                  </span>
+                </div>
+              )}
+              {WALLET_ENABLED && held > 0 && (
                 <div className="flex justify-between gap-4">
                   <span className="text-gray-500 dark:text-gray-400">{t('booking.heldBalance')}</span>
                   <span className="font-semibold text-amber-600 dark:text-amber-400">
@@ -1018,7 +1027,7 @@ export default function ListingPage() {
                 </div>
               )}
             </div>
-            {!canAfford(balance, total) && (
+            {WALLET_ENABLED && !canAfford(balance, total) && (
               <div className="-mt-3 mb-5 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 p-3 text-sm text-red-600 dark:text-red-400">
                 <div className="flex items-start gap-2">
                   <AlertTriangle size={16} className="shrink-0 mt-0.5" />
@@ -1051,7 +1060,7 @@ export default function ListingPage() {
               <button
                 type="button"
                 onClick={() => rentalMutation.mutate()}
-                disabled={rentalMutation.isPending || !canAfford(balance, total)}
+                disabled={rentalMutation.isPending || (WALLET_ENABLED && !canAfford(balance, total))}
                 className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:opacity-60 transition flex items-center gap-2"
               >
                 {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.confirm')}

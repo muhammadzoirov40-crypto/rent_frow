@@ -13,25 +13,16 @@ interface LayoutProps {
   children: React.ReactNode
 }
 
-// The left rail is the signed-in app's navigation. The marketing and browsing
-// pages keep the whole width — the header already carries their navigation
-// there, and a rail beside the hero just steals the room the hero needs.
-const APP_ROUTES = [
-  '/create-listing',
-  '/favorites',
-  '/messages',
-  '/profile',
-  '/rental-requests',
-  '/notifications',
-  '/settings',
-  '/admin',
-]
+// The left rail is the site's navigation: it goes on every page that wears
+// the site chrome, the marketing pages included. Only the auth screens keep
+// the whole width (there is nothing to navigate to before signing in), and
+// the full-screen dashboards sit outside this layout entirely.
 
 export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const isAuthPage = pathname === '/login' || pathname === '/register'
-  const showSidebar = !isAuthPage && APP_ROUTES.some((route) => pathname.startsWith(route))
+  const showSidebar = !isAuthPage
   const { isAuthenticated } = useAuthStore()
   const { isLoading } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(

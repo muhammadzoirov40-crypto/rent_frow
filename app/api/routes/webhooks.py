@@ -57,6 +57,12 @@ def first(payload: dict, keys) -> str | None:
 @router.post("/pay-dc")
 async def pay_dc_callback(request: Request, db: AsyncSession = Depends(get_db)):
     settings = get_settings()
+
+    # The balance is switched off, so there is nothing for a payment to land
+    # in. Answering plainly beats pretending the callback was understood.
+    if not settings.WALLET_ENABLED:
+        raise HTTPException(status_code=503, detail="WALLET_DISABLED")
+
     payload = await read_payload(request)
 
     # Nothing may be credited until DC City registers this endpoint with us

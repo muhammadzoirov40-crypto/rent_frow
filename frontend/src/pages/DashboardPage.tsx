@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { WALLET_ENABLED } from '../config/features';
 import { Link } from 'react-router-dom';
 import { AlertCircle, ArrowDownRight, ArrowUpRight, CalendarCheck, CheckCircle2, ClipboardList, Clock, DollarSign, Home, Inbox, LayoutGrid, MessageSquare, Percent, PlusCircle, Ticket } from 'lucide-react';
 import {
@@ -508,7 +509,7 @@ export default function DashboardPage() {
     if (active === 'listings') return isOwnerLike ? <ListingsSection /> : ownerOnlyPanel;
     if (active === 'bookings') return isOwnerLike ? <BookingsSection /> : ownerOnlyPanel;
     if (active === 'earnings') return isOwnerLike ? <EarningsSection /> : ownerOnlyPanel;
-    if (active === 'wallet') return <WalletSection />;
+    if (active === 'wallet') return WALLET_ENABLED ? <WalletSection /> : renderOverview();
     if (active === 'calendar') return isOwnerLike ? <CalendarSection /> : ownerOnlyPanel;
     if (active === 'reviews') return isOwnerLike ? <ReviewsSection /> : ownerOnlyPanel;
     if (active === 'messages') return <MessagesSection />;

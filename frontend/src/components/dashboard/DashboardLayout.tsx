@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { WALLET_ENABLED } from '../../config/features';
 import {
   LayoutDashboard,
   LayoutGrid,
@@ -89,6 +90,8 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
   const visibleItems = navItems.filter(
     (item) =>
       (isOwnerLike || !item.ownerOnly) &&
+      // The balance ships switched off: no row in the menu, no section behind it.
+      (WALLET_ENABLED || item.key !== 'wallet') &&
       (!query.trim() ? true : item.label.toLowerCase().includes(query.trim().toLowerCase()))
   );
 

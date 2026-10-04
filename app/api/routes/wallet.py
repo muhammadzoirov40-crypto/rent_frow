@@ -86,6 +86,8 @@ async def top_up_balance(
     Tests flip ``WALLET_ALLOW_MANUAL_TOPUP`` to exercise the ledger directly.
     """
     settings = get_settings()
+    if not settings.WALLET_ENABLED:
+        raise HTTPException(status_code=403, detail="WALLET_DISABLED")
     if not current_user.is_admin and not settings.WALLET_ALLOW_MANUAL_TOPUP:
         raise HTTPException(status_code=403, detail="TOPUP_ADMIN_ONLY")
 
@@ -109,6 +111,8 @@ async def prepare_top_up(
     reference that travels in the link's ``f3`` and comes back with the
     callback.
     """
+    if not get_settings().WALLET_ENABLED:
+        raise HTTPException(status_code=403, detail="WALLET_DISABLED")
     data = await topup_service.prepare(db, current_user.user_id, payload.amount)
     return APIResponse(message="Payment link created", data=TopupPrepareResponse(**data))
 
@@ -121,6 +125,8 @@ async def list_top_ups(
     db: AsyncSession = Depends(get_db),
 ):
     """Pending and settled top-ups, so money on its way is never invisible."""
+    if not get_settings().WALLET_ENABLED:
+        raise HTTPException(status_code=403, detail="WALLET_DISABLED")
     rows = await topup_service.intents(db, current_user.user_id, page_size)
     return PaginatedResponse(
         data=[TopupIntentResponse.model_validate(r) for r in rows],
@@ -148,6 +154,8 @@ async def confirm_top_up(
     Admin only: a customer must never be able to stamp their own payment as
     paid.
     """
+    if not get_settings().WALLET_ENABLED:
+        raise HTTPException(status_code=403, detail="WALLET_DISABLED")
     row = await topup_service.find(db, reference)
     if row is None:
         raise HTTPException(status_code=404, detail="TOPUP_NOT_FOUND")

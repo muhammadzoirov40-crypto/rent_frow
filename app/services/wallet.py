@@ -68,6 +68,9 @@ class WalletService:
         }
 
     async def can_afford(self, user_id: int, amount: float) -> bool:
+        # With the balance switched off nothing is ever short.
+        if not get_settings().WALLET_ENABLED:
+            return True
         wallet = await self.get_or_create(user_id)
         return money(wallet.balance) >= money(amount)
 
@@ -105,6 +108,8 @@ class WalletService:
         is an explicit manual credit - swap this one method for a provider and
         nothing else in the flow has to change."""
         amount = money(amount)
+        if not get_settings().WALLET_ENABLED:
+            raise HTTPException(status_code=403, detail="WALLET_DISABLED")
         if amount <= 0:
             raise HTTPException(status_code=400, detail="Amount must be greater than zero")
         if amount > 1_000_000:
@@ -132,6 +137,9 @@ class WalletService:
         Raises INSUFFICIENT_BALANCE when the renter cannot cover it, and does
         nothing (returns None) when this request is already held.
         """
+        # No balance, no reservation: the request just goes through.
+        if not get_settings().WALLET_ENABLED:
+            return None
         amount = money(amount)
         if amount <= 0:
             return None
