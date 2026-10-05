@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.core.dependencies import require_admin, require_auth, require_customer, CurrentUser
+from app.core.dependencies import require_admin, require_auth, CurrentUser
 from app.schemas.payment import PaymentCreate, PaymentResponse, PaymentConfirm
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.payment import PaymentService
@@ -9,11 +9,18 @@ from app.core.enums import PaymentStatus
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
 
+# Who may act on a payment is decided by the payment itself - is this caller
+# the renter who paid, the owner who confirms, the customer of this booking - 
+# not by the role their account happens to carry. That distinction matters:
+# an OWNER who rents from somebody else must still be able to pay, and the
+# service below already refuses anybody who is not on the request. A role gate
+# here only ever refused people who were entitled to it.
+
 
 @router.post("", response_model=APIResponse[PaymentResponse])
 async def create_payment(
     data: PaymentCreate,
-    current_user: CurrentUser = Depends(require_customer),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = PaymentService(db)
@@ -26,7 +33,7 @@ async def list_my_payments(
     status: PaymentStatus | None = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
-    current_user: CurrentUser = Depends(require_customer),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = PaymentService(db)
@@ -56,11 +63,13 @@ async def list_all_payments(
 @router.get("/booking/{booking_id}", response_model=APIResponse[list[PaymentResponse]])
 async def get_booking_payments(
     booking_id: int,
-    current_user: CurrentUser = Depends(require_customer),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = PaymentService(db)
-    payments = await service.get_by_booking(booking_id)
+    payments = await service.payments_for_booking(
+        booking_id, current_user.user_id, current_user.is_admin
+    )
     return APIResponse(data=payments)
 
 
@@ -85,7 +94,7 @@ async def get_rental_request_payments(
 @router.get("/{payment_id}", response_model=APIResponse[PaymentResponse])
 async def get_payment(
     payment_id: int,
-    current_user: CurrentUser = Depends(require_customer),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = PaymentService(db)

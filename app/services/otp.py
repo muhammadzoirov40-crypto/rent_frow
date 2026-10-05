@@ -1,6 +1,7 @@
 import json
-import random
+import secrets
 import smtplib
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -27,7 +28,85 @@ def _log(message: str) -> None:
 
 
 def generate_otp() -> str:
-    return str(random.randint(100000, 999999))
+    """A code an attacker cannot predict.
+
+    ``random`` is a Mersenne twister seeded from the clock: anyone who sees a
+    handful of codes can recover the state and forecast the next one, which
+    would hand them login for free. ``secrets`` reads from the OS CSPRNG.
+    """
+    return f"{secrets.randbelow(900000) + 100000}"
+
+
+# ---------------------------------------------------------------- rate limits
+class _WindowCounter:
+    """Fixed-window attempt counter, kept in this process's memory.
+
+    RentHub runs as one uvicorn process, so memory *is* the shared state. It is
+    deliberately not a cache of anything the user owns: the worst a restart does
+    is forgive a few failed attempts, and the worst a bug does is ask a real
+    user to wait out a window. Both fail towards "ask again later", never
+    towards "let the brute force through".
+    """
+
+    def __init__(self) -> None:
+        self._hits: dict[str, list[float]] = {}
+        self._lock = threading.Lock()
+
+    def check(self, key: str, max_hits: int, window: int) -> bool:
+        """True while this key still has attempts left. Records nothing."""
+        now = time.monotonic()
+        with self._lock:
+            live = [t for t in self._hits.get(key, ()) if now - t < window]
+            self._hits[key] = live
+            return len(live) < max_hits
+
+    def record(self, key: str, window: int) -> None:
+        now = time.monotonic()
+        with self._lock:
+            live = [t for t in self._hits.get(key, ()) if now - t < window]
+            live.append(now)
+            self._hits[key] = live
+
+    def reset(self, key: str) -> None:
+        with self._lock:
+            self._hits.pop(key, None)
+
+    def clear(self) -> None:
+        with self._lock:
+            self._hits.clear()
+
+
+# The send and the verify counters answer different questions - "may this
+# address ask again" and "is this address guessing" - so they never share a
+# bucket: a burst of sends must not hide a burst of wrong codes.
+_send_counter = _WindowCounter()
+_verify_counter = _WindowCounter()
+
+
+def reset_rate_limits() -> None:
+    """Used by the tests, which would otherwise inherit each other's windows."""
+    _send_counter.clear()
+    _verify_counter.clear()
+
+
+def allow_send(email: str, ip: str | None) -> tuple[bool, int]:
+    """(allowed, retry_after_seconds) for one more code to this address."""
+    settings = get_settings()
+    for key, limit in (
+        (f"send:email:{email.strip().lower()}", settings.OTP_SEND_MAX),
+        (f"send:ip:{ip or 'unknown'}", settings.OTP_SEND_IP_MAX),
+    ):
+        if not _send_counter.check(key, limit, settings.OTP_SEND_WINDOW_SECONDS):
+            return False, settings.OTP_SEND_WINDOW_SECONDS
+    return True, 0
+
+
+def record_send(email: str, ip: str | None) -> None:
+    settings = get_settings()
+    window = settings.OTP_SEND_WINDOW_SECONDS
+    _send_counter.record(f"send:email:{email.strip().lower()}", window)
+    if ip:
+        _send_counter.record(f"send:ip:{ip}", window)
 
 
 async def save_otp(db: AsyncSession, email: str, code: str) -> None:
@@ -42,21 +121,58 @@ async def save_otp(db: AsyncSession, email: str, code: str) -> None:
 
 
 async def verify_otp(db: AsyncSession, email: str, code: str) -> bool:
+    """Consume a code the caller was actually sent - and nothing else.
+
+    Three things a login check has to get right:
+
+    * **no brute force.** A 6-digit code is guessable in bulk, so a wrong guess
+      is counted and, past ``OTP_VERIFY_MAX_WRONG``, every outstanding code for
+      that address is burned and the caller is told to slow down (429). One
+      right guess clears the counter, so nobody is punished for a typo.
+    * **no timing leak.** The code comes back from the database by email, then
+      is compared with ``secrets.compare_digest`` rather than in SQL, so the
+      response time does not narrow the search.
+    * **no replay.** The row is marked used in the same transaction that
+      consumed it.
+    """
+    settings = get_settings()
+    key = f"verify:{email.strip().lower()}"
+    window = settings.OTP_VERIFY_WINDOW_SECONDS
+    if not _verify_counter.check(key, settings.OTP_VERIFY_MAX_WRONG, window):
+        raise HTTPException(status_code=429, detail="TOO_MANY_OTP_ATTEMPTS")
+
     now = datetime.utcnow()
     result = await db.execute(
         select(OtpCode).where(
             OtpCode.email == email,
-            OtpCode.code == code,
             OtpCode.used == False,
             OtpCode.expires_at > now,
         )
     )
-    otp = result.scalar_one_or_none()
-    if otp:
-        otp.used = True
-        await db.flush()
-        return True
-    return False
+    otp = None
+    for candidate in result.scalars():
+        if secrets.compare_digest(str(candidate.code), str(code)):
+            otp = candidate
+            break
+
+    if otp is None:
+        _verify_counter.record(key, window)
+        if not _verify_counter.check(key, settings.OTP_VERIFY_MAX_WRONG, window):
+            # Out of guesses: the code the attacker was aiming at dies with the
+            # attempt, so the window that just closed cannot be replayed.
+            await db.execute(
+                update(OtpCode)
+                .where(OtpCode.email == email, OtpCode.used == False)
+                .values(used=True)
+            )
+            await db.flush()
+            raise HTTPException(status_code=429, detail="TOO_MANY_OTP_ATTEMPTS")
+        return False
+
+    _verify_counter.reset(key)
+    otp.used = True
+    await db.flush()
+    return True
 
 
 def _otp_subject(code: str) -> str:

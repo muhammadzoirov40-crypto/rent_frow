@@ -59,6 +59,23 @@ class Settings(BaseSettings):
     # tests - by this switch, never by the user's own POST.
     WALLET_ALLOW_MANUAL_TOPUP: bool = False
     OTP_EXPIRE_MINUTES: int = 10
+    # --- OTP abuse limits -------------------------------------------------
+    # A 6-digit code is 900 000 possibilities, so an attacker only needs to be
+    # lucky once unless something stops them asking. Two limits, both keyed on
+    # the email (the thing the attacker controls) plus one per caller IP:
+    #
+    #   * sending: how many codes one address may request in the window, and
+    #     how many any single IP may request - this is the email-bomb stopper;
+    #   * checking: how many *wrong* codes one address may submit before every
+    #     outstanding code for it is voided and the window starts over.
+    #
+    # A correct code resets the checking counter, so a real user who mistypes
+    # twice is never locked out of a code they were legitimately sent.
+    OTP_SEND_MAX: int = 5
+    OTP_SEND_WINDOW_SECONDS: int = 600
+    OTP_SEND_IP_MAX: int = 30
+    OTP_VERIFY_MAX_WRONG: int = 5
+    OTP_VERIFY_WINDOW_SECONDS: int = 900
     JWT_ALGORITHM: str = "HS256"
 
     S3_ENDPOINT: str = "http://localhost:9000"

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, UploadFile, File
+from fastapi import APIRouter, Depends, Request, UploadFile, File
 from fastapi import HTTPException, status as http_status
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,7 +9,14 @@ from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, SendO
 from app.schemas.user import UserResponse, UpdateProfileRequest
 from app.schemas.base import APIResponse
 from app.services.auth import AuthService
-from app.services.otp import generate_otp, save_otp, send_otp_email, verify_otp
+from app.services.otp import (
+    allow_send,
+    generate_otp,
+    record_send,
+    save_otp,
+    send_otp_email,
+    verify_otp,
+)
 from app.repositories.user import UserRepository
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -18,14 +25,40 @@ ALLOWED_AVATAR_TYPES = {"image/jpeg", "image/jpg", "image/png"}
 MAX_AVATAR_SIZE = 5 * 1024 * 1024  # 5MB
 
 
+def caller_ip(request: Request) -> str:
+    """The address the rate limiter counts against.
+
+    nginx terminates TLS and passes the real client in ``X-Forwarded-For``;
+    ``request.client`` would otherwise be 127.0.0.1 for everybody, which makes
+    the per-IP limit one shared bucket for the whole internet. The header is
+    only trusted because the only thing behind it is our own proxy - the
+    backend port is not published.
+    """
+    forwarded = request.headers.get("x-forwarded-for", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 @router.post("/send-otp", response_model=APIResponse[dict])
-async def send_otp(data: SendOtpRequest, db: AsyncSession = Depends(get_db)):
+async def send_otp(data: SendOtpRequest, request: Request, db: AsyncSession = Depends(get_db)):
     """Send OTP to email for login or registration."""
     settings = get_settings()
+    ip = caller_ip(request)
+
+    allowed, retry_after = allow_send(data.email, ip)
+    if not allowed:
+        raise HTTPException(
+            status_code=http_status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="TOO_MANY_OTP_REQUESTS",
+            headers={"Retry-After": str(retry_after)},
+        )
+
     repo = UserRepository(db)
     existing = await repo.get_by_email(data.email)
     code = generate_otp()
     await save_otp(db, data.email, code)
+    record_send(data.email, ip)
     sent_via_email = await asyncio.to_thread(send_otp_email, data.email, code)
     dev_code = code if settings.DEBUG else None
     if not sent_via_email and dev_code is None:

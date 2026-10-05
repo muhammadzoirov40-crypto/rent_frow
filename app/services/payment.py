@@ -189,6 +189,25 @@ class PaymentService:
     async def get_by_booking(self, booking_id: int) -> list[Payment]:
         return await self.payment_repo.get_by_booking_id(booking_id)
 
+    async def payments_for_booking(
+        self, booking_id: int, user_id: int, is_admin: bool = False
+    ) -> list[Payment]:
+        """What has been paid against one booking - to its own customer, or to
+        an admin.
+
+        The plain ``get_by_booking`` answers any question put to it, so a route
+        that uses it has to establish who is asking first; this is that check,
+        in the same shape as ``payments_for_request``. Without it, switching the
+        route from a role gate to an identity gate would have opened somebody
+        else's payment history to everyone.
+        """
+        booking = await self.booking_repo.get_by_id(booking_id)
+        if not booking:
+            raise HTTPException(status_code=404, detail="Booking not found")
+        if not is_admin and booking.customer_id != user_id:
+            raise HTTPException(status_code=403, detail="Access denied")
+        return await self.payment_repo.get_by_booking_id(booking_id)
+
     async def get_by_rental_request(self, rental_request_id: int) -> list[Payment]:
         return await self.payment_repo.get_by_rental_request_id(rental_request_id)
 

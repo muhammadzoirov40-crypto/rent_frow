@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.core.dependencies import require_admin, require_customer, CurrentUser
+from app.core.dependencies import require_admin, require_auth, CurrentUser
 from app.schemas.rental import RentalResponse, ReturnRequest
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.rental import RentalService
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/rentals", tags=["Rentals"])
 async def list_my_rentals(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
-    current_user: CurrentUser = Depends(require_customer),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = RentalService(db)
@@ -42,7 +42,7 @@ async def list_all_rentals(
 @router.get("/{rental_id}", response_model=APIResponse[RentalResponse])
 async def get_rental(
     rental_id: int,
-    current_user: CurrentUser = Depends(require_customer),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = RentalService(db)
@@ -56,7 +56,7 @@ async def get_rental(
 @router.post("/{rental_id}/request-return", response_model=APIResponse[RentalResponse])
 async def request_return(
     rental_id: int,
-    current_user: CurrentUser = Depends(require_customer),
+    current_user: CurrentUser = Depends(require_auth),
     db: AsyncSession = Depends(get_db),
 ):
     service = RentalService(db)

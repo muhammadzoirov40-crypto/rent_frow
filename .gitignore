@@ -16,7 +16,9 @@ build/
 htmlcov/
 .coverage
 uploads/
-frontend copy/
+# the abandoned copy lives on under _archive/ (nothing is deleted); this only
+# stops a fresh duplicate from ever being re-added at the root
+/frontend copy/
 node_modules/
 *.log
 backend.pid
