@@ -1,0 +1,139 @@
+name: tests
+
+# The review this workflow answers: "tests don't run in CI". Two independent
+# jobs - one proves the migrations build a PostgreSQL schema from nothing,
+# one runs the suite against PostgreSQL - so a red build means the change
+# under review broke something real, not just that it was not tried.
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  migrations:
+    name: Migrations (fresh PostgreSQL)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: rentflow
+          POSTGRES_PASSWORD: rentflow
+          POSTGRES_DB: rentflow_migrate
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rentflow -d rentflow_migrate"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # alembic/env.py reads this first; the app's own URL is never used here.
+      ALEMBIC_DATABASE_URL: postgresql+psycopg2://rentflow:rentflow@localhost:5432/rentflow_migrate
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Build the schema from nothing
+        run: alembic upgrade head
+
+      - name: Run them again - a second run must change nothing
+        run: alembic upgrade head
+
+      - name: The schema matches what the models declare
+        run: |
+          python - <<'PY'
+          import os
+          import sqlalchemy as sa
+
+          from app.core.database import Base
+          from app.models import *  # noqa: F401,F403
+
+          engine = sa.create_engine(os.environ["ALEMBIC_DATABASE_URL"])
+          inspector = sa.inspect(engine)
+          built = set(inspector.get_table_names()) - {"alembic_version"}
+          declared = set(Base.metadata.tables)
+          assert built == declared, (
+              f"only in the migration {sorted(built - declared)} / "
+              f"only in the models {sorted(declared - built)}"
+          )
+          print(f"{len(built)} tables, identical to the models")
+          PY
+
+  backend:
+    name: Backend tests (pytest)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: rentflow
+          POSTGRES_PASSWORD: rentflow
+          POSTGRES_DB: rentflow_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U rentflow -d rentflow_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # The exact default conftest.py falls back to - stated so the job does
+      # not depend on that default staying where it is.
+      TEST_DATABASE_URL: postgresql+asyncpg://rentflow:rentflow@localhost:5432/rentflow_test
+      # Same database for the application's engine, which otherwise points at
+      # a `rentflow` database this job never creates.
+      DATABASE_URL: postgresql+asyncpg://rentflow:rentflow@localhost:5432/rentflow_test
+      # No mail server in CI; conftest.py sets this too, kept here so nobody
+      # has to read conftest to know why no email is sent.
+      EMAIL_ENABLED: "false"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install --upgrade pip && pip install -r requirements.txt
+
+      - name: Run the suite
+        run: python -m pytest tests/ -q
+
+  frontend:
+    name: Frontend (types + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build

@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.core.config import get_settings
-from app.core.database import engine, Base
+from app.core.database import engine
 from app.core.migrations import run_schema_migrations
 from app.api.router import api_router
 
@@ -16,14 +16,13 @@ UPLOAD_DIR = Path("uploads")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    # Alembic is the only thing that decides what the schema looks like:
+    # an empty database is built from the revisions, one written by the old
+    # startup code is stamped and caught up, an up-to-date one is left alone.
     try:
         applied = await run_schema_migrations(engine)
-        if applied:
-            print("Schema migrations applied:")
-            for change in applied:
-                print(f"  - {change}")
+        for change in applied:
+            print(f"  - {change}")
     except Exception as e:
         print(f"Schema migrations skipped: {e}")
     UPLOAD_DIR.mkdir(exist_ok=True)

@@ -388,107 +388,109 @@ async def test_only_the_people_on_a_request_can_read_its_payments(
 # --------------------------------------------------------------------------
 # the production schema itself — RentHub runs on SQLite, which has no
 # ALTER TABLE ... DROP NOT NULL, so the migration has to rebuild the table
+#
+# The rebuild lives in the Alembic revision, not in application code, so the
+# tests reach it there: the file is loaded by path (alembic/versions is not a
+# package) and the function is handed a plain connection, exactly as the
+# migration itself calls it.
 # --------------------------------------------------------------------------
-@pytest.mark.asyncio
-async def test_sqlite_rebuild_makes_booking_id_nullable_without_losing_anything():
+_OLD_PAYMENTS_DDL = (
+    "CREATE TABLE payments ("
+    " id INTEGER NOT NULL PRIMARY KEY,"
+    " booking_id INTEGER NOT NULL,"
+    " customer_id INTEGER NOT NULL,"
+    " amount NUMERIC NOT NULL,"
+    " payment_type VARCHAR(8) NOT NULL,"
+    " status VARCHAR(8) NOT NULL,"
+    " transaction_id VARCHAR(255),"
+    " created_at TIMESTAMP NOT NULL)"
+)
+
+
+def _load_catch_up_revision():
+    import importlib.util
+    from pathlib import Path
+
+    path = (
+        Path(__file__).resolve().parents[1]
+        / "alembic"
+        / "versions"
+        / "a1c7f0d42b93_catch_up_with_models.py"
+    )
+    spec = importlib.util.spec_from_file_location("catch_up_migration", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _payments_state(conn):
     from sqlalchemy import text
-    from sqlalchemy.ext.asyncio import create_async_engine
 
-    from app.core.migrations import _allow_payment_to_be_for_a_request
-
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
-    try:
-        async with engine.begin() as conn:
-            await conn.execute(text(
-                "CREATE TABLE payments ("
-                " id INTEGER NOT NULL PRIMARY KEY,"
-                " booking_id INTEGER NOT NULL,"
-                " customer_id INTEGER NOT NULL,"
-                " amount NUMERIC NOT NULL,"
-                " payment_type VARCHAR(8) NOT NULL,"
-                " status VARCHAR(8) NOT NULL,"
-                " transaction_id VARCHAR(255),"
-                " created_at TIMESTAMP NOT NULL)"
-            ))
-            await conn.execute(text(
-                "CREATE INDEX ix_payments_booking_id ON payments (booking_id)"
-            ))
-            await conn.execute(text(
-                "INSERT INTO payments VALUES "
-                "(1, 7, 3, 100, 'BOOKING', 'PAID', 'tx-1', '2026-01-01')"
-            ))
-            # what _add_missing_columns does first
-            await conn.execute(text(
-                "ALTER TABLE payments ADD COLUMN rental_request_id INTEGER"
-            ))
-
-            assert await _allow_payment_to_be_for_a_request(conn, "sqlite") is True
-
-            info = {
-                r[1]: r for r in await conn.execute(text("PRAGMA table_info(payments)"))
-            }
-            assert info["booking_id"][3] == 0, "booking_id is still NOT NULL"
-            assert "rental_request_id" in info
-
-            row = (await conn.execute(text(
-                "SELECT id, booking_id, customer_id, amount, transaction_id, "
-                "rental_request_id FROM payments"
-            ))).one()
-            assert tuple(row) == (1, 7, 3, 100, "tx-1", None), "row was lost"
-
-            idx = [
-                r[0] for r in await conn.execute(text(
-                    "SELECT name FROM sqlite_master WHERE type = 'index' "
-                    "AND tbl_name = 'payments' AND sql IS NOT NULL"
-                ))
-            ]
-            assert "ix_payments_booking_id" in idx, "indexes were not restored"
-
-            # a second start-up must not rebuild anything
-            assert (
-                await _allow_payment_to_be_for_a_request(conn, "sqlite")
-            ) is False
-    finally:
-        await engine.dispose()
+    info = {r[1]: r for r in conn.execute(text("PRAGMA table_info(payments)"))}
+    indexes = [
+        r[0]
+        for r in conn.execute(
+            text(
+                "SELECT name FROM sqlite_master WHERE type = 'index' "
+                "AND tbl_name = 'payments' AND sql IS NOT NULL"
+            )
+        )
+    ]
+    row = conn.execute(
+        text(
+            "SELECT id, booking_id, customer_id, amount, transaction_id, "
+            "rental_request_id FROM payments"
+        )
+    ).one()
+    return info, indexes, tuple(row)
 
 
-@pytest.mark.asyncio
-async def test_sqlite_rebuild_handles_a_table_that_never_got_the_new_column():
+def test_sqlite_rebuild_makes_booking_id_nullable_without_losing_anything():
+    from sqlalchemy import create_engine, text
+
+    rebuild = _load_catch_up_revision()._rebuild_payments_on_sqlite
+
+    engine = create_engine("sqlite:///:memory:")
+    with engine.begin() as conn:
+        conn.execute(text(_OLD_PAYMENTS_DDL))
+        conn.execute(text("CREATE INDEX ix_payments_booking_id ON payments (booking_id)"))
+        conn.execute(
+            text("INSERT INTO payments VALUES (1, 7, 3, 100, 'BOOKING', 'PAID', 'tx-1', '2026-01-01')")
+        )
+        # what the revision's LATE_COLUMNS loop does first
+        conn.execute(text("ALTER TABLE payments ADD COLUMN rental_request_id INTEGER"))
+
+        assert rebuild(conn) is True
+
+        info, indexes, row = _payments_state(conn)
+        assert info["booking_id"][3] == 0, "booking_id is still NOT NULL"
+        assert "rental_request_id" in info
+        assert row == (1, 7, 3, 100, "tx-1", None), "row was lost"
+        assert "ix_payments_booking_id" in indexes, "indexes were not restored"
+
+        # a second start-up must not rebuild anything
+        assert rebuild(conn) is False
+        assert _payments_state(conn) == (info, indexes, row)
+    engine.dispose()
+
+
+def test_sqlite_rebuild_handles_a_table_that_never_got_the_new_column():
     """No ALTER first: the column is added by the rebuild itself."""
-    from sqlalchemy import text
-    from sqlalchemy.ext.asyncio import create_async_engine
+    from sqlalchemy import create_engine, text
 
-    from app.core.migrations import _allow_payment_to_be_for_a_request
+    rebuild = _load_catch_up_revision()._rebuild_payments_on_sqlite
 
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
-    try:
-        async with engine.begin() as conn:
-            await conn.execute(text(
-                "CREATE TABLE payments ("
-                " id INTEGER NOT NULL PRIMARY KEY,"
-                " booking_id INTEGER NOT NULL,"
-                " customer_id INTEGER NOT NULL,"
-                " amount NUMERIC NOT NULL,"
-                " payment_type VARCHAR(8) NOT NULL,"
-                " status VARCHAR(8) NOT NULL,"
-                " transaction_id VARCHAR(255),"
-                " created_at TIMESTAMP NOT NULL)"
-            ))
-            await conn.execute(text(
-                "INSERT INTO payments VALUES "
-                "(1, 7, 3, 100, 'BOOKING', 'PAID', 'tx-1', '2026-01-01')"
-            ))
+    engine = create_engine("sqlite:///:memory:")
+    with engine.begin() as conn:
+        conn.execute(text(_OLD_PAYMENTS_DDL))
+        conn.execute(
+            text("INSERT INTO payments VALUES (1, 7, 3, 100, 'BOOKING', 'PAID', 'tx-1', '2026-01-01')")
+        )
 
-            assert await _allow_payment_to_be_for_a_request(conn, "sqlite") is True
+        assert rebuild(conn) is True
 
-            info = {
-                r[1]: r for r in await conn.execute(text("PRAGMA table_info(payments)"))
-            }
-            assert "rental_request_id" in info
-            assert info["booking_id"][3] == 0
-            row = (await conn.execute(text(
-                "SELECT booking_id, rental_request_id FROM payments"
-            ))).one()
-            assert tuple(row) == (7, None)
-    finally:
-        await engine.dispose()
+        info, indexes, row = _payments_state(conn)
+        assert "rental_request_id" in info
+        assert info["booking_id"][3] == 0
+        assert row == (1, 7, 3, 100, "tx-1", None)
+    engine.dispose()

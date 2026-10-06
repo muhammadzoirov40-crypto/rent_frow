@@ -54,6 +54,20 @@ class RentalRequestService:
     async def _conversation(self, request: RentalRequest):
         """The chat this request lives in, created and tagged on first use."""
         conv = await self.conv_repo.get_by_rental_request(request.id)
+        # The tag can outlive the request it points at. A removed request
+        # leaves its conversation holding a now-free id, and the next request
+        # created takes that id over - so a conversation between two other
+        # people answers for this one. Trusting it would write this rental
+        # into a chat neither party is in (it failed with 403, which is how
+        # it was noticed). Only a conversation between exactly this renter
+        # and this owner counts as the right one.
+        if conv and {conv.user1_id, conv.user2_id} != {
+            request.renter_id,
+            request.owner_id,
+        }:
+            conv.rental_request_id = None
+            await self.db.flush()
+            conv = None
         if not conv:
             conv = await self.conv_repo.get_or_create(
                 request.renter_id, request.owner_id, request.listing_id
