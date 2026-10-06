@@ -22,6 +22,8 @@ import Section from '../components/home/Section';
 import SearchBar from '../components/search/SearchBar';
 import { useGeolocation } from '../hooks/useGeolocation';
 
+import AnimatedHero from '../components/home/AnimatedHero';
+
 export default function HomePage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -35,67 +37,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)]">
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-gray-200/80 dark:border-white/10 bg-gradient-to-b from-gray-50/80 via-white to-gray-50/30 dark:from-[#0d1321] dark:via-[#0b0f19] dark:to-[#0b0f19]">
-        {/* Soft accent gradient backdrop — follows the theme colour (--accent-rgb) */}
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-44 -left-40 h-[34rem] w-[34rem] rounded-full bg-[rgb(var(--accent-rgb)/0.2)] blur-[110px]" />
-          <div className="absolute -bottom-56 -right-28 h-[32rem] w-[32rem] rounded-full bg-[rgb(var(--accent-rgb)/0.13)] blur-[110px]" />
-          <div className="absolute inset-0 bg-gradient-to-br from-[rgb(var(--accent-rgb)/0.06)] via-transparent to-transparent" />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                'radial-gradient(rgb(var(--accent-rgb) / 0.3) 1px, transparent 1px)',
-              backgroundSize: '24px 24px',
-              maskImage: 'radial-gradient(70% 80% at 85% 25%, black 0%, transparent 75%)',
-              WebkitMaskImage: 'radial-gradient(70% 80% at 85% 25%, black 0%, transparent 75%)',
-              opacity: 0.5,
-            }}
-          />
-        </div>
+      {/* Animated Hero matching video design */}
+      <AnimatedHero />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-14 md:pt-16 md:pb-16">
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] text-xs font-bold uppercase tracking-wider mb-5">
-              <Star className="w-3.5 h-3.5" />
-              {t('home.heroKicker')}
-            </span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-[#1A1A2E] dark:text-white leading-[1.08]">
-              <span className="block">{t('home.heroTitle')}</span>
-            </h1>
-            <p className="mt-4 text-base sm:text-lg text-gray-600 dark:text-gray-300 max-w-2xl">
-              {t('home.heroSubtitle')}
-            </p>
-          </div>
-
-          <div className="mt-8 max-w-5xl">
-            <SearchBar />
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <button
-              onClick={() => navigate('/search')}
-              className="inline-flex items-center gap-2 text-sm font-bold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
-            >
-              {t('home.find')}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <a
-              href="#how"
-              className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] transition-colors"
-            >
-              {t('home.howItWorks')}
-            </a>
-            <a
-              href="#categories"
-              className="text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] transition-colors"
-            >
-              {t('home.popularCategories')}
-            </a>
-          </div>
-        </div>
-      </section>
 
       <CategoryExplorer />
 

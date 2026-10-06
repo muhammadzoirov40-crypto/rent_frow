@@ -16,6 +16,7 @@ import {
   Cell,
 } from 'recharts';
 import DashboardLayout, { type DashboardSection } from '../components/dashboard/DashboardLayout';
+import GlassStatsCard from '../components/dashboard/GlassStatsCard';
 import ListingsSection from '../components/dashboard/ListingsSection';
 import BookingsSection from '../components/dashboard/BookingsSection';
 import WalletSection from '../components/dashboard/WalletSection';
@@ -321,29 +322,37 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6" data-testid="overview">
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <MetricCard
+          <GlassStatsCard
             title={t('dashboard.overview.totalRevenue')}
             value={som(summary?.total_revenue ?? 0)}
             change={summary?.revenue_change_pct ?? 0}
-            icon={<DollarSign className="w-5 h-5" />}
+            icon={DollarSign}
+            gradient="from-[#FF6B35]/30 to-[#FF4500]/10"
+            subtitle={t('dashboard.overview.vsPrev')}
           />
-          <MetricCard
+          <GlassStatsCard
             title={t('dashboard.overview.totalBookings')}
             value={String(summary?.total_bookings ?? 0)}
             change={summary?.bookings_change_pct ?? 0}
-            icon={<Ticket className="w-5 h-5" />}
+            icon={Ticket}
+            gradient="from-[#00F0FF]/30 to-[#0284C7]/10"
+            subtitle={t('dashboard.overview.vsPrev')}
           />
-          <MetricCard
+          <GlassStatsCard
             title={t('dashboard.overview.activeRentals')}
             value={String(summary?.active_rentals ?? 0)}
             change={summary?.active_rentals_change_pct ?? 0}
-            icon={<CalendarCheck className="w-5 h-5" />}
+            icon={CalendarCheck}
+            gradient="from-emerald-500/30 to-teal-500/10"
+            subtitle={t('dashboard.overview.vsPrev')}
           />
-          <MetricCard
+          <GlassStatsCard
             title={t('dashboard.overview.occupancy')}
             value={`${(summary?.occupancy_rate ?? 0).toFixed(1)}%`}
             change={summary?.occupancy_change_pct ?? 0}
-            icon={<Percent className="w-5 h-5" />}
+            icon={Percent}
+            gradient="from-purple-500/30 to-indigo-500/10"
+            subtitle={t('dashboard.overview.vsPrev')}
           />
         </div>
 

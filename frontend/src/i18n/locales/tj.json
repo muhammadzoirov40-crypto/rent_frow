@@ -94,8 +94,8 @@
     "googleLoginFailed": "Хатои воридшавӣ тавассути Google. Лутфан аз нав кӯшиш кунед."
   },
   "home": {
-    "heroTitle": "Ҳама чизеро, ки лозим аст, иҷора гиред.",
-    "heroSubtitle": "Абзор, техника ва дигар ашёҳои дастрасро дар наздикии худ ёбед.",
+    "heroTitle": "Ҳама чиз барои иҷора дар",
+    "heroSubtitle": "Амволи ғайриманқул, автомобилҳои замонавӣ ва таҷҳизоти касбиро бо эътимоднокӣ ва бе миёнарав ба иҷора гиред ё ба иҷора диҳед.",
     "find": "Ёфтан",
     "popularCategories": "Категорияҳои машҳур",
     "popularListings": "Эълонҳои машҳур",
@@ -121,7 +121,7 @@
     "statsRating": "Ҳисоботи миёна",
     "ctaTitle": "Бо RentHub иҷора кунед ё даромад кунед",
     "ctaText": "Ба ҳазорон истифодабаранда дар Тоҷикистон ҳамроҳ шавед.",
-    "heroKicker": "Иҷора · Даромад · Соддагӣ",
+    "heroKicker": "Платформаи рақамии иҷора дар Тоҷикистон",
     "searchWhat": "Чиро меҷӯед?",
     "categoriesHint": "Барои дидани эълонҳои мувофиқ категорияро интихоб кунед",
     "listingsCount": "{{count}} эълон",
@@ -174,7 +174,20 @@
     "groupOtherHint": "Электроника, либос, варзиш",
     "results": "{{count}} эълон",
     "noListingsYet": "Ҳанӯз эълон нест",
-    "noListingsYetHint": "Аввалин шавед — дар ин бахш эълон гузоред."
+    "noListingsYetHint": "Аввалин шавед — дар ин бахш эълон гузоред.",
+    "heroQuickJump": "Зуд гузаштан:",
+    "heroPillProperty": "Манзилҳо",
+    "heroPillTransport": "Автомобилҳо",
+    "heroPillEquipment": "Таҷҳизот",
+    "heroTagProperty": "Манзил",
+    "heroTagTransport": "Авто",
+    "heroTagEquipment": "Таҷҳизот",
+    "heroTagPhoto": "Фото/Видео",
+    "heroCardWhere": "Душанбе, И. Сомонӣ",
+    "heroCardSpec": "Автомат • Sport Plus",
+    "heroCardPro": "Таҷҳизоти касбӣ",
+    "heroCardCam": "Кинокамера 4K 120fps",
+    "heroPerDay": "с./рӯз"
   },
   "search": {
     "resultsFound": "{{count}} эълон ёфт шуд",

@@ -94,8 +94,8 @@
     "googleLoginFailed": "Ошибка входа через Google. Пожалуйста, попробуйте снова."
   },
   "home": {
-    "heroTitle": "Арендуйте то, что нужно.",
-    "heroSubtitle": "Найдите инструменты, технику и другие предметы рядом с вами.",
+    "heroTitle": "Всё для аренды в",
+    "heroSubtitle": "Недвижимость, современные автомобили и профессиональное оборудование — арендуйте или сдавайте уверенно и без посредников.",
     "find": "Найти",
     "popularCategories": "Популярные категории",
     "popularListings": "Популярные объявления",
@@ -121,7 +121,7 @@
     "statsRating": "Средний рейтинг",
     "ctaTitle": "Арендуйте или зарабатывайте с RentHub",
     "ctaText": "Присоединяйтесь к тысячам пользователей по всему Таджикистану.",
-    "heroKicker": "Аренда · Доход · Простота",
+    "heroKicker": "Цифровая платформа аренды в Таджикистане",
     "searchWhat": "Что вы ищете?",
     "categoriesHint": "Выберите категорию, чтобы увидеть подходящие объявления",
     "listingsCount": "{{count}} объявлений",
@@ -174,7 +174,20 @@
     "groupOtherHint": "Электроника, одежда, спорт",
     "results": "{{count}} объявлений",
     "noListingsYet": "Объявлений пока нет",
-    "noListingsYetHint": "Станьте первым — разместите объявление в этом разделе."
+    "noListingsYetHint": "Станьте первым — разместите объявление в этом разделе.",
+    "heroQuickJump": "Быстрый переход:",
+    "heroPillProperty": "Недвижимость",
+    "heroPillTransport": "Автомобили",
+    "heroPillEquipment": "Оборудование",
+    "heroTagProperty": "Недвижимость",
+    "heroTagTransport": "Авто",
+    "heroTagEquipment": "Оборудование",
+    "heroTagPhoto": "Фото/Видео",
+    "heroCardWhere": "Душанбе, им. Сомони",
+    "heroCardSpec": "Автомат • Sport Plus",
+    "heroCardPro": "Профессиональное оборудование",
+    "heroCardCam": "Кинокамера 4K 120fps",
+    "heroPerDay": "сом./сут."
   },
   "search": {
     "resultsFound": "Найдено {{count}} объявлений",

@@ -94,8 +94,8 @@
     "googleLoginFailed": "Google login failed. Please try again."
   },
   "home": {
-    "heroTitle": "Rent what you need.",
-    "heroSubtitle": "Find tools, equipment and other items available for rent near you.",
+    "heroTitle": "Everything you need to rent at",
+    "heroSubtitle": "Rent out or take property, modern cars and professional equipment — confidently, and without middlemen.",
     "find": "Find",
     "popularCategories": "Popular categories",
     "popularListings": "Popular listings",
@@ -121,7 +121,7 @@
     "statsRating": "Average rating",
     "ctaTitle": "Rent or earn with RentHub",
     "ctaText": "Join thousands of users across Tajikistan.",
-    "heroKicker": "Rent · Earn · Repeat",
+    "heroKicker": "Tajikistan's digital rental platform",
     "searchWhat": "What are you looking for?",
     "categoriesHint": "Pick a category to see matching listings",
     "listingsCount": "{{count}} listings",
@@ -174,7 +174,20 @@
     "groupOtherHint": "Electronics, clothing, sports",
     "results": "{{count}} listings",
     "noListingsYet": "No listings to show yet",
-    "noListingsYetHint": "Be the first to post a listing in this section."
+    "noListingsYetHint": "Be the first to post a listing in this section.",
+    "heroQuickJump": "Quick jump:",
+    "heroPillProperty": "Homes",
+    "heroPillTransport": "Cars",
+    "heroPillEquipment": "Equipment",
+    "heroTagProperty": "Property",
+    "heroTagTransport": "Auto",
+    "heroTagEquipment": "Equipment",
+    "heroTagPhoto": "Photo/Video",
+    "heroCardWhere": "Dushanbe, Somoni",
+    "heroCardSpec": "Automatic • Sport Plus",
+    "heroCardPro": "Professional equipment",
+    "heroCardCam": "Cinema camera 4K 120fps",
+    "heroPerDay": "som./day"
   },
   "search": {
     "resultsFound": "Found {{count}} listings",
