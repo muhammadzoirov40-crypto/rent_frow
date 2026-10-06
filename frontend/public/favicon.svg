@@ -1,21 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Same house + handshake mark as components/Logo.tsx.
-       Raster assets cannot follow the CSS accent variable, so the favicon
-       uses the default RentHub accent (#FF6B35), which reads on both light
-       and dark browser chrome. -->
-  <g fill="none" stroke="#FF6B35" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M11.5 26V57h41V26" stroke-width="5.5"/>
-    <path d="M4 31 32 7l28 24" stroke-width="5.5"/>
-    <g stroke-width="3.5">
-      <rect x="37.5" y="22" width="11" height="11" rx="1.5"/>
-      <path d="M43 22v11M37.5 27.5h11"/>
-    </g>
-    <g stroke-width="9" stroke-opacity="0.6">
-      <path d="M16 53 26 46"/>
-      <path d="M48 53 38 46"/>
-    </g>
+  <!-- Same mark as components/Logo.tsx, thinned out to survive 16px:
+       five towers instead of seven, two ripples instead of three, heavier
+       strokes. A favicon is rendered on its own and has no access to the
+       page's CSS variables, so the brand gradient is written out literally
+       (#FF6B35 = the default accent) rather than read from var(--accent). -->
+  <defs>
+    <linearGradient id="g" x1="2" y1="62" x2="62" y2="2" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF6B35"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#g)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M4 18h12v8H4z"/>
+    <path d="M16 11h11v15H16z"/>
+    <path d="M27 6h10v20H27z"/>
+    <path d="M37 11h11v15H37z"/>
+    <path d="M48 18h12v8H48z"/>
+
+    <path d="M4 26v20l9 8"/>
+    <path d="M60 26v20l-9 8"/>
+
+    <circle cx="32" cy="44" r="13"/>
+    <circle cx="32" cy="44" r="8.5"/>
+
+    <path fill-rule="evenodd" stroke="none" fill="url(#g)"
+          d="M32 50c-.9-.9-4-3-4-7a4 4 0 1 1 8 0c0 4-3.1 6.1-4 7zM30.1 43a1.9 1.9 0 1 0 3.8 0 1.9 1.9 0 1 0-3.8 0z"/>
   </g>
-  <rect x="22" y="40" width="20" height="13" rx="6" fill="#FF6B35"/>
-  <rect x="24" y="36" width="10" height="9" rx="4.5" fill="#FF6B35"/>
-  <path d="M33 50.5 39.5 44" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="1.7" stroke-linecap="round"/>
 </svg>

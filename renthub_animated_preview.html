@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RentHub — Animated Landing Page</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(1deg); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.08); }
+    }
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-float {
+      animation: floatSlow 5s ease-in-out infinite;
+    }
+    .animate-float-delayed {
+      animation: floatSlow 6s ease-in-out 1.5s infinite;
+    }
+    .animate-glow {
+      animation: pulseGlow 4s ease-in-out infinite;
+    }
+    .animate-slide-up {
+      animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-[#090D16] text-slate-100 min-h-screen antialiased overflow-x-hidden selection:bg-[#FF6B35] selection:text-white">
+
+  <!-- Background decorative light spheres -->
+  <div class="fixed top-[-100px] left-[-100px] w-96 h-96 bg-[#FF6B35]/20 rounded-full blur-[120px] pointer-events-none animate-glow"></div>
+  <div class="fixed bottom-[-100px] right-[-100px] w-96 h-96 bg-[#00F0FF]/15 rounded-full blur-[140px] pointer-events-none animate-glow" style="animation-delay: 2s;"></div>
+
+  <!-- NAVIGATION BAR -->
+  <header class="sticky top-0 z-50 backdrop-blur-xl bg-[#090D16]/80 border-b border-slate-800/80 px-6 py-3.5 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Logo #1 (The Integrated 'R') -->
+      <a href="#" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/70 p-1.5 flex items-center justify-center shadow-lg group-hover:border-[#FF6B35]/50 transition-all">
+          <svg viewBox="0 0 64 64" class="w-full h-full">
+            <defs>
+              <linearGradient id="navPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FF7A3D" />
+                <stop offset="100%" stop-color="#FF5216" />
+              </linearGradient>
+              <linearGradient id="navAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00F0FF" />
+                <stop offset="100%" stop-color="#0099FF" />
+              </linearGradient>
+            </defs>
+            <path d="M 18 16 L 18 48" stroke="url(#navPrimary)" stroke-width="7" stroke-linecap="round" />
+            <path d="M 18 16 C 18 9, 44 9, 44 26 C 44 35, 30 35, 23 35" fill="none" stroke="url(#navPrimary)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M 32 32 L 47 48" stroke="url(#navAccent)" stroke-width="7" stroke-linecap="round" />
+            <circle cx="31" cy="24" r="3.2" fill="#FFFFFF" />
+            <polygon points="29.5,25 32.5,25 33.2,30 28.8,30" fill="#FFFFFF" />
+          </svg>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-xl font-extrabold tracking-tight text-white flex items-center">
+            Rent<span class="text-[#FF6B35]">Hub</span>
+          </span>
+          <span class="text-[9px] font-semibold text-slate-400 tracking-widest uppercase">Аренда & Прокат</span>
+        </div>
+      </a>
+
+      <!-- Menu links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+        <a href="#explore" class="hover:text-white transition-colors">Амвол</a>
+        <a href="#explore" class="hover:text-white transition-colors">Мошинҳо</a>
+        <a href="#explore" class="hover:text-white transition-colors">Таҷҳизот</a>
+        <a href="#about" class="hover:text-white transition-colors">Дар бораи мо</a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <button class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
+          Воридшавӣ
+        </button>
+        <button class="px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-[#FF6B35] to-[#FF5216] text-white shadow-lg shadow-[#FF6B35]/25 hover:shadow-[#FF6B35]/40 hover:scale-[1.02] active:scale-[0.98] transition-all">
+          + Эълон додан
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="max-w-7xl mx-auto px-6 pt-16 pb-20 relative">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Left Content -->
+      <div class="lg:col-span-7 space-y-8 animate-slide-up">
+        
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-[#00F0FF] shadow-inner">
+          <span class="w-2 h-2 rounded-full bg-[#00F0FF] animate-pulse"></span>
+          Платформаи №1 иҷора дар Тоҷикистон
+        </div>
+
+        <!-- Main Title -->
+        <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-[1.1] text-white">
+          Ҳама чизро ба иҷора гиред ё ба
+          <span class="bg-gradient-to-r from-[#FF7A3D] via-[#FF5216] to-[#00F0FF] bg-clip-text text-transparent">
+            иҷора диҳед!
+          </span>
+        </h1>
+
+        <p class="text-lg text-slate-400 max-w-xl leading-relaxed">
+          Аз манзилҳои замонавӣ ва автомобилҳои боҳашамат то асбобҳои сохтмонӣ ва таҷҳизоти касбӣ. Бе миёнарав ва бо кафолати амният.
+        </p>
+
+        <!-- Search Bar Component -->
+        <div class="bg-slate-900/90 border border-slate-700/80 p-2 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col sm:flex-row gap-2 max-w-2xl">
+          <div class="flex-1 flex items-center px-4 py-2.5 gap-3 border-b sm:border-b-0 sm:border-r border-slate-800">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" placeholder="Чӣ меҷӯед? (Манзил, BMW, Генератор...)" class="bg-transparent text-sm w-full outline-none placeholder:text-slate-500 text-white" />
+          </div>
+          <div class="flex items-center px-4 py-2.5 gap-2 border-b sm:border-b-0 sm:border-r border-slate-800 text-slate-300 text-sm">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <select class="bg-transparent outline-none cursor-pointer">
+              <option class="bg-slate-900">Душанбе</option>
+              <option class="bg-slate-900">Хуҷанд</option>
+              <option class="bg-slate-900">Бохтар</option>
+            </select>
+          </div>
+          <button class="bg-[#FF6B35] hover:bg-[#ff5518] text-white px-7 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-[#FF6B35]/30">
+            Ҷустуҷӯ
+          </button>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-3 gap-6 pt-4 max-w-lg border-t border-slate-800/80">
+          <div>
+            <div class="text-2xl font-black text-white">4,200+</div>
+            <div class="text-xs text-slate-400 mt-0.5">Эълонҳои фаъол</div>
+          </div>
+          <div>
+            <div class="text-2xl font-black text-[#00F0FF]">18,500+</div>
+            <div class="text-xs text-slate-400 mt-0.5">Истифодабарандагон</div>
+          </div>
+          <div>
+            <div class="text-2xl font-black text-[#FF6B35]">99.4%</div>
+            <div class="text-xs text-slate-400 mt-0.5">Баҳои қаноатмандӣ</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Visual Cards (Animated Float Stack) -->
+      <div class="lg:col-span-5 relative">
+        <div class="relative w-full h-[460px] flex items-center justify-center">
+          
+          <!-- Card 1: Luxury Apartment -->
+          <div class="absolute top-0 right-4 w-64 bg-slate-900/90 border border-slate-700/80 rounded-2xl p-4 shadow-2xl backdrop-blur-md animate-float">
+            <div class="h-32 w-full rounded-xl bg-gradient-to-tr from-slate-800 to-slate-700 overflow-hidden relative">
+              <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&auto=format&fit=crop&q=60" alt="Apartment" class="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500" />
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[11px] font-bold text-[#FF6B35]">Манзил</span>
+            </div>
+            <div class="mt-3">
+              <div class="text-sm font-bold text-white truncate">Ҳавлии замонавӣ (Loft)</div>
+              <div class="text-xs text-slate-400 flex items-center gap-1 mt-0.5">Душанбе, марказ</div>
+              <div class="mt-2 flex items-center justify-between">
+                <span class="text-[#00F0FF] font-black text-sm">350 с. <span class="text-[11px] font-normal text-slate-400">/рӯз</span></span>
+                <button class="text-xs bg-slate-800 hover:bg-[#FF6B35] text-white px-3 py-1 rounded-lg font-medium transition-colors">Брон</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Rental Vehicle (BMW) -->
+          <div class="absolute bottom-4 left-4 w-72 bg-slate-900/95 border border-slate-700/90 rounded-2xl p-4 shadow-2xl backdrop-blur-md animate-float-delayed z-20">
+            <div class="h-36 w-full rounded-xl bg-slate-800 overflow-hidden relative">
+              <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?w=500&auto=format&fit=crop&q=60" alt="Car" class="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500" />
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-md text-[11px] font-bold text-[#00F0FF]">Автомобил</span>
+            </div>
+            <div class="mt-3">
+              <div class="text-sm font-bold text-white truncate">BMW M5 Competition 2023</div>
+              <div class="text-xs text-slate-400 mt-0.5">Автомат • Бензин • VIP</div>
+              <div class="mt-2 flex items-center justify-between">
+                <span class="text-[#FF6B35] font-black text-base">790 с. <span class="text-[11px] font-normal text-slate-400">/рӯз</span></span>
+                <button class="text-xs bg-[#FF6B35] hover:bg-[#ff5518] text-white px-3.5 py-1.5 rounded-lg font-bold transition-all shadow-md shadow-[#FF6B35]/30">Иҷора</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Tool / Equipment Floating Pill -->
+          <div class="absolute bottom-28 right-0 bg-slate-800/90 border border-slate-600/80 rounded-xl px-4 py-2.5 shadow-xl backdrop-blur-md flex items-center gap-3 z-30 animate-pulse">
+            <div class="w-9 h-9 rounded-lg bg-[#FF6B35]/20 flex items-center justify-center text-[#FF6B35]">
+              ⚡
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white">Генератори 5 кВт</div>
+              <div class="text-[11px] text-[#00F0FF] font-semibold">120 с. / рӯз • Омода</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CATEGORIES FILTER -->
+  <section id="explore" class="max-w-7xl mx-auto px-6 py-10 border-t border-slate-800/80">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-2xl font-bold text-white">Категорияҳои асосӣ</h2>
+        <p class="text-sm text-slate-400 mt-1">Интихоби васеи хизматрасониҳо ва ашё барои иҷора</p>
+      </div>
+      <a href="#" class="text-sm font-semibold text-[#FF6B35] hover:text-[#ff8558] flex items-center gap-1">
+        Ҳамаи категорияҳо &rarr;
+      </a>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      
+      <div class="bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-[#FF6B35]/50 p-5 rounded-2xl transition-all cursor-pointer group text-center flex flex-col items-center">
+        <div class="w-14 h-14 rounded-2xl bg-[#FF6B35]/10 text-[#FF6B35] flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+          🏠
+        </div>
+        <div class="font-bold text-sm text-white">Манзил ва амвол</div>
+        <div class="text-xs text-slate-400 mt-1">1,240 эълон</div>
+      </div>
+
+      <div class="bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-[#00F0FF]/50 p-5 rounded-2xl transition-all cursor-pointer group text-center flex flex-col items-center">
+        <div class="w-14 h-14 rounded-2xl bg-[#00F0FF]/10 text-[#00F0FF] flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+          🚗
+        </div>
+        <div class="font-bold text-sm text-white">Мошинҳо ва нақлиёт</div>
+        <div class="text-xs text-slate-400 mt-1">850 эълон</div>
+      </div>
+
+      <div class="bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-amber-500/50 p-5 rounded-2xl transition-all cursor-pointer group text-center flex flex-col items-center">
+        <div class="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+          🛠️
+        </div>
+        <div class="font-bold text-sm text-white">Асбобу таҷҳизот</div>
+        <div class="text-xs text-slate-400 mt-1">620 эълон</div>
+      </div>
+
+      <div class="bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-purple-500/50 p-5 rounded-2xl transition-all cursor-pointer group text-center flex flex-col items-center">
+        <div class="w-14 h-14 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-2xl mb-3 group-hover:scale-110 transition-transform">
+          📷
+        </div>
+        <div class="font-bold text-sm text-white">Фото ва Видеокамераҳо</div>
+        <div class="text-xs text-slate-400 mt-1">310 эълон</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="mt-20 border-t border-slate-800/80 py-8 bg-slate-950/70 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>© 2026 RentHub. Ҳамаи ҳуқуқҳо маҳфузанд.</div>
+      <div class="flex items-center gap-6">
+        <a href="#" class="hover:text-slate-300">Шартҳои истифода</a>
+        <a href="#" class="hover:text-slate-300">Махфият</a>
+        <a href="#" class="hover:text-slate-300">Тамос</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
