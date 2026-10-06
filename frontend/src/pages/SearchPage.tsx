@@ -292,7 +292,7 @@ export default function SearchPage() {
 
       <div className="flex gap-6">
         <aside className="hidden lg:block w-[280px] flex-shrink-0">
-          <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-6 shadow-sm sticky top-24">
+          <div className="bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl rounded-2xl border border-gray-100 dark:border-white/10 p-6 shadow-sm sticky top-24">
             <h3 className="flex items-center gap-2 font-bold text-[#1A1A2E] dark:text-white mb-5">
               <SlidersHorizontal className="w-[18px] h-[18px] text-[var(--accent)]" />
               {t('search.filters')}
@@ -333,7 +333,7 @@ export default function SearchPage() {
               {listingsList.map((listing) => (
                 <div key={listing.id} className="w-full">
                   <Link to={`/listing/${listing.id}`} className="block">
-                    <div className="bg-white dark:bg-[#1A1A2E] rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden flex hover:shadow-lg transition-all">
+                    <div className="bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden flex hover:shadow-lg transition-all">
                       <div className="w-56 flex-shrink-0 relative bg-gray-100">
                         {listing.primary_image ? (
                           <img
@@ -459,8 +459,8 @@ export default function SearchPage() {
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white dark:bg-[#1A1A2E] z-50 lg:hidden overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white dark:bg-[#1A1A2E] border-b border-gray-100 dark:border-white/10 p-4 flex items-center justify-between z-10">
+          <div className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl z-50 lg:hidden overflow-y-auto shadow-2xl">
+            <div className="sticky top-0 bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl border-b border-gray-100 dark:border-white/10 p-4 flex items-center justify-between z-10">
               <h3 className="font-bold text-[#1A1A2E] dark:text-white">{t('search.filters')}</h3>
               <button
                 onClick={() => setMobileFiltersOpen(false)}

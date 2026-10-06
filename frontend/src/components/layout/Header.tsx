@@ -142,7 +142,7 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className="site-header fixed top-0 left-0 right-0 z-50 bg-white/85 dark:bg-[#0b0f19]/85 backdrop-blur-xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] border-b border-gray-200/70 dark:border-white/10 transition-colors"
+      className="site-header fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] border-b border-gray-200/60 dark:border-white/10 transition-colors"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">

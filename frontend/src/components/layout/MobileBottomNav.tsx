@@ -30,7 +30,7 @@ export default function MobileBottomNav({ isAuthenticated }: MobileBottomNavProp
   }
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-[#1A1A2E] border-t border-gray-100 dark:border-white/10 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.3)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/70 dark:bg-[#1A1A2E]/70 backdrop-blur-xl border-t border-gray-100 dark:border-white/10 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_-2px_10px_rgba(0,0,0,0.3)]">
       <div className="flex items-center justify-around px-2 py-1">
         {NAV_ITEMS.map((item) => {
           const to = getTo(item)

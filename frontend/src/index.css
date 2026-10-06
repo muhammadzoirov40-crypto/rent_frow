@@ -141,15 +141,23 @@
     color: var(--text-page);
   }
 
+  /* Cards are frosted, not painted: the page's ambient wash shows through,
+     so every surface reads as glass instead of an opaque sheet. */
   .card {
-    @apply rounded-2xl overflow-hidden transition-all duration-300;
-    background-color: var(--bg-card);
-    border: 1px solid var(--border-card);
+    @apply rounded-2xl overflow-hidden backdrop-blur-xl transition-all duration-300;
+    background: rgba(255, 255, 255, 0.68);
+    border: 1px solid rgba(255, 255, 255, 0.75);
     box-shadow: var(--shadow-card);
+  }
+
+  .dark .card {
+    background: rgba(17, 24, 39, 0.58);
+    border-color: rgba(255, 255, 255, 0.07);
   }
 
   .card:hover {
     box-shadow: var(--shadow-card-hover);
+    border-color: rgba(var(--accent-rgb) / 0.35);
   }
 
   .glass-card {
@@ -238,7 +246,10 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.glass-card {
+/* Theme-aware: the light variant lives in @layer components above; only the
+   dark override is unlayered so it beats the layer without hijacking a light
+   page with an opaque dark rgba(). */
+.dark .glass-card {
   background: rgba(22, 28, 42, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -246,13 +257,28 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
+/* Light-mode frost: translucent white + blur, so the ambient wash reads through. */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow: 0 10px 30px -12px rgba(15, 23, 42, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
 .glass-card-hover {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.glass-card-hover:hover {
+.dark .glass-card-hover:hover {
   background: rgba(26, 34, 52, 0.85);
   border-color: rgba(255, 107, 53, 0.35);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 107, 53, 0.15);
+  transform: translateY(-4px);
+}
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.86);
+  border-color: rgba(var(--accent-rgb) / 0.4);
+  box-shadow: 0 18px 40px -18px rgba(15, 23, 42, 0.35), 0 0 20px rgba(var(--accent-rgb) / 0.12);
   transform: translateY(-4px);
 }
 
@@ -265,12 +291,33 @@
    Deliberately unlayered: Tailwind's utilities live in @layer utilities and
    lose to this, which is what lets .glass-tile own the card's background and
    border while the component keeps its own rounded-/padding utilities. */
+/* Ambient wash behind everything: three soft light pools so the frosted
+   panels have something to reveal. Fixed, so cards blur it as you scroll. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60rem 40rem at 8% -10%, rgba(var(--accent-rgb), 0.14), transparent 62%),
+    radial-gradient(52rem 36rem at 96% -6%, rgba(0, 200, 235, 0.13), transparent 60%),
+    radial-gradient(64rem 46rem at 50% 112%, rgba(139, 92, 246, 0.11), transparent 65%),
+    var(--bg-page);
+}
+
+/* Dark theme keeps the faceted field (public/geo-bg.svg) and layers the same
+   pools on top of it, so the facets still show through the glass. */
 .dark body::before {
   content: '';
   position: fixed;
   inset: 0;
   z-index: -1;
-  background: #0b0f19 url('/geo-bg.svg') center / cover no-repeat;
+  background:
+    radial-gradient(60rem 40rem at 8% -10%, rgba(var(--accent-rgb), 0.16), transparent 62%),
+    radial-gradient(52rem 36rem at 96% -6%, rgba(0, 240, 255, 0.10), transparent 60%),
+    radial-gradient(64rem 46rem at 50% 112%, rgba(139, 92, 246, 0.12), transparent 65%),
+    #0b0f19 url('/geo-bg.svg') center / cover no-repeat;
   pointer-events: none;
 }
 

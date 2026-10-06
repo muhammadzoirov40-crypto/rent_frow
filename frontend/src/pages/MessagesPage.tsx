@@ -584,7 +584,7 @@ export default function MessagesPage() {
                 onClick={() => setForwardMsg(null)}
               >
                 <div
-                  className="w-full max-w-sm rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
+                  className="w-full max-w-sm rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
@@ -905,7 +905,7 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
             role="dialog"
             aria-modal="true"
             data-testid="confirm-chat-decision-modal"
-            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            className="bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
