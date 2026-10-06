@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="RentHub">
+  <defs>
+    <linearGradient id="rhC" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B2447"/>
+      <stop offset="0.55" stop-color="#0F3470"/>
+      <stop offset="1" stop-color="#1B6EF3"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded tile (app icon / avatar) with the home carved out in negative space -->
+  <path fill="url(#rhC)" fill-rule="evenodd" d="
+    M4 18 C4 10.3 10.3 4 18 4 L46 4 C53.7 4 60 10.3 60 18
+    L60 46 C60 53.7 53.7 60 46 60 L18 60 C10.3 60 4 53.7 4 46 Z
+    M32 17 L45.6 28.2 Q46.8 29.2 46.8 30.7 L46.8 41.4 Q46.8 43.8 44.4 43.8
+    L19.6 43.8 Q17.2 43.8 17.2 41.4 L17.2 30.7 Q17.2 29.2 18.4 28.2 Z"/>
+  <!-- Pin tail breaking the baseline: the address marker -->
+  <path fill="#1B6EF3" d="M26.6 43.8 L37.4 43.8 L37.4 47.2 Q37.4 52.4 32 56.2 Q26.6 52.4 26.6 47.2 Z"/>
+  <!-- Hub node -->
+  <circle cx="32" cy="33.4" r="5.4" fill="#0B2447"/>
+</svg>

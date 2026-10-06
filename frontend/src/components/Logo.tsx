@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useId } from 'react';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -9,60 +10,65 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { icon: 'w-7 h-7 text-xs', word: 'text-lg', dot: 'w-1.5 h-1.5' },
-  md: { icon: 'w-8 h-8 text-sm', word: 'text-xl', dot: 'w-2 h-2' },
-  lg: { icon: 'w-10 h-10 text-base', word: 'text-2xl', dot: 'w-2.5 h-2.5' },
-  xl: { icon: 'w-12 h-12 text-lg', word: 'text-3xl', dot: 'w-3 h-3' },
+  sm: { icon: 'w-7 h-7', word: 'text-lg' },
+  md: { icon: 'w-8 h-8', word: 'text-xl' },
+  lg: { icon: 'w-10 h-10', word: 'text-2xl' },
+  xl: { icon: 'w-12 h-12', word: 'text-3xl' },
 };
 
 /**
- * RentHub Modern Minimalist Wordmark + Luxury Emblem
- * Designed specifically for renthub.qobus.tj:
- * - A refined luxury geometric 'R' tile with golden-amber accent
- * - Pure, ultra-clean Plus Jakarta Sans typography
- * - Dynamic accent 'Hub' that seamlessly blends with the site's dark/light modes
+ * RentHub symbol — one mark, five meanings:
+ *
+ *   LOCATION  the outer silhouette is a map pin
+ *   HOME      the pin's core is carved away into a house (negative space)
+ *   RENTAL    a house inside a pin is the universal "place to rent" gesture
+ *   HUB       two linked nodes — renter and owner — meeting under one roof
+ *   TRUST     one continuous geometric shape, rounded but precise
+ *
+ * Colors are theme-aware tokens (index.css): deep navy + electric blue.
  */
 export function LogoMark({ className = 'w-8 h-8' }: { className?: string }) {
+  const raw = useId();
+  const gid = `rh${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
+
   return (
-    <div
-      className={`${className} shrink-0 rounded-xl bg-gradient-to-br from-[#1E2433] via-[#111624] to-[#0A0D14] border border-white/10 shadow-lg flex items-center justify-center relative overflow-hidden group-hover:border-[var(--accent,#FF6B35)]/60 transition-all duration-300`}
+    <svg
+      viewBox="0 0 64 64"
+      className={`${className} shrink-0`}
+      aria-hidden="true"
+      focusable="false"
     >
-      {/* Subtle top inner glow */}
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-      
-      {/* Precision Vector 'R' */}
-      <svg viewBox="0 0 40 40" className="w-[62%] h-[62%]" fill="none">
-        <defs>
-          <linearGradient id="rWordmarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="50%" stopColor="var(--accent, #FF6B35)" />
-            <stop offset="100%" stopColor="#FFA14A" />
-          </linearGradient>
-        </defs>
-        {/* Modern streamlined 'R' */}
-        <path
-          d="M 11 8 V 32"
-          stroke="url(#rWordmarkGrad)"
-          strokeWidth="4.2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 11 8 H 22 C 28.5 8, 28.5 20, 22 20 H 11"
-          stroke="url(#rWordmarkGrad)"
-          strokeWidth="4.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M 19 20 L 28.5 32"
-          stroke="var(--accent, #FF6B35)"
-          strokeWidth="4.2"
-          strokeLinecap="round"
-        />
-        {/* Subtle center keyhole dot */}
-        <circle cx="18" cy="14" r="1.8" fill="#FFFFFF" opacity="0.9" />
-      </svg>
-    </div>
+      <defs>
+        <linearGradient id={gid} x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="var(--logo-grad-a, #0B2447)" />
+          <stop offset="0.5" stopColor="var(--logo-grad-b, #123F86)" />
+          <stop offset="1" stopColor="var(--logo-blue, #1B6EF3)" />
+        </linearGradient>
+      </defs>
+
+      {/* Pin with the house cut out of it (single path, evenodd) */}
+      <path
+        fill={`url(#${gid})`}
+        fillRule="evenodd"
+        d="M32 4 C18.7 4 8 14.7 8 28
+           C8 41.8 22.5 54.4 28.6 58.9
+           A4.7 4.7 0 0 0 35.4 58.9
+           C41.5 54.4 56 41.8 56 28
+           C56 14.7 45.3 4 32 4 Z
+           M32 14.6 L47.4 26.6
+           Q48.8 27.7 48.8 29.4
+           L48.8 37.3
+           Q48.8 40 46.1 40
+           L17.9 40
+           Q15.2 40 15.2 37.3
+           L15.2 29.4
+           Q15.2 27.7 16.6 26.6 Z"
+      />
+
+      {/* The hub: two connected nodes (renter + owner) */}
+      <circle cx="27.7" cy="32.4" r="5.4" fill="var(--logo-node, #0B2447)" />
+      <circle cx="36.3" cy="32.4" r="5.4" fill="var(--logo-blue, #1B6EF3)" fillOpacity="0.94" />
+    </svg>
   );
 }
 
@@ -83,27 +89,16 @@ export default function Logo({
       className="flex items-center gap-2.5 group select-none transition-transform duration-200 active:scale-95"
       data-testid="logo"
     >
-      {/* Sleek Emblem */}
       <LogoMark className={s.icon} />
 
-      {/* Clean Premium Wordmark */}
       {showWord && (
         <div className={`flex flex-col justify-center ${hideWordOnMobile ? 'hidden sm:flex' : ''}`}>
-          <div className="flex items-center">
-            <span
-              className={`${s.word} font-black tracking-[-0.03em] leading-none text-slate-900 dark:text-white transition-colors`}
-              style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
-            >
-              Rent<span className="text-[var(--accent,#FF6B35)]">Hub</span>
-            </span>
-            {/* Minimalist dot indicator */}
-            <span
-              className={`${s.dot} rounded-full bg-[var(--accent,#FF6B35)] ml-1 shadow-[0_0_8px_rgba(255,107,53,0.6)] animate-pulse`}
-              style={{ animationDuration: '3s' }}
-            />
-          </div>
-          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 tracking-[0.16em] uppercase mt-0.5 leading-none">
-            Аренда & Прокат
+          <span
+            className={`${s.word} font-black tracking-[-0.03em] leading-none transition-colors`}
+            style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
+          >
+            <span className="text-[var(--logo-word,#0B2447)] dark:text-white">Rent</span>
+            <span className="text-[var(--logo-blue,#1B6EF3)]">Hub</span>
           </span>
         </div>
       )}

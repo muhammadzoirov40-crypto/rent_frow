@@ -33,6 +33,13 @@
        this in sync with the real DOM height; the values below are fallbacks
        for the very first paint before JS measures it. */
     --header-h: 7rem;
+
+    /* ===== RentHub brand logo — deep navy + electric blue ===== */
+    --logo-grad-a: #0b2447;
+    --logo-grad-b: #123f86;
+    --logo-blue: #1b6ef3;
+    --logo-node: #0b2447;
+    --logo-word: #0b2447;
   }
 
   @media (max-width: 767px) {
@@ -84,6 +91,13 @@
     --border-card: rgba(255, 255, 255, 0.06);
     --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
     --shadow-card-hover: 0 16px 36px -8px rgba(0, 0, 0, 0.55);
+
+    /* Logo stays branded on a dark page: navy lifts, blue brightens. */
+    --logo-grad-a: #173a76;
+    --logo-grad-b: #164485;
+    --logo-blue: #3b8dff;
+    --logo-node: #2e5fa8;
+    --logo-word: #ffffff;
   }
 
   body {
