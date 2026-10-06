@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { useId } from 'react';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
@@ -10,96 +9,60 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { mark: 'w-8 h-8', word: 'text-base' },
-  md: { mark: 'w-10 h-10', word: 'text-lg' },
-  lg: { mark: 'w-12 h-12', word: 'text-xl' },
-  xl: { mark: 'w-16 h-16', word: 'text-2xl' },
+  sm: { icon: 'w-7 h-7 text-xs', word: 'text-lg', dot: 'w-1.5 h-1.5' },
+  md: { icon: 'w-8 h-8 text-sm', word: 'text-xl', dot: 'w-2 h-2' },
+  lg: { icon: 'w-10 h-10 text-base', word: 'text-2xl', dot: 'w-2.5 h-2.5' },
+  xl: { icon: 'w-12 h-12 text-lg', word: 'text-3xl', dot: 'w-3 h-3' },
 };
 
 /**
- * RentHub Luxury Hexagon Monogram 'R' (Option 1):
- * Dual-tone 3D faceted hexagon with embedded Letter 'R'
- * Left side: Gold/Orange glow, Right side: Cyan/Electric Blue glow.
+ * RentHub Modern Minimalist Wordmark + Luxury Emblem
+ * Designed specifically for renthub.qobus.tj:
+ * - A refined luxury geometric 'R' tile with golden-amber accent
+ * - Pure, ultra-clean Plus Jakarta Sans typography
+ * - Dynamic accent 'Hub' that seamlessly blends with the site's dark/light modes
  */
-export function LogoMark({ className = '' }: { className?: string }) {
-  const raw = useId();
-  const gradOrange = `hexO${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const gradCyan = `hexC${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
-
+export function LogoMark({ className = 'w-8 h-8' }: { className?: string }) {
   return (
-    <svg
-      viewBox="0 0 100 100"
-      className={`${className} shrink-0`}
-      aria-hidden="true"
-      focusable="false"
+    <div
+      className={`${className} shrink-0 rounded-xl bg-gradient-to-br from-[#1E2433] via-[#111624] to-[#0A0D14] border border-white/10 shadow-lg flex items-center justify-center relative overflow-hidden group-hover:border-[var(--accent,#FF6B35)]/60 transition-all duration-300`}
     >
-      <defs>
-        {/* Left Orange/Gold Gradient */}
-        <linearGradient id={gradOrange} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FFB300" />
-          <stop offset="60%" stopColor="#FF6B35" />
-          <stop offset="100%" stopColor="#E63900" />
-        </linearGradient>
-
-        {/* Right Cyan Neon Gradient */}
-        <linearGradient id={gradCyan} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00F0FF" />
-          <stop offset="60%" stopColor="#00B4D8" />
-          <stop offset="100%" stopColor="#0077B6" />
-        </linearGradient>
-      </defs>
-
-      {/* Hexagon Outer Frame */}
-      {/* Left Orange Half */}
-      <path
-        d="M 50 6 L 12 28 L 12 72 L 50 94 Z"
-        fill="currentColor"
-        fillOpacity="0.06"
-        stroke={`url(#${gradOrange})`}
-        strokeWidth="4.5"
-        strokeLinejoin="round"
-      />
-
-      {/* Right Cyan Half */}
-      <path
-        d="M 50 6 L 88 28 L 88 72 L 50 94 Z"
-        fill="currentColor"
-        fillOpacity="0.06"
-        stroke={`url(#${gradCyan})`}
-        strokeWidth="4.5"
-        strokeLinejoin="round"
-      />
-
-      {/* 3D Facet Bevel Lines */}
-      <path d="M 12 28 L 26 36 L 26 64 L 12 72" fill="none" stroke={`url(#${gradOrange})`} strokeWidth="2.5" opacity="0.6" />
-      <path d="M 88 28 L 74 36 L 74 64 L 88 72" fill="none" stroke={`url(#${gradCyan})`} strokeWidth="2.5" opacity="0.6" />
-      <path d="M 50 6 L 50 20 M 50 80 L 50 94" stroke="#FFFFFF" strokeWidth="2" opacity="0.4" />
-
-      {/* Central Integrated Stylized Monogram "R" */}
-      {/* Left Vertical Stem (Orange) */}
-      <path
-        d="M 34 26 L 34 74 L 44 74 L 44 26 Z"
-        fill={`url(#${gradOrange})`}
-      />
-
-      {/* Top Loop/Bowl of R (Cyan) */}
-      <path
-        d="M 44 26 L 58 26 C 70 26, 74 34, 74 44 C 74 54, 68 58, 54 58 L 44 58 Z"
-        fill={`url(#${gradCyan})`}
-      />
-
-      {/* Inner Loop Cutout */}
-      <path
-        d="M 44 35 L 56 35 C 62 35, 63 39, 63 44 C 63 49, 60 49, 54 49 L 44 49 Z"
-        fill="#090D16"
-      />
-
-      {/* Dynamic Diagonal Kick / Leg of R (Cyan) */}
-      <path
-        d="M 50 56 L 72 78 L 82 78 L 58 54 Z"
-        fill={`url(#${gradCyan})`}
-      />
-    </svg>
+      {/* Subtle top inner glow */}
+      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+      
+      {/* Precision Vector 'R' */}
+      <svg viewBox="0 0 40 40" className="w-[62%] h-[62%]" fill="none">
+        <defs>
+          <linearGradient id="rWordmarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="50%" stopColor="var(--accent, #FF6B35)" />
+            <stop offset="100%" stopColor="#FFA14A" />
+          </linearGradient>
+        </defs>
+        {/* Modern streamlined 'R' */}
+        <path
+          d="M 11 8 V 32"
+          stroke="url(#rWordmarkGrad)"
+          strokeWidth="4.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M 11 8 H 22 C 28.5 8, 28.5 20, 22 20 H 11"
+          stroke="url(#rWordmarkGrad)"
+          strokeWidth="4.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M 19 20 L 28.5 32"
+          stroke="var(--accent, #FF6B35)"
+          strokeWidth="4.2"
+          strokeLinecap="round"
+        />
+        {/* Subtle center keyhole dot */}
+        <circle cx="18" cy="14" r="1.8" fill="#FFFFFF" opacity="0.9" />
+      </svg>
+    </div>
   );
 }
 
@@ -111,24 +74,35 @@ export default function Logo({
   onClick,
 }: LogoProps) {
   const s = SIZES[size];
+
   return (
     <Link
       to={to}
       onClick={onClick}
       aria-label="RentHub"
-      className="flex items-center gap-3 group"
+      className="flex items-center gap-2.5 group select-none transition-transform duration-200 active:scale-95"
       data-testid="logo"
     >
-      <div className="p-1 rounded-xl bg-slate-900/40 border border-slate-700/40 group-hover:border-[#FF6B35]/50 transition-colors shadow-sm">
-        <LogoMark className={s.mark} />
-      </div>
+      {/* Sleek Emblem */}
+      <LogoMark className={s.icon} />
+
+      {/* Clean Premium Wordmark */}
       {showWord && (
-        <div className={`flex flex-col ${hideWordOnMobile ? 'hidden sm:flex' : ''}`}>
-          <span className={`${s.word} font-black tracking-tight leading-none`}>
-            <span className="text-[#FF8A00]">Rent</span>
-            <span className="text-[#00F0FF]">Hub</span>
-          </span>
-          <span className="text-[9px] font-bold text-slate-400 tracking-wider uppercase mt-1">
+        <div className={`flex flex-col justify-center ${hideWordOnMobile ? 'hidden sm:flex' : ''}`}>
+          <div className="flex items-center">
+            <span
+              className={`${s.word} font-black tracking-[-0.03em] leading-none text-slate-900 dark:text-white transition-colors`}
+              style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
+            >
+              Rent<span className="text-[var(--accent,#FF6B35)]">Hub</span>
+            </span>
+            {/* Minimalist dot indicator */}
+            <span
+              className={`${s.dot} rounded-full bg-[var(--accent,#FF6B35)] ml-1 shadow-[0_0_8px_rgba(255,107,53,0.6)] animate-pulse`}
+              style={{ animationDuration: '3s' }}
+            />
+          </div>
+          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 tracking-[0.16em] uppercase mt-0.5 leading-none">
             Аренда & Прокат
           </span>
         </div>
