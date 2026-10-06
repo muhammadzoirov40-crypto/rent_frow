@@ -1,18 +1,119 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
-  <!-- RentHub Official Native Favicon (House + Handshake) -->
-  <g fill="none" stroke="#FF6B35" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M11.5 26V57h41V26" stroke-width="5.5"/>
-    <path d="M4 31 32 7l28 24" stroke-width="5.5"/>
-    <g stroke-width="3.5">
-      <rect x="37.5" y="22" width="11" height="11" rx="1.5"/>
-      <path d="M43 22v11M37.5 27.5h11"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 120" width="100%" height="100%">
+  <defs>
+    <!-- R Left Vertical & Top Curve Gradient: Electric Cyan to Deep Royal Blue -->
+    <linearGradient id="rBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00A2FF"/>
+      <stop offset="45%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#0038FF"/>
+    </linearGradient>
+
+    <!-- R Kick / Dynamic Leg Gradient -->
+    <linearGradient id="rLegGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0080FF"/>
+      <stop offset="100%" stop-color="#0040FF"/>
+    </linearGradient>
+
+    <!-- Subtle 3D shadow for house roof fold -->
+    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="3" stdDeviation="3" flood-color="#002080" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- ==================== LEFT ICON: LETTER 'R' WITH EMBEDDED HOUSE ==================== -->
+  <g transform="translate(10, 10)">
+    
+    <!-- 1. Main Upper & Outer Loop of 'R' with Top Arch -->
+    <path
+      d="M 12 10 
+         C 12 6, 16 2, 22 2 
+         L 58 2 
+         C 78 2, 88 14, 88 32 
+         C 88 48, 76 60, 58 64 
+         L 90 98 
+         C 93 101, 91 104, 85 104 
+         L 70 104 
+         C 66 104, 62 101, 58 96 
+         L 36 68 
+         L 36 100 
+         C 36 103, 33 105, 30 105 
+         L 18 105 
+         C 14 105, 12 103, 12 99 
+         Z"
+      fill="url(#rBlueGrad)"
+      filter="url(#softShadow)"
+    />
+
+    <!-- 2. Embedded Negative-Space House (White Cutout Arch) -->
+    <!-- House Outer Peak cutting into the inner bowl of R -->
+    <path
+      d="M 12 36 
+         L 46 14 
+         C 48 12.5, 52 12.5, 54 14 
+         L 70 25 
+         C 72 26.5, 73 29, 73 32 
+         L 73 60 
+         L 50 60 
+         L 36 50 
+         L 36 40 
+         Z"
+      fill="#FFFFFF"
+    />
+
+    <!-- Thick Roof Eaves (White Ribbon defining the House) -->
+    <path
+      d="M 12 40 
+         L 48 16 
+         C 50 14.5, 53 14.5, 55 16 
+         L 76 30 
+         L 70 38 
+         L 52 26 
+         L 20 48 
+         Z"
+      fill="#FFFFFF"
+    />
+
+    <!-- 3. Four Window Panes (Blue Squares inside the house) -->
+    <g fill="#0066FF">
+      <!-- Top Left -->
+      <rect x="43" y="42" width="7.5" height="7.5" rx="1.8"/>
+      <!-- Top Right -->
+      <rect x="53.5" y="42" width="7.5" height="7.5" rx="1.8"/>
+      <!-- Bottom Left -->
+      <rect x="43" y="52.5" width="7.5" height="7.5" rx="1.8"/>
+      <!-- Bottom Right -->
+      <rect x="53.5" y="52.5" width="7.5" height="7.5" rx="1.8"/>
     </g>
-    <g stroke-width="9" stroke-opacity="0.6">
-      <path d="M16 53 26 46"/>
-      <path d="M48 53 38 46"/>
-    </g>
+
+    <!-- 4. Overlapping Right Leg of R (Giving the 3D folded illusion) -->
+    <path
+      d="M 52 50 
+         C 58 50, 68 45, 68 34 
+         C 68 24, 60 18, 48 18 
+         L 38 25 
+         L 48 40 
+         C 52 46, 56 52, 62 60 
+         L 86 94 
+         L 72 94 
+         L 50 64 
+         Z"
+      fill="url(#rLegGrad)"
+      opacity="0.95"
+    />
+
   </g>
-  <rect x="22" y="40" width="20" height="13" rx="6" fill="#FF6B35"/>
-  <rect x="24" y="36" width="10" height="9" rx="4.5" fill="#FF6B35"/>
-  <path d="M33 50.5 39.5 44" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="1.7" stroke-linecap="round"/>
+
+  <!-- ==================== RIGHT TYPOGRAPHY: EXACT 'RentHub' ==================== -->
+  <g transform="translate(125, 68)">
+    
+    <!-- Wordmark: Rent (Dark Charcoal/Black) + Hub (Electric Blue) -->
+    <text font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="48" font-weight="900" letter-spacing="-0.03em">
+      <tspan fill="#0F172A">Rent</tspan><tspan fill="#0066FF">Hub</tspan>
+    </text>
+
+    <!-- Tagline: Иҷора • Фурӯш • Харид -->
+    <text x="4" y="28" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="14.5" font-weight="600" fill="#334155" letter-spacing="0.1em">
+      Иҷора  •  Фурӯш  •  Харид
+    </text>
+
+  </g>
 </svg>

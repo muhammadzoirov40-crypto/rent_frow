@@ -9,23 +9,81 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { img: 'h-9 w-9', word: 'text-lg' },
-  md: { img: 'h-10 w-10', word: 'text-xl' },
-  lg: { img: 'h-12 w-12', word: 'text-2xl' },
-  xl: { img: 'h-16 w-16', word: 'text-3xl' },
+  sm: { img: 'h-8 sm:h-9', word: 'text-lg', sub: 'text-[9px]' },
+  md: { img: 'h-10 sm:h-11', word: 'text-xl sm:text-2xl', sub: 'text-[10px]' },
+  lg: { img: 'h-12 sm:h-14', word: 'text-2xl sm:text-3xl', sub: 'text-xs' },
+  xl: { img: 'h-16 sm:h-18', word: 'text-3xl sm:text-4xl', sub: 'text-sm' },
 };
 
 /**
- * Option 1 Logo Emblem (The Integrated 'R' with keyhole & city)
+ * Exact Vector LogoMark matching user's requested identity:
+ * - Royal Blue gradient Letter 'R'
+ * - Negative space White House Roof cut into the R
+ * - 4 Blue Window panes
  */
-export function LogoMark({ className = 'h-10 w-10' }: { className?: string }) {
+export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) {
   return (
-    <img
-      src="/logo.png"
-      alt="RentHub"
-      className={`${className} object-cover rounded-xl shadow-md border border-white/10 shrink-0 transition-transform duration-200 group-hover:scale-105`}
-      loading="eager"
-    />
+    <svg viewBox="0 0 100 100" className={`${className} shrink-0`} fill="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="rBlueGradNative" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00A2FF" />
+          <stop offset="45%" stopColor="#0066FF" />
+          <stop offset="100%" stopColor="#0038FF" />
+        </linearGradient>
+      </defs>
+
+      {/* Main R Body */}
+      <path
+        d="M 16 12 
+           C 16 7, 20 4, 28 4 
+           L 58 4 
+           C 80 4, 90 16, 90 35 
+           C 90 50, 78 60, 58 64 
+           L 88 95 
+           C 90 97, 88 100, 84 100 
+           L 68 100 
+           C 64 100, 60 97, 57 93 
+           L 38 68 
+           L 38 96 
+           C 38 99, 35 100, 32 100 
+           L 20 100 
+           C 17 100, 16 98, 16 95 
+           Z"
+        fill="url(#rBlueGradNative)"
+      />
+
+      {/* Negative Space White Roof Overhang */}
+      <path
+        d="M 16 42 
+           L 48 16 
+           C 50 14, 53 14, 55 16 
+           L 76 34 
+           L 70 42 
+           L 50 24 
+           L 26 44 
+           Z"
+        fill="#FFFFFF"
+      />
+
+      {/* White House Body Cutout */}
+      <path
+        d="M 32 44 
+           L 50 28 
+           L 66 42 
+           L 66 64 
+           L 32 64 
+           Z"
+        fill="#FFFFFF"
+      />
+
+      {/* 4 Blue Windows inside the house */}
+      <g fill="#0066FF">
+        <rect x="38" y="44" width="8" height="8" rx="2" />
+        <rect x="50" y="44" width="8" height="8" rx="2" />
+        <rect x="38" y="55" width="8" height="8" rx="2" />
+        <rect x="50" y="55" width="8" height="8" rx="2" />
+      </g>
+    </svg>
   );
 }
 
@@ -43,25 +101,30 @@ export default function Logo({
       to={to}
       onClick={onClick}
       aria-label="RentHub"
-      className="flex items-center gap-2.5 group select-none transition-opacity hover:opacity-95"
+      className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-150 active:scale-95 shrink-0"
       data-testid="logo"
     >
-      <img
-        src="/logo.png"
-        alt="RentHub Logo"
-        className={`${s.img} object-cover rounded-xl shadow-md border border-white/10 shrink-0 group-hover:scale-105 transition-transform duration-200`}
-        loading="eager"
-      />
+      {/* 1. Vector Logo Emblem */}
+      <LogoMark className={s.img} />
 
+      {/* 2. Exact Typography: Rent (Dark) + Hub (Blue) + Slogan (Иҷора • Фурӯш • Харид) */}
       {showWord && (
-        <span
-          className={`${s.word} font-black tracking-tight leading-none text-slate-900 dark:text-white transition-colors flex items-center ${
-            hideWordOnMobile ? 'hidden sm:flex' : 'flex'
-          }`}
-          style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif" }}
-        >
-          Rent<span className="text-[#FF6B35]">Hub</span>
-        </span>
+        <div className={`flex flex-col justify-center ${hideWordOnMobile ? 'hidden sm:flex' : 'flex'}`}>
+          <div className="flex items-baseline leading-none">
+            <span
+              className={`${s.word} font-black tracking-[-0.03em] text-slate-900 dark:text-white transition-colors`}
+              style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
+            >
+              Rent<span className="text-[#0066FF]">Hub</span>
+            </span>
+          </div>
+
+          <span
+            className={`${s.sub} font-semibold text-slate-500 dark:text-slate-400 tracking-[0.06em] mt-1 leading-none whitespace-nowrap`}
+          >
+            Иҷора • Фурӯш • Харид
+          </span>
+        </div>
       )}
     </Link>
   );
