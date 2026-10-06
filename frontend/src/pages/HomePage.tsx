@@ -116,7 +116,7 @@ function StatsSection({
         {benefits.map((item) => (
           <div
             key={item.title}
-            className={`group relative overflow-hidden rounded-3xl bg-white/95 dark:bg-[#111827]/90 backdrop-blur-md border border-gray-200/80 dark:border-white/10 p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl dark:hover:shadow-[0_20px_45px_-12px_rgba(0,0,0,0.7)] ${item.accentGlow}`}
+            className={`group relative overflow-hidden rounded-3xl bg-white/70 dark:bg-[#111827]/65 backdrop-blur-xl border border-gray-200/80 dark:border-white/10 p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl dark:hover:shadow-[0_20px_45px_-12px_rgba(0,0,0,0.7)] ${item.accentGlow}`}
           >
             {/* Top gradient accent line on hover */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -171,7 +171,7 @@ function StatsSection({
         ].map((stat) => (
           <div
             key={stat.label}
-            className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white/95 dark:bg-[#111827]/90 backdrop-blur-md border border-gray-200/80 dark:border-white/10 p-5 sm:p-6 text-center shadow-sm hover:shadow-lg dark:hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.6)] hover:border-[var(--accent)]/40 transition-all duration-300 hover:-translate-y-1"
+            className="group relative overflow-hidden rounded-2xl sm:rounded-3xl bg-white/70 dark:bg-[#111827]/65 backdrop-blur-xl border border-gray-200/80 dark:border-white/10 p-5 sm:p-6 text-center shadow-sm hover:shadow-lg dark:hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.6)] hover:border-[var(--accent)]/40 transition-all duration-300 hover:-translate-y-1"
           >
             <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] mb-2 group-hover:scale-110 transition-transform">
               <stat.icon className="w-5 h-5" />

@@ -54,7 +54,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
   const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0]
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 flex items-center justify-between px-6">
+    <header className="sticky top-0 z-30 h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/5 flex items-center justify-between px-6">
       {/* Left */}
       <div className="flex items-center gap-3">
         <h2 className="text-sm font-semibold text-gray-700 dark:text-slate-300">

@@ -62,7 +62,7 @@ export function CalendarSection() {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-12 text-center" data-testid="calendar-section">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-12 text-center" data-testid="calendar-section">
         <CalendarIcon className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
         <p className="font-bold">{t('dashboard.listings.empty')}</p>
       </div>
@@ -71,7 +71,7 @@ export function CalendarSection() {
 
   return (
     <div className="space-y-4" data-testid="calendar-section">
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-4 sm:p-5">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
           <label className="text-sm font-semibold text-gray-600 dark:text-gray-300">{t('dashboard.sec.pickListing')}</label>
           <select
@@ -135,7 +135,7 @@ export function MessagesSection() {
           <Loader2 className="h-7 w-7 animate-spin text-[var(--accent)]" />
         </div>
       ) : conversations.length === 0 ? (
-        <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-12 text-center">
+        <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-12 text-center">
           <MessageSquare className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
           <p className="font-bold">{t('dashboard.sec.noConv')}</p>
         </div>
@@ -146,7 +146,7 @@ export function MessagesSection() {
               key={c.id}
               type="button"
               onClick={() => navigate(`/messages?conversation=${c.id}`)}
-              className="w-full text-left rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-4 flex items-center gap-3 hover:border-[rgb(var(--accent-rgb)/0.4)] transition"
+              className="w-full text-left rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-4 flex items-center gap-3 hover:border-[rgb(var(--accent-rgb)/0.4)] transition"
             >
               <span className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white flex items-center justify-center text-sm font-semibold overflow-hidden shrink-0">
                 {c.other_user_avatar ? (
@@ -214,7 +214,7 @@ export function ReviewsSection() {
 
   return (
     <div className="space-y-4" data-testid="reviews-section">
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5 flex items-center gap-6">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5 flex items-center gap-6">
         <div>
           <p className="text-3xl font-extrabold tabular-nums">{avg.toFixed(1)}</p>
           <Stars rating={avg} />
@@ -225,7 +225,7 @@ export function ReviewsSection() {
       </div>
 
       {merged.length === 0 ? (
-        <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-12 text-center">
+        <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-12 text-center">
           <Star className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
           <p className="font-bold">{t('dashboard.sec.noReviews')}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.sec.noReviewsHint')}</p>
@@ -235,7 +235,7 @@ export function ReviewsSection() {
           {merged.map((r) => (
             <div
               key={`${r.listing_id}-${r.id}`}
-              className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-4"
+              className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-4"
             >
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 <div className="flex items-center gap-2 min-w-0">
@@ -291,21 +291,21 @@ export function EarningsSection() {
   return (
     <div className="space-y-4" data-testid="earnings-section">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
+        <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.overview.totalRevenue')}</p>
           <p className="text-2xl font-extrabold tabular-nums mt-1">{som(summary?.total_revenue ?? 0)}</p>
         </div>
-        <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
+        <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.overview.totalBookings')}</p>
           <p className="text-2xl font-extrabold tabular-nums mt-1">{summary?.total_bookings ?? 0}</p>
         </div>
-        <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
+        <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.overview.occupancy')}</p>
           <p className="text-2xl font-extrabold tabular-nums mt-1">{(summary?.occupancy_rate ?? 0).toFixed(1)}%</p>
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h2 className="font-semibold">{t('dashboard.overview.revenueChart')}</h2>
           <div className="flex flex-wrap gap-1 rounded-xl bg-gray-100 p-1 dark:bg-white/5">
@@ -316,7 +316,7 @@ export function EarningsSection() {
                 onClick={() => setPeriod(p)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition ${
                   period === p
-                    ? 'bg-white dark:bg-[#1a1d24] text-[var(--accent)] shadow-sm'
+                    ? 'bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl text-[var(--accent)] shadow-sm'
                     : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                 }`}
               >
@@ -372,7 +372,7 @@ export function ProfileSection() {
   const u = me;
   return (
     <div className="space-y-4" data-testid="profile-section">
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-6">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-6">
         <div className="flex items-center gap-4">
           <span className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white flex items-center justify-center text-xl font-bold overflow-hidden">
             {u?.avatar_url ? (
@@ -444,7 +444,7 @@ export function SettingsSection() {
 
   return (
     <div className="space-y-4" data-testid="settings-section">
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
         <h2 className="font-semibold mb-4 flex items-center gap-2">
           <Languages className="w-4 h-4 text-[var(--accent)]" />
           {t('dashboard.sec.language')}
@@ -467,7 +467,7 @@ export function SettingsSection() {
         </div>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
         <h2 className="font-semibold mb-4 flex items-center gap-2">
           <Globe className="w-4 h-4 text-[var(--accent)]" />
           {t('dashboard.sec.appearance')}
@@ -482,7 +482,7 @@ export function SettingsSection() {
         </button>
       </div>
 
-      <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-5">
+      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
         <div className="flex flex-wrap gap-2">
           <Link
             to="/settings"

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="RentHub">
+  <defs>
+    <linearGradient id="rhA" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0B2447"/>
+      <stop offset="0.5" stop-color="#123F86"/>
+      <stop offset="1" stop-color="#1B6EF3"/>
+    </linearGradient>
+  </defs>
+  <!-- Map pin (location) whose interior is cut away into a house (home) -->
+  <path fill="url(#rhA)" fill-rule="evenodd" d="
+    M32 4 C18.7 4 8 14.7 8 28
+    C8 41.8 22.5 54.4 28.6 58.9
+    A4.7 4.7 0 0 0 35.4 58.9
+    C41.5 54.4 56 41.8 56 28
+    C56 14.7 45.3 4 32 4 Z
+    M32 14.6 L47.4 26.6
+    Q48.8 27.7 48.8 29.4
+    L48.8 37.3
+    Q48.8 40 46.1 40
+    L17.9 40
+    Q15.2 40 15.2 37.3
+    L15.2 29.4
+    Q15.2 27.7 16.6 26.6 Z"/>
+  <!-- Hub: two connected nodes (renter + owner) meeting inside the home -->
+  <circle cx="27.5" cy="32" r="6" fill="#0B2447"/>
+  <circle cx="36.5" cy="32" r="6" fill="#1B6EF3" fill-opacity="0.92"/>
+</svg>
