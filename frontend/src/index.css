@@ -12,6 +12,14 @@
     --accent-foreground: #ffffff;
     --accent-rgb: 255 107 53;
 
+    /* Cool end of the logo gradient (the warm end is --accent itself, which
+       the theme colour picker already drives). One value cannot serve both
+       themes: the bright brand cyan is excellent on #0b0f19 and washed out on
+       #f8fafc, so light mode gets the darker shade of the same hue. The
+       favicon cannot read any of this - it is rendered outside the page - so
+       public/favicon.svg spells out its own compromise colour. */
+    --logo-cool: #0284c7;
+
     --color-primary: var(--accent);
     --color-primary-dark: var(--accent-hover);
     --color-secondary: #0f172a;
@@ -72,6 +80,7 @@
   }
 
   .dark {
+    --logo-cool: #22d3ee;
     --bg-page: #0b0f19;
     --bg-card: #111827;
     --bg-card-hover: #1e293b;

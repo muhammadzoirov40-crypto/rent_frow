@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useId } from 'react';
 
 interface LogoProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   to?: string;
   showWord?: boolean;
   hideWordOnMobile?: boolean;
@@ -10,100 +10,118 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { mark: 'w-8 h-8', word: 'text-lg' },
-  md: { mark: 'w-9 h-9', word: 'text-lg' },
-  lg: { mark: 'w-11 h-11', word: 'text-xl' },
+  sm: { mark: 'w-8 h-8', word: 'text-base' },
+  md: { mark: 'w-10 h-10', word: 'text-lg' },
+  lg: { mark: 'w-12 h-12', word: 'text-xl' },
+  xl: { mark: 'w-16 h-16', word: 'text-2xl' },
 };
 
-/* The mark is a skyline over a pin wrapped in ripples: a city, and a place in
- * it — the two things a rental listing is. It is drawn inline (no raster
- * asset) so it stays crisp at every size the header uses.
- *
- * Colour: the gradient runs from `var(--accent)` to a fixed cyan. With the
- * default accent that is exactly the brand orange -> cyan; picking another
- * accent in the theme moves the warm end with it, so the mark never fights
- * the rest of the page. A standalone copy (the favicon) cannot see the page's
- * CSS variables, so `public/favicon.svg` spells the same two colours out
- * literally.
+/**
+ * RentHub Option 1 Logo:
+ * Premium Monogram 'R' merging a City Skyline, a Keyhole Portal, and a dynamic Forward Arrow.
  */
 export function LogoMark({ className = '' }: { className?: string }) {
   const raw = useId();
-  const grad = `rentHubGrad${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const gradPrimary = `rhGradP${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const gradCool = `rhGradC${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
+
   return (
     <svg
-      viewBox="0 0 64 64"
+      viewBox="0 0 100 100"
       className={`${className} shrink-0`}
       aria-hidden="true"
       focusable="false"
     >
       <defs>
-        <linearGradient id={grad} x1="2" y1="60" x2="62" y2="4" gradientUnits="userSpaceOnUse">
-          <stop offset="0" style={{ stopColor: 'var(--accent, #FF6B35)' }} />
-          <stop offset="1" style={{ stopColor: '#22D3EE' }} />
+        {/* Warm Orange Gradient (Brand Accent) */}
+        <linearGradient id={gradPrimary} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: 'var(--accent, #FF6B35)' }} />
+          <stop offset="100%" style={{ stopColor: '#FF4500' }} />
+        </linearGradient>
+
+        {/* Cool Cyan / Electric Blue Gradient */}
+        <linearGradient id={gradCool} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style={{ stopColor: '#00F0FF' }} />
+          <stop offset="100%" style={{ stopColor: '#0284C7' }} />
         </linearGradient>
       </defs>
 
-      <g
+      {/* --- City Skyline Silhouette atop the R --- */}
+      <g fill="none" stroke={`url(#${gradCool})`} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9">
+        {/* Left tower */}
+        <path d="M 38 32 L 38 20 L 48 20 L 48 32" />
+        {/* Center skyscraper with spire */}
+        <path d="M 50 32 L 50 12 L 62 12 L 62 32" />
+        <path d="M 56 12 L 56 6" />
+        {/* Right building */}
+        <path d="M 64 32 L 64 22 L 74 22 L 74 34" />
+        {/* Window accents */}
+        <path d="M 43 24 h 1 M 56 17 h 1 M 56 22 h 1 M 69 26 h 1" stroke="#FFFFFF" strokeWidth="2.5" />
+      </g>
+
+      {/* --- Main Monogram 'R' Structure --- */}
+      {/* 1. Left Vertical Pillar (Orange Gradient) */}
+      <path
+        d="M 28 32 L 28 86"
+        stroke={`url(#${gradPrimary})`}
+        strokeWidth="11"
+        strokeLinecap="round"
+      />
+
+      {/* 2. Keyhole Arch & Upper Bowl of 'R' */}
+      <path
+        d="M 28 32 C 28 17, 78 17, 78 48 C 78 64, 52 64, 40 64"
         fill="none"
-        stroke={`url(#${grad})`}
-        strokeWidth="2"
+        stroke={`url(#${gradPrimary})`}
+        strokeWidth="11"
         strokeLinecap="round"
         strokeLinejoin="round"
-      >
-        {/* skyline — seven towers standing on one ground line */}
-        <path d="M4 17h8v7h-8z" />
-        <path d="M12 9h8v15h-8z" />
-        <path d="M20 14h8v10h-8z" />
-        <path d="M28 4h8v20h-8z" />
-        <path d="M36 14h8v10h-8z" />
-        <path d="M44 9h8v15h-8z" />
-        <path d="M52 17h8v7h-8z" />
+      />
 
-        {/* windows */}
-        <g strokeWidth="1.1" strokeOpacity="0.8">
-          <path d="M6.5 19.5h3" />
-          <path d="M14.5 12h3M14.5 15.5h3M14.5 19h3" />
-          <path d="M22.5 17h3M22.5 20.5h3" />
-          <path d="M30.5 7h3M30.5 10.5h3M30.5 14h3M30.5 17.5h3" />
-          <path d="M38.5 17h3M38.5 20.5h3" />
-          <path d="M46.5 12h3M46.5 15.5h3M46.5 19h3" />
-          <path d="M54.5 19.5h3" />
-        </g>
+      {/* 3. Dynamic Diagonal Leg / Arrow of 'R' (Cyan to Electric Blue) */}
+      <path
+        d="M 55 58 L 82 86"
+        stroke={`url(#${gradCool})`}
+        strokeWidth="11"
+        strokeLinecap="round"
+      />
 
-        {/* the two outer towers' walls drop past the mark and cut inward,
-            which is what turns a skyline into a frame */}
-        <path d="M4 24v24l9.5 9" />
-        <path d="M60 24v24l-9.5 9" />
-
-        {/* ripples around the pin */}
-        <circle cx="32" cy="43" r="15" />
-        <circle cx="32" cy="43" r="11" />
-        <circle cx="32" cy="43" r="7" />
-
-        {/* pin — evenodd so the hole shows whatever is behind the logo */}
-        <path
-          fill={`url(#${grad})`}
-          fillRule="evenodd"
-          stroke="none"
-          d="M32 47.2C31.2 46.4 28.8 44.6 28.8 41.8a3.2 3.2 0 1 1 6.4 0c0 2.8-2.4 4.6-3.2 5.4zM30.4 41.8a1.6 1.6 0 1 0 3.2 0 1.6 1.6 0 1 0-3.2 0z"
-        />
-      </g>
+      {/* 4. Center Keyhole Core (Representing Security & Rental Access) */}
+      <circle cx="53" cy="45" r="5" fill="#FFFFFF" />
+      <polygon points="50.5,46 55.5,46 57,56 49,56" fill="#FFFFFF" />
     </svg>
   );
 }
 
-export default function Logo({ size = 'md', to = '/', showWord = true, hideWordOnMobile = false, onClick }: LogoProps) {
+export default function Logo({
+  size = 'md',
+  to = '/',
+  showWord = true,
+  hideWordOnMobile = false,
+  onClick,
+}: LogoProps) {
   const s = SIZES[size];
   return (
-    <Link to={to} onClick={onClick} aria-label="RentHub" className="flex items-center gap-2.5" data-testid="logo">
-      <LogoMark className={s.mark} />
+    <Link
+      to={to}
+      onClick={onClick}
+      aria-label="RentHub"
+      className="flex items-center gap-3 group"
+      data-testid="logo"
+    >
+      <div className="p-1 rounded-xl bg-slate-900/40 border border-slate-700/40 group-hover:border-[var(--accent,#FF6B35)]/50 transition-colors shadow-sm">
+        <LogoMark className={s.mark} />
+      </div>
       {showWord && (
-        <span
-          className={`${s.word} font-extrabold tracking-tight ${hideWordOnMobile ? 'hidden sm:block' : ''}`}
-        >
-          <span className="text-[#1A1A2E] dark:text-white">Rent</span>
-          <span className="text-[var(--accent)]">Hub</span>
-        </span>
+        <div className={`flex flex-col ${hideWordOnMobile ? 'hidden sm:flex' : ''}`}>
+          <span className={`${s.word} font-black tracking-tight leading-none`}>
+            <span className="text-slate-900 dark:text-white">Rent</span>
+            <span className="text-[var(--accent,#FF6B35)]">Hub</span>
+          </span>
+          <span className="text-[9px] font-bold text-slate-400 tracking-wider uppercase mt-1">
+            Аренда & Прокат
+          </span>
+        </div>
       )}
     </Link>
   );
