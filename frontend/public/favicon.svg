@@ -1,37 +1,78 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <linearGradient id="favP" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FF7A3D" />
-      <stop offset="100%" stop-color="#FF5216" />
+    <!-- Left Orange/Gold Gradient -->
+    <linearGradient id="hexOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFB300" />
+      <stop offset="60%" stop-color="#FF6B35" />
+      <stop offset="100%" stop-color="#E63900" />
     </linearGradient>
-    <linearGradient id="favC" x1="0%" y1="0%" x2="100%" y2="100%">
+
+    <!-- Right Cyan Neon Gradient -->
+    <linearGradient id="hexCyan" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00F0FF" />
-      <stop offset="100%" stop-color="#0284C7" />
+      <stop offset="60%" stop-color="#00B4D8" />
+      <stop offset="100%" stop-color="#0077B6" />
+    </linearGradient>
+
+    <!-- Subtle inner shadow -->
+    <linearGradient id="hexDarkFacet" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#020617" stop-opacity="0.9" />
     </linearGradient>
   </defs>
 
-  <!-- Background tile for crisp display in all browser tabs -->
-  <rect width="100" height="100" rx="26" fill="#0B1120" />
+  <!-- Hexagon Outer Shape (Split Dual-Tone) -->
+  <!-- Left Side: Orange Hexagon Half -->
+  <path
+    d="M 50 6 L 12 28 L 12 72 L 50 94 Z"
+    fill="url(#hexDarkFacet)"
+    stroke="url(#hexOrange)"
+    stroke-width="4.5"
+    stroke-linejoin="round"
+  />
 
-  <!-- City Skyline Silhouette atop the R -->
-  <g fill="none" stroke="url(#favC)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
-    <path d="M 38 32 L 38 20 L 48 20 L 48 32" />
-    <path d="M 50 32 L 50 12 L 62 12 L 62 32" />
-    <path d="M 56 12 L 56 6" />
-    <path d="M 64 32 L 64 22 L 74 22 L 74 34" />
-    <path d="M 43 24 h 1 M 56 17 h 1 M 56 22 h 1 M 69 26 h 1" stroke="#FFFFFF" stroke-width="2.5" />
-  </g>
+  <!-- Right Side: Cyan Hexagon Half -->
+  <path
+    d="M 50 6 L 88 28 L 88 72 L 50 94 Z"
+    fill="url(#hexDarkFacet)"
+    stroke="url(#hexCyan)"
+    stroke-width="4.5"
+    stroke-linejoin="round"
+  />
 
-  <!-- Left Vertical Pillar -->
-  <path d="M 28 32 L 28 86" stroke="url(#favP)" stroke-width="12" stroke-linecap="round" />
+  <!-- Inner 3D Facet Bevels for Depth -->
+  <path d="M 12 28 L 26 36 L 26 64 L 12 72" fill="none" stroke="url(#hexOrange)" stroke-width="2.5" opacity="0.6" />
+  <path d="M 88 28 L 74 36 L 74 64 L 88 72" fill="none" stroke="url(#hexCyan)" stroke-width="2.5" opacity="0.6" />
+  <path d="M 50 6 L 50 20 M 50 80 L 50 94" stroke="#FFFFFF" stroke-width="2" opacity="0.4" />
 
-  <!-- Upper Bowl & Keyhole arch -->
-  <path d="M 28 32 C 28 17, 78 17, 78 48 C 78 64, 52 64, 40 64" fill="none" stroke="url(#favP)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Central Integrated Stylized Monogram "R" -->
+  <!-- Left Vertical Stem of R (Orange) -->
+  <path
+    d="M 34 26 L 34 74 L 44 74 L 44 26 Z"
+    fill="url(#hexOrange)"
+    stroke="#020617"
+    stroke-width="1.5"
+  />
 
-  <!-- Diagonal Leg / Arrow -->
-  <path d="M 55 58 L 82 86" stroke="url(#favC)" stroke-width="12" stroke-linecap="round" />
+  <!-- Top Loop/Bowl of R (Dual Orange & Cyan) -->
+  <path
+    d="M 44 26 L 58 26 C 70 26, 74 34, 74 44 C 74 54, 68 58, 54 58 L 44 58 Z"
+    fill="url(#hexCyan)"
+    stroke="#020617"
+    stroke-width="1.5"
+  />
 
-  <!-- Center Keyhole Core -->
-  <circle cx="53" cy="45" r="5" fill="#FFFFFF" />
-  <polygon points="50.5,46 55.5,46 57,56 49,56" fill="#FFFFFF" />
+  <!-- Inner Loop Cutout -->
+  <path
+    d="M 44 35 L 56 35 C 62 35, 63 39, 63 44 C 63 49, 60 49, 54 49 L 44 49 Z"
+    fill="#0B1120"
+  />
+
+  <!-- Dynamic Diagonal Kick / Leg of R (Cutting Outward in Cyan) -->
+  <path
+    d="M 50 56 L 72 78 L 82 78 L 58 54 Z"
+    fill="url(#hexCyan)"
+    stroke="#020617"
+    stroke-width="1.5"
+  />
 </svg>

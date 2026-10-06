@@ -17,13 +17,14 @@ const SIZES = {
 };
 
 /**
- * RentHub Option 1 Logo:
- * Premium Monogram 'R' merging a City Skyline, a Keyhole Portal, and a dynamic Forward Arrow.
+ * RentHub Luxury Hexagon Monogram 'R' (Option 1):
+ * Dual-tone 3D faceted hexagon with embedded Letter 'R'
+ * Left side: Gold/Orange glow, Right side: Cyan/Electric Blue glow.
  */
 export function LogoMark({ className = '' }: { className?: string }) {
   const raw = useId();
-  const gradPrimary = `rhGradP${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
-  const gradCool = `rhGradC${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const gradOrange = `hexO${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
+  const gradCyan = `hexC${raw.replace(/[^a-zA-Z0-9]/g, '')}`;
 
   return (
     <svg
@@ -33,62 +34,71 @@ export function LogoMark({ className = '' }: { className?: string }) {
       focusable="false"
     >
       <defs>
-        {/* Warm Orange Gradient (Brand Accent) */}
-        <linearGradient id={gradPrimary} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'var(--accent, #FF6B35)' }} />
-          <stop offset="100%" style={{ stopColor: '#FF4500' }} />
+        {/* Left Orange/Gold Gradient */}
+        <linearGradient id={gradOrange} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFB300" />
+          <stop offset="60%" stopColor="#FF6B35" />
+          <stop offset="100%" stopColor="#E63900" />
         </linearGradient>
 
-        {/* Cool Cyan / Electric Blue Gradient */}
-        <linearGradient id={gradCool} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: '#00F0FF' }} />
-          <stop offset="100%" style={{ stopColor: '#0284C7' }} />
+        {/* Right Cyan Neon Gradient */}
+        <linearGradient id={gradCyan} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00F0FF" />
+          <stop offset="60%" stopColor="#00B4D8" />
+          <stop offset="100%" stopColor="#0077B6" />
         </linearGradient>
       </defs>
 
-      {/* --- City Skyline Silhouette atop the R --- */}
-      <g fill="none" stroke={`url(#${gradCool})`} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity="0.9">
-        {/* Left tower */}
-        <path d="M 38 32 L 38 20 L 48 20 L 48 32" />
-        {/* Center skyscraper with spire */}
-        <path d="M 50 32 L 50 12 L 62 12 L 62 32" />
-        <path d="M 56 12 L 56 6" />
-        {/* Right building */}
-        <path d="M 64 32 L 64 22 L 74 22 L 74 34" />
-        {/* Window accents */}
-        <path d="M 43 24 h 1 M 56 17 h 1 M 56 22 h 1 M 69 26 h 1" stroke="#FFFFFF" strokeWidth="2.5" />
-      </g>
-
-      {/* --- Main Monogram 'R' Structure --- */}
-      {/* 1. Left Vertical Pillar (Orange Gradient) */}
+      {/* Hexagon Outer Frame */}
+      {/* Left Orange Half */}
       <path
-        d="M 28 32 L 28 86"
-        stroke={`url(#${gradPrimary})`}
-        strokeWidth="11"
-        strokeLinecap="round"
-      />
-
-      {/* 2. Keyhole Arch & Upper Bowl of 'R' */}
-      <path
-        d="M 28 32 C 28 17, 78 17, 78 48 C 78 64, 52 64, 40 64"
-        fill="none"
-        stroke={`url(#${gradPrimary})`}
-        strokeWidth="11"
-        strokeLinecap="round"
+        d="M 50 6 L 12 28 L 12 72 L 50 94 Z"
+        fill="currentColor"
+        fillOpacity="0.06"
+        stroke={`url(#${gradOrange})`}
+        strokeWidth="4.5"
         strokeLinejoin="round"
       />
 
-      {/* 3. Dynamic Diagonal Leg / Arrow of 'R' (Cyan to Electric Blue) */}
+      {/* Right Cyan Half */}
       <path
-        d="M 55 58 L 82 86"
-        stroke={`url(#${gradCool})`}
-        strokeWidth="11"
-        strokeLinecap="round"
+        d="M 50 6 L 88 28 L 88 72 L 50 94 Z"
+        fill="currentColor"
+        fillOpacity="0.06"
+        stroke={`url(#${gradCyan})`}
+        strokeWidth="4.5"
+        strokeLinejoin="round"
       />
 
-      {/* 4. Center Keyhole Core (Representing Security & Rental Access) */}
-      <circle cx="53" cy="45" r="5" fill="#FFFFFF" />
-      <polygon points="50.5,46 55.5,46 57,56 49,56" fill="#FFFFFF" />
+      {/* 3D Facet Bevel Lines */}
+      <path d="M 12 28 L 26 36 L 26 64 L 12 72" fill="none" stroke={`url(#${gradOrange})`} strokeWidth="2.5" opacity="0.6" />
+      <path d="M 88 28 L 74 36 L 74 64 L 88 72" fill="none" stroke={`url(#${gradCyan})`} strokeWidth="2.5" opacity="0.6" />
+      <path d="M 50 6 L 50 20 M 50 80 L 50 94" stroke="#FFFFFF" strokeWidth="2" opacity="0.4" />
+
+      {/* Central Integrated Stylized Monogram "R" */}
+      {/* Left Vertical Stem (Orange) */}
+      <path
+        d="M 34 26 L 34 74 L 44 74 L 44 26 Z"
+        fill={`url(#${gradOrange})`}
+      />
+
+      {/* Top Loop/Bowl of R (Cyan) */}
+      <path
+        d="M 44 26 L 58 26 C 70 26, 74 34, 74 44 C 74 54, 68 58, 54 58 L 44 58 Z"
+        fill={`url(#${gradCyan})`}
+      />
+
+      {/* Inner Loop Cutout */}
+      <path
+        d="M 44 35 L 56 35 C 62 35, 63 39, 63 44 C 63 49, 60 49, 54 49 L 44 49 Z"
+        fill="#090D16"
+      />
+
+      {/* Dynamic Diagonal Kick / Leg of R (Cyan) */}
+      <path
+        d="M 50 56 L 72 78 L 82 78 L 58 54 Z"
+        fill={`url(#${gradCyan})`}
+      />
     </svg>
   );
 }
@@ -109,14 +119,14 @@ export default function Logo({
       className="flex items-center gap-3 group"
       data-testid="logo"
     >
-      <div className="p-1 rounded-xl bg-slate-900/40 border border-slate-700/40 group-hover:border-[var(--accent,#FF6B35)]/50 transition-colors shadow-sm">
+      <div className="p-1 rounded-xl bg-slate-900/40 border border-slate-700/40 group-hover:border-[#FF6B35]/50 transition-colors shadow-sm">
         <LogoMark className={s.mark} />
       </div>
       {showWord && (
         <div className={`flex flex-col ${hideWordOnMobile ? 'hidden sm:flex' : ''}`}>
           <span className={`${s.word} font-black tracking-tight leading-none`}>
-            <span className="text-slate-900 dark:text-white">Rent</span>
-            <span className="text-[var(--accent,#FF6B35)]">Hub</span>
+            <span className="text-[#FF8A00]">Rent</span>
+            <span className="text-[#00F0FF]">Hub</span>
           </span>
           <span className="text-[9px] font-bold text-slate-400 tracking-wider uppercase mt-1">
             Аренда & Прокат
