@@ -94,8 +94,11 @@
     "googleLoginFailed": "Google login failed. Please try again."
   },
   "home": {
+    "heroCountry": "Tajikistan",
+    "heroFallbackTag": "RENT",
+
     "heroTitle": "Everything you need to rent at",
-    "heroSubtitle": "Rent out or take property, modern cars and professional equipment — confidently, and without middlemen.",
+    "heroSubtitle": "Real listings for renting homes, cars and professional equipment — straight from the owners.",
     "find": "Find",
     "popularCategories": "Popular categories",
     "popularListings": "Popular listings",

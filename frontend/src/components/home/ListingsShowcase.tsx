@@ -138,7 +138,7 @@ export default function ListingsShowcase({ tabs, coords, initialTab }: ListingsS
       )}
 
       {empty ? (
-        <div className="bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 rounded-2xl">
+        <div className="glass-tile border rounded-2xl">
           <EmptyState
             icon={active === 'nearYou' ? MapPin : Package}
             title={active === 'nearYou' ? t('home.nearYouEmpty') : t('home.noListingsYet')}

@@ -256,3 +256,41 @@
   transform: translateY(-4px);
 }
 
+/* ===== Faceted backdrop + glass tiles =====
+   The dark theme gets a low-poly field (public/geo-bg.svg) fixed behind the
+   page; cards then sit on it as frosted tiles, so the facets read *through*
+   them instead of being hidden by an opaque panel. Light mode keeps a plain
+   page — glass over flat white has nothing worth revealing.
+
+   Deliberately unlayered: Tailwind's utilities live in @layer utilities and
+   lose to this, which is what lets .glass-tile own the card's background and
+   border while the component keeps its own rounded-/padding utilities. */
+.dark body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: #0b0f19 url('/geo-bg.svg') center / cover no-repeat;
+  pointer-events: none;
+}
+
+/* Separate from .glass-card on purpose: that one pins an opaque dark rgba() in
+   every theme, which is simply wrong on a light page. */
+.glass-tile {
+  background: rgba(255, 255, 255, 0.62);
+  border-color: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: 0 12px 32px -14px rgba(15, 23, 42, 0.25);
+}
+
+.dark .glass-tile {
+  background: rgba(20, 26, 38, 0.5);
+  border-color: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px) saturate(150%);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  box-shadow:
+    0 18px 44px -18px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+

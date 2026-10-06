@@ -89,7 +89,7 @@ export function NearYouSection({ radius = 25 }: { radius?: number }) {
           ))}
         </div>
       ) : items.length === 0 ? (
-        <div className="bg-white dark:bg-[#12141a] border border-gray-200 dark:border-white/10 rounded-2xl">
+        <div className="glass-tile border rounded-2xl">
           <EmptyState
             icon={MapPin}
             title={t('home.nearYouEmpty')}

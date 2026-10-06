@@ -38,7 +38,7 @@ export default function Layout({ children }: LayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-transparent flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-gray-400 font-medium">{t('common.loading')}</p>
@@ -48,7 +48,7 @@ export default function Layout({ children }: LayoutProps) {
   }
 
   return (
-    <div className="assistant-shift min-h-screen bg-gray-50 dark:bg-[#0a0a1a] flex flex-col">
+    <div className="assistant-shift min-h-screen bg-gray-50 dark:bg-transparent flex flex-col">
       <Header />
       <div className="flex flex-1 min-h-0">
         {showSidebar && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}

@@ -36,7 +36,9 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[var(--bg-page)]">
+    <div className="min-h-screen">
+      {/* no bg-colour fill on this root: the faceted dark backdrop lives on
+          body::before, and an opaque page-colour fill would sit on top of it */}
       {/* Animated Hero matching video design */}
       <AnimatedHero />
 

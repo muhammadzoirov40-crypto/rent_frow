@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Sparkles, Building2, Car, Wrench, ArrowRight } from 'lucide-react';
 import SearchBar from '../search/SearchBar';
 import { listings, type ListingListItem } from '../../api';
+import { useTranslation } from 'react-i18next';
 
 // Fallback high quality items if backend has few listings
 const FALLBACK_LISTINGS = [
@@ -15,7 +16,7 @@ const FALLBACK_LISTINGS = [
     price: 450,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80',
-    category_name: 'МАНЗИЛ',
+    categoryKey: 'home.heroTagProperty',
     badgeColor: '#FF6B35',
   },
   {
@@ -25,7 +26,7 @@ const FALLBACK_LISTINGS = [
     price: 790,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=600&auto=format&fit=crop&q=80',
-    category_name: 'АВТО',
+    categoryKey: 'home.heroTagTransport',
     badgeColor: '#00F0FF',
   },
   {
@@ -35,7 +36,7 @@ const FALLBACK_LISTINGS = [
     price: 110,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?w=600&auto=format&fit=crop&q=80',
-    category_name: 'ТАҶҲИЗОТ',
+    categoryKey: 'home.heroTagEquipment',
     badgeColor: '#10B981',
   },
   {
@@ -45,7 +46,7 @@ const FALLBACK_LISTINGS = [
     price: 280,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&auto=format&fit=crop&q=80',
-    category_name: 'ФОТО/ВИДЕО',
+    categoryKey: 'home.heroTagPhoto',
     badgeColor: '#A855F7',
   },
   {
@@ -55,7 +56,7 @@ const FALLBACK_LISTINGS = [
     price: 1200,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1520031441872-265e4ff70366?w=600&auto=format&fit=crop&q=80',
-    category_name: 'АВТО',
+    categoryKey: 'home.heroTagTransport',
     badgeColor: '#00F0FF',
   },
   {
@@ -65,7 +66,7 @@ const FALLBACK_LISTINGS = [
     price: 950,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&auto=format&fit=crop&q=80',
-    category_name: 'МАНЗИЛ',
+    categoryKey: 'home.heroTagProperty',
     badgeColor: '#FF6B35',
   },
   {
@@ -75,7 +76,7 @@ const FALLBACK_LISTINGS = [
     price: 350,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1508614589041-895b88991e3e?w=600&auto=format&fit=crop&q=80',
-    category_name: 'ТАҶҲИЗОТ',
+    categoryKey: 'home.heroTagEquipment',
     badgeColor: '#10B981',
   },
   {
@@ -85,7 +86,7 @@ const FALLBACK_LISTINGS = [
     price: 320,
     price_unit: 'day',
     primary_image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&auto=format&fit=crop&q=80',
-    category_name: 'МАНЗИЛ',
+    categoryKey: 'home.heroTagProperty',
     badgeColor: '#FF6B35',
   },
 ];
@@ -99,21 +100,25 @@ interface RealCardProps {
     price_unit?: string;
     primary_image?: string | null;
     category_name?: string | null;
+    categoryKey?: string;
     badgeColor?: string;
   };
 }
 
 function InfiniteCard({ item }: RealCardProps) {
+  const { t } = useTranslation();
   const image =
     item.primary_image ||
     'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&auto=format&fit=crop&q=80';
-  const category = item.category_name || 'ИҶОРА';
+  const category = item.categoryKey
+    ? t(item.categoryKey)
+    : item.category_name || t('home.heroFallbackTag');
   const badgeColor = item.badgeColor || '#00F0FF';
 
   return (
     <Link
       to={`/listings/${item.id}`}
-      className="block group bg-slate-900/90 hover:bg-slate-800/95 border border-slate-800 hover:border-[#FF6B35]/40 rounded-2xl p-3 sm:p-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
+      className="block group bg-slate-900/60 hover:bg-slate-800/85 border border-white/10 hover:border-[#FF6B35]/50 rounded-2xl p-3 sm:p-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
     >
       <div className="h-32 sm:h-36 w-full rounded-xl overflow-hidden relative bg-slate-800">
         <img
@@ -135,15 +140,15 @@ function InfiniteCard({ item }: RealCardProps) {
           {item.title}
         </h4>
         <p className="text-[11px] text-slate-400 truncate mt-0.5">
-          {item.city_name || 'Тоҷикистон'}
+          {item.city_name || t('home.heroCountry')}
         </p>
 
         <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-slate-800">
           <span className="text-xs font-black text-[#00F0FF]">
-            {item.price} с.<span className="text-[10px] text-slate-400 font-normal">/рӯз</span>
+            {item.price} <span className="text-[10px] text-slate-400 font-normal">{t('home.heroPerDay')}</span>
           </span>
           <span className="text-[10px] font-bold text-slate-400 group-hover:text-white transition-colors flex items-center gap-0.5">
-            Бештар дидан &rarr;
+            {t('common.viewDetails')} &rarr;
           </span>
         </div>
       </div>
@@ -152,6 +157,7 @@ function InfiniteCard({ item }: RealCardProps) {
 }
 
 export default function AnimatedHero() {
+  const { t } = useTranslation();
   // Fetch real listings from backend
   const { data } = useQuery({
     queryKey: ['heroRealListings'],
@@ -190,19 +196,19 @@ export default function AnimatedHero() {
             {/* Pill Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--accent,#FF6B35)]/10 border border-[var(--accent,#FF6B35)]/25 text-xs font-bold text-[var(--accent,#FF6B35)] shadow-sm">
               <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '4s' }} />
-              <span>Платформаи рақамии иҷора дар Тоҷикистон</span>
+              <span>{t('home.heroKicker')}</span>
             </div>
 
             {/* Title with Gradient Accent */}
             <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
-              Ҳама чиз барои иҷора дар{' '}
+              {t('home.heroTitle')}{' '}
               <span className="bg-gradient-to-r from-[var(--accent,#FF6B35)] via-[#FF7A3D] to-[#00F0FF] bg-clip-text text-transparent">
                 RentHub
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
-              Эълонҳои воқеӣ (реалӣ) барои иҷораи манзилҳо, автомобилҳо ва таҷҳизоти касбӣ бевосита аз соҳибон.
+              {t('home.heroSubtitle')}
             </p>
 
             {/* Search Bar */}
@@ -212,27 +218,27 @@ export default function AnimatedHero() {
 
             {/* Category Shortcuts */}
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
-              <span className="text-xs font-semibold text-slate-400">Зуд гузаштан:</span>
+              <span className="text-xs font-semibold text-slate-400">{t('home.heroQuickJump')}</span>
               <a
                 href="#categories"
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-[var(--accent,#FF6B35)]/10 hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
               >
                 <Building2 className="w-3.5 h-3.5 text-[var(--accent,#FF6B35)]" />
-                Манзилҳо
+                {t('home.heroPillProperty')}
               </a>
               <a
                 href="#categories"
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-[#00F0FF]/10 hover:text-[#00F0FF] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
               >
                 <Car className="w-3.5 h-3.5 text-[#00F0FF]" />
-                Автомобилҳо
+                {t('home.heroPillTransport')}
               </a>
               <a
                 href="#categories"
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-emerald-500/10 hover:text-emerald-500 text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
               >
                 <Wrench className="w-3.5 h-3.5 text-emerald-500" />
-                Таҷҳизот
+                {t('home.heroPillEquipment')}
               </a>
             </div>
           </motion.div>
