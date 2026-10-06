@@ -9,10 +9,10 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { img: 'h-8 sm:h-9', word: 'text-lg', sub: 'text-[9px]' },
-  md: { img: 'h-10 sm:h-11', word: 'text-xl sm:text-2xl', sub: 'text-[10px]' },
-  lg: { img: 'h-12 sm:h-14', word: 'text-2xl sm:text-3xl', sub: 'text-xs' },
-  xl: { img: 'h-16 sm:h-18', word: 'text-3xl sm:text-4xl', sub: 'text-sm' },
+  sm: { img: 'h-8 sm:h-9', word: 'text-xl sm:text-2xl' },
+  md: { img: 'h-10 sm:h-11', word: 'text-2xl sm:text-3xl' },
+  lg: { img: 'h-12 sm:h-14', word: 'text-3xl sm:text-4xl' },
+  xl: { img: 'h-16 sm:h-18', word: 'text-4xl sm:text-5xl' },
 };
 
 /**
@@ -107,24 +107,16 @@ export default function Logo({
       {/* 1. Vector Logo Emblem */}
       <LogoMark className={s.img} />
 
-      {/* 2. Exact Typography: Rent (Dark) + Hub (Blue) + Slogan (Иҷора • Фурӯш • Харид) */}
+      {/* 2. Exact Typography: ONLY 'RentHub' (NO SUBTITLE/SLOGAN) */}
       {showWord && (
-        <div className={`flex flex-col justify-center ${hideWordOnMobile ? 'hidden sm:flex' : 'flex'}`}>
-          <div className="flex items-baseline leading-none">
-            <span
-              className={`${s.word} font-black tracking-[-0.03em] text-slate-900 dark:text-white transition-colors`}
-              style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
-            >
-              Rent<span className="text-[#0066FF]">Hub</span>
-            </span>
-          </div>
-
-          <span
-            className={`${s.sub} font-semibold text-slate-500 dark:text-slate-400 tracking-[0.06em] mt-1 leading-none whitespace-nowrap`}
-          >
-            Иҷора • Фурӯш • Харид
-          </span>
-        </div>
+        <span
+          className={`${s.word} font-black tracking-[-0.03em] leading-none text-slate-900 dark:text-white transition-colors flex items-center ${
+            hideWordOnMobile ? 'hidden sm:flex' : 'flex'
+          }`}
+          style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
+        >
+          Rent<span className="text-[#0066FF]">Hub</span>
+        </span>
       )}
     </Link>
   );
