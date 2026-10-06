@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
@@ -88,17 +88,33 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
     navigate(`/search?${params.toString()}`);
   };
 
+  // The browser's own calendar button would be a second, dark calendar icon
+  // sitting on top of the date text, so it is hidden in CSS. Clicking the
+  // field itself now opens the picker instead.
+  const openPicker = (e: MouseEvent<HTMLInputElement>) => {
+    const el = e.currentTarget;
+    el.focus();
+    try {
+      el.showPicker?.();
+    } catch {
+      /* unsupported browser — the field stays typeable */
+    }
+  };
+
   const selectCls =
-    'w-full min-w-0 bg-transparent border-0 focus:outline-none text-sm text-gray-900 dark:text-white py-2.5 pr-6 cursor-pointer appearance-none';
+    // appearance-none drops the native dropdown arrow (its UA padding alone
+    // would eat ~32px, enough to clip "Ҳамаи категорияҳо"), so the right
+    // padding stays at zero — there is no chevron to reserve room for.
+    'w-full min-w-0 bg-transparent border-0 focus:outline-none text-sm text-gray-900 dark:text-white py-2.5 cursor-pointer appearance-none';
 
   return (
     <form
       onSubmit={submit}
-      className={`bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 rounded-2xl shadow-[0_16px_40px_-20px_rgba(0,0,0,0.12)] dark:shadow-[0_20px_45px_-20px_rgba(0,0,0,0.7)] p-2 sm:p-2.5 flex flex-col gap-1.5 md:flex-row md:items-center md:gap-1.5 backdrop-blur-md ${
+      className={`bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-white/10 rounded-2xl shadow-[0_16px_40px_-20px_rgba(0,0,0,0.12)] dark:shadow-[0_20px_45px_-20px_rgba(0,0,0,0.7)] p-2 sm:p-2.5 flex flex-col gap-1.5 md:flex-row md:flex-wrap md:items-center md:gap-1.5 backdrop-blur-md ${
         compact ? 'md:rounded-xl rounded-xl' : ''
       }`}
     >
-      <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
+      <div className={`flex-1 min-w-0 md:min-w-[9.5rem] md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
         <Search className="w-4 h-4 text-gray-400 shrink-0" />
         <input
           type="search"
@@ -110,7 +126,9 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
         />
       </div>
 
-      <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
+      {/* 12rem, not 9.5rem: this label is the longest one in the bar and the
+          group must keep ~138px for it once icon, gap and padding are paid. */}
+      <div className={`flex-1 min-w-0 md:min-w-[12rem] md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
         <LayoutGrid className="w-4 h-4 text-gray-400 shrink-0" />
         <select
           value={values.category_id}
@@ -127,7 +145,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
         </select>
       </div>
 
-      <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
+      <div className={`flex-1 min-w-0 md:min-w-[10.5rem] md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
         <MapPin className="w-4 h-4 text-gray-400 shrink-0" />
         <select
           value={values.city_id}
@@ -144,14 +162,15 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
         </select>
       </div>
 
-      <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
+      <div className={`flex-1 min-w-0 md:min-w-[9.5rem] md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
         <CalendarDays className="w-4 h-4 text-gray-400 shrink-0" />
         <input
           type="date"
           value={values.start_date}
           onChange={(e) => set('start_date', e.target.value)}
           aria-label={t('search.dateFrom')}
-          className={`${fieldCls} md:w-[7.5rem]`}
+          onClick={openPicker}
+          className={`${fieldCls} date-field md:w-[7.5rem]`}
         />
         <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
         <input
@@ -160,12 +179,13 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
           min={values.start_date || undefined}
           onChange={(e) => set('end_date', e.target.value)}
           aria-label={t('search.dateTo')}
-          className={`${fieldCls} md:w-[7.5rem]`}
+          onClick={openPicker}
+          className={`${fieldCls} date-field md:w-[7.5rem]`}
         />
       </div>
 
       {showMore && (
-        <div className={`flex-1 min-w-0 md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
+        <div className={`flex-1 min-w-0 md:min-w-[9.5rem] md:border-r border-gray-100 dark:border-white/10 ${groupCls}`}>
           <Tag className="w-4 h-4 text-gray-400 shrink-0" />
           <input
             type="number"

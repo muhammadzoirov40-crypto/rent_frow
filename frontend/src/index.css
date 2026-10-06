@@ -294,3 +294,20 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+
+/* Search-bar date fields.
+   Chrome draws its own calendar button inside every <input type="date">, which
+   put a second, dark calendar glyph on top of "дд.мм.гггг" — visually the same
+   as a rendering bug. It is hidden here and SearchBar.openPicker() opens the
+   picker from the field itself, so the control keeps working. */
+.date-field::-webkit-calendar-picker-indicator,
+.date-field::-webkit-inner-spin-button,
+.date-field::-webkit-clear-button {
+  display: none;
+  appearance: none;
+  -webkit-appearance: none;
+  opacity: 0;
+  width: 0;
+  margin: 0;
+  padding: 0;
+}
