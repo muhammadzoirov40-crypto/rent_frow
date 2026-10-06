@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 interface LogoProps {
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg';
   to?: string;
   showWord?: boolean;
   hideWordOnMobile?: boolean;
@@ -9,60 +9,66 @@ interface LogoProps {
 }
 
 const SIZES = {
-  sm: { icon: 'w-7 h-7 text-xs', word: 'text-lg', dot: 'w-1.5 h-1.5' },
-  md: { icon: 'w-8 h-8 text-sm', word: 'text-xl', dot: 'w-2 h-2' },
-  lg: { icon: 'w-10 h-10 text-base', word: 'text-2xl', dot: 'w-2.5 h-2.5' },
-  xl: { icon: 'w-12 h-12 text-lg', word: 'text-3xl', dot: 'w-3 h-3' },
+  sm: { mark: 'w-8 h-8', word: 'text-lg' },
+  md: { mark: 'w-9 h-9', word: 'text-lg' },
+  lg: { mark: 'w-11 h-11', word: 'text-xl' },
 };
 
 /**
- * RentHub Modern Minimalist Wordmark + Luxury Emblem
- * Designed specifically for renthub.qobus.tj:
- * - A refined luxury geometric 'R' tile with golden-amber accent
- * - Pure, ultra-clean Plus Jakarta Sans typography
- * - Dynamic accent 'Hub' that seamlessly blends with the site's dark/light modes
+ * House + handshake mark (The true native identity of https://renthub.qobus.tj/).
+ * Drawn inline so it dynamically reacts to theme variables (--accent), stays razor sharp,
+ * and maintains 100% brand authenticity on desktop and mobile.
  */
-export function LogoMark({ className = 'w-8 h-8' }: { className?: string }) {
+export function LogoMark({ className = '' }: { className?: string }) {
   return (
-    <div
-      className={`${className} shrink-0 rounded-xl bg-gradient-to-br from-[#1E2433] via-[#111624] to-[#0A0D14] border border-white/10 shadow-lg flex items-center justify-center relative overflow-hidden group-hover:border-[var(--accent,#FF6B35)]/60 transition-all duration-300`}
+    <svg
+      viewBox="0 0 64 64"
+      className={`${className} shrink-0 text-[var(--accent,#FF6B35)]`}
+      aria-hidden="true"
+      focusable="false"
     >
-      {/* Subtle top inner glow */}
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-      
-      {/* Precision Vector 'R' */}
-      <svg viewBox="0 0 40 40" className="w-[62%] h-[62%]" fill="none">
-        <defs>
-          <linearGradient id="rWordmarkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="50%" stopColor="var(--accent, #FF6B35)" />
-            <stop offset="100%" stopColor="#FFA14A" />
-          </linearGradient>
-        </defs>
-        {/* Modern streamlined 'R' */}
-        <path
-          d="M 11 8 V 32"
-          stroke="url(#rWordmarkGrad)"
-          strokeWidth="4.2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M 11 8 H 22 C 28.5 8, 28.5 20, 22 20 H 11"
-          stroke="url(#rWordmarkGrad)"
-          strokeWidth="4.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M 19 20 L 28.5 32"
-          stroke="var(--accent, #FF6B35)"
-          strokeWidth="4.2"
-          strokeLinecap="round"
-        />
-        {/* Subtle center keyhole dot */}
-        <circle cx="18" cy="14" r="1.8" fill="#FFFFFF" opacity="0.9" />
-      </svg>
-    </div>
+      {/* House walls */}
+      <path
+        d="M11.5 26V57h41V26"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Roof with overhang */}
+      <path
+        d="M4 31 32 7l28 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="5.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Window */}
+      <g fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round">
+        <rect x="37.5" y="22" width="11" height="11" rx="1.5" />
+        <path d="M43 22v11M37.5 27.5h11" />
+      </g>
+      {/* Handshake: sleeves */}
+      <g fill="none" stroke="currentColor" strokeOpacity="0.6" strokeWidth="9" strokeLinecap="round">
+        <path d="M16 53 26 46" />
+        <path d="M48 53 38 46" />
+      </g>
+      {/* Clasped hands */}
+      <rect x="22" y="40" width="20" height="13" rx="6" fill="currentColor" />
+      {/* Thumb grip */}
+      <rect x="24" y="36" width="10" height="9" rx="4.5" fill="currentColor" />
+      {/* Grip line */}
+      <path
+        d="M33 50.5 39.5 44"
+        fill="none"
+        stroke="#fff"
+        strokeOpacity="0.7"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
@@ -74,38 +80,24 @@ export default function Logo({
   onClick,
 }: LogoProps) {
   const s = SIZES[size];
-
   return (
     <Link
       to={to}
       onClick={onClick}
       aria-label="RentHub"
-      className="flex items-center gap-2.5 group select-none transition-transform duration-200 active:scale-95"
+      className="flex items-center gap-2.5 transition-opacity hover:opacity-95"
       data-testid="logo"
     >
-      {/* Sleek Emblem */}
-      <LogoMark className={s.icon} />
-
-      {/* Clean Premium Wordmark */}
+      <LogoMark className={s.mark} />
       {showWord && (
-        <div className={`flex flex-col justify-center ${hideWordOnMobile ? 'hidden sm:flex' : ''}`}>
-          <div className="flex items-center">
-            <span
-              className={`${s.word} font-black tracking-[-0.03em] leading-none text-slate-900 dark:text-white transition-colors`}
-              style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
-            >
-              Rent<span className="text-[var(--accent,#FF6B35)]">Hub</span>
-            </span>
-            {/* Minimalist dot indicator */}
-            <span
-              className={`${s.dot} rounded-full bg-[var(--accent,#FF6B35)] ml-1 shadow-[0_0_8px_rgba(255,107,53,0.6)] animate-pulse`}
-              style={{ animationDuration: '3s' }}
-            />
-          </div>
-          <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 tracking-[0.16em] uppercase mt-0.5 leading-none">
-            Аренда & Прокат
-          </span>
-        </div>
+        <span
+          className={`${s.word} font-extrabold tracking-tight ${
+            hideWordOnMobile ? 'hidden sm:block' : ''
+          }`}
+        >
+          <span className="text-[#1A1A2E] dark:text-white">Rent</span>
+          <span className="text-[var(--accent,#FF6B35)]">Hub</span>
+        </span>
       )}
     </Link>
   );
