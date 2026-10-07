@@ -1,82 +1,83 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 90" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" width="100%" height="100%">
   <defs>
-    <!-- R Left Vertical & Top Curve Gradient: Electric Cyan to Deep Royal Blue -->
-    <linearGradient id="rBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Deep Navy to Modern Electric Blue Gradient for Symbol -->
+    <linearGradient id="rhUnifiedGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00A2FF"/>
-      <stop offset="45%" stop-color="#0066FF"/>
-      <stop offset="100%" stop-color="#0038FF"/>
+      <stop offset="55%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#0044CC"/>
     </linearGradient>
 
-    <!-- Subtle 3D shadow -->
-    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
-      <feDropShadow dx="1" dy="3" stdDeviation="3" flood-color="#002080" flood-opacity="0.3"/>
-    </filter>
+    <!-- Subtle connection node accent -->
+    <linearGradient id="rhAccentPulse" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="100%" stop-color="#0066FF"/>
+    </linearGradient>
   </defs>
 
-  <!-- ==================== LEFT ICON: LETTER 'R' WITH EMBEDDED HOUSE ==================== -->
-  <g transform="translate(6, 4)">
+  <!-- ==================== UNIFIED SYMBOL: HOUSE + PIN + RENTAL LOOP + HUB ==================== -->
+  <g transform="translate(10, 8)">
     
-    <!-- 1. Main Upper & Outer Loop of 'R' -->
+    <!-- Outer Location Pin + Continuous Rental Loop forming the Monogram R/House Profile -->
+    <!-- 
+      Geometrical structure:
+      - Pointed arch roof top (House/Dwelling)
+      - Curved dynamic pin contour (Location/Finding a place)
+      - Integrated continuous loop (Renter <-> Owner connection & Hub exchange)
+    -->
     <path
-      d="M 12 10 
-         C 12 6, 16 2, 22 2 
-         L 58 2 
-         C 78 2, 88 14, 88 32 
-         C 88 48, 76 60, 58 64 
-         L 90 98 
-         C 93 101, 91 104, 85 104 
-         L 70 104 
-         C 66 104, 62 101, 58 96 
-         L 36 68 
-         L 36 100 
-         C 36 103, 33 105, 30 105 
-         L 18 105 
-         C 14 105, 12 103, 12 99 
+      d="M 42 6
+         C 46 6, 49 8, 52 11
+         L 72 30
+         C 79 37, 82 46, 79 55
+         C 75 66, 64 72, 52 74
+         L 74 88
+         C 77 90, 75 94, 70 94
+         L 55 94
+         C 51 94, 47 91, 44 87
+         L 28 67
+         L 28 88
+         C 28 92, 25 94, 21 94
+         L 13 94
+         C 9 94, 7 92, 7 88
+         L 7 12
+         C 7 8, 10 6, 14 6
          Z"
-      fill="url(#rBlueGrad)"
-      transform="scale(0.78)"
-      filter="url(#softShadow)"
+      fill="url(#rhUnifiedGrad)"
     />
 
-    <!-- 2. Embedded House Roof (White Cutout Arch) -->
-    <g transform="scale(0.78)">
-      <path
-        d="M 12 40 
-           L 48 16 
-           C 50 14.5, 53 14.5, 55 16 
-           L 76 30 
-           L 70 38 
-           L 52 26 
-           L 20 48 
-           Z"
-        fill="#FFFFFF"
-      />
+    <!-- Negative Space: The Portal (Interior House Silhouette + Location Pin Inversion) -->
+    <path
+      d="M 23 20
+         L 44 8
+         C 46 7, 48 7, 50 8
+         L 67 23
+         C 72 28, 72 37, 67 43
+         C 63 48, 56 50, 48 50
+         L 23 50
+         Z"
+      fill="#FFFFFF"
+    />
 
-      <path
-        d="M 30 42 
-           L 48 26 
-           L 66 40 
-           L 66 64 
-           L 30 64 
-           Z"
-        fill="#FFFFFF"
-      />
+    <!-- Central Node: The Marketplace Hub & Owner/Renter Handshake Core -->
+    <circle cx="46" cy="30" r="6.5" fill="url(#rhAccentPulse)"/>
+    <path d="M 46 36.5 V 45" stroke="url(#rhAccentPulse)" stroke-width="3" stroke-linecap="round"/>
 
-      <!-- 3. Four Window Panes -->
-      <g fill="#0066FF">
-        <rect x="37" y="42" width="8" height="8" rx="2"/>
-        <rect x="49" y="42" width="8" height="8" rx="2"/>
-        <rect x="37" y="53" width="8" height="8" rx="2"/>
-        <rect x="49" y="53" width="8" height="8" rx="2"/>
-      </g>
-    </g>
+    <!-- Dynamic Flow Arch on the stem (Expressing continuous rental lifecycle) -->
+    <path
+      d="M 7 54
+         C 12 50, 18 50, 23 54"
+      stroke="#FFFFFF"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      opacity="0.8"
+    />
 
   </g>
 
-  <!-- ==================== RIGHT TYPOGRAPHY: ONLY 'RentHub' ==================== -->
-  <g transform="translate(92, 58)">
-    <text font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="52" font-weight="900" letter-spacing="-0.03em">
-      <tspan fill="#0F172A">Rent</tspan><tspan fill="#0066FF">Hub</tspan>
+  <!-- ==================== TYPOGRAPHY: BALANCED & REFINED GEOMETRIC SANS ==================== -->
+  <g transform="translate(108, 62)">
+    <text font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="50" font-weight="900" letter-spacing="-0.03em">
+      <tspan fill="#0B132B">Rent</tspan><tspan fill="#0066FF">Hub</tspan>
     </text>
   </g>
 </svg>

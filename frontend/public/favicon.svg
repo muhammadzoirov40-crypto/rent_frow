@@ -1,58 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
-    <!-- Cyan to Deep Blue gradient matching exact image -->
-    <linearGradient id="favRBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+    <!-- Deep Navy & Electric Blue Gradient -->
+    <linearGradient id="favRhGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00A2FF"/>
-      <stop offset="50%" stop-color="#0066FF"/>
-      <stop offset="100%" stop-color="#0038FF"/>
+      <stop offset="55%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#0044CC"/>
+    </linearGradient>
+    <linearGradient id="favNode" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00F0FF"/>
+      <stop offset="100%" stop-color="#0066FF"/>
     </linearGradient>
   </defs>
 
-  <!-- Solid R Monogram Body with embedded house shape -->
-  <!-- Main R Body -->
+  <!-- Unified Emblem: House + Location Pin + Connection Loop forming Monogram R -->
   <path
-    d="M 16 12 
-       C 16 8, 20 5, 26 5 
-       L 58 5 
-       C 78 5, 88 16, 88 34 
-       C 88 50, 76 60, 58 64 
-       L 88 95 
-       L 68 95 
-       L 44 68 
-       L 44 95 
-       L 16 95 
+    d="M 46 6
+       C 50 6, 53 8, 56 11
+       L 76 30
+       C 83 37, 86 46, 83 55
+       C 79 66, 68 72, 56 74
+       L 78 88
+       C 81 90, 79 94, 74 94
+       L 59 94
+       C 55 94, 51 91, 48 87
+       L 32 67
+       L 32 88
+       C 32 92, 29 94, 25 94
+       L 17 94
+       C 13 94, 11 92, 11 88
+       L 11 12
+       C 11 8, 14 6, 18 6
        Z"
-    fill="url(#favRBlue)"
+    fill="url(#favRhGrad)"
   />
 
-  <!-- Embedded White House Roof cutting inside R -->
+  <!-- Interior Negative Space: House / Portal -->
   <path
-    d="M 16 42 
-       L 48 16 
-       L 76 34 
-       L 70 42 
-       L 48 24 
-       L 26 44 
-       Z"
-    fill="#FFFFFF"
-  />
-
-  <!-- White house arch inside -->
-  <path
-    d="M 32 44 
-       L 48 30 
-       L 64 42 
-       L 64 64 
-       L 32 64 
+    d="M 27 20
+       L 48 8
+       C 50 7, 52 7, 54 8
+       L 71 23
+       C 76 28, 76 37, 71 43
+       C 67 48, 60 50, 52 50
+       L 27 50
        Z"
     fill="#FFFFFF"
   />
 
-  <!-- 4 Blue Windows -->
-  <g fill="#0066FF">
-    <rect x="38" y="44" width="8" height="8" rx="2"/>
-    <rect x="50" y="44" width="8" height="8" rx="2"/>
-    <rect x="38" y="55" width="8" height="8" rx="2"/>
-    <rect x="50" y="55" width="8" height="8" rx="2"/>
-  </g>
+  <!-- Central Hub & Connection Core -->
+  <circle cx="50" cy="30" r="7" fill="url(#favNode)"/>
+  <path d="M 50 37 V 45" stroke="url(#favNode)" stroke-width="3" stroke-linecap="round"/>
 </svg>
