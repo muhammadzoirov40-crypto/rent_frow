@@ -1,20 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="RentHub">
-  <title>RentHub</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 90" width="100%" height="100%">
   <defs>
-    <linearGradient id="rhGrad" x1="8" y1="4" x2="56" y2="60" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0B2447"/>
-      <stop offset="0.55" stop-color="#123F86"/>
-      <stop offset="1" stop-color="#1B6EF3"/>
+    <!-- R Left Vertical & Top Curve Gradient: Electric Cyan to Deep Royal Blue -->
+    <linearGradient id="rBlueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00A2FF"/>
+      <stop offset="45%" stop-color="#0066FF"/>
+      <stop offset="100%" stop-color="#0038FF"/>
     </linearGradient>
+
+    <!-- Subtle 3D shadow -->
+    <filter id="softShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="3" stdDeviation="3" flood-color="#002080" flood-opacity="0.3"/>
+    </filter>
   </defs>
-  <!-- Location: a map pin. Home: the pin's core is carved away into a house
-       (negative space, even-odd). Rental/entry: an arched doorway standing in
-       that opening, on the pin's axis. Solid on purpose — a two-leaf split was
-       measured and goes to 44-50% alpha at 32/36px (favicon and header size). -->
-  <path fill="url(#rhGrad)" fill-rule="evenodd" clip-rule="evenodd"
-        d="M32 61 C36 54.5 55.6 41 55.6 27.2 A23.6 23.6 0 0 0 8.4 27.2 C8.4 41 28 54.5 32 61 Z
-           M32 12.6 L46.4 22.8 Q47.5 23.6 47.5 24.9 L47.5 34 Q47.5 36.5 45 36.5 L19 36.5
-           Q16.5 36.5 16.5 34 L16.5 24.9 Q16.5 23.6 17.6 22.8 Z"/>
-  <path fill="url(#rhGrad)"
-        d="M27.5 37.5 L27.5 30.5 A4.5 4.5 0 0 1 36.5 30.5 L36.5 37.5 Z"/>
+
+  <!-- ==================== LEFT ICON: LETTER 'R' WITH EMBEDDED HOUSE ==================== -->
+  <g transform="translate(6, 4)">
+    
+    <!-- 1. Main Upper & Outer Loop of 'R' -->
+    <path
+      d="M 12 10 
+         C 12 6, 16 2, 22 2 
+         L 58 2 
+         C 78 2, 88 14, 88 32 
+         C 88 48, 76 60, 58 64 
+         L 90 98 
+         C 93 101, 91 104, 85 104 
+         L 70 104 
+         C 66 104, 62 101, 58 96 
+         L 36 68 
+         L 36 100 
+         C 36 103, 33 105, 30 105 
+         L 18 105 
+         C 14 105, 12 103, 12 99 
+         Z"
+      fill="url(#rBlueGrad)"
+      transform="scale(0.78)"
+      filter="url(#softShadow)"
+    />
+
+    <!-- 2. Embedded House Roof (White Cutout Arch) -->
+    <g transform="scale(0.78)">
+      <path
+        d="M 12 40 
+           L 48 16 
+           C 50 14.5, 53 14.5, 55 16 
+           L 76 30 
+           L 70 38 
+           L 52 26 
+           L 20 48 
+           Z"
+        fill="#FFFFFF"
+      />
+
+      <path
+        d="M 30 42 
+           L 48 26 
+           L 66 40 
+           L 66 64 
+           L 30 64 
+           Z"
+        fill="#FFFFFF"
+      />
+
+      <!-- 3. Four Window Panes -->
+      <g fill="#0066FF">
+        <rect x="37" y="42" width="8" height="8" rx="2"/>
+        <rect x="49" y="42" width="8" height="8" rx="2"/>
+        <rect x="37" y="53" width="8" height="8" rx="2"/>
+        <rect x="49" y="53" width="8" height="8" rx="2"/>
+      </g>
+    </g>
+
+  </g>
+
+  <!-- ==================== RIGHT TYPOGRAPHY: ONLY 'RentHub' ==================== -->
+  <g transform="translate(92, 58)">
+    <text font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="52" font-weight="900" letter-spacing="-0.03em">
+      <tspan fill="#0F172A">Rent</tspan><tspan fill="#0066FF">Hub</tspan>
+    </text>
+  </g>
 </svg>
