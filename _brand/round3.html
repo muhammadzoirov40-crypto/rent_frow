@@ -1,0 +1,77 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>RentHub — round 3</title>
+<style>
+  body { margin:0; font:13px/1.4 system-ui,sans-serif; background:#fff; color:#0B2447; }
+  h1 { font-size:15px; margin:18px 24px 6px; }
+  p  { margin:0 24px 14px; color:#5b6472; }
+  .row { display:grid; grid-template-columns:230px 1fr 1fr; align-items:center;
+          gap:14px; padding:13px 24px; border-top:1px solid #eef1f5; }
+  .label b { display:block; font-size:13px; }
+  .label span { color:#7a8494; font-size:11.5px; }
+  .light { display:flex; align-items:center; gap:20px; background:#fff; }
+  .dark  { display:flex; align-items:center; gap:20px; background:#0a0a1a;
+            padding:12px; border-radius:10px; }
+  .lockrow { display:grid; gap:14px; padding:16px 24px; border-top:1px solid #eef1f5; }
+  .bar { display:flex; align-items:center; gap:12px; padding:14px 18px;
+          border-radius:12px; border:1px solid #e6eaf0; }
+  .bar.dark { background:#0a0a1a; border-color:#1d2333; }
+  .word { font-size:27px; font-weight:800; letter-spacing:-.02em; }
+  .word b { color:#0B2447; font-weight:800; }
+  .word i { color:#1B6EF3; font-style:normal; font-weight:800; }
+  .dark .word b { color:#fff; }
+  .dark .word i { color:#4D9FFF; }
+  .nav { margin-left:18px; font-size:14px; color:#5b6472; }
+  .dark .nav { color:#9aa4b5; }
+  .cta { margin-left:auto; background:#FF6B35; color:#fff; font-size:13.5px;
+          font-weight:700; padding:9px 16px; border-radius:9px; }
+</style>
+<h1>RentHub — round 3: settle the doorway</h1>
+<p>16 / 24 / 32 / 48 / 64 / 96 / 128&nbsp;px, light and dark.</p>
+
+    <div class="row">
+      <div class="label"><b>w1</b><span>solid doorway</span></div>
+      <div class="light"><img src="w1.svg" width="16" height="16" alt="w1"><img src="w1.svg" width="24" height="24" alt="w1"><img src="w1.svg" width="32" height="32" alt="w1"><img src="w1.svg" width="48" height="48" alt="w1"><img src="w1.svg" width="64" height="64" alt="w1"><img src="w1.svg" width="96" height="96" alt="w1"><img src="w1.svg" width="128" height="128" alt="w1"></div>
+      <div class="dark"><img src="w1.svg" width="16" height="16" alt="w1"><img src="w1.svg" width="24" height="24" alt="w1"><img src="w1.svg" width="32" height="32" alt="w1"><img src="w1.svg" width="48" height="48" alt="w1"><img src="w1.svg" width="64" height="64" alt="w1"><img src="w1.svg" width="96" height="96" alt="w1"><img src="w1.svg" width="128" height="128" alt="w1"></div>
+    </div>
+    <div class="row">
+      <div class="label"><b>w5</b><span>two leaves — connection, hidden at 16px</span></div>
+      <div class="light"><img src="w5.svg" width="16" height="16" alt="w5"><img src="w5.svg" width="24" height="24" alt="w5"><img src="w5.svg" width="32" height="32" alt="w5"><img src="w5.svg" width="48" height="48" alt="w5"><img src="w5.svg" width="64" height="64" alt="w5"><img src="w5.svg" width="96" height="96" alt="w5"><img src="w5.svg" width="128" height="128" alt="w5"></div>
+      <div class="dark"><img src="w5.svg" width="16" height="16" alt="w5"><img src="w5.svg" width="24" height="24" alt="w5"><img src="w5.svg" width="32" height="32" alt="w5"><img src="w5.svg" width="48" height="48" alt="w5"><img src="w5.svg" width="64" height="64" alt="w5"><img src="w5.svg" width="96" height="96" alt="w5"><img src="w5.svg" width="128" height="128" alt="w5"></div>
+    </div>
+    <div class="row">
+      <div class="label"><b>w6</b><span>narrower doorway (control)</span></div>
+      <div class="light"><img src="w6.svg" width="16" height="16" alt="w6"><img src="w6.svg" width="24" height="24" alt="w6"><img src="w6.svg" width="32" height="32" alt="w6"><img src="w6.svg" width="48" height="48" alt="w6"><img src="w6.svg" width="64" height="64" alt="w6"><img src="w6.svg" width="96" height="96" alt="w6"><img src="w6.svg" width="128" height="128" alt="w6"></div>
+      <div class="dark"><img src="w6.svg" width="16" height="16" alt="w6"><img src="w6.svg" width="24" height="24" alt="w6"><img src="w6.svg" width="32" height="32" alt="w6"><img src="w6.svg" width="48" height="48" alt="w6"><img src="w6.svg" width="64" height="64" alt="w6"><img src="w6.svg" width="96" height="96" alt="w6"><img src="w6.svg" width="128" height="128" alt="w6"></div>
+    </div>
+<h1 style="margin-top:22px">Lockup at header size (h-10 = 40px)</h1>
+<p>Wordmark: “Rent” deep navy, “Hub” electric blue; the orange accent stays in the UI.</p>
+
+    <div class="lockrow">
+      <div class="light bar">
+        <img src="w1.svg" width="40" height="40" alt="">
+        <span class="word"><b>Rent</b><i>Hub</i></span>
+        <span class="nav">Ҷустуҷӯ &nbsp;·&nbsp; Хонаҳо &nbsp;·&nbsp; Даромадан</span>
+        <span class="cta">Ба қайд гирифтан</span>
+      </div>
+      <div class="dark bar">
+        <img src="w1.svg" width="40" height="40" alt="">
+        <span class="word"><b>Rent</b><i>Hub</i></span>
+        <span class="nav">Ҷустуҷӯ &nbsp;·&nbsp; Хонаҳо &nbsp;·&nbsp; Даромадан</span>
+        <span class="cta">Ба қайд гирифтан</span>
+      </div>
+    </div>
+    <div class="lockrow">
+      <div class="light bar">
+        <img src="w5.svg" width="40" height="40" alt="">
+        <span class="word"><b>Rent</b><i>Hub</i></span>
+        <span class="nav">Ҷустуҷӯ &nbsp;·&nbsp; Хонаҳо &nbsp;·&nbsp; Даромадан</span>
+        <span class="cta">Ба қайд гирифтан</span>
+      </div>
+      <div class="dark bar">
+        <img src="w5.svg" width="40" height="40" alt="">
+        <span class="word"><b>Rent</b><i>Hub</i></span>
+        <span class="nav">Ҷустуҷӯ &nbsp;·&nbsp; Хонаҳо &nbsp;·&nbsp; Даромадан</span>
+        <span class="cta">Ба қайд гирифтан</span>
+      </div>
+    </div>

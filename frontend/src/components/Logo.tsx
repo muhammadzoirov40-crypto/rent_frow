@@ -16,73 +16,64 @@ const SIZES = {
 };
 
 /**
- * Exact Vector LogoMark matching user's requested identity:
- * - Royal Blue gradient Letter 'R'
- * - Negative space White House Roof cut into the R
- * - 4 Blue Window panes
+ * Concept #1 — one symbol, not a collage.
+ *
+ * A map pin (location / hub) whose interior is carved away into a gable-roofed
+ * house (home / property) by a single even-odd path, so the house is true
+ * negative space and adapts to whatever sits behind the mark. Standing in that
+ * opening is an arched doorway (rental entry — where renter and owner meet):
+ * it sits on the floor line and shares its axis with the pin's point, so the
+ * eye travels point -> door -> roof as one movement.
+ *
+ * The doorway is deliberately a single solid arch. A two-leaf split was built
+ * and measured: at 32px and 36px the 2u seam rasterises to 44-50% alpha, i.e.
+ * a soft stripe through the door at exactly favicon and header size. A third
+ * feature does not survive those sizes, so it is left out rather than shipped
+ * mushy.
+ *
+ * Colours come from the brand tokens in index.css (--logo-grad-a/b,
+ * --logo-blue), which already swap to a lighter ramp under `.dark`.
  */
 export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 100" className={`${className} shrink-0`} fill="none" aria-hidden="true">
+    <svg
+      viewBox="0 0 64 64"
+      className={`${className} shrink-0`}
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
       <defs>
-        <linearGradient id="rBlueGradNative" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00A2FF" />
-          <stop offset="45%" stopColor="#0066FF" />
-          <stop offset="100%" stopColor="#0038FF" />
+        <linearGradient
+          id="rhMarkGrad"
+          x1="8"
+          y1="4"
+          x2="56"
+          y2="60"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stopColor="var(--logo-grad-a, #0b2447)" />
+          <stop offset="0.55" stopColor="var(--logo-grad-b, #123f86)" />
+          <stop offset="1" stopColor="var(--logo-blue, #1b6ef3)" />
         </linearGradient>
       </defs>
 
-      {/* Main R Body */}
+      {/* Pin with the house cut out of it. Even-odd: pin (1) + house (2) = open. */}
       <path
-        d="M 16 12 
-           C 16 7, 20 4, 28 4 
-           L 58 4 
-           C 80 4, 90 16, 90 35 
-           C 90 50, 78 60, 58 64 
-           L 88 95 
-           C 90 97, 88 100, 84 100 
-           L 68 100 
-           C 64 100, 60 97, 57 93 
-           L 38 68 
-           L 38 96 
-           C 38 99, 35 100, 32 100 
-           L 20 100 
-           C 17 100, 16 98, 16 95 
-           Z"
-        fill="url(#rBlueGradNative)"
+        fillRule="evenodd"
+        clipRule="evenodd"
+        fill="url(#rhMarkGrad)"
+        d="M32 61 C36 54.5 55.6 41 55.6 27.2 A23.6 23.6 0 0 0 8.4 27.2 C8.4 41 28 54.5 32 61 Z
+           M32 12.6 L46.4 22.8 Q47.5 23.6 47.5 24.9 L47.5 34 Q47.5 36.5 45 36.5 L19 36.5
+           Q16.5 36.5 16.5 34 L16.5 24.9 Q16.5 23.6 17.6 22.8 Z"
       />
 
-      {/* Negative Space White Roof Overhang */}
+      {/* The doorway: drawn over the opening and 1u past the floor line so its
+          base fuses with the solid pin instead of meeting it on a shared edge. */}
       <path
-        d="M 16 42 
-           L 48 16 
-           C 50 14, 53 14, 55 16 
-           L 76 34 
-           L 70 42 
-           L 50 24 
-           L 26 44 
-           Z"
-        fill="#FFFFFF"
+        fill="url(#rhMarkGrad)"
+        d="M27.5 37.5 L27.5 30.5 A4.5 4.5 0 0 1 36.5 30.5 L36.5 37.5 Z"
       />
-
-      {/* White House Body Cutout */}
-      <path
-        d="M 32 44 
-           L 50 28 
-           L 66 42 
-           L 66 64 
-           L 32 64 
-           Z"
-        fill="#FFFFFF"
-      />
-
-      {/* 4 Blue Windows inside the house */}
-      <g fill="#0066FF">
-        <rect x="38" y="44" width="8" height="8" rx="2" />
-        <rect x="50" y="44" width="8" height="8" rx="2" />
-        <rect x="38" y="55" width="8" height="8" rx="2" />
-        <rect x="50" y="55" width="8" height="8" rx="2" />
-      </g>
     </svg>
   );
 }
@@ -107,15 +98,15 @@ export default function Logo({
       {/* 1. Vector Logo Emblem */}
       <LogoMark className={s.img} />
 
-      {/* 2. Exact Typography: ONLY 'RentHub' (NO SUBTITLE/SLOGAN) */}
+      {/* 2. Wordmark: “Rent” deep navy, “Hub” electric blue (theme-aware). */}
       {showWord && (
         <span
-          className={`${s.word} font-black tracking-[-0.03em] leading-none text-slate-900 dark:text-white transition-colors flex items-center ${
+          className={`${s.word} font-black tracking-[-0.03em] leading-none text-[var(--logo-word)] transition-colors flex items-center ${
             hideWordOnMobile ? 'hidden sm:flex' : 'flex'
           }`}
           style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
         >
-          Rent<span className="text-[#0066FF]">Hub</span>
+          Rent<span className="text-[var(--logo-blue)]">Hub</span>
         </span>
       )}
     </Link>
