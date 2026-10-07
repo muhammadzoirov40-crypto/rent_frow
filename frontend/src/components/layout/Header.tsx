@@ -166,7 +166,7 @@ export default function Header() {
           <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition"
+              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition"
               aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -175,7 +175,7 @@ export default function Header() {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition text-sm font-medium"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition text-sm font-medium"
               >
                 <Globe className="w-4 h-4" />
                 <span>{currentLang.code.toUpperCase()}</span>
@@ -212,14 +212,14 @@ export default function Header() {
 
                 <Link
                   to="/favorites"
-                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <Heart className="w-5 h-5" />
                 </Link>
 
                 <Link
                   to="/messages"
-                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <MessageSquare className="w-5 h-5" />
                 </Link>
@@ -227,7 +227,7 @@ export default function Header() {
                 <div className="relative" ref={notifRef}>
                   <button
                     onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false) }}
-                    className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/5 transition hidden sm:flex"
+                    className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (

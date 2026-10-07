@@ -70,15 +70,17 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const iconClass = (to: string) =>
     isActive(to) ? 'text-white' : 'text-gray-400 dark:text-gray-500';
 
-  const items = [
-    { to: '/', label: t('nav.home'), icon: Home, show: true },
-    { to: '/search', label: t('nav.search'), icon: Search, show: true },
-    { to: '/favorites', label: t('nav.favorites'), icon: Heart, show: isAuthenticated },
-    { to: '/messages', label: t('nav.messages'), icon: MessageSquare, show: isAuthenticated },
-    { to: '/notifications', label: t('nav.notifications'), icon: Bell, show: isAuthenticated },
-    { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList, show: isAuthenticated },
+  const coreItems = [
+    { to: '/', label: t('nav.home'), icon: Home },
+    { to: '/search', label: t('nav.search'), icon: Search },
+    { to: '/favorites', label: t('nav.favorites'), icon: Heart },
+    { to: '/messages', label: t('nav.messages'), icon: MessageSquare },
+    { to: '/notifications', label: t('nav.notifications'), icon: Bell },
+    { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList },
+  ];
+
+  const userItems = [
     { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: isAuthenticated },
-    { to: '/create-listing', label: t('nav.createListing'), icon: PlusCircle, show: isAuthenticated },
     { to: '/profile', label: t('nav.profile'), icon: User, show: isAuthenticated },
     { to: '/settings', label: t('nav.settings'), icon: Settings, show: isAuthenticated },
     { to: '/admin', label: t('nav.adminDashboard'), icon: Shield, show: user?.role === 'ADMIN' },
@@ -87,7 +89,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   return (
     <>
       <div
-        className={`fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={onClose}
@@ -96,12 +98,12 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
       <aside
         aria-hidden={!open}
-        className={`fixed inset-y-0 left-0 z-[61] w-[280px] max-w-[85vw] flex flex-col
-          bg-white/75 dark:bg-[#1a1d24]/75 backdrop-blur-xl border-r border-gray-200 dark:border-white/10
+        className={`fixed inset-y-0 left-0 z-[61] w-[290px] max-w-[85vw] flex flex-col
+          bg-white/80 dark:bg-[#0b0f19]/85 backdrop-blur-2xl border-r border-gray-200/60 dark:border-white/10
           shadow-2xl transition-transform duration-300 ease-in-out md:hidden
           ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200 dark:border-white/10 shrink-0">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200/60 dark:border-white/10 shrink-0">
           <Logo onClick={onClose} />
           <button
             type="button"
@@ -115,15 +117,15 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
         <div className="px-4 pt-4 pb-2 shrink-0">
           {isAuthenticated ? (
-            <Link to="/profile" onClick={onClose} className="flex items-center gap-3 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)] transition">
+            <Link to="/profile" onClick={onClose} className="flex items-center gap-3 p-3 rounded-2xl bg-white/40 dark:bg-white/5 border border-gray-200/60 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)] backdrop-blur-md transition">
               <span className="relative shrink-0">
-                <span className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white text-sm font-semibold flex items-center justify-center">
+                <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white text-sm font-bold flex items-center justify-center">
                   {(user?.display_name || user?.email || '?').charAt(0).toUpperCase()}
                 </span>
                 <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#1a1d24]" />
               </span>
               <span className="min-w-0">
-                <span className="block text-sm font-semibold text-gray-900 dark:text-white truncate">
+                <span className="block text-sm font-bold text-gray-900 dark:text-white truncate">
                   {user?.display_name || user?.email}
                 </span>
                 <span className="block text-xs text-gray-400 dark:text-gray-500 truncate">
@@ -136,7 +138,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               <Link
                 to="/login"
                 onClick={onClose}
-                className="block w-full text-center px-4 py-2.5 bg-gray-100 dark:bg-white/5 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition"
+                className="block w-full text-center px-4 py-2.5 bg-white/50 dark:bg-white/5 border border-gray-200/60 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition"
               >
                 {t('header.login')}
               </Link>
@@ -149,32 +151,48 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               </Link>
             </div>
           )}
-          {isAuthenticated && (
-            <Link
-              to="/dashboard"
-              onClick={onClose}
-              className="mt-2 flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-orange-50 dark:bg-[rgb(var(--accent-rgb)/0.1)] border border-[rgb(var(--accent-rgb)/0.25)] text-[var(--accent)] text-sm font-semibold hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition"
-            >
-              <LayoutDashboard size={18} />
-              <span>{t('nav.dashboard')}</span>
-            </Link>
-          )}
+
+          {/* Prominent Create Listing Button */}
+          <Link
+            to="/create-listing"
+            onClick={onClose}
+            className="mt-3 flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white text-sm font-bold shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] border border-emerald-400/30 hover:-translate-y-0.5 transition"
+          >
+            <PlusCircle className="w-5 h-5" />
+            <span>{t('nav.createListing')}</span>
+          </Link>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-          <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          <p className="px-2 mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             {t('dashboard.menu')}
           </p>
-          {items
-            .filter((item) => item.show)
-            .map((item) => (
-              <Link key={item.to} to={item.to} onClick={onClose} className={linkClass(item.to)}>
-                <span className={iconClass(item.to)}>
-                  <item.icon className="w-5 h-5" />
-                </span>
-                <span className="truncate">{item.label}</span>
-              </Link>
-            ))}
+          {coreItems.map((item) => (
+            <Link key={item.to} to={item.to} onClick={onClose} className={linkClass(item.to)}>
+              <span className={iconClass(item.to)}>
+                <item.icon className="w-5 h-5" />
+              </span>
+              <span className="truncate">{item.label}</span>
+            </Link>
+          ))}
+
+          {userItems.some((i) => i.show) && (
+            <div className="pt-2">
+              <p className="px-2 mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                {t('nav.account')}
+              </p>
+              {userItems
+                .filter((item) => item.show)
+                .map((item) => (
+                  <Link key={item.to} to={item.to} onClick={onClose} className={linkClass(item.to)}>
+                    <span className={iconClass(item.to)}>
+                      <item.icon className="w-5 h-5" />
+                    </span>
+                    <span className="truncate">{item.label}</span>
+                  </Link>
+                ))}
+            </div>
+          )}
           {isAuthenticated && (
             <button
               type="button"

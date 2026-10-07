@@ -107,9 +107,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="group block bg-white/70 dark:bg-[#111827]/70 backdrop-blur-xl rounded-2xl overflow-hidden border border-gray-200/80 dark:border-white/10 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_20px_-6px_rgba(0,0,0,0.4)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.6)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+      className="group block bg-white/60 dark:bg-[#111827]/40 backdrop-blur-xl rounded-2xl overflow-hidden border border-gray-200/60 dark:border-white/10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_25px_-6px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[var(--accent)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] hover:shadow-[rgb(var(--accent-rgb)/0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
     >
-      <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800 overflow-hidden">
+      <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800/60 overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -138,11 +138,13 @@ export default function ListingCard({ listing }: ListingCardProps) {
           onClick={toggleFavorite}
           aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
           aria-pressed={isFavorited}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm flex items-center justify-center shadow-md ring-1 ring-black/5 hover:scale-110 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 hover:border-[var(--accent)] hover:scale-110 active:scale-95 transition-all group/fav focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
-              isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-500 dark:text-slate-400'
+              isFavorited
+                ? 'fill-[var(--accent)] text-[var(--accent)]'
+                : 'text-gray-400 dark:text-slate-400 group-hover/fav:text-[var(--accent)]'
             }`}
             aria-hidden="true"
           />

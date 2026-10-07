@@ -1,6 +1,6 @@
-import type { ElementType } from 'react';
 import {
   LayoutGrid,
+  Grid2X2,
   Home,
   Car,
   Wrench,
@@ -10,6 +10,7 @@ import {
   WashingMachine,
   Camera,
   Music,
+  PartyPopper,
   TreePine,
   HardHat,
   Truck,
@@ -17,6 +18,7 @@ import {
   Ship,
   Baby,
 } from 'lucide-react';
+import type { ElementType } from 'react';
 import type { Category } from '../api/index';
 import { localizeCategoryName } from './categoryName';
 
@@ -27,15 +29,17 @@ export const ICON_MAP: Record<string, ElementType> = {
   'Transport': Car,
   'Инструменты': Wrench,
   'Асбобҳо': Wrench,
+  'Таҷҳизот': Wrench,
   'Tools & Equipment': Wrench,
   'Недвижимость': Home,
   'Моликият': Home,
   'Property': Home,
   'Фото и видео': Camera,
   'Аудио и видео': Music,
-  'Для мероприятий': Music,
-  'Барои чорабиниҳо': Music,
-  'Events': Music,
+  'Для мероприятий': PartyPopper,
+  'Барои чорабиниҳо': PartyPopper,
+  'Чорабиниҳо': PartyPopper,
+  'Events': PartyPopper,
   'Сад и огород': TreePine,
   'Строительство': HardHat,
   'Электроника': Laptop,
@@ -43,6 +47,9 @@ export const ICON_MAP: Record<string, ElementType> = {
   'Спорт': Dumbbell,
   'Варзиш': Dumbbell,
   'Sports': Dumbbell,
+  'Дигар': Grid2X2,
+  'Другое': Grid2X2,
+  'Other': Grid2X2,
   'Детские товары': Baby,
   'Спецтехника': Truck,
   'Кафе и кухня': Utensils,

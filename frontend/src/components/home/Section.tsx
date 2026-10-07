@@ -25,20 +25,24 @@ export default function Section({
 }: SectionProps) {
   return (
     <section id={id} className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${className}`}>
-      <div className="flex items-end justify-between gap-4 mb-5">
+      <div className="flex items-end justify-between gap-4 mb-6">
         <div className="min-w-0">
-          <Heading className="text-xl sm:text-2xl font-bold tracking-tight text-[#1A1A2E] dark:text-white">
+          <Heading className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-white">
             {title}
           </Heading>
-          {hint && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{hint}</p>}
+          {hint && (
+            <p className="mt-1.5 text-sm sm:text-base text-gray-500 dark:text-gray-400 leading-relaxed max-w-2xl">
+              {hint}
+            </p>
+          )}
         </div>
         {actionLabel && onAction && (
           <button
             onClick={onAction}
-            className="hidden sm:inline-flex shrink-0 items-center gap-1 text-sm font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
+            className="group inline-flex shrink-0 items-center gap-1.5 text-sm sm:text-[15px] font-bold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-all cursor-pointer"
           >
-            {actionLabel}
-            <ArrowRight className="w-4 h-4" />
+            <span>{actionLabel}</span>
+            <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
           </button>
         )}
       </div>

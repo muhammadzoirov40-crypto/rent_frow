@@ -17,6 +17,8 @@ import {
   User,
 } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
+import { useQuery } from '@tanstack/react-query';
+import { notifications as notificationsApi } from '../../api/index';
 
 interface SiteSidebarProps {
   collapsed: boolean;
@@ -28,25 +30,37 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   const { pathname } = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
 
+  const { data: unreadNotifData } = useQuery({
+    queryKey: ['unread-count'],
+    queryFn: () => notificationsApi.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
+  const unreadNotifs = unreadNotifData?.count || 0;
+
   const isActive = (to: string) => (to === '/' ? pathname === '/' : pathname.startsWith(to));
 
   const linkClass = (to: string) =>
-    `w-full flex items-center rounded-2xl text-sm font-semibold transition-all duration-200 ${
+    `w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 ${
       collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
     } ${
       isActive(to)
-        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
-        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.35)] border border-emerald-400/30'
+        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-transparent hover:bg-white/50 dark:hover:bg-white/[0.06] border border-transparent hover:border-gray-200/50 dark:hover:border-white/10 backdrop-blur-sm'
     }`;
 
-  const items = [
-    { to: '/', label: t('nav.home'), icon: Home, show: true },
-    { to: '/search', label: t('nav.search'), icon: Search, show: true },
-    { to: '/favorites', label: t('nav.favorites'), icon: Heart, show: isAuthenticated },
-    { to: '/messages', label: t('nav.messages'), icon: MessageSquare, show: isAuthenticated },
-    { to: '/notifications', label: t('nav.notifications'), icon: Bell, show: isAuthenticated },
-    { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList, show: isAuthenticated },
-    { to: '/create-listing', label: t('nav.createListing'), icon: PlusCircle, show: isAuthenticated },
+  // Core navigation items as specified
+  const coreNavItems = [
+    { to: '/', label: t('nav.home'), icon: Home },
+    { to: '/search', label: t('nav.search'), icon: Search },
+    { to: '/favorites', label: t('nav.favorites'), icon: Heart },
+    { to: '/messages', label: t('nav.messages'), icon: MessageSquare },
+    { to: '/notifications', label: t('nav.notifications'), icon: Bell, badge: unreadNotifs },
+    { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList },
+  ];
+
+  const userItems = [
+    { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: isAuthenticated },
     { to: '/profile', label: t('nav.profile'), icon: User, show: isAuthenticated },
     { to: '/settings', label: t('nav.settings'), icon: Settings, show: isAuthenticated },
     { to: '/admin', label: t('nav.adminDashboard'), icon: Shield, show: user?.role === 'ADMIN' },
@@ -55,29 +69,36 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   return (
     <aside
       className={`hidden md:flex flex-col shrink-0 sticky top-[var(--header-h)] h-[calc(100vh_-_var(--header-h))] overflow-y-auto
-        bg-white/70 dark:bg-[#0f172a]/70 backdrop-blur-xl
-        border-r border-gray-200/80 dark:border-white/10
+        bg-white/50 dark:bg-[#0b0f19]/65 backdrop-blur-2xl
+        border-r border-gray-200/60 dark:border-white/10
         transition-[width] duration-300 ease-out ${collapsed ? 'w-[76px]' : 'w-64'}`}
     >
-      <div className={collapsed ? 'p-3' : 'p-4'}>
+      <div className={collapsed ? 'p-3 flex flex-col h-full' : 'p-4 flex flex-col h-full'}>
+        {/* User Card */}
         <div
-          className={`relative overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.04] mb-5 ${
-            collapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-4 flex items-center gap-3'
+          className={`relative overflow-hidden rounded-2xl border border-gray-200/60 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-md mb-4 ${
+            collapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-3.5 flex items-center gap-3'
           }`}
         >
           <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[rgb(var(--accent-rgb)/0.2)] rounded-full blur-2xl" />
           {isAuthenticated ? (
-            <Link to="/profile" className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#1A1A2E] to-[var(--accent)] text-white text-sm font-semibold flex items-center justify-center shrink-0 shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]">
+            <Link
+              to="/profile"
+              className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white text-sm font-bold flex items-center justify-center shrink-0 shadow-md shadow-[rgb(var(--accent-rgb)/0.25)] border border-emerald-400/20"
+            >
               {(user?.display_name || user?.email || '?').charAt(0).toUpperCase()}
             </Link>
           ) : (
-            <div className="relative w-10 h-10 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[#ff9a66] flex items-center justify-center shrink-0 shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]">
+            <Link
+              to="/login"
+              className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white flex items-center justify-center shrink-0 shadow-md shadow-[rgb(var(--accent-rgb)/0.25)] border border-emerald-400/20"
+            >
               <User className="w-5 h-5 text-white" />
-            </div>
+            </Link>
           )}
           {!collapsed && (
             <div className="relative flex-1 min-w-0">
-              <h2 className="font-extrabold text-[15px] text-gray-900 dark:text-white truncate">
+              <h2 className="font-extrabold text-[14px] text-gray-900 dark:text-white truncate">
                 {isAuthenticated ? user?.display_name || user?.email : t('header.login')}
               </h2>
               <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
@@ -90,7 +111,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
             onClick={onToggle}
             aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
             title={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-            className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/10 transition ${
+            className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] transition ${
               collapsed ? '' : 'shrink-0'
             }`}
           >
@@ -98,46 +119,82 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
           </button>
         </div>
 
-        <nav className="space-y-1.5">
+        {/* Primary Action Button: Эълон додан */}
+        <div className="mb-4">
+          <Link
+            to="/create-listing"
+            title={collapsed ? t('nav.createListing') : undefined}
+            className={`w-full flex items-center justify-center font-bold text-sm text-white rounded-xl shadow-lg transition-all duration-200 active:scale-[0.98] ${
+              collapsed ? 'p-3' : 'gap-2.5 px-4 py-3'
+            } bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] hover:from-[var(--accent-hover)] hover:to-[var(--accent-dark)] shadow-[rgb(var(--accent-rgb)/0.35)] border border-emerald-400/30 hover:-translate-y-0.5`}
+          >
+            <PlusCircle className="w-5 h-5 shrink-0" />
+            {!collapsed && <span className="truncate">{t('nav.createListing')}</span>}
+          </Link>
+        </div>
+
+        {/* Navigation list */}
+        <nav className="space-y-1.5 flex-1">
           {!collapsed && (
-            <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500">
+            <p className="px-4 pb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500">
               {t('admin.menu')}
             </p>
           )}
-          {isAuthenticated && (
+
+          {/* Core items */}
+          {coreNavItems.map((item) => (
             <Link
-              to="/dashboard"
-              title={collapsed ? t('nav.dashboard') : undefined}
-              className={`w-full flex items-center rounded-2xl text-sm font-semibold transition-all duration-200 ${
-                collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
-              } ${
-                isActive('/dashboard')
-                  ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
-                  : 'text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-[rgb(var(--accent-rgb)/0.1)]'
-              }`}
+              key={item.to}
+              to={item.to}
+              title={collapsed ? item.label : undefined}
+              className={linkClass(item.to)}
             >
-              <span className="shrink-0">
-                <LayoutDashboard className="w-5 h-5" />
+              <span className="relative shrink-0">
+                <item.icon className="w-5 h-5" />
+                {item.badge && item.badge > 0 ? (
+                  <span className="absolute -top-1 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center shadow">
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                ) : null}
               </span>
-              {!collapsed && <span className="truncate">{t('nav.dashboard')}</span>}
+              {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
+          ))}
+
+          {/* Secondary items for authenticated users */}
+          {userItems.some((i) => i.show) && !collapsed && (
+            <div className="pt-3 pb-1">
+              <p className="px-4 text-[10px] font-bold uppercase tracking-[0.15em] text-gray-400 dark:text-gray-500">
+                {t('nav.account')}
+              </p>
+            </div>
           )}
-          {items
+
+          {userItems
             .filter((item) => item.show)
             .map((item) => (
-              <Link key={item.to} to={item.to} title={collapsed ? item.label : undefined} className={linkClass(item.to)}>
+              <Link
+                key={item.to}
+                to={item.to}
+                title={collapsed ? item.label : undefined}
+                className={linkClass(item.to)}
+              >
                 <span className="shrink-0">
                   <item.icon className="w-5 h-5" />
                 </span>
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </Link>
             ))}
-          {isAuthenticated && (
+        </nav>
+
+        {/* Sign out */}
+        {isAuthenticated && (
+          <div className="pt-2 border-t border-gray-200/50 dark:border-white/10 mt-auto">
             <button
               type="button"
               onClick={() => logout()}
               title={collapsed ? t('common.signOut') : undefined}
-              className={`w-full flex items-center rounded-2xl text-sm font-semibold text-red-500 hover:bg-red-500/10 transition-all duration-200 ${
+              className={`w-full flex items-center rounded-xl text-sm font-semibold text-red-500 hover:bg-red-500/10 transition-all duration-200 ${
                 collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
               }`}
             >
@@ -146,9 +203,8 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
               </span>
               {!collapsed && <span>{t('common.signOut')}</span>}
             </button>
-          )}
-        </nav>
-
+          </div>
+        )}
       </div>
     </aside>
   );

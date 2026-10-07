@@ -301,8 +301,8 @@
 }
 .dark .glass-card-hover:hover {
   background: rgba(26, 34, 52, 0.85);
-  border-color: rgba(255, 107, 53, 0.35);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 107, 53, 0.15);
+  border-color: rgba(var(--accent-rgb) / 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(var(--accent-rgb) / 0.2);
   transform: translateY(-4px);
 }
 .glass-card-hover:hover {

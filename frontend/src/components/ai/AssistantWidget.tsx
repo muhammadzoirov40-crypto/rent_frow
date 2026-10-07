@@ -131,19 +131,33 @@ export default function AssistantWidget() {
   return (
     <>
       {/* Floating launcher */}
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-label={t('assistant.title')}
-        className={`fixed z-50 right-4 sm:right-6 ${open ? 'lg:right-[376px] xl:right-[416px]' : ''} bottom-24 md:bottom-6 w-14 h-14 rounded-full flex items-center justify-center text-white transition-all duration-200 shadow-xl shadow-[rgb(var(--accent-rgb)/0.35)] hover:scale-105 active:scale-95 ${
-          open ? 'bg-gray-700 dark:bg-white/15' : 'bg-[var(--accent)] hover:bg-[var(--accent-hover)]'
-        }`}
+      <div
+        className={`fixed z-50 right-4 sm:right-6 ${
+          open ? 'lg:right-[376px] xl:right-[416px]' : ''
+        } bottom-20 md:bottom-6 flex items-center gap-2 group`}
       >
-        {open ? <X className="w-6 h-6" /> : <Sparkles className="w-6 h-6" />}
         {!open && (
-          <span className="absolute -top-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#0a0a1a]" />
+          <span className="hidden sm:inline-block pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-1 group-hover:translate-x-0 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900/90 dark:bg-slate-800/90 backdrop-blur-md shadow-lg border border-white/10 whitespace-nowrap">
+            Ёрдамчии AI
+          </span>
         )}
-      </button>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={t('assistant.title')}
+          title="Ёрдамчии AI"
+          className={`relative w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.35)] hover:shadow-xl hover:shadow-[rgb(var(--accent-rgb)/0.5)] hover:scale-105 active:scale-95 border border-emerald-400/30 ${
+            open
+              ? 'bg-gray-800/90 dark:bg-slate-800/90 backdrop-blur-md'
+              : 'bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)]'
+          }`}
+        >
+          {open ? <X className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+          {!open && (
+            <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white dark:border-[#0a0a1a] animate-pulse" />
+          )}
+        </button>
+      </div>
 
       {/* Panel. Stays at z-50, same as before: the docked panel and the fixed
           header never overlap (the header's right edge moves to the panel's

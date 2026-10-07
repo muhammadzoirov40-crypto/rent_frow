@@ -65,9 +65,9 @@ export default function CategoryExplorer() {
   if (isLoading) {
     return (
       <Section id="categories" title={t('home.popularCategories')} hint={t('home.categoriesHint')}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-xl bg-gray-100 dark:bg-white/5 animate-skeleton" />
+            <div key={i} className="h-36 rounded-2xl bg-white/40 dark:bg-white/5 border border-gray-200/40 dark:border-white/10 animate-skeleton backdrop-blur-md" />
           ))}
         </div>
       </Section>
@@ -89,13 +89,13 @@ export default function CategoryExplorer() {
       onAction={() => navigate('/search')}
     >
       {hasGroups && (
-        <div className="flex flex-wrap justify-center gap-2 mb-5">
+        <div className="flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar py-1 px-1 sm:justify-center">
           <button
             onClick={() => setActiveGroup('')}
-            className={`px-3.5 py-2 rounded-xl text-sm font-semibold border transition ${
+            className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border backdrop-blur-md transition-all duration-200 cursor-pointer ${
               !activeGroup
-                ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.3)]'
-                : 'bg-white dark:bg-[#12141a] border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-[rgb(var(--accent-rgb)/0.5)]'
+                ? 'bg-[var(--accent)] border-emerald-400/40 text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
+                : 'bg-white/50 dark:bg-slate-900/40 border-gray-200/80 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50 hover:bg-white/80 dark:hover:bg-slate-800/60'
             }`}
           >
             {t('common.all')}
@@ -104,10 +104,10 @@ export default function CategoryExplorer() {
             <button
               key={g.key}
               onClick={() => setActiveGroup(g.key)}
-              className={`px-3.5 py-2 rounded-xl text-sm font-semibold border transition ${
+              className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border backdrop-blur-md transition-all duration-200 cursor-pointer ${
                 activeGroup === g.key
-                  ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.3)]'
-                  : 'bg-white dark:bg-[#12141a] border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-[rgb(var(--accent-rgb)/0.5)]'
+                  ? 'bg-[var(--accent)] border-emerald-400/40 text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
+                  : 'bg-white/50 dark:bg-slate-900/40 border-gray-200/80 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50 hover:bg-white/80 dark:hover:bg-slate-800/60'
               }`}
             >
               {t(g.labelKey)}
@@ -116,7 +116,7 @@ export default function CategoryExplorer() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {shown.map((cat) => {
           const Icon = iconFor(cat, i18n.language);
           const count = categoryCounts[cat.id];
@@ -124,16 +124,16 @@ export default function CategoryExplorer() {
             <button
               key={cat.id}
               onClick={() => navigate(`/search?category_id=${cat.id}`)}
-              className="group glass-tile h-full flex flex-col items-center justify-center text-center border rounded-2xl p-5 hover:border-[rgb(var(--accent-rgb)/0.5)] transition-all duration-300 hover:-translate-y-1"
+              className="group h-full flex flex-col items-center justify-center text-center rounded-2xl p-5 bg-white/60 dark:bg-[#111827]/40 backdrop-blur-xl border border-gray-200/60 dark:border-white/10 hover:border-[var(--accent)] hover:shadow-lg hover:shadow-[rgb(var(--accent-rgb)/0.25)] hover:bg-white/80 dark:hover:bg-[#1f293d]/50 transition-all duration-200 hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
-              <div className="w-12 h-12 shrink-0 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-300">
+              <div className="w-12 h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.08)] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-200">
                 {cat.image_url ? (
                   <img src={cat.image_url} alt="" className="w-6 h-6 object-contain" loading="lazy" />
                 ) : (
-                  <Icon className="w-5 h-5 text-[var(--accent)] group-hover:text-white transition" />
+                  <Icon className="w-6 h-6 text-[var(--accent)] group-hover:text-white transition-colors duration-200" />
                 )}
               </div>
-              <h3 className="font-semibold text-sm text-[#1A1A2E] dark:text-white group-hover:text-[var(--accent)] transition-colors leading-snug">
+              <h3 className="font-bold text-sm text-[#0f172a] dark:text-white group-hover:text-[var(--accent)] transition-colors leading-snug line-clamp-1">
                 {localizeCategoryName(cat, i18n.language)}
               </h3>
               <p className="mt-1 text-xs font-medium text-gray-500 dark:text-gray-400">
