@@ -10,7 +10,6 @@ import {
   MessageSquare,
   PanelLeft,
   PanelLeftClose,
-  PlusCircle,
   Search,
   Settings,
   Shield,
@@ -117,20 +116,6 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
           >
             {collapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
           </button>
-        </div>
-
-        {/* Primary Action Button: Эълон додан */}
-        <div className="mb-4">
-          <Link
-            to="/create-listing"
-            title={collapsed ? t('nav.createListing') : undefined}
-            className={`w-full flex items-center justify-center font-bold text-sm text-white rounded-xl shadow-lg transition-all duration-200 active:scale-[0.98] ${
-              collapsed ? 'p-3' : 'gap-2.5 px-4 py-3'
-            } bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] hover:from-[var(--accent-hover)] hover:to-[var(--accent-dark)] shadow-[rgb(var(--accent-rgb)/0.35)] border border-emerald-400/30 hover:-translate-y-0.5`}
-          >
-            <PlusCircle className="w-5 h-5 shrink-0" />
-            {!collapsed && <span className="truncate">{t('nav.createListing')}</span>}
-          </Link>
         </div>
 
         {/* Navigation list */}
