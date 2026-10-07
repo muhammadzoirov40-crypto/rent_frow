@@ -16,17 +16,13 @@ const SIZES = {
 };
 
 /**
- * Unified RentHub Concept #1 Emblem:
- * Integrates:
- * 1. House Profile (Roofline and interior portal)
- * 2. Location Pin Geometry (Finding & mapping rentals)
- * 3. Connection / Rental Loop (Exchange between renter & owner)
- * 4. The Monogram 'R'
- * Rendered with deep navy and modern electric blue gradient.
+ * 100% Transparent Vector LogoMark (Шаффоф / Бе ягон замина ё доғи сафед).
+ * Uses true SVG compound path cutout (evenodd rule) so the inner house portal
+ * is genuinely transparent and reveals whatever background is behind it (Dark or Light).
  */
 export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 100" className={`${className} shrink-0`} fill="none" aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={`${className} shrink-0 bg-transparent`} fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="rhUnifiedMark" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#00A2FF" />
@@ -39,8 +35,14 @@ export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) 
         </linearGradient>
       </defs>
 
-      {/* Unified Monogram: Pin + Roof + Rental Loop */}
+      {/* 
+        Single compound path with fillRule="evenodd":
+        Outer: Pin + Roof + Rental Loop
+        Inner: House portal cutout (100% transparent through-hole)
+      */}
       <path
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M 46 6
            C 50 6, 53 8, 56 11
            L 76 30
@@ -57,13 +59,8 @@ export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) 
            C 13 94, 11 92, 11 88
            L 11 12
            C 11 8, 14 6, 18 6
-           Z"
-        fill="url(#rhUnifiedMark)"
-      />
-
-      {/* Negative Space Interior (House Portal & Inverted Pin Peak) */}
-      <path
-        d="M 27 20
+           Z
+           M 27 20
            L 48 8
            C 50 7, 52 7, 54 8
            L 71 23
@@ -71,7 +68,7 @@ export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) 
            C 67 48, 60 50, 52 50
            L 27 50
            Z"
-        fill="#FFFFFF"
+        fill="url(#rhUnifiedMark)"
       />
 
       {/* Central Hub Node (Connection Core) */}
@@ -95,16 +92,16 @@ export default function Logo({
       to={to}
       onClick={onClick}
       aria-label="RentHub"
-      className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-150 active:scale-95 shrink-0"
+      className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-150 active:scale-95 shrink-0 bg-transparent"
       data-testid="logo"
     >
-      {/* 1. Unified Concept #1 Emblem */}
+      {/* 1. 100% Transparent Emblem */}
       <LogoMark className={s.img} />
 
-      {/* 2. Premium Wordmark: Rent (Deep Navy) + Hub (Electric Blue) */}
+      {/* 2. Wordmark: Rent (Navy/White) + Hub (Electric Blue) */}
       {showWord && (
         <span
-          className={`${s.word} font-black tracking-[-0.03em] leading-none transition-colors flex items-center ${
+          className={`${s.word} font-black tracking-[-0.03em] leading-none transition-colors flex items-center bg-transparent ${
             hideWordOnMobile ? 'hidden sm:flex' : 'flex'
           }`}
           style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}

@@ -1,19 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
   <defs>
     <!-- Deep Navy & Electric Blue Gradient -->
-    <linearGradient id="favRhGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="favRhGradT" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00A2FF"/>
       <stop offset="55%" stop-color="#0066FF"/>
       <stop offset="100%" stop-color="#0044CC"/>
     </linearGradient>
-    <linearGradient id="favNode" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="favNodeT" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#00F0FF"/>
       <stop offset="100%" stop-color="#0066FF"/>
     </linearGradient>
   </defs>
 
-  <!-- Unified Emblem: House + Location Pin + Connection Loop forming Monogram R -->
+  <!-- 100% Transparent Favicon Emblem with Compound Cutout -->
   <path
+    fill-rule="evenodd"
+    clip-rule="evenodd"
     d="M 46 6
        C 50 6, 53 8, 56 11
        L 76 30
@@ -30,13 +32,8 @@
        C 13 94, 11 92, 11 88
        L 11 12
        C 11 8, 14 6, 18 6
-       Z"
-    fill="url(#favRhGrad)"
-  />
-
-  <!-- Interior Negative Space: House / Portal -->
-  <path
-    d="M 27 20
+       Z
+       M 27 20
        L 48 8
        C 50 7, 52 7, 54 8
        L 71 23
@@ -44,10 +41,10 @@
        C 67 48, 60 50, 52 50
        L 27 50
        Z"
-    fill="#FFFFFF"
+    fill="url(#favRhGradT)"
   />
 
-  <!-- Central Hub & Connection Core -->
-  <circle cx="50" cy="30" r="7" fill="url(#favNode)"/>
-  <path d="M 50 37 V 45" stroke="url(#favNode)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Central Hub Node -->
+  <circle cx="50" cy="30" r="7" fill="url(#favNodeT)"/>
+  <path d="M 50 37 V 45" stroke="url(#favNodeT)" stroke-width="3" stroke-linecap="round"/>
 </svg>
