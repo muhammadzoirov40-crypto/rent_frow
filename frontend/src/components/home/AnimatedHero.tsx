@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Sparkles, Building2, Car, Wrench, ArrowRight } from 'lucide-react';
+import { Building2, Car, Wrench, ArrowRight } from 'lucide-react';
 import SearchBar from '../search/SearchBar';
 import { listings, type ListingListItem } from '../../api';
 import { useTranslation } from 'react-i18next';
@@ -193,12 +193,6 @@ export default function AnimatedHero() {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             className="lg:col-span-6 space-y-6"
           >
-            {/* Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--accent,#FF6B35)]/10 border border-[var(--accent,#FF6B35)]/25 text-xs font-bold text-[var(--accent,#FF6B35)] shadow-sm">
-              <Sparkles className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '4s' }} />
-              <span>{t('home.heroKicker')}</span>
-            </div>
-
             {/* Title with Gradient Accent */}
             <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
               {t('home.heroTitle')}{' '}
