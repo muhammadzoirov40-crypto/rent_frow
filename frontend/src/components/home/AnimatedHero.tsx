@@ -203,10 +203,10 @@ export default function AnimatedHero() {
             <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
               {t('home.heroTitle')}{' '}
               <span className="whitespace-nowrap">
-                <span className="bg-gradient-to-r from-[var(--accent,#FF6B35)] via-[#FFB300] to-[var(--accent-light,#FF8552)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_rgba(255,107,53,0.35)]">
+                <span className="bg-gradient-to-r from-[var(--hero-rent-from)] via-[var(--hero-rent-via)] to-[var(--hero-rent-to)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_var(--hero-rent-shadow)]">
                   Rent
                 </span>
-                <span className="bg-gradient-to-r from-[#7BF7FF] via-[#00F0FF] to-[#0090C8] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_rgba(0,240,255,0.30)]">
+                <span className="bg-gradient-to-r from-[var(--hero-hub-from)] via-[var(--hero-hub-via)] to-[var(--hero-hub-to)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_var(--hero-hub-shadow)]">
                   Hub
                 </span>
               </span>

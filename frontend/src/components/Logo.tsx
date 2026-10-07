@@ -25,13 +25,13 @@ export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) 
     <svg viewBox="0 0 100 100" className={`${className} shrink-0 bg-transparent`} fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="rhUnifiedMark" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00A2FF" />
-          <stop offset="55%" stopColor="#0066FF" />
-          <stop offset="100%" stopColor="#0044CC" />
+          <stop offset="0%" stopColor="#6C9BFF" />
+          <stop offset="55%" stopColor="#2E63F5" />
+          <stop offset="100%" stopColor="#143DB8" />
         </linearGradient>
         <linearGradient id="rhUnifiedNode" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00F0FF" />
-          <stop offset="100%" stopColor="#0066FF" />
+          <stop offset="0%" stopColor="#5C93FF" />
+          <stop offset="100%" stopColor="#2E63F5" />
         </linearGradient>
       </defs>
 
@@ -98,7 +98,7 @@ export default function Logo({
       {/* 1. 100% Transparent Emblem */}
       <LogoMark className={s.img} />
 
-      {/* 2. Wordmark: Rent (Navy/White) + Hub (Electric Blue) */}
+      {/* 2. Wordmark: Rent (Navy/White) + Hub (Royal Blue) */}
       {showWord && (
         <span
           className={`${s.word} font-black tracking-[-0.03em] leading-none transition-colors flex items-center bg-transparent ${
@@ -107,7 +107,7 @@ export default function Logo({
           style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
         >
           <span className="text-[#0B132B] dark:text-white">Rent</span>
-          <span className="text-[#0066FF]">Hub</span>
+          <span className="text-[#2E63F5]">Hub</span>
         </span>
       )}
     </Link>

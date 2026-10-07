@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100" width="100%" height="100%">
   <defs>
-    <!-- Deep Navy & Electric Blue Gradient -->
+    <!-- Royal Sapphire Gradient -->
     <linearGradient id="logoSvgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00A2FF"/>
-      <stop offset="55%" stop-color="#0066FF"/>
-      <stop offset="100%" stop-color="#0044CC"/>
+      <stop offset="0%" stop-color="#6C9BFF"/>
+      <stop offset="55%" stop-color="#2E63F5"/>
+      <stop offset="100%" stop-color="#143DB8"/>
     </linearGradient>
     <linearGradient id="logoSvgNode" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00F0FF"/>
-      <stop offset="100%" stop-color="#0066FF"/>
+      <stop offset="0%" stop-color="#5C93FF"/>
+      <stop offset="100%" stop-color="#2E63F5"/>
     </linearGradient>
   </defs>
 
@@ -53,7 +53,7 @@
   <!-- Typography -->
   <g transform="translate(108, 62)">
     <text font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="50" font-weight="900" letter-spacing="-0.03em">
-      <tspan fill="#0B132B">Rent</tspan><tspan fill="#0066FF">Hub</tspan>
+      <tspan fill="#0B132B">Rent</tspan><tspan fill="#2E63F5">Hub</tspan>
     </text>
   </g>
 </svg>

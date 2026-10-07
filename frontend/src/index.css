@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    /* ===== Accent / theme color tokens (Original = RentHub brand) ===== */
-    --accent: #ff6b35;
-    --accent-hover: #e55a2b;
-    --accent-light: #ff8552;
-    --accent-dark: #cc4a22;
+    /* ===== Accent / theme color tokens (Default = RentHub Emerald Green) ===== */
+    --accent: #10b981;
+    --accent-hover: #059669;
+    --accent-light: #34d399;
+    --accent-dark: #047857;
     --accent-foreground: #ffffff;
-    --accent-rgb: 255 107 53;
+    --accent-rgb: 16 185 129;
 
     --color-primary: var(--accent);
     --color-primary-dark: var(--accent-hover);
@@ -34,12 +34,22 @@
        for the very first paint before JS measures it. */
     --header-h: 7rem;
 
-    /* ===== RentHub brand logo — deep navy + electric blue ===== */
+    /* ===== RentHub brand logo — royal sapphire ===== */
     --logo-grad-a: #0b2447;
     --logo-grad-b: #123f86;
-    --logo-blue: #1b6ef3;
+    --logo-blue: #2e63f5;
     --logo-node: #0b2447;
     --logo-word: #0b2447;
+
+    /* ===== Hero headline wordmark — same palette as the header logo ===== */
+    --hero-rent-from: #0b132b;
+    --hero-rent-via: #334b6b;
+    --hero-rent-to: #0b132b;
+    --hero-rent-shadow: rgba(11, 19, 43, 0.35);
+    --hero-hub-from: #2e63f5;
+    --hero-hub-via: #5590ff;
+    --hero-hub-to: #4475f0;
+    --hero-hub-shadow: rgba(46, 99, 245, 0.4);
   }
 
   @media (max-width: 767px) {
@@ -95,9 +105,15 @@
     /* Logo stays branded on a dark page: navy lifts, blue brightens. */
     --logo-grad-a: #173a76;
     --logo-grad-b: #164485;
-    --logo-blue: #3b8dff;
+    --logo-blue: #5c93ff;
     --logo-node: #2e5fa8;
     --logo-word: #ffffff;
+
+    /* Hero headline: navy lifts to white, royal blue holds its own on dark. */
+    --hero-rent-from: #ffffff;
+    --hero-rent-via: #cbd5e1;
+    --hero-rent-to: #ffffff;
+    --hero-rent-shadow: rgba(226, 232, 240, 0.3);
   }
 
   body {
