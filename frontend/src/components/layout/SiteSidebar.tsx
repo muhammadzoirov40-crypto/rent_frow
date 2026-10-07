@@ -73,51 +73,6 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
         transition-[width] duration-300 ease-out ${collapsed ? 'w-[76px]' : 'w-64'}`}
     >
       <div className={collapsed ? 'p-3 flex flex-col h-full' : 'p-4 flex flex-col h-full'}>
-        {/* User Card */}
-        <div
-          className={`relative overflow-hidden rounded-2xl border border-gray-200/60 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-md mb-4 ${
-            collapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-3.5 flex items-center gap-3'
-          }`}
-        >
-          <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[rgb(var(--accent-rgb)/0.2)] rounded-full blur-2xl" />
-          {isAuthenticated ? (
-            <Link
-              to="/profile"
-              className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white text-sm font-bold flex items-center justify-center shrink-0 shadow-md shadow-[rgb(var(--accent-rgb)/0.25)] border border-emerald-400/20"
-            >
-              {(user?.display_name || user?.email || '?').charAt(0).toUpperCase()}
-            </Link>
-          ) : (
-            <Link
-              to="/login"
-              className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white flex items-center justify-center shrink-0 shadow-md shadow-[rgb(var(--accent-rgb)/0.25)] border border-emerald-400/20"
-            >
-              <User className="w-5 h-5 text-white" />
-            </Link>
-          )}
-          {!collapsed && (
-            <div className="relative flex-1 min-w-0">
-              <h2 className="font-extrabold text-[14px] text-gray-900 dark:text-white truncate">
-                {isAuthenticated ? user?.display_name || user?.email : t('header.login')}
-              </h2>
-              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                {isAuthenticated ? user?.email : t('nav.menuSubtitle')}
-              </p>
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-            title={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-            className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] transition ${
-              collapsed ? '' : 'shrink-0'
-            }`}
-          >
-            {collapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
-          </button>
-        </div>
-
         {/* Navigation list */}
         <nav className="space-y-1.5 flex-1">
           {!collapsed && (
@@ -190,6 +145,51 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
             </button>
           </div>
         )}
+        {/* User Card: pinned to the very bottom, under sign-out */}
+        <div
+          className={`relative overflow-hidden rounded-2xl border border-gray-200/60 dark:border-white/10 bg-white/40 dark:bg-white/[0.04] backdrop-blur-md mt-4 ${
+            collapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-3.5 flex items-center gap-3'
+          }`}
+        >
+          <div className="pointer-events-none absolute -top-10 -right-8 w-28 h-28 bg-[rgb(var(--accent-rgb)/0.2)] rounded-full blur-2xl" />
+          {isAuthenticated ? (
+            <Link
+              to="/profile"
+              className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white text-sm font-bold flex items-center justify-center shrink-0 shadow-md shadow-[rgb(var(--accent-rgb)/0.25)] border border-emerald-400/20"
+            >
+              {(user?.display_name || user?.email || '?').charAt(0).toUpperCase()}
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white flex items-center justify-center shrink-0 shadow-md shadow-[rgb(var(--accent-rgb)/0.25)] border border-emerald-400/20"
+            >
+              <User className="w-5 h-5 text-white" />
+            </Link>
+          )}
+          {!collapsed && (
+            <div className="relative flex-1 min-w-0">
+              <h2 className="font-extrabold text-[14px] text-gray-900 dark:text-white truncate">
+                {isAuthenticated ? user?.display_name || user?.email : t('header.login')}
+              </h2>
+              <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
+                {isAuthenticated ? user?.email : t('nav.menuSubtitle')}
+              </p>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
+            title={collapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
+            className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] transition ${
+              collapsed ? '' : 'shrink-0'
+            }`}
+          >
+            {collapsed ? <PanelLeft className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+          </button>
+        </div>
+
       </div>
     </aside>
   );
