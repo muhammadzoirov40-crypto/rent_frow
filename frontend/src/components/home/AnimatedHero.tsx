@@ -200,7 +200,7 @@ export default function AnimatedHero() {
                 <span className="bg-gradient-to-r from-[var(--hero-rent-from)] via-[var(--hero-rent-via)] to-[var(--hero-rent-to)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_var(--hero-rent-shadow)]">
                   Rent
                 </span>
-                <span className="bg-gradient-to-r from-[var(--hero-hub-from)] via-[var(--hero-hub-via)] to-[var(--hero-hub-to)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_var(--hero-hub-shadow)]">
+                <span className="bg-gradient-to-r from-[var(--accent)] via-[var(--accent-light)] to-[var(--accent-hover)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_rgb(var(--accent-rgb)/0.4)]">
                   Hub
                 </span>
               </span>

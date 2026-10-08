@@ -79,7 +79,11 @@ export default function ChatInput({
     const el = textareaRef.current;
     if (!el) return;
     el.style.height = 'auto';
-    el.style.height = `${Math.min(el.scrollHeight, 150)}px`;
+    // border-box: the inline height must also cover the 1px border on each
+    // side — otherwise the content overflows by 2px and a phantom
+    // scrollbar sliver shows inside the field.
+    const border = el.offsetHeight - el.clientHeight;
+    el.style.height = `${Math.min(el.scrollHeight + border, 150)}px`;
   }, [value]);
 
   useEffect(() => {

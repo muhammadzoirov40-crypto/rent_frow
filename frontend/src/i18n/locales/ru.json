@@ -434,6 +434,7 @@
     "previewImage": "📷 Фото",
     "previewVoice": "🎤 Голосовое сообщение",
     "previewFile": "📎 Файл",
+    "noMessagesYet": "Пока нет сообщений",
     "speaker": "Динамик",
     "deleteConfirm": "Удалить сообщение?",
     "deleted": "Сообщение удалено",

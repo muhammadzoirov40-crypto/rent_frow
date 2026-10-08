@@ -434,6 +434,7 @@
     "previewImage": "📷 Photo",
     "previewVoice": "🎤 Voice message",
     "previewFile": "📎 File",
+    "noMessagesYet": "No messages yet",
     "speaker": "Speaker",
     "deleteConfirm": "Delete message?",
     "deleted": "Message deleted",

@@ -457,7 +457,7 @@ export default function MessagesPage() {
                         <img src={other.avatar_url} alt="" className="w-11 h-11 rounded-full object-cover" />
                       ) : (
                         <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[var(--accent)] to-[#1A1A2E] flex items-center justify-center text-white font-semibold text-sm shadow-md shadow-[rgb(var(--accent-rgb)/0.2)]">
-                          {other?.display_name?.charAt(0) || '?'}
+                          {other?.display_name?.charAt(0) || t('messages.user').charAt(0)}
                         </div>
                       )}
                       {unreadCount > 0 && (
@@ -471,17 +471,15 @@ export default function MessagesPage() {
                         <span className={`text-sm truncate ${unreadCount > 0 ? 'font-bold text-gray-900 dark:text-white' : 'font-semibold text-gray-800 dark:text-gray-100'}`}>
                           {other?.display_name || t('messages.user')}
                         </span>
-                        {conv.last_message_at && (
-                          <span className={`text-[11px] flex-shrink-0 ml-2 ${unreadCount > 0 ? 'text-[var(--accent)] font-semibold' : 'text-gray-400'}`}>
-                            {timeAgo(conv.last_message_at, t)}
-                          </span>
-                        )}
+                        <span className={`text-[11px] flex-shrink-0 ml-2 ${unreadCount > 0 ? 'text-[var(--accent)] font-semibold' : 'text-gray-400'}`}>
+                          {timeAgo(conv.last_message_at ?? conv.created_at, t)}
+                        </span>
                       </div>
-                      {conv.last_message_content && (
-                        <p className={`text-xs truncate ${unreadCount > 0 ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
-                          {previewText(conv.last_message_content)}
-                        </p>
-                      )}
+                      <p className={`text-xs truncate ${unreadCount > 0 ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
+                        {conv.last_message_content
+                          ? previewText(conv.last_message_content)
+                          : t('messages.noMessagesYet')}
+                      </p>
                     </div>
                   </div>
                 </button>

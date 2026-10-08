@@ -398,12 +398,42 @@ body::before {
   [class*='renthubShine'] { animation: none !important; }
 }
 
-    /* Native <select> lists are painted by the OS popup, which ignores the page's
-       dark-mode text colour and renders white-on-white. Give options an explicit
-       surface in both themes; the selected/hovered row takes the accent. */
+    /* Native <select> lists are painted by the OS popup: it ignores the page's
+       dark-mode colours and never follows the accent theme. `appearance:
+       base-select` (Chrome 135+, Safari 18.4+, Firefox 132+) hands the popup
+       over to CSS so the ::picker()/option rules below actually paint; older
+       browsers drop the declaration and keep their native popup. */
+    select {
+      appearance: base-select;
+    }
+
+    /* Search-bar selects are width-budgeted to the pixel and never had a
+       chevron — keep them chevron-free. */
+    select.no-picker-icon::picker-icon {
+      content: none;
+      display: none;
+    }
+
+    /* Every other select: draw the chevron base-select no longer provides. */
+    select::picker-icon {
+      content: "";
+      display: inline-block;
+      width: 0.6rem;
+      height: 0.6rem;
+      margin-left: 0.5rem;
+      align-self: center;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
     select option {
       background-color: var(--bg-card);
       color: var(--text-card);
+      border-radius: 8px;
+      padding: 7px 12px;
     }
 
     select option:checked,
@@ -417,4 +447,6 @@ body::before {
       border: 1px solid rgb(var(--accent-rgb) / 0.25);
       border-radius: 14px;
       padding: 6px;
+      margin-top: 6px;
+      box-shadow: 0 24px 60px -24px rgb(0 0 0 / 0.45);
     }

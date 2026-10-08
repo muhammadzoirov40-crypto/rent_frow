@@ -25,13 +25,13 @@ export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) 
     <svg viewBox="0 0 100 100" className={`${className} shrink-0 bg-transparent`} fill="none" aria-hidden="true">
       <defs>
         <linearGradient id="rhUnifiedMark" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#6C9BFF" />
-          <stop offset="55%" stopColor="#2E63F5" />
-          <stop offset="100%" stopColor="#143DB8" />
+          <stop offset="0%" style={{ stopColor: 'var(--accent-light)' }} />
+          <stop offset="55%" style={{ stopColor: 'var(--accent)' }} />
+          <stop offset="100%" style={{ stopColor: 'var(--accent-dark)' }} />
         </linearGradient>
         <linearGradient id="rhUnifiedNode" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#5C93FF" />
-          <stop offset="100%" stopColor="#2E63F5" />
+          <stop offset="0%" style={{ stopColor: 'var(--accent-light)' }} />
+          <stop offset="100%" style={{ stopColor: 'var(--accent)' }} />
         </linearGradient>
       </defs>
 
@@ -107,7 +107,7 @@ export default function Logo({
           style={{ fontFamily: "'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" }}
         >
           <span className="text-[#0B132B] dark:text-white">Rent</span>
-          <span className="text-[#2E63F5]">Hub</span>
+          <span className="text-[var(--accent)]">Hub</span>
         </span>
       )}
     </Link>

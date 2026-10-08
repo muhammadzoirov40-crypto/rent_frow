@@ -185,7 +185,7 @@ export default function ChatMessageList({
   const scrollRef = useRef<HTMLDivElement>(null);
   const pressTimer = useRef<number | undefined>(undefined);
   const [menu, setMenu] = useState<MenuState | null>(null);
-
+  const atBottomRef = useRef(true);
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -195,6 +195,30 @@ export default function ChatMessageList({
     }
   }, [messages.length]);
 
+  // Re-pin to the newest message when the box or the content resizes after
+  // the first scroll: the rental/listing bars and the composer load
+  // asynchronously, and without this the last message stays half-hidden
+  // behind the composer.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      atBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 200;
+    };
+    onScroll();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    const pin = () => {
+      if (atBottomRef.current) el.scrollTop = el.scrollHeight;
+    };
+    const ro = new ResizeObserver(pin);
+    ro.observe(el);
+    const content = el.firstElementChild;
+    if (content) ro.observe(content);
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      ro.disconnect();
+    };
+  }, [messages.length]);
   useEffect(() => {
     if (!menu) return;
     const close = () => setMenu(null);

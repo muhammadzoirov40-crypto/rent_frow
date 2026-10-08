@@ -102,10 +102,11 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
   };
 
   const selectCls =
-    // appearance-none drops the native dropdown arrow (its UA padding alone
-    // would eat ~32px, enough to clip "Ҳамаи категорияҳо"), so the right
-    // padding stays at zero — there is no chevron to reserve room for.
-    'w-full min-w-0 bg-transparent border-0 focus:outline-none text-sm text-gray-900 dark:text-white py-2.5 cursor-pointer appearance-none';
+    // appearance:base-select (index.css) hands the popup over to CSS so the
+    // list follows the accent theme; no chevron is drawn here (see
+    // .no-picker-icon) because its UA padding alone would eat ~32px and
+    // clip "Ҳамаи категорияҳо".
+    'w-full min-w-0 bg-transparent border-0 focus:outline-none text-sm text-gray-900 dark:text-white py-2.5 cursor-pointer no-picker-icon';
 
   return (
     <form
