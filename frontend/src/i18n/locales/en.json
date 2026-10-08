@@ -889,7 +889,13 @@
     "cancel": "Cancel",
     "hint": "Feedback is published after administrator approval.",
     "sent": "Feedback sent! Thank you.",
-    "error": "Failed to send"
+    "error": "Failed to send",
+    "addImage": "Add photo",
+    "imageUploading": "Uploading photo…",
+    "removeImage": "Remove photo",
+    "imageTypeError": "Wrong file type — JPG, JPEG, PNG or WebP",
+    "imageTooLarge": "Image is larger than 10MB",
+    "imageUploadError": "Failed to upload photo"
   },
   "dashboard": {
     "searchPlaceholder": "Search...",
