@@ -191,7 +191,7 @@ export default function AnimatedHero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-start-1 lg:col-span-6 lg:row-start-1 lg:self-start space-y-6"
+            className="lg:col-start-1 lg:col-span-6 lg:row-start-1 space-y-6"
           >
             {/* Title with Gradient Accent */}
             <h1 className="text-5xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
