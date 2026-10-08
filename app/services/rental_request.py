@@ -184,6 +184,7 @@ class RentalRequestService:
                 end_date=data.end_date,
                 days=total_days,
                 total=total_price,
+                note=data.message,
             ),
         )
         # 3. and both get it by email too — best effort, never blocks the request

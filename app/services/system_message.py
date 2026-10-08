@@ -31,11 +31,19 @@ def money(value) -> str:
     return f"{float(value):g}"
 
 
-def request_created(*, listing_title: str, start_date, end_date, days: int, total) -> str:
-    return wrap(
+def request_created(*, listing_title: str, start_date, end_date, days: int, total, note: str | None = None) -> str:
+    line = (
         f'Rental request for "{listing_title}": {start_date} — {end_date} '
         f"· {days} days · {money(total)} сомони · awaiting owner confirmation."
     )
+    if note and note.strip():
+        # The renter's own words (the "place of rent" note typed in the booking
+        # card) ride along so the owner reads the feedback inside the chat.
+        clean = " ".join(note.split())
+        if len(clean) > 140:
+            clean = clean[:137] + "..."
+        line += f" Note: {clean}"
+    return wrap(line)
 
 
 def request_accepted(*, listing_title: str, start_date, end_date, days: int, total) -> str:
