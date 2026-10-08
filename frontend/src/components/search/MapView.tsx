@@ -103,13 +103,13 @@ export default function MapView({ items, focus, className = '', height = '28rem'
            <div style="font-weight:700;font-size:14px;margin-bottom:4px">${
              item.title.length > 60 ? `${item.title.slice(0, 60)}…` : item.title
            }</div>
-           <div style="font-size:13px;color:#ff6b35;font-weight:700">${price}</div>
+           <div style="font-size:13px;color:var(--accent);font-weight:700">${price}</div>
            <div style="font-size:12px;color:#6b7280;margin-top:2px">${
              item.city_name || ''
            }</div>
            <a href="/listing/${item.id}" data-listing-id="${
              item.id
-           }" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:700;color:#ff6b35;text-decoration:none">${
+           }" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);text-decoration:none">${
              t('common.viewDetails')
            } →</a>
          </div>`,

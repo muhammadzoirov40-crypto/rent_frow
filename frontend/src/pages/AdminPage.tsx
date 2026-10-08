@@ -440,7 +440,7 @@ export default function AdminPage() {
                 onClick={() => setAdminSidebarCollapsed(!adminSidebarCollapsed)}
                 aria-label="Toggle sidebar"
                 title={adminSidebarCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
-                className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-orange-50 dark:hover:bg-white/10 transition ${
+                className={`relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.1)] transition ${
                   adminSidebarCollapsed ? '' : 'shrink-0'
                 }`}
               >

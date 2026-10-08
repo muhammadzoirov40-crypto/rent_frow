@@ -44,7 +44,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
       collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
     } ${
       isActive(to)
-        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.35)] border border-emerald-400/30'
+        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.35)] border border-[rgb(var(--accent-rgb)/0.35)]'
         : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-transparent hover:bg-white/50 dark:hover:bg-white/[0.06] border border-transparent hover:border-gray-200/50 dark:hover:border-white/10 backdrop-blur-sm'
     }`;
 

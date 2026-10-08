@@ -340,7 +340,7 @@ export default function Header() {
                           {t('header.settings')}
                         </Link>
                         {user?.role === 'ADMIN' && (
-                          <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--accent)] font-semibold hover:bg-orange-50 dark:hover:bg-[rgb(var(--accent-rgb)/0.1)] transition">
+                          <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--accent)] font-semibold hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.1)] transition">
                             <Shield className="w-4 h-4" />
                             {t('nav.adminDashboard')}
                           </Link>

@@ -94,7 +94,7 @@ export default function CategoryExplorer() {
             onClick={() => setActiveGroup('')}
             className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border backdrop-blur-md transition-all duration-200 cursor-pointer ${
               !activeGroup
-                ? 'bg-[var(--accent)] border-emerald-400/40 text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
+                ? 'bg-[var(--accent)] border-[rgb(var(--accent-rgb)/0.4)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
                 : 'bg-white/50 dark:bg-slate-900/40 border-gray-200/80 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50 hover:bg-white/80 dark:hover:bg-slate-800/60'
             }`}
           >
@@ -106,7 +106,7 @@ export default function CategoryExplorer() {
               onClick={() => setActiveGroup(g.key)}
               className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border backdrop-blur-md transition-all duration-200 cursor-pointer ${
                 activeGroup === g.key
-                  ? 'bg-[var(--accent)] border-emerald-400/40 text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
+                  ? 'bg-[var(--accent)] border-[rgb(var(--accent-rgb)/0.4)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
                   : 'bg-white/50 dark:bg-slate-900/40 border-gray-200/80 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50 hover:bg-white/80 dark:hover:bg-slate-800/60'
               }`}
             >

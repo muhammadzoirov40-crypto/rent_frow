@@ -113,12 +113,12 @@ function InfiniteCard({ item }: RealCardProps) {
   const category = item.categoryKey
     ? t(item.categoryKey)
     : item.category_name || t('home.heroFallbackTag');
-  const badgeColor = item.badgeColor || '#00F0FF';
+  const badgeColor = 'var(--accent)';
 
   return (
     <Link
       to={`/listings/${item.id}`}
-      className="block group bg-slate-900/60 hover:bg-slate-800/85 border border-white/10 hover:border-[#FF6B35]/50 rounded-2xl p-3 sm:p-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
+      className="block group bg-slate-900/60 hover:bg-slate-800/85 border border-white/10 hover:border-[rgb(var(--accent-rgb)/0.5)] rounded-2xl p-3 sm:p-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
     >
       <div className="h-32 sm:h-36 w-full rounded-xl overflow-hidden relative bg-slate-800">
         <img
@@ -129,14 +129,14 @@ function InfiniteCard({ item }: RealCardProps) {
         />
         <span
           className="absolute top-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider backdrop-blur-md shadow-md border border-white/10"
-          style={{ backgroundColor: `${badgeColor}33`, color: badgeColor }}
+          style={{ backgroundColor: 'rgba(var(--accent-rgb) / 0.2)', color: badgeColor }}
         >
           {category}
         </span>
       </div>
 
       <div className="mt-3">
-        <h4 className="text-sm font-bold text-white truncate group-hover:text-[#FF6B35] transition-colors">
+        <h4 className="text-sm font-bold text-white truncate group-hover:text-[var(--accent)] transition-colors">
           {item.title}
         </h4>
         <p className="text-[11px] text-slate-400 truncate mt-0.5">
@@ -144,7 +144,7 @@ function InfiniteCard({ item }: RealCardProps) {
         </p>
 
         <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-slate-800">
-          <span className="text-xs font-black text-[#00F0FF]">
+          <span className="text-xs font-black text-[var(--accent)]">
             {item.price} <span className="text-[10px] text-slate-400 font-normal">{t('home.heroPerDay')}</span>
           </span>
           <span className="text-[10px] font-bold text-slate-400 group-hover:text-white transition-colors flex items-center gap-0.5">
@@ -181,7 +181,7 @@ export default function AnimatedHero() {
   return (
     <div className="relative overflow-hidden pt-6 pb-16 md:pt-10 md:pb-24">
       {/* Background glow effects */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-[var(--accent,#FF6B35)]/15 via-[#00F0FF]/10 to-transparent blur-[150px] pointer-events-none rounded-full" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-[var(--accent,#FF6B35)]/15 via-[rgb(var(--accent-rgb)/0.1)] to-transparent blur-[150px] pointer-events-none rounded-full" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
@@ -227,16 +227,16 @@ export default function AnimatedHero() {
               </a>
               <a
                 href="#categories"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-[#00F0FF]/10 hover:text-[#00F0FF] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
               >
-                <Car className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <Car className="w-3.5 h-3.5 text-[var(--accent)]" />
                 {t('home.heroPillTransport')}
               </a>
               <a
                 href="#categories"
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-emerald-500/10 hover:text-emerald-500 text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800/80 hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
               >
-                <Wrench className="w-3.5 h-3.5 text-emerald-500" />
+                <Wrench className="w-3.5 h-3.5 text-[var(--accent)]" />
                 {t('home.heroPillEquipment')}
               </a>
             </div>

@@ -20,7 +20,7 @@ export const GlassStatsCard: React.FC<GlassStatsCardProps> = ({
   value,
   change,
   icon: Icon,
-  gradient = 'from-[#FF6B35]/20 to-transparent',
+  gradient = 'from-[rgb(var(--accent-rgb)/0.2)] to-transparent',
   subtitle,
 }) => {
   const hasChange = typeof change === 'number' && !Number.isNaN(change);

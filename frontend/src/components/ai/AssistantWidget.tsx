@@ -146,7 +146,7 @@ export default function AssistantWidget() {
           onClick={() => setOpen((v) => !v)}
           aria-label={t('assistant.title')}
           title="Ёрдамчии AI"
-          className={`relative w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.35)] hover:shadow-xl hover:shadow-[rgb(var(--accent-rgb)/0.5)] hover:scale-105 active:scale-95 border border-emerald-400/30 ${
+          className={`relative w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.35)] hover:shadow-xl hover:shadow-[rgb(var(--accent-rgb)/0.5)] hover:scale-105 active:scale-95 border border-[rgb(var(--accent-rgb)/0.35)] ${
             open
               ? 'bg-gray-800/90 dark:bg-slate-800/90 backdrop-blur-md'
               : 'bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)]'

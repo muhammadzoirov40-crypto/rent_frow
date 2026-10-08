@@ -327,7 +327,7 @@ export default function DashboardPage() {
             value={som(summary?.total_revenue ?? 0)}
             change={summary?.revenue_change_pct ?? 0}
             icon={DollarSign}
-            gradient="from-[#FF6B35]/30 to-[#FF4500]/10"
+            gradient="from-[rgb(var(--accent-rgb)/0.3)] to-[rgb(var(--accent-rgb)/0.06)]"
             subtitle={t('dashboard.overview.vsPrev')}
           />
           <GlassStatsCard
@@ -335,7 +335,7 @@ export default function DashboardPage() {
             value={String(summary?.total_bookings ?? 0)}
             change={summary?.bookings_change_pct ?? 0}
             icon={Ticket}
-            gradient="from-[#00F0FF]/30 to-[#0284C7]/10"
+            gradient="from-[rgb(var(--accent-rgb)/0.3)] to-[rgb(var(--accent-rgb)/0.06)]"
             subtitle={t('dashboard.overview.vsPrev')}
           />
           <GlassStatsCard

@@ -4,13 +4,13 @@
 
 @layer base {
   :root {
-    /* ===== Accent / theme color tokens (Default = RentHub Emerald Green) ===== */
-    --accent: #10b981;
-    --accent-hover: #059669;
-    --accent-light: #34d399;
-    --accent-dark: #047857;
+    /* ===== Accent / theme color tokens (Default = Royal Sapphire) ===== */
+    --accent: #2e63f5;
+    --accent-hover: #2554d8;
+    --accent-light: #6c9bff;
+    --accent-dark: #143db8;
     --accent-foreground: #ffffff;
-    --accent-rgb: 16 185 129;
+    --accent-rgb: 46 99 245;
 
     --color-primary: var(--accent);
     --color-primary-dark: var(--accent-hover);
@@ -397,3 +397,24 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   [class*='renthubShine'] { animation: none !important; }
 }
+
+    /* Native <select> lists are painted by the OS popup, which ignores the page's
+       dark-mode text colour and renders white-on-white. Give options an explicit
+       surface in both themes; the selected/hovered row takes the accent. */
+    select option {
+      background-color: var(--bg-card);
+      color: var(--text-card);
+    }
+
+    select option:checked,
+    select option:hover {
+      background-color: var(--accent);
+      color: var(--accent-foreground);
+    }
+
+    select::picker(select) {
+      background-color: var(--bg-card);
+      border: 1px solid rgb(var(--accent-rgb) / 0.25);
+      border-radius: 14px;
+      padding: 6px;
+    }

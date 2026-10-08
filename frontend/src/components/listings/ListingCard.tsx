@@ -128,7 +128,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
         {isVerified && (
           <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
-            <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" aria-hidden="true" />
+            <BadgeCheck className="w-3.5 h-3.5 text-[var(--accent-light)]" aria-hidden="true" />
             {t('listing.verified')}
           </span>
         )}
