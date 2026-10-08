@@ -25,7 +25,7 @@ interface SearchBarProps {
 const fieldCls =
   'w-full min-w-0 bg-transparent border-0 focus:outline-none text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 py-2.5';
 const groupCls =
-  'flex items-center gap-2.5 px-3.5 rounded-xl transition hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-[rgb(var(--accent-rgb)/0.12)] focus-within:bg-[rgb(var(--accent-rgb)/0.08)] dark:focus-within:bg-[rgb(var(--accent-rgb)/0.12)] focus-within:ring-1 focus-within:ring-[rgb(var(--accent-rgb)/0.45)]';
+  'flex items-center gap-1.5 px-2 rounded-xl transition hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-[rgb(var(--accent-rgb)/0.12)] focus-within:bg-[rgb(var(--accent-rgb)/0.08)] dark:focus-within:bg-[rgb(var(--accent-rgb)/0.12)] focus-within:ring-1 focus-within:ring-[rgb(var(--accent-rgb)/0.45)]';
 
 function toValues(params: URLSearchParams): SearchBarValues {
   return {
@@ -110,11 +110,11 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
   return (
     <form
       onSubmit={submit}
-      className={`bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-[rgb(var(--accent-rgb)/0.28)] shadow-[0_18px_45px_-22px_rgba(15,23,42,0.25)] dark:shadow-[0_30px_70px_-30px_rgb(var(--accent-rgb)/0.55)] p-2 sm:p-2.5 flex flex-col gap-1.5 md:flex-row md:flex-wrap md:items-center md:gap-1.5 backdrop-blur-md ${
+      className={`bg-white dark:bg-[#111827] border border-gray-200/80 dark:border-[rgb(var(--accent-rgb)/0.28)] shadow-[0_18px_45px_-22px_rgba(15,23,42,0.25)] dark:shadow-[0_30px_70px_-30px_rgb(var(--accent-rgb)/0.55)] p-2 flex flex-col gap-1.5 md:flex-row md:flex-wrap md:items-center md:gap-1 backdrop-blur-md ${
         compact ? 'rounded-xl' : 'rounded-3xl'
       }`}
     >
-      <div className={`flex-1 min-w-0 md:min-w-[9.5rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
+      <div className={`flex-[2_1_0%] min-w-0 md:min-w-[5.5rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
         <Search className="w-4 h-4 text-[var(--accent)] shrink-0" />
         <input
           type="search"
@@ -128,7 +128,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
 
       {/* 12rem, not 9.5rem: this label is the longest one in the bar and the
           group must keep ~138px for it once icon, gap and padding are paid. */}
-      <div className={`flex-1 min-w-0 md:min-w-[12rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
+      <div className={`flex-1 min-w-0 md:min-w-[5.25rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
         <LayoutGrid className="w-4 h-4 text-[var(--accent)] shrink-0" />
         <select
           value={values.category_id}
@@ -145,7 +145,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
         </select>
       </div>
 
-      <div className={`flex-1 min-w-0 md:min-w-[10.5rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
+      <div className={`flex-1 min-w-0 md:min-w-[4.75rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
         <MapPin className="w-4 h-4 text-[var(--accent)] shrink-0" />
         <select
           value={values.city_id}
@@ -162,7 +162,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
         </select>
       </div>
 
-      <div className={`flex-1 min-w-0 md:min-w-[9.5rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
+      <div className={`min-w-0 md:min-w-[13.25rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
         <CalendarDays className="w-4 h-4 text-[var(--accent)] shrink-0" />
         <input
           type="date"
@@ -170,7 +170,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
           onChange={(e) => set('start_date', e.target.value)}
           aria-label={t('search.dateFrom')}
           onClick={openPicker}
-          className={`${fieldCls} date-field md:w-[7.5rem]`}
+          className={`${fieldCls} date-field md:w-[4.75rem]`}
         />
         <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
         <input
@@ -180,12 +180,12 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
           onChange={(e) => set('end_date', e.target.value)}
           aria-label={t('search.dateTo')}
           onClick={openPicker}
-          className={`${fieldCls} date-field md:w-[7.5rem]`}
+          className={`${fieldCls} date-field md:w-[4.75rem]`}
         />
       </div>
 
       {showMore && (
-        <div className={`flex-1 min-w-0 md:min-w-[9.5rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
+        <div className={`min-w-0 md:min-w-[12.75rem] md:border-r border-[rgb(var(--accent-rgb)/0.16)] dark:border-[rgb(var(--accent-rgb)/0.2)] ${groupCls}`}>
           <Tag className="w-4 h-4 text-[var(--accent)] shrink-0" />
           <input
             type="number"
@@ -195,7 +195,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
             onChange={(e) => set('price_min', e.target.value)}
             placeholder={t('search.priceFrom')}
             aria-label={t('search.priceFrom')}
-            className={`${fieldCls} md:w-[6rem]`}
+            className={`${fieldCls} md:w-[4.5rem]`}
           />
           <span className="text-gray-300 dark:text-gray-600 text-xs">—</span>
           <input
@@ -206,7 +206,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
             onChange={(e) => set('price_max', e.target.value)}
             placeholder={t('search.priceTo')}
             aria-label={t('search.priceTo')}
-            className={`${fieldCls} md:w-[6rem]`}
+            className={`${fieldCls} md:w-[4.5rem]`}
           />
         </div>
       )}
@@ -217,13 +217,13 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
           onClick={() => setShowMore((v) => !v)}
           aria-pressed={showMore}
           title={t('search.moreFilters')}
-          className="hidden md:inline-flex items-center justify-center w-10 h-10 rounded-xl text-gray-500 dark:text-gray-400 hover:bg-[rgb(var(--accent-rgb)/0.12)] dark:hover:bg-[rgb(var(--accent-rgb)/0.14)] hover:text-[var(--accent)] transition"
+          className="hidden md:inline-flex items-center justify-center w-7 h-7 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-[rgb(var(--accent-rgb)/0.12)] dark:hover:bg-[rgb(var(--accent-rgb)/0.14)] hover:text-[var(--accent)] transition"
         >
           <Tag className="w-4 h-4" />
         </button>
         <button
           type="submit"
-          className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-bold transition-all shadow-[0_18px_35px_-12px_rgb(var(--accent-rgb)/0.6)] ring-1 ring-white/15 hover:ring-white/30"
+          className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-2xl bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white text-sm font-bold transition-all shadow-[0_18px_35px_-12px_rgb(var(--accent-rgb)/0.6)] ring-1 ring-white/15 hover:ring-white/30"
         >
           <Search className="w-4 h-4" />
           {t('home.find')}

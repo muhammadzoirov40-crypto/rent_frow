@@ -191,7 +191,7 @@ export default function AnimatedHero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-6 space-y-6"
+            className="lg:col-start-1 lg:col-span-6 lg:row-start-1 space-y-6"
           >
             {/* Title with Gradient Accent */}
             <h1 className="text-5xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
@@ -209,11 +209,6 @@ export default function AnimatedHero() {
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed">
               {t('home.heroSubtitle')}
             </p>
-
-            {/* Search Bar */}
-            <div className="pt-2 max-w-xl">
-              <SearchBar />
-            </div>
 
             {/* Category Shortcuts */}
             <div className="flex flex-wrap items-center gap-2.5 pt-2">
@@ -241,11 +236,17 @@ export default function AnimatedHero() {
               </a>
             </div>
           </motion.div>
+          {/* One line or nothing: the bar needs ~710px to keep every field on a
+              single row, which is wider than the text column can give it, so it
+              owns a full-width row of its own (mobile order is unchanged). */}
+          <div className="lg:col-start-1 lg:col-span-12 lg:row-start-2 w-full">
+            <SearchBar />
+          </div>
 
           {/* RIGHT: REAL POSTS WITH OPPOSITE INFINITE SCROLL */}
           {/* Column 1 scrolls DOWN -> UP (ба боло меравад) */}
           {/* Column 2 scrolls UP -> DOWN (аз боло ба поён меравад) */}
-          <div className="lg:col-span-6 relative flex items-center justify-center pt-4 lg:pt-0">
+          <div className="lg:col-start-7 lg:col-span-6 lg:row-start-1 relative flex items-center justify-center pt-4 lg:pt-0">
             <div className="relative w-full max-w-lg h-[540px] sm:h-[600px] overflow-hidden rounded-3xl p-2 mask-gradient">
               
               {/* Fade masks top and bottom for smooth disappearing */}

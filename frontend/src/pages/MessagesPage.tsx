@@ -403,14 +403,14 @@ export default function MessagesPage() {
 
   if (convLoading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh_-_var(--header-h))]">
+      <div className="flex items-center justify-center h-[calc(100vh_-_var(--header-h)_-_5rem)] md:h-[calc(100vh_-_var(--header-h))]">
         <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-[calc(100vh-11rem)] md:h-[calc(100vh-6rem)] max-w-7xl mx-auto bg-white dark:bg-[#121418] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl my-4">
+    <div className="flex h-[calc(100vh_-_var(--header-h)_-_7rem)] md:h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto bg-white dark:bg-[#121418] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl my-4">
       <div className={`w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col bg-gray-50 dark:bg-[#1a1d24] ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
           <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t('messages.title')}</h2>

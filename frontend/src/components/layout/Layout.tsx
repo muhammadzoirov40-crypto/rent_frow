@@ -60,7 +60,9 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
       {!isAuthPage && <MobileBottomNav isAuthenticated={isAuthenticated} />}
-      {!isAuthPage && <AssistantWidget />}
+      {/* The chat owns the bottom-right corner: the floating assistant would sit
+          on top of the composer there, so it stays off the messages route. */}
+      {!isAuthPage && pathname !== '/messages' && <AssistantWidget />}
     </div>
   )
 }
