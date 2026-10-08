@@ -1064,7 +1064,16 @@
     "insufficientBalance": "You need {{total}} сомони, your balance is {{balance}} сомони.",
     "heldBalance": "Reserved",
     "insufficientFunds": "Insufficient funds",
-    "balanceToppedUp": "Balance topped up: {{balance}} сомони"
+    "balanceToppedUp": "Balance topped up: {{balance}} сомони",
+    "place": "Rental place",
+    "placePlaceholder": "Enter a place, e.g. Dushanbe, Sino",
+    "period": "Rental period",
+    "periodValue": "from {{start}} to {{end}}",
+    "handover": "Handover",
+    "handoverValue": "Handed over after the owner approves",
+    "totalPrice": "Total price",
+    "forDays": "for",
+    "sendRequest": "Send request"
   },
   "payment": {
     "pay": "Pay",

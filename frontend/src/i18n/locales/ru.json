@@ -1064,7 +1064,16 @@
     "insufficientBalance": "Требуется {{total}} сомони, ваш баланс — {{balance}} сомони.",
     "heldBalance": "Заблокировано",
     "insufficientFunds": "Недостаточно средств",
-    "balanceToppedUp": "Баланс пополнен: {{balance}} сомони"
+    "balanceToppedUp": "Баланс пополнен: {{balance}} сомони",
+    "place": "Место аренды",
+    "placePlaceholder": "Укажите место, например: Душанбе, Сино",
+    "period": "Срок аренды",
+    "periodValue": "с {{start}} по {{end}}",
+    "handover": "Передача",
+    "handoverValue": "Передаётся после подтверждения владельца",
+    "totalPrice": "Общая цена",
+    "forDays": "за",
+    "sendRequest": "Отправить запрос"
   },
   "payment": {
     "pay": "Оплатить",

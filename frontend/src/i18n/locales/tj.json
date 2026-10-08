@@ -1064,7 +1064,16 @@
     "insufficientBalance": "Ба шумо {{total}} сомони лозим аст, баланси шумо {{balance}} сомони.",
     "heldBalance": "Банд карда шуда",
     "insufficientFunds": "Маблағ накифа нест",
-    "balanceToppedUp": "Баланс пурра карда шуд: {{balance}} сомони"
+    "balanceToppedUp": "Баланс пурра карда шуд: {{balance}} сомони",
+    "place": "Ҷои иҷора",
+    "placePlaceholder": "Ҷои дилхоҳро нависед, масалан: Душанбе, Сино",
+    "period": "Дарозии иҷора",
+    "periodValue": "аз {{start}} то {{end}}",
+    "handover": "Уҳдасупорӣ",
+    "handoverValue": "Баъд аз тасдиқи соҳиб супорида мешавад",
+    "totalPrice": "Нархи умумӣ",
+    "forDays": "барои",
+    "sendRequest": "Дархост фиристодан"
   },
   "payment": {
     "pay": "Пардохт кунед",

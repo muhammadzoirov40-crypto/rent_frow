@@ -76,8 +76,16 @@ export default function ListingPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const touchX = useRef<number | null>(null);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
+  // The card opens with a one-day window already selected (today -> tomorrow)
+  // the way the reference booking panel does; the calendar can still move it.
+  const isoDay = (offset: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  };
+  const [startDate, setStartDate] = useState(() => isoDay(0));
+  const [endDate, setEndDate] = useState(() => isoDay(1));
+  const [placeNote, setPlaceNote] = useState('');
   const [showPhone, setShowPhone] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
@@ -186,11 +194,13 @@ export default function ListingPage() {
         listing_id: Number(id),
         start_date: startDate,
         end_date: endDate,
+        message: placeNote.trim() || undefined,
       }),
     onSuccess: () => {
       toast.success(t('listing.rentalRequestSent'));
       setStartDate('');
       setEndDate('');
+      setPlaceNote('');
       setBookingSuccess(true);
       setShowConfirm(false);
       queryClient.invalidateQueries({ queryKey: ['my-requests'] });
@@ -597,13 +607,28 @@ export default function ListingPage() {
                         <span className="text-xs text-gray-400 dark:text-gray-500 shrink-0">{listing.owner.display_name}</span>
                       )}
                     </div>
-                    <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                      <span>{t('booking.start')}</span>
-                      <span className="font-semibold text-[#1A1A2E] dark:text-white">{formatDate(startDate)}</span>
+                    <div className="pt-1">
+                      <label
+                        htmlFor="rent-place"
+                        className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"
+                      >
+                        {t('booking.place')}
+                      </label>
+                      <input
+                        id="rent-place"
+                        type="text"
+                        value={placeNote}
+                        onChange={(event) => setPlaceNote(event.target.value)}
+                        placeholder={t('booking.placePlaceholder')}
+                        maxLength={200}
+                        className="w-full rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-[#1A1A2E] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                      />
                     </div>
-                    <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
-                      <span>{t('booking.end')}</span>
-                      <span className="font-semibold text-[#1A1A2E] dark:text-white">{formatDate(endDate)}</span>
+                    <div className="flex items-center justify-between gap-3 text-gray-500 dark:text-gray-400">
+                      <span className="shrink-0">{t('booking.period')}</span>
+                      <span className="font-semibold text-[#1A1A2E] dark:text-white text-right">
+                        {t('booking.periodValue', { start: formatDate(startDate), end: formatDate(endDate) })}
+                      </span>
                     </div>
                     <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                       <span>{t('booking.duration')}</span>
@@ -611,13 +636,9 @@ export default function ListingPage() {
                         {days} {t('listing.days')}
                       </span>
                     </div>
-                    <div className="flex items-center justify-between text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-white/10">
-                      <span>
-                        {formatAmount(listing.price)} {t('common.somoni')} × {days}
-                      </span>
-                      <span className="font-semibold text-[#1A1A2E] dark:text-white">
-                        {formatAmount(Math.round(subtotal))} {t('common.somoni')}
-                      </span>
+                    <div className="flex items-center justify-between gap-3 text-gray-500 dark:text-gray-400">
+                      <span className="shrink-0">{t('booking.handover')}</span>
+                      <span className="text-right">{t('booking.handoverValue')}</span>
                     </div>
                     {(listing.deposit ?? 0) > 0 && (
                       <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
@@ -627,10 +648,10 @@ export default function ListingPage() {
                         </span>
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-white/10">
-                      <span className="font-bold text-[#1A1A2E] dark:text-white">{t('booking.total')}</span>
-                      <span className="text-lg font-extrabold text-[var(--accent)]">
-                        {formatAmount(total)} {t('common.somoni')}
+                    <div className="flex items-center justify-between gap-3 pt-2 border-t border-gray-100 dark:border-white/10">
+                      <span className="font-bold text-[#1A1A2E] dark:text-white shrink-0">{t('booking.totalPrice')}</span>
+                      <span className="text-base sm:text-lg font-extrabold text-[var(--accent)] text-right">
+                        {formatAmount(total)} {t('common.somoni')}, {t('booking.forDays')} {days} {t('listing.days')}
                       </span>
                     </div>
                     {WALLET_ENABLED && isAuthenticated && (
@@ -680,9 +701,9 @@ export default function ListingPage() {
                     <button
                       onClick={requestRental}
                       disabled={rentalMutation.isPending || shortOnBalance || listing.status !== 'ACTIVE'}
-                      className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] active:scale-[0.98]"
+                      className="w-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white font-semibold uppercase tracking-wide py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-[rgb(var(--accent-rgb)/0.2)] active:scale-[0.98]"
                     >
-                      {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
+                      {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.sendRequest')}
                     </button>
 
                     <button
@@ -1187,9 +1208,9 @@ export default function ListingPage() {
             <button
               onClick={requestRental}
               disabled={rentalMutation.isPending || shortOnBalance}
-              className="flex-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white text-sm font-semibold py-3 rounded-xl transition active:scale-[0.98]"
+              className="flex-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white text-sm font-semibold uppercase tracking-wide py-3 rounded-xl transition active:scale-[0.98]"
             >
-              {rentalMutation.isPending ? t('listing.sendingRequest') : t('listing.requestRental')}
+              {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.sendRequest')}
             </button>
             <button
               onClick={() => {
