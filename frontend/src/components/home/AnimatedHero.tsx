@@ -117,7 +117,7 @@ function InfiniteCard({ item }: RealCardProps) {
 
   return (
     <Link
-      to={`/listings/${item.id}`}
+      to={`/listing/${item.id}`}
       className="block group bg-slate-900/60 hover:bg-slate-800/85 border border-white/10 hover:border-[rgb(var(--accent-rgb)/0.5)] rounded-2xl p-2.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
     >
       <div className="h-24 sm:h-28 w-full rounded-xl overflow-hidden relative bg-slate-800">
