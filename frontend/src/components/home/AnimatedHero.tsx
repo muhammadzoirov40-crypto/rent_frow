@@ -194,7 +194,7 @@ export default function AnimatedHero() {
             className="lg:col-span-6 space-y-6"
           >
             {/* Title with Gradient Accent */}
-            <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
+            <h1 className="text-5xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
               {t('home.heroTitle')}{' '}
               <span className="whitespace-nowrap">
                 <span className="bg-gradient-to-r from-[var(--hero-rent-from)] via-[var(--hero-rent-via)] to-[var(--hero-rent-to)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_var(--hero-rent-shadow)]">
