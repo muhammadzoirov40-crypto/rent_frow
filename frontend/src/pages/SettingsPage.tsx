@@ -95,9 +95,10 @@ function SectionHeading({ icon: Icon, title, desc }: { icon: any; title: string;
   );
 }
 
-/* Theme color options — `original` keeps the exact RentHub brand color (#FF6B35) */
+/* Theme color options — `original` is the RentHub brand colour, which is now
+   the same royal sapphire the site defaults to, so one click restores it. */
 const ACCENT_OPTIONS = [
-  { id: 'original', color: '#FF6B35' },
+  { id: 'original', color: '#2E63F5' },
   { id: 'yellow', color: '#EAB308' },
   { id: 'red', color: '#EF4444' },
   { id: 'green', color: '#22C55E' },
@@ -119,7 +120,7 @@ const CUSTOM_SWATCH =
 function CustomAccentButton({ value, onSelect }: { value: string; onSelect: (hex: string) => void }) {
   const { t } = useTranslation();
   const selected = isCustomAccent(value);
-  const hex = selected ? value : '#ff6b35';
+  const hex = selected ? value : '#2e63f5';
 
   return (
     <label
