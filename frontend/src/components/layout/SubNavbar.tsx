@@ -182,11 +182,10 @@ export default function SubNavbar() {
     go({ price_min: minInput.trim(), price_max: maxInput.trim() });
   };
 
-  // The messages page is a chat workspace: this filter bar has nothing
-  // to offer there and the chat needs the height — every other route
-  // keeps it. (Hiding it also shrinks --header-h, which Layout measures
-  // live, so the chat box grows by exactly this much.)
-  if (location.pathname.startsWith('/messages')) return null;
+  // The bar exists for one job — filtering search results — so it lives on
+  // /search alone; every other route renders without it. (--header-h is
+  // measured live, so Layout/SiteSidebar and the chat height all follow.)
+  if (location.pathname !== '/search') return null;
 
   return (
     <div
@@ -282,21 +281,16 @@ export default function SubNavbar() {
             )}
           </div>
 
-          {location.pathname !== '/' && (
-            <span className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-white/10 mx-2 shrink-0" />
-          )}
+          <span className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-white/10 mx-2 shrink-0" />
 
           {/* ── Category chips (scrollable) ─────────────────────── */}
-          {/* On the homepage the same category names are already shown by the
-              "Popular categories" section right below the hero, so rendering
-              them here too just repeats every name. The wrapper stays (it is
-              the flex spacer that pins the city/price/filters to the right),
-              and the chips come back on every other route. */}
+          {/* The bar renders on /search only, so the homepage duplicate (the
+              "Popular categories" section under the hero) can no longer clash
+              with these chips. */}
           <div className="relative flex-1 min-w-0 h-full">
             <div ref={chipsRef} onScroll={updateEdge} className="h-full overflow-x-auto no-scrollbar">
               <div className="flex items-stretch h-full min-w-max">
-                {location.pathname !== '/' &&
-                  categoryList.map((cat) => {
+                {categoryList.map((cat) => {
                   const Icon = iconFor(cat, i18n.language);
                   const active = String(cat.id) === activeCategoryId;
                   return (
