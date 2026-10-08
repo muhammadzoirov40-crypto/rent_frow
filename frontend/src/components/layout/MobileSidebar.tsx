@@ -11,7 +11,6 @@ import {
   LogOut,
   MessageSquare,
   Moon,
-  PlusCircle,
   Search,
   Settings,
   Shield,
@@ -152,15 +151,6 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             </div>
           )}
 
-          {/* Prominent Create Listing Button */}
-          <Link
-            to="/create-listing"
-            onClick={onClose}
-            className="mt-3 flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white text-sm font-bold shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] border border-emerald-400/30 hover:-translate-y-0.5 transition"
-          >
-            <PlusCircle className="w-5 h-5" />
-            <span>{t('nav.createListing')}</span>
-          </Link>
         </div>
 
         <nav className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
@@ -237,14 +227,6 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               ))}
             </div>
 
-            <Link
-              to="/create-listing"
-              onClick={onClose}
-              aria-label={t('nav.createListing')}
-              className="p-2.5 rounded-xl bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)] transition"
-            >
-              <PlusCircle className="w-5 h-5" />
-            </Link>
           </div>
         </div>
       </aside>
