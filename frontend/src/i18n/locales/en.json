@@ -876,6 +876,21 @@
     "rejectReasonLabel": "Rejection reason (optional)",
     "menu": "Menu"
   },
+  "feedback": {
+    "title": "Feedback",
+    "dialogTitle": "Send feedback",
+    "dialogSubtitle": "Write your opinion, suggestion or issue for the administrator",
+    "titleLabel": "Title",
+    "titlePlaceholder": "E.g. an idea for the search page",
+    "contentLabel": "Message",
+    "contentPlaceholder": "Write your thoughts…",
+    "send": "Send",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "hint": "Feedback is published after administrator approval.",
+    "sent": "Feedback sent! Thank you.",
+    "error": "Failed to send"
+  },
   "dashboard": {
     "searchPlaceholder": "Search...",
     "menu": "Menu",

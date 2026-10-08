@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,6 +9,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
+  MessageSquareQuote,
   PanelLeft,
   PanelLeftClose,
   Search,
@@ -16,6 +18,7 @@ import {
   User,
 } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
+import FeedbackDialog from '../FeedbackDialog';
 import { useQuery } from '@tanstack/react-query';
 import { notifications as notificationsApi } from '../../api/index';
 
@@ -28,6 +31,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   const { data: unreadNotifData } = useQuery({
     queryKey: ['unread-count'],
@@ -66,6 +70,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   ];
 
   return (
+    <>
     <aside
       className={`hidden md:flex flex-col shrink-0 sticky top-[var(--header-h)] h-[calc(100vh_-_var(--header-h))] overflow-y-auto
         bg-white/50 dark:bg-[#0b0f19]/65 backdrop-blur-2xl
@@ -138,6 +143,23 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </Link>
             ))}
+
+          {/* Feedback — sent as a pending post, moderated in Admin → Постҳо */}
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={() => setFeedbackOpen(true)}
+              title={collapsed ? t('feedback.title') : undefined}
+              className={`w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 ${
+                collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
+              } text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-transparent hover:bg-white/50 dark:hover:bg-white/[0.06] border border-transparent hover:border-gray-200/50 dark:hover:border-white/10 backdrop-blur-sm`}
+            >
+              <span className="shrink-0">
+                <MessageSquareQuote className="w-5 h-5" />
+              </span>
+              {!collapsed && <span className="truncate">{t('feedback.title')}</span>}
+            </button>
+          )}
         </nav>
 
         {/* Sign out */}
@@ -158,7 +180,9 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
             </button>
           </div>
         )}
-      </div>
-    </aside>
+        </div>
+      </aside>
+      <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+    </>
   );
 }

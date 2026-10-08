@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from '../Logo';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
+  MessageSquareQuote,
   Moon,
   Search,
   Settings,
@@ -20,6 +21,7 @@ import {
 } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
+import FeedbackDialog from '../FeedbackDialog';
 
 const LANGUAGES = [
   { code: 'tj', label: 'Тоҷикӣ', flag: '🇹🇯' },
@@ -37,6 +39,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const { pathname } = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   useEffect(() => {
     onClose();
@@ -181,6 +184,20 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                     <span className="truncate">{item.label}</span>
                   </Link>
                 ))}
+              {/* Feedback — sent as a pending post, moderated in Admin → Постҳо */}
+              <button
+                type="button"
+                onClick={() => {
+                  setFeedbackOpen(true);
+                  onClose();
+                }}
+                className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
+              >
+                <span className="text-gray-400 dark:text-gray-500">
+                  <MessageSquareQuote className="w-5 h-5" />
+                </span>
+                <span className="truncate">{t('feedback.title')}</span>
+              </button>
             </div>
           )}
           {isAuthenticated && (
@@ -230,6 +247,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           </div>
         </div>
       </aside>
+      <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </>
   );
 }

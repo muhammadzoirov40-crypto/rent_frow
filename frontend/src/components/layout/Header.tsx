@@ -20,8 +20,10 @@ import {
   Settings,
   Shield,
   PlusCircle,
+  MessageSquareQuote,
 } from 'lucide-react'
 import MobileSidebar from './MobileSidebar'
+import FeedbackDialog from '../FeedbackDialog'
 import SubNavbar from './SubNavbar'
 import useAuthStore from '../../store/authStore'
 import { useTheme } from '../../contexts/ThemeContext'
@@ -51,6 +53,7 @@ export default function Header() {
   const [notifOpen, setNotifOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
 
   const notifRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
@@ -339,6 +342,14 @@ export default function Header() {
                           <Settings className="w-4 h-4 text-gray-400" />
                           {t('header.settings')}
                         </Link>
+                        <button
+                          type="button"
+                          onClick={() => { setUserMenuOpen(false); setFeedbackOpen(true) }}
+                          className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition text-left"
+                        >
+                          <MessageSquareQuote className="w-4 h-4 text-gray-400" />
+                          {t('feedback.title')}
+                        </button>
                         {user?.role === 'ADMIN' && (
                           <Link to="/admin" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-[var(--accent)] font-semibold hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.1)] transition">
                             <Shield className="w-4 h-4" />
@@ -403,6 +414,8 @@ export default function Header() {
       <SubNavbar />
 
       <MobileSidebar open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
+
+      <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </header>
   )
 }
