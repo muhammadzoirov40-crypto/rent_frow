@@ -19,6 +19,13 @@ export default function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  // Where the visitor wanted to go before being sent to this page
+  // (e.g. /messages?conversation=123 from a rental email).
+  const fromLocation = (location.state as { from?: { pathname?: string; search?: string } } | null)
+    ?.from;
+  const destination = fromLocation?.pathname
+    ? `${fromLocation.pathname}${fromLocation.search ?? ''}`
+    : '/';
   const { login: storeLogin, isAuthenticated } = useAuthStore();
   const [mode, setMode] = useState<AuthMode>(
     location.pathname === '/register' ? 'register' : 'login'
@@ -36,7 +43,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/', { replace: true });
+      navigate(destination, { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
@@ -82,7 +89,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       storeLogin(data.access_token, data.user);
       toast.success(t('auth.welcome'));
-      navigate('/');
+      navigate(destination);
     },
     onError: (err: any) => {
       toast.error(getApiError(err) || t('auth.invalidOtp'));
@@ -97,7 +104,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       storeLogin(data.access_token, data.user);
       toast.success(t('auth.accountCreated'));
-      navigate('/');
+      navigate(destination);
     },
     onError: (err: any) => {
       toast.error(getApiError(err) || t('auth.registrationError'));
@@ -110,7 +117,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       storeLogin(data.access_token, data.user);
       toast.success(t('auth.welcome'));
-      navigate('/');
+      navigate(destination);
     },
     onError: (err: any) => {
       toast.error(getApiError(err) || t('auth.invalidCredentials'));
@@ -122,7 +129,7 @@ export default function LoginPage() {
     onSuccess: (data) => {
       storeLogin(data.access_token, data.user);
       toast.success(t('auth.welcome'));
-      navigate('/');
+      navigate(destination);
     },
     onError: (err: any) => {
       toast.error(getApiError(err) || t('auth.googleLoginFailed'));

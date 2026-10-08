@@ -272,11 +272,33 @@ export default function MessagesPage() {
   });
 
   const filteredConversations = useMemo(() => {
-    if (!search.trim()) return conversations;
-    return conversations.filter((conv) => {
-      return conv.other_user_name?.toLowerCase().includes(search.toLowerCase());
-    });
-  }, [conversations, search]);
+    const base = search.trim()
+      ? conversations.filter((conv) =>
+          conv.other_user_name?.toLowerCase().includes(search.toLowerCase()),
+        )
+      : conversations;
+    if (!user?.id) return base;
+    // One row per user: keep that user's most recent conversation in the list
+    // and merge their older chats behind it (unread badges are summed).
+    // Hidden conversations stay on the server and remain reachable through
+    // /messages?conversation=<id> links — nothing is deleted.
+    const byUser = new Map<number, Conversation>();
+    for (const conv of base) {
+      const otherId = conv.user1_id === user.id ? conv.user2_id : conv.user1_id;
+      const prev = byUser.get(otherId);
+      if (!prev) {
+        byUser.set(otherId, { ...conv });
+        continue;
+      }
+      const newer =
+        (Date.parse(conv.last_message_at ?? conv.created_at) || 0) >
+        (Date.parse(prev.last_message_at ?? prev.created_at) || 0)
+          ? conv
+          : prev;
+      byUser.set(otherId, { ...newer, unread_count: prev.unread_count + conv.unread_count });
+    }
+    return Array.from(byUser.values());
+  }, [conversations, search, user?.id]);
 
 
   useEffect(() => {

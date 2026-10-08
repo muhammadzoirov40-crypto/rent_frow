@@ -22,7 +22,10 @@ export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const isAuthPage = pathname === '/login' || pathname === '/register'
-  const showSidebar = !isAuthPage
+  // The messages page is a chat workspace: the left rail steps aside there
+  // (same idea as the assistant widget below) so the conversation gets
+  // the full width — every other route keeps it.
+  const showSidebar = !isAuthPage && !pathname.startsWith('/messages')
   const { isAuthenticated } = useAuthStore()
   const { isLoading } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(

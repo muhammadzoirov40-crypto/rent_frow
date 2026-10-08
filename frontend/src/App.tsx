@@ -29,6 +29,7 @@ interface ProtectedRouteProps {
 
 function ProtectedRoute({ children, adminOnly = false }: ProtectedRouteProps) {
   const { isAuthenticated, user, isInitialized } = useAuthStore();
+  const location = useLocation();
 
   if (!isInitialized) {
     return (
@@ -39,7 +40,10 @@ function ProtectedRoute({ children, adminOnly = false }: ProtectedRouteProps) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Deep links (the «Открыть чат» button in rental emails) land here while
+    // signed out — remember where the user was headed so login can bring
+    // them back to the exact page (with its query string).
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (adminOnly && user?.role !== 'ADMIN') {
