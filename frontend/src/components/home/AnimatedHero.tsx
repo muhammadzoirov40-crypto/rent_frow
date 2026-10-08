@@ -179,7 +179,7 @@ export default function AnimatedHero() {
   const col2Repeated = [...col2, ...col2];
 
   return (
-    <div className="relative overflow-hidden pt-6 pb-16 md:pt-10 md:pb-24">
+    <div className="relative overflow-hidden pt-4 pb-10 md:pt-6 md:pb-14">
       {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-[var(--accent,#FF6B35)]/15 via-[rgb(var(--accent-rgb)/0.1)] to-transparent blur-[150px] pointer-events-none rounded-full" />
 
@@ -247,7 +247,7 @@ export default function AnimatedHero() {
           {/* Column 1 scrolls DOWN -> UP (ба боло меравад) */}
           {/* Column 2 scrolls UP -> DOWN (аз боло ба поён меравад) */}
           <div className="lg:col-start-7 lg:col-span-6 lg:row-start-1 relative flex items-center justify-center pt-4 lg:pt-0">
-            <div className="relative w-full max-w-lg h-[540px] sm:h-[600px] overflow-hidden rounded-3xl p-2 mask-gradient">
+            <div className="relative w-full max-w-lg h-[460px] sm:h-[520px] overflow-hidden rounded-3xl p-2 mask-gradient">
               
               {/* Fade masks top and bottom for smooth disappearing */}
               <div className="absolute top-0 inset-x-0 h-16 bg-gradient-to-b from-[var(--bg-page,#090D16)] via-[var(--bg-page,#090D16)]/80 to-transparent z-20 pointer-events-none" />
