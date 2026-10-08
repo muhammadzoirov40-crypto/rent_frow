@@ -182,10 +182,11 @@ export default function SubNavbar() {
     go({ price_min: minInput.trim(), price_max: maxInput.trim() });
   };
 
-  // The bar exists for one job — filtering search results — so it lives on
-  // /search alone; every other route renders without it. (--header-h is
+  // The bar filters search results, so it lives on /search and doubles as a
+  // quick-jump entry on the homepage (chips navigate to /search with the
+  // filter applied). Every other route renders without it. (--header-h is
   // measured live, so Layout/SiteSidebar and the chat height all follow.)
-  if (location.pathname !== '/search') return null;
+  if (location.pathname !== '/' && location.pathname !== '/search') return null;
 
   return (
     <div
