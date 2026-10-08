@@ -59,12 +59,17 @@ class ListingService:
             raise HTTPException(status_code=404, detail="Listing not found")
         return listing
 
-    async def update(self, listing_id: int, owner_id: int, data: ListingUpdate) -> Listing:
+    async def update(
+        self, listing_id: int, owner_id: int, data: ListingUpdate, *, is_admin: bool = False
+    ) -> Listing:
         listing = await self.repo.get_by_id(listing_id)
         if not listing:
             raise HTTPException(status_code=404, detail="Listing not found")
-        if listing.owner_id != owner_id:
+        # An admin moderates every listing, not only the ones they posted
+        # — the same rule delete() below already follows.
+        if listing.owner_id != owner_id and not is_admin:
             raise HTTPException(status_code=403, detail="Not authorized to update this listing")
+        moderated = listing.owner_id != owner_id
         update_data = data.model_dump(exclude_unset=True)
 
         new_status = update_data.get("status")
@@ -89,7 +94,7 @@ class ListingService:
                 data={
                     "listing_id": listing.id,
                     "listing_title": listing.title,
-                    "reason": "deactivated_by_owner",
+                    "reason": "deactivated_by_admin" if moderated else "deactivated_by_owner",
                 },
             )
         return updated

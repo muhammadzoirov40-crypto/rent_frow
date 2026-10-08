@@ -182,6 +182,12 @@ export default function SubNavbar() {
     go({ price_min: minInput.trim(), price_max: maxInput.trim() });
   };
 
+  // The messages page is a chat workspace: this filter bar has nothing
+  // to offer there and the chat needs the height — every other route
+  // keeps it. (Hiding it also shrinks --header-h, which Layout measures
+  // live, so the chat box grows by exactly this much.)
+  if (location.pathname.startsWith('/messages')) return null;
+
   return (
     <div
       ref={barRef}

@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, MessageSquare, Pin, X, Package, ChevronRight, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, MessageSquare, Pin, X, Package, ChevronRight, Check, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { messages, upload, listings, rentalRequests, payments } from '../api';
 import type { Conversation, Message, RentalRequest } from '../api';
@@ -30,6 +30,7 @@ export default function MessagesPage() {
   const { t, i18n } = useTranslation();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [inputText, setInputText] = useState('');
   const [search, setSearch] = useState('');
@@ -435,7 +436,18 @@ export default function MessagesPage() {
     <div className="flex h-[calc(100vh_-_var(--header-h)_-_7rem)] md:h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto bg-white dark:bg-[#121418] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl my-4">
       <div className={`w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col bg-gray-50 dark:bg-[#1a1d24] ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-3">{t('messages.title')}</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              aria-label={t('common.back')}
+              title={t('common.back')}
+              className="p-2 -ml-1.5 rounded-full text-gray-500 hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] dark:text-gray-400 transition shrink-0"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('messages.title')}</h2>
+          </div>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input

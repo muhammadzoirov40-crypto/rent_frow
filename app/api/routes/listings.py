@@ -364,7 +364,9 @@ async def update_listing(
     db: AsyncSession = Depends(get_db),
 ):
     service = ListingService(db)
-    listing = await service.update(listing_id, current_user.user_id, data)
+    listing = await service.update(
+        listing_id, current_user.user_id, data, is_admin=current_user.is_admin
+    )
     return APIResponse(message="Listing updated successfully", data=_listing_to_response(listing))
 
 

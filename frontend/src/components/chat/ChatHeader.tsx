@@ -29,7 +29,7 @@ export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, 
           type="button"
           onClick={onBack}
           aria-label={t('common.back')}
-          className="md:hidden p-2 -ml-1 rounded-full text-gray-500 hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] dark:text-gray-400 transition"
+          className="p-2 -ml-1 rounded-full text-gray-500 hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] dark:text-gray-400 transition shrink-0"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
