@@ -118,9 +118,9 @@ function InfiniteCard({ item }: RealCardProps) {
   return (
     <Link
       to={`/listings/${item.id}`}
-      className="block group bg-slate-900/60 hover:bg-slate-800/85 border border-white/10 hover:border-[rgb(var(--accent-rgb)/0.5)] rounded-2xl p-3 sm:p-3.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
+      className="block group bg-slate-900/60 hover:bg-slate-800/85 border border-white/10 hover:border-[rgb(var(--accent-rgb)/0.5)] rounded-2xl p-2.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
     >
-      <div className="h-32 sm:h-36 w-full rounded-xl overflow-hidden relative bg-slate-800">
+      <div className="h-24 sm:h-28 w-full rounded-xl overflow-hidden relative bg-slate-800">
         <img
           src={image}
           alt={item.title}
@@ -135,15 +135,15 @@ function InfiniteCard({ item }: RealCardProps) {
         </span>
       </div>
 
-      <div className="mt-3">
-        <h4 className="text-sm font-bold text-white truncate group-hover:text-[var(--accent)] transition-colors">
+      <div className="mt-2">
+        <h4 className="text-[13px] font-bold text-white truncate group-hover:text-[var(--accent)] transition-colors">
           {item.title}
         </h4>
         <p className="text-[11px] text-slate-400 truncate mt-0.5">
           {item.city_name || t('home.heroCountry')}
         </p>
 
-        <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-slate-800">
+        <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-800">
           <span className="text-xs font-black text-[var(--accent)]">
             {item.price} <span className="text-[10px] text-slate-400 font-normal">{t('home.heroPerDay')}</span>
           </span>
@@ -258,7 +258,7 @@ export default function AnimatedHero() {
                 {/* COLUMN 1: Infinite Scroll UPWARDS (ба боло) */}
                 <div className="overflow-hidden relative h-full">
                   <motion.div
-                    className="flex flex-col gap-4 pb-4"
+                    className="flex flex-col gap-3 pb-4"
                     animate={{
                       y: ['0%', '-50%'],
                     }}
@@ -278,7 +278,7 @@ export default function AnimatedHero() {
                 {/* COLUMN 2: Infinite Scroll DOWNWARDS (аз боло ба поён) */}
                 <div className="overflow-hidden relative h-full">
                   <motion.div
-                    className="flex flex-col gap-4 pb-4"
+                    className="flex flex-col gap-3 pb-4"
                     animate={{
                       y: ['-50%', '0%'],
                     }}
