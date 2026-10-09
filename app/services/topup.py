@@ -120,6 +120,61 @@ async def open_promotion_intent(
     }
 
 
+async def open_payment_intent(
+    db: AsyncSession, *, user_id: int, payment_id: int, amount: float
+) -> dict:
+    """The same waiting room again, bound to a rental payment.
+
+    Identical reference, identical link, identical settle - the only
+    difference is ``payment_id``, which is how the callback knows the money
+    pays the rent (or the deposit) instead of adding to a balance or buying
+    a TOP window.
+    """
+    amount = money(amount)
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="BAD_AMOUNT")
+    if amount > MAX_AMOUNT:
+        raise HTTPException(status_code=400, detail="AMOUNT_TOO_LARGE")
+
+    settings = get_settings()
+    if not settings.PAYDC_ENABLED:
+        raise HTTPException(status_code=400, detail="TOPUP_DISABLED")
+
+    reference = uuid.uuid4().hex[:24].upper()
+    intent = TopupIntent(
+        user_id=user_id,
+        amount=amount,
+        reference=reference,
+        payment_id=payment_id,
+    )
+    db.add(intent)
+    await db.flush()
+
+    return {
+        "reference": reference,
+        "amount": amount,
+        "status": intent.status,
+        "provider": intent.provider,
+        "url": payment_url(user_id, amount, reference),
+        "created_at": intent.created_at,
+    }
+
+
+async def pending_payment_intent(
+    db: AsyncSession, payment_id: int
+) -> TopupIntent | None:
+    """The un-paid link already opened for this payment, if any - so a
+    checkout that was opened, abandoned and needed again re-opens with its
+    own reference instead of starting a second one."""
+    result = await db.execute(
+        select(TopupIntent).where(
+            TopupIntent.payment_id == payment_id,
+            TopupIntent.status == "PENDING",
+        )
+    )
+    return result.scalars().first()
+
+
 async def pending_promotion_intent(
     db: AsyncSession, promotion_id: int
 ) -> TopupIntent | None:
@@ -157,6 +212,25 @@ async def latest_promotion_intents(
     return newest
 
 
+async def latest_payment_intents(
+    db: AsyncSession, payment_ids: list[int]
+) -> dict[int, TopupIntent]:
+    """The newest intent per rental payment, paid or not - how a response
+    learns the reference a DC payment was made under, so the operator can
+    match it in the statement and the renter can show it."""
+    if not payment_ids:
+        return {}
+    result = await db.execute(
+        select(TopupIntent)
+        .where(TopupIntent.payment_id.in_(payment_ids))
+        .order_by(TopupIntent.created_at, TopupIntent.id)
+    )
+    newest: dict[int, TopupIntent] = {}
+    for row in result.scalars().all():
+        newest[row.payment_id] = row  # ordered oldest first: the last wins
+    return newest
+
+
 async def find(db: AsyncSession, reference: str) -> TopupIntent | None:
     """The one top-up a reference points at — the lookup shared by the
     callback, an operator confirming by hand, and anyone asking what a
@@ -190,6 +264,27 @@ async def _settle_promotion(db: AsyncSession, row: TopupIntent) -> str:
     return await complete_dc_payment(db, promo_id=row.promotion_id)
 
 
+async def _settle_payment(db: AsyncSession, row: TopupIntent) -> str:
+    """Hand a settled payment to the rental payment it was opened for.
+
+    Same late import for the same reason: the payment service may one day
+    build DC links through this module, so the dependency stays one-way.
+    "Already paid" here means the owner (or an operator) confirmed the row
+    by hand while the callback was in flight - the intent still closes; the
+    money is not counted twice.
+    """
+    from app.services.payment import PaymentService
+
+    try:
+        await PaymentService(db).confirm_payment(row.user_id, row.payment_id)
+    except HTTPException as exc:  # noqa: BLE001
+        detail = str(getattr(exc, "detail", "PAYMENT_FAILED"))
+        if detail.startswith("Cannot confirm payment in"):
+            return "ALREADY_PAID"
+        return detail
+    return "PAYMENT_PAID"
+
+
 async def settle(
     db: AsyncSession,
     *,
@@ -199,12 +294,13 @@ async def settle(
 ) -> tuple[bool, str]:
     """Put a confirmed payment where it was headed. Idempotent by construction.
 
-    Two destinations share this one function: a NULL ``promotion_id`` credits
-    the wallet (``CREDITED``), a bound one activates the TOP promotion it was
-    opened for (``PROMOTION_ACTIVATED`` / ``PROMOTION_PAID``). Either way the
-    intent closes once - a webhook retries are answered with ``ALREADY_PAID``
-    rather than a second credit, and a callback we cannot place is refused
-    instead of guessed at.
+    Three destinations share this one function: a NULL ``promotion_id`` and
+    NULL ``payment_id`` credit the wallet (``CREDITED``), a bound promotion
+    activates the TOP window it was opened for (``PROMOTION_ACTIVATED`` /
+    ``PROMOTION_PAID``), a bound payment marks the rental payment PAID
+    (``PAYMENT_PAID``). Either way the intent closes once - a webhook retry
+    is answered with ``ALREADY_PAID`` rather than a second credit, and a
+    callback we cannot place is refused instead of guessed at.
     """
     if not reference:
         return False, "NO_REFERENCE"
@@ -228,6 +324,18 @@ async def settle(
         row.raw_response = json.dumps(raw, ensure_ascii=False)[:4000] if raw else None
         await db.flush()
         return reason in ("PROMOTION_ACTIVATED", "PROMOTION_PAID"), reason
+
+    if row.payment_id:
+        # money for a rental payment - the rent or the deposit - not for the
+        # balance. It arrived either way, so the intent closes here; what the
+        # payment does with it is its own business (a row confirmed by hand
+        # in the meantime was already PAID, and still is).
+        reason = await _settle_payment(db, row)
+        row.status = "PAID"
+        row.paid_at = datetime.utcnow()
+        row.raw_response = json.dumps(raw, ensure_ascii=False)[:4000] if raw else None
+        await db.flush()
+        return reason == "PAYMENT_PAID", reason
 
     try:
         await WalletService(db).topup(

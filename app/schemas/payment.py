@@ -42,6 +42,19 @@ class PaymentResponse(BaseModel):
     status: PaymentStatus
     transaction_id: Optional[str] = None
     created_at: datetime
+    # the reference a DC checkout was opened under, when there is one: how
+    # the operator matches this row in the statement and the renter shows
+    # which payment they mean. Pinned by the routes that read payments.
+    payment_reference: Optional[str] = None
+
+
+class PaymentPayDc(BaseModel):
+    """What opening a DC checkout hands back: the link to follow and the
+    reference it carries, plus the still-PENDING payment it belongs to."""
+
+    url: str
+    reference: str
+    payment: PaymentResponse
 
 
 class PaymentConfirm(BaseModel):

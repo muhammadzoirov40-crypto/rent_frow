@@ -46,11 +46,20 @@ export default function PaymentLine({
 
   if (payment?.status === 'PENDING') {
     return (
-      <span className="flex items-center gap-2">
+      <span className="flex items-center gap-2 flex-wrap">
         <span className="flex items-center gap-1.5 text-sm font-semibold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-4 py-2 rounded-xl">
           <Clock className="w-4 h-4" />
           {t('payment.pending')} {name}
         </span>
+        {payment.payment_reference && (
+          <span
+            className="hidden sm:flex items-center gap-1 text-[11px] font-mono text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-2 py-1.5 rounded-lg"
+            title={t('payment.reference')}
+            data-testid="payment-reference"
+          >
+            {payment.payment_reference}
+          </span>
+        )}
         {role === 'owner' && (
           <button
             type="button"

@@ -235,6 +235,9 @@ export interface PaymentRecord {
   status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
   transaction_id: string | null;
   created_at: string;
+  /** The DC checkout reference this payment was opened under, when there is
+   *  one — what the operator matches in the statement. Pinned by the API. */
+  payment_reference?: string | null;
 }
 
 const unwrap = <T>(response: { data: APIResponse<T> }): T => response.data.data;
@@ -698,9 +701,29 @@ export const payments = {
         payment_type: paymentType,
       })
       .then(unwrap),
+  /** The same payment, through DC Wallet (Dushanbe City): the browser follows
+   *  the link the server built for the request's own amount, and the reference
+   *  it carries is how the callback finds this exact payment. A checkout left
+   *  half-finished re-opens its own link instead of refusing the second click. */
+  payDc: (rentalRequestId: number, paymentType: 'BOOKING' | 'DEPOSIT' = 'BOOKING') =>
+    client
+      .post<APIResponse<{ url: string; reference: string; payment: PaymentRecord }>>(
+        '/payments/pay-dc',
+        {
+          rental_request_id: rentalRequestId,
+          payment_type: paymentType,
+        },
+      )
+      .then(unwrap),
   /** The owner of the listing (or an admin) marks the money as received. */
   confirm: (paymentId: number) =>
     client.post<APIResponse<PaymentRecord>>(`/payments/${paymentId}/confirm`).then(unwrap),
+  /** Admin: every payment on the platform, newest first — the panel's
+   *  confirmation list, with each row's DC reference for the statement. */
+  adminAll: (skip = 0, limit = 100) =>
+    client
+      .get<PaginatedResponse<PaymentRecord>>('/payments/admin/all', { params: { skip, limit } })
+      .then(unwrapPaginated),
 };
 
 export const reviews = {

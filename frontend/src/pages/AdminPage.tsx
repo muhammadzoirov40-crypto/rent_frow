@@ -14,7 +14,7 @@ import {
   PieChart, Pie, Cell,
 } from 'recharts';
 import client from '../api/client';
-import { topPromotions } from '../api';
+import { payments, topPromotions } from '../api';
 import type { User, Listing, RentalRequest, Category, TopPlan, TopPromotion, TopStats } from '../api';
 import { formatDate } from '../utils/dates';
 import { formatAmount } from '../utils/format';
@@ -182,7 +182,7 @@ const adminApi = {
   deleteCategory: (id: number) => client.delete(`/categories/${id}`).then((r) => r.data),
 };
 
-type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'top' | 'categories' | 'posts';
+type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'payments' | 'top' | 'categories' | 'posts';
 
 /** Status/payment colour chips for the TOP tables — one shared vocabulary. */
 const TOP_BADGE_STYLES: Record<string, string> = {
@@ -318,6 +318,24 @@ export default function AdminPage() {
       }),
     enabled: activeTab === 'top',
     select: (page) => page.items,
+  });
+
+  // Payments: only fetched while the tab is open. Each row carries the DC
+  // reference when a checkout was opened for it - what the operator matches
+  // in the statement before pressing confirm.
+  const { data: paymentRows = [], isLoading: paymentsLoading } = useQuery({
+    queryKey: ['admin-payments'],
+    queryFn: () => payments.adminAll(0, 200).then((page) => page.items),
+    enabled: activeTab === 'payments',
+  });
+
+  const paymentConfirmMutation = useMutation({
+    mutationFn: payments.confirm,
+    onSuccess: () => {
+      toast.success(t('payment.confirmed'));
+      queryClient.invalidateQueries({ queryKey: ['admin-payments'] });
+    },
+    onError: () => toast.error(t('admin.failedAction')),
   });
 
   const blockMutation = useMutation({
@@ -571,6 +589,7 @@ export default function AdminPage() {
     { key: 'users', label: t('admin.users'), icon: <Users className="w-5 h-5" /> },
     { key: 'listings', label: t('admin.listings'), icon: <FileText className="w-5 h-5" /> },
     { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" /> },
+    { key: 'payments', label: t('admin.payments'), icon: <Banknote className="w-5 h-5" /> },
     { key: 'top', label: t('admin.topTab'), icon: <Crown className="w-5 h-5" /> },
     { key: 'categories', label: t('admin.categories'), icon: <FolderTree className="w-5 h-5" /> },
     { key: 'posts', label: t('admin.posts'), icon: <MessageSquare className="w-5 h-5" /> },
@@ -1270,6 +1289,106 @@ export default function AdminPage() {
                     </table>
                   </div>
                   {filteredRequests.length === 0 && (
+                    <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'payments' && (
+            <div>
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                  <Banknote className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                  {t('admin.paymentsManagement')}
+                </h1>
+                <p className="text-sm text-gray-500 mt-0.5">{t('admin.platformManagement')}</p>
+              </div>
+
+              {paymentsLoading ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-white/10">
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.payments')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('settings.payments.amount')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('settings.payments.typeLabel')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topField.reference')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.date')}</th>
+                          <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                        {paymentRows.map((p) => (
+                          <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                            <td className="px-6 py-4">
+                              <p className="font-medium text-sm text-gray-900 dark:text-white">
+                                {t('admin.payments')} #{p.id}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {p.rental_request_id
+                                  ? `${t('admin.requests')} #${p.rental_request_id}`
+                                  : '—'}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4 text-sm font-semibold text-gray-900 dark:text-white tabular-nums">
+                              {formatAmount(p.amount)} {t('common.somoni')}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                              {t(`settings.payments.types.${p.payment_type}`)}
+                            </td>
+                            <td className="px-6 py-4">
+                              {p.payment_reference ? (
+                                <span
+                                  className="font-mono text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-2 py-1 rounded-lg"
+                                  data-testid="payment-row-reference"
+                                >
+                                  {p.payment_reference}
+                                </span>
+                              ) : (
+                                <span className="text-gray-300 dark:text-gray-600">—</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span
+                                className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${
+                                  TOP_BADGE_STYLES[p.status] ||
+                                  'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10'
+                                }`}
+                              >
+                                {t(`settings.payments.statuses.${p.status}`)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-400">
+                              {formatDate(p.created_at)}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              {p.status === 'PENDING' && (
+                                <button
+                                  type="button"
+                                  onClick={() => paymentConfirmMutation.mutate(p.id)}
+                                  disabled={paymentConfirmMutation.isPending}
+                                  data-testid="payment-confirm-button"
+                                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-white bg-emerald-500 hover:bg-emerald-600 px-4 py-2 rounded-xl transition shadow-sm shadow-emerald-500/20 disabled:opacity-50"
+                                >
+                                  <Banknote className="w-4 h-4" />
+                                  {t('payment.confirm')}
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {paymentRows.length === 0 && (
                     <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
                   )}
                 </div>

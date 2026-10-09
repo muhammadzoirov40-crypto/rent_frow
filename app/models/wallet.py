@@ -115,6 +115,13 @@ class TopupIntent(Base):
     promotion_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("top_promotions.id"), nullable=True, index=True
     )
+    # ...and this one when it settles a rental payment (the rent or the
+    # deposit) instead: the checkout link carries the reference, the callback
+    # hands the money to that exact payment. NULL with promotion_id NULL =
+    # still a plain balance top-up.
+    payment_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("payments.id"), nullable=True, index=True
+    )
     # whatever the callback sent, kept verbatim for the audit trail
     raw_response: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

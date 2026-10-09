@@ -100,10 +100,13 @@ export function RequestCard({
   ];
 
   const payMutation = useMutation({
-    mutationFn: (kind: 'BOOKING' | 'DEPOSIT') => payments.payForRequest(req.id, kind),
-    onSuccess: () => {
-      toast.success(t('payment.created'));
+    mutationFn: (kind: 'BOOKING' | 'DEPOSIT') => payments.payDc(req.id, kind),
+    onSuccess: (data) => {
+      // DC Wallet is where the money happens: the browser follows the link
+      // the server built for this request's own amount, and the payment row
+      // it left behind is what the callback will settle.
       queryClient.invalidateQueries({ queryKey: ['payment-for-request', req.id] });
+      if (data?.url) window.location.href = data.url;
     },
     onError: (error: any) => toast.error(paymentError(error)),
   });

@@ -884,6 +884,7 @@
     "customer": "Customer",
     "posts": "Posts",
     "postsManagement": "Posts moderation",
+    "paymentsManagement": "Confirming payments",
     "postsSubtitle": "Approve, reject or delete user posts",
     "post": "Post",
     "author": "Author",
@@ -904,6 +905,7 @@
     "rejectReasonLabel": "Rejection reason (optional)",
     "menu": "Menu",
     "topTab": "TOP",
+    "payments": "Payments",
     "topManagement": "TOP promotion management",
     "topHint": "Plans, requests and financial stats",
     "topAddPlan": "New plan",
@@ -1209,7 +1211,8 @@
     "waitingForRenter": "Waiting for the renter to pay",
     "created": "Payment requested — the listing owner confirms it",
     "confirmed": "Payment confirmed",
-    "failed": "Payment failed"
+    "failed": "Payment failed",
+    "reference": "Payment reference"
   },
   "accents": {
     "original": "Original",

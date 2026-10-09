@@ -776,10 +776,12 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
   };
 
   const payMutation = useMutation({
-    mutationFn: (kind: 'BOOKING' | 'DEPOSIT') => payments.payForRequest(requestId, kind),
-    onSuccess: () => {
-      toast.success(t('payment.created'));
+    mutationFn: (kind: 'BOOKING' | 'DEPOSIT') => payments.payDc(requestId, kind),
+    onSuccess: (data) => {
+      // Same as the requests page: out to DC Wallet for the money, the row
+      // stays PENDING here until the callback (or an operator) settles it.
       queryClient.invalidateQueries({ queryKey: ['payment-for-request', requestId] });
+      if (data?.url) window.location.href = data.url;
     },
     onError: (error: any) => toast.error(paymentError(error)),
   });
