@@ -807,10 +807,10 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        {header}
-        {content}
-      </div>
+      {/* Full-bleed: the panel stretches edge to edge instead of sitting in a
+          centred 1024px column with dead margins on wide screens. */}
+      {header}
+      {content}
     </div>
   );
 }
