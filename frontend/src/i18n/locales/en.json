@@ -903,7 +903,8 @@
     "removeImage": "Remove photo",
     "imageTypeError": "Wrong file type — JPG, JPEG, PNG or WebP",
     "imageTooLarge": "Image is larger than 10MB",
-    "imageUploadError": "Failed to upload photo"
+    "imageUploadError": "Failed to upload photo",
+    "imageRetry": "Retry"
   },
   "dashboard": {
     "searchPlaceholder": "Search...",

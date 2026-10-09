@@ -903,7 +903,8 @@
     "removeImage": "Аксро нест кардан",
     "imageTypeError": "Навъи акс нодуруст аст — JPG, JPEG, PNG ё WebP",
     "imageTooLarge": "Акс аз 10MB калонтар аст",
-    "imageUploadError": "Акс боргирда нашуд"
+    "imageUploadError": "Акс боргирда нашуд",
+    "imageRetry": "Боз кӯшиш"
   },
   "dashboard": {
     "searchPlaceholder": "Ҷустуҷӯ...",

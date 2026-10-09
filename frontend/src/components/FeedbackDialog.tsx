@@ -34,24 +34,19 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [imgPreview, setImgPreview] = useState<string | null>(null);
+  const [imgFile, setImgFile] = useState<File | null>(null);
   const [imageKey, setImageKey] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  const [uploadError, setUploadError] = useState(false);
 
   const resetImage = () => {
     setImgPreview((prev) => {
       if (prev) URL.revokeObjectURL(prev);
       return null;
     });
+    setImgFile(null);
     setImageKey(null);
+    setUploadError(false);
   };
 
   const mutation = useMutation({
@@ -81,42 +76,57 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
     const preview = URL.createObjectURL(file);
     resetImage(); // replace a previous pick (revokes its object URL)
     setImgPreview(preview);
+    setImgFile(file);
     setUploading(true);
     try {
       const res = await postApi.uploadImage(file);
       setImageKey(res.data.data.image_key);
+      setUploadError(false);
     } catch (error) {
       toast.error(errorDetail(error) ?? t('feedback.imageUploadError'));
-      setImgPreview((prev) => {
-        if (prev) URL.revokeObjectURL(prev);
-        return null;
-      });
-      setImageKey(null);
+      // Keep the preview: the photo must never silently disappear — an inline
+      // error + retry row appears next to it instead (see below).
+      setUploadError(true);
     } finally {
       setUploading(false);
     }
   };
 
-  // Ctrl+V with a screenshot/image in the clipboard attaches it, anywhere in
-  // the dialog — plain text pastes keep their default behaviour.
-  const handlePaste = (e: React.ClipboardEvent) => {
-    const items = e.clipboardData?.items;
-    if (!items || uploading) return;
-    for (const item of Array.from(items)) {
-      if (item.kind === 'file' && item.type.startsWith('image/')) {
-        const file = item.getAsFile();
-        if (file) {
-          e.preventDefault();
-          void handleImage(file);
-          return;
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    // Paste is bound to the document, not the dialog node: right after the
+    // dialog opens, focus usually still sits on the menu button that opened
+    // it, so a node-level handler would never see the event at all.
+    const onPaste = (e: ClipboardEvent) => {
+      if (uploading) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of Array.from(items)) {
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) {
+            e.preventDefault();
+            void handleImage(file);
+            return;
+          }
         }
       }
-    }
-  };
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('paste', onPaste);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('paste', onPaste);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, uploading]);
 
   if (!open) return null;
 
-  const canSubmit = title.trim().length > 0 && content.trim().length > 0 && !uploading && !mutation.isPending;
+  const canSubmit = title.trim().length > 0 && content.trim().length > 0 && !uploading && !uploadError && !mutation.isPending;
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -139,7 +149,6 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-label={t('feedback.dialogTitle')}
-        onPaste={handlePaste}
         className="relative w-full max-w-lg bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
       >
         <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/10">
@@ -228,6 +237,20 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
               </div>
             )}
             {uploading && <span className="text-xs text-gray-400">{t('feedback.imageUploading')}</span>}
+            {uploadError && !uploading && (
+              <span className="flex items-center gap-2 text-xs">
+                <span className="text-red-500 font-semibold">{t('feedback.imageUploadError')}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (imgFile) void handleImage(imgFile);
+                  }}
+                  className="font-semibold text-[var(--accent)] hover:underline"
+                >
+                  {t('feedback.imageRetry')}
+                </button>
+              </span>
+            )}
             <input
               ref={fileRef}
               type="file"

@@ -903,7 +903,8 @@
     "removeImage": "Удалить фото",
     "imageTypeError": "Неверный тип файла — JPG, JPEG, PNG или WebP",
     "imageTooLarge": "Фото больше 10MB",
-    "imageUploadError": "Не удалось загрузить фото"
+    "imageUploadError": "Не удалось загрузить фото",
+    "imageRetry": "Повторить"
   },
   "dashboard": {
     "searchPlaceholder": "Поиск...",
