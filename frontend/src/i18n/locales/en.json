@@ -964,7 +964,11 @@
       "expires": "Expires",
       "listingId": "Listing ID",
       "rejectReason": "Rejection reason"
-    }
+    },
+    "feedbackBadge": "Feedback",
+    "filterAll": "All",
+    "filterEmpty": "Nothing in this filter",
+    "postDetail": "Open post details"
   },
   "feedback": {
     "title": "Feedback",

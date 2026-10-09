@@ -6,6 +6,7 @@ import {
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
   ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
   PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail, Crown, Pencil, Play,
+  MessageSquareQuote,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -128,6 +129,7 @@ interface CrmData {
 interface AdminPost {
   id: number;
   user_id: number;
+  category_id: number | null;
   title: string;
   content: string;
   image_url: string | null;
@@ -217,7 +219,7 @@ function StatusBadge({ status, t }: { status: string; t: (key: string) => string
     blocked: 'admin.blocked',
   };
   return (
-    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${styles[status] || styles.pending}`}>
+    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full whitespace-nowrap ${styles[status] || styles.pending}`}>
       {t(labelKeys[status] || status)}
     </span>
   );
@@ -242,6 +244,12 @@ export default function AdminPage() {
   const [topRejectReason, setTopRejectReason] = useState('');
   const [planModal, setPlanModal] = useState<null | { mode: 'new' } | { mode: 'edit'; plan: TopPlan }>(null);
   const [planForm, setPlanForm] = useState({ name: '', duration_key: '1d', price: '0', is_active: true });
+
+  // Feedback moderation: the list opens on the unprocessed queue, so a post
+  // leaves the view the moment it is approved or rejected — history is never
+  // deleted, it just moves behind the "All" filter.
+  const [postStatus, setPostStatus] = useState<'pending' | 'approved' | 'rejected' | 'all'>('pending');
+  const [postDetail, setPostDetail] = useState<AdminPost | null>(null);
   const queryClient = useQueryClient();
 
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
@@ -508,9 +516,13 @@ export default function AdminPage() {
     (u) => (u.display_name || '').toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredPosts = posts.filter(
-    (p) => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || (p.author_name || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPosts = posts.filter((p) => {
+    if (postStatus !== 'all' && p.status !== postStatus) return false;
+    return (
+      p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (p.author_name || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   const openProfile = async (u: User) => {
     setProfileUser({
@@ -1750,6 +1762,33 @@ export default function AdminPage() {
                 </div>
               </div>
 
+              {/* Status queue: opens on the unprocessed feedback, so anything
+                  already handled drops out of the view on its own. */}
+              <div className="flex items-center gap-2 flex-wrap mb-4">
+                {(
+                  [
+                    ['pending', 'admin.pending'],
+                    ['approved', 'admin.approved'],
+                    ['rejected', 'admin.rejected'],
+                    ['all', 'admin.filterAll'],
+                  ] as const
+                ).map(([key, labelKey]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setPostStatus(key)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition ${
+                      postStatus === key
+                        ? 'bg-[var(--accent)] text-white border-transparent shadow'
+                        : 'bg-white dark:bg-white/5 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-amber-300'
+                    }`}
+                    data-testid={`post-filter-${key}`}
+                  >
+                    {t(labelKey)}
+                  </button>
+                ))}
+              </div>
+
               {postsLoading ? (
                 <div className="flex justify-center py-16">
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
@@ -1769,8 +1808,12 @@ export default function AdminPage() {
                       </thead>
                       <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                         {filteredPosts.map((p) => (
-                          <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition">
-                            <td className="px-6 py-4">
+                          <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition" data-testid={`post-row-${p.id}`}>
+                            <td
+                              className="px-6 py-4 cursor-pointer"
+                              onClick={() => setPostDetail(p)}
+                              title={t('admin.postDetail')}
+                            >
                               <div className="flex items-center gap-3">
                                 {p.image_url ? (
                                   <img src={p.image_url} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
@@ -1780,6 +1823,15 @@ export default function AdminPage() {
                                   </div>
                                 )}
                                 <div className="min-w-0 max-w-xs">
+                                  {p.category_id == null && (
+                                    <span
+                                      className="inline-flex items-center gap-1 px-1.5 py-0.5 mb-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-[rgb(var(--accent-rgb)/0.12)] text-[var(--accent)]"
+                                      data-testid={`post-feedback-badge-${p.id}`}
+                                    >
+                                      <MessageSquareQuote className="w-3 h-3" aria-hidden="true" />
+                                      {t('admin.feedbackBadge')}
+                                    </span>
+                                  )}
                                   <p className="font-medium text-sm text-gray-900 dark:text-white truncate">{p.title}</p>
                                   <p className="text-xs text-gray-400 truncate">{p.content}</p>
                                 </div>
@@ -1831,8 +1883,105 @@ export default function AdminPage() {
                     </table>
                   </div>
                   {filteredPosts.length === 0 && (
-                    <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
+                    <div className="py-12 text-center text-sm text-gray-400">
+                      {adminApiDown
+                        ? t('common.error')
+                        : posts.length === 0
+                          ? t('admin.notFound')
+                          : t('admin.filterEmpty')}
+                    </div>
                   )}
+                </div>
+              )}
+
+              {/* Full feedback: click a row to read the whole note and see the
+                  photo at a real size — the table only fits a preview line. */}
+              {postDetail && (
+                <div
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  onClick={() => setPostDetail(null)}
+                >
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    data-testid="post-detail-modal"
+                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="min-w-0">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 mb-1.5 rounded-md text-[10px] font-bold uppercase tracking-wide bg-[rgb(var(--accent-rgb)/0.12)] text-[var(--accent)]">
+                          <MessageSquareQuote className="w-3 h-3" aria-hidden="true" />
+                          {postDetail.category_id == null ? t('admin.feedbackBadge') : t('admin.post')}
+                        </span>
+                        <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white">{postDetail.title}</h3>
+                        <p className="text-xs text-gray-400">
+                          {postDetail.author_name || '—'} · {formatDate(postDetail.created_at)}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setPostDetail(null)}
+                        className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    <div className="mb-3">
+                      <StatusBadge status={postDetail.status} t={t} />
+                    </div>
+
+                    {postDetail.image_url && (
+                      <a href={postDetail.image_url} target="_blank" rel="noreferrer" className="block mb-3">
+                        <img
+                          src={postDetail.image_url}
+                          alt=""
+                          className="w-full max-h-80 object-contain rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
+                        />
+                      </a>
+                    )}
+
+                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
+                      {postDetail.content}
+                    </p>
+
+                    <div className="flex justify-end gap-2 mt-5">
+                      {postDetail.status !== 'approved' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            approvePostMutation.mutate(postDetail.id);
+                            setPostDetail(null);
+                          }}
+                          className="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transition"
+                          data-testid="post-detail-approve"
+                        >
+                          {t('admin.approvePost')}
+                        </button>
+                      )}
+                      {postDetail.status !== 'rejected' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            rejectPostMutation.mutate(postDetail.id);
+                            setPostDetail(null);
+                          }}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 transition"
+                          data-testid="post-detail-reject"
+                        >
+                          {t('admin.rejectPost')}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setPostDetail(null)}
+                        className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition"
+                      >
+                        {t('common.close')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

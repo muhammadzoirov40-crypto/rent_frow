@@ -964,7 +964,11 @@
       "expires": "Анҷом",
       "listingId": "ID-и эълон",
       "rejectReason": "Сабаби радкунӣ"
-    }
+    },
+    "feedbackBadge": "Фидбек",
+    "filterAll": "Ҳама",
+    "filterEmpty": "Дар ин интихоб чизе нест",
+    "postDetail": "Тафсилоти постро бинед"
   },
   "feedback": {
     "title": "Фидбэк",

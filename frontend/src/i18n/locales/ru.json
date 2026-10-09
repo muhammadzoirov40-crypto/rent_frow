@@ -964,7 +964,11 @@
       "expires": "Окончание",
       "listingId": "ID объявления",
       "rejectReason": "Причина отказа"
-    }
+    },
+    "feedbackBadge": "Фидбек",
+    "filterAll": "Все",
+    "filterEmpty": "В этой вкладке ничего нет",
+    "postDetail": "Открыть детали поста"
   },
   "feedback": {
     "title": "Обратная связь",
