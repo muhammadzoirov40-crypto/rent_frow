@@ -22,10 +22,16 @@ export default function Layout({ children }: LayoutProps) {
   const { t } = useTranslation()
   const { pathname } = useLocation()
   const isAuthPage = pathname === '/login' || pathname === '/register'
-  // The messages page is a chat workspace: the left rail steps aside there
-  // (same idea as the assistant widget below) so the conversation gets
-  // the full width — every other route keeps it.
-  const showSidebar = !isAuthPage && !pathname.startsWith('/messages')
+  // Site chrome — the left rail and the floating assistant — steps aside on
+  // three kinds of route: the auth screens (nothing to navigate to before
+  // signing in), the messages chat (a workspace that needs the width), and
+  // the full-screen control panels /admin and /settings, where their own
+  // menus are the only navigation that matters.
+  const showChrome =
+    !isAuthPage &&
+    !pathname.startsWith('/messages') &&
+    !pathname.startsWith('/admin') &&
+    !pathname.startsWith('/settings')
   const { isAuthenticated } = useAuthStore()
   const { isLoading } = useAuth()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
@@ -54,7 +60,7 @@ export default function Layout({ children }: LayoutProps) {
     <div className="assistant-shift min-h-screen bg-transparent flex flex-col">
       <Header />
       <div className="flex flex-1 min-h-0">
-        {showSidebar && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
+        {showChrome && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
         <div className="flex-1 min-w-0 flex flex-col">
           <main className={`flex-1 pt-[var(--header-h)] ${isAuthPage ? '' : 'pb-20'} md:pb-0`}>
             {children}
@@ -63,9 +69,9 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </div>
       {!isAuthPage && <MobileBottomNav isAuthenticated={isAuthenticated} />}
-      {/* The chat owns the bottom-right corner: the floating assistant would sit
-          on top of the composer there, so it stays off the messages route. */}
-      {!isAuthPage && pathname !== '/messages' && <AssistantWidget />}
+      {/* The chat owns the bottom-right corner, and the admin/settings
+          panels asked for a clean canvas — the assistant stays off them. */}
+      {showChrome && <AssistantWidget />}
     </div>
   )
 }
