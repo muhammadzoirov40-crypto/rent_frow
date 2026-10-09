@@ -58,11 +58,12 @@ def first(payload: dict, keys) -> str | None:
 async def pay_dc_callback(request: Request, db: AsyncSession = Depends(get_db)):
     settings = get_settings()
 
-    # The balance is switched off, so there is nothing for a payment to land
-    # in. Answering plainly beats pretending the callback was understood.
-    if not settings.WALLET_ENABLED:
-        raise HTTPException(status_code=503, detail="WALLET_DISABLED")
-
+    # Deliberately no wallet gate here. What settles through this callback is
+    # a TOP window (or, once wired, a rental payment) — neither touches a
+    # balance, so a switched-off wallet has no business refusing money that
+    # already arrived. A plain balance top-up that cannot land says so as
+    # `settle`'s reason (WALLET_DISABLED), which still answers 200 instead
+    # of a retry the provider can do nothing with.
     payload = await read_payload(request)
 
     # Nothing may be credited until DC City registers this endpoint with us
