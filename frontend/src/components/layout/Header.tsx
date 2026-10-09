@@ -145,38 +145,34 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className="site-header fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-[var(--accent)] to-[var(--accent-hover)] backdrop-blur-xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] border-b border-gray-200/60 dark:border-white/10 transition-colors"
+      className="site-header fixed top-0 left-0 right-0 z-50 bg-white/70 dark:bg-[#0b0f19]/70 backdrop-blur-xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] border-b border-gray-200/60 dark:border-white/10 transition-colors"
     >
-      {/* The bar itself wears the accent colour edge to edge — logo left,
-          search centre, actions right (space-between). The sub-navbar below
-          keeps the regular glass chrome and sits on its own background. */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      {/* Full-bleed bar: logo pinned left, actions pinned right — true
+          space-between across the viewport instead of a centred 1280px
+          column with dead margins on wide screens. */}
+      <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-1 shrink-0">
-            {/* White chip: the mark and the "Hub" word are accent-coloured,
-                so they need a neutral plate to stay visible on accent. */}
-            <div className="bg-white rounded-xl px-2 py-1.5 shadow-sm">
-              <Logo size="sm" hideWordOnMobile />
-            </div>
+            <Logo size="sm" hideWordOnMobile />
           </div>
 
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-8">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('header.searchPlaceholder')}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/15 border border-white/25 rounded-xl text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
               />
             </div>
           </form>
 
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl text-white/90 hover:text-white hover:bg-white/20 transition"
+              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition"
               aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -185,7 +181,7 @@ export default function Header() {
             <div className="relative" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-white/90 hover:text-white hover:bg-white/20 transition text-sm font-medium"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition text-sm font-medium"
               >
                 <Globe className="w-4 h-4" />
                 <span>{currentLang.code.toUpperCase()}</span>
@@ -214,7 +210,7 @@ export default function Header() {
               <>
                 <Link
                   to="/create-listing"
-                  className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white hover:bg-white/90 text-[var(--accent)] shadow-sm transition-all hover:-translate-y-0.5 active:scale-95 whitespace-nowrap ml-1 mr-1"
+                  className="hidden md:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-sm shadow-[rgb(var(--accent-rgb)/0.25)] transition-all hover:-translate-y-0.5 active:scale-95 whitespace-nowrap ml-1 mr-1"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>{t('nav.createListing')}</span>
@@ -222,14 +218,14 @@ export default function Header() {
 
                 <Link
                   to="/favorites"
-                  className="relative p-2.5 rounded-xl text-white/90 hover:text-white hover:bg-white/20 transition hidden sm:flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <Heart className="w-5 h-5" />
                 </Link>
 
                 <Link
                   to="/messages"
-                  className="relative p-2.5 rounded-xl text-white/90 hover:text-white hover:bg-white/20 transition hidden sm:flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <MessageSquare className="w-5 h-5" />
                 </Link>
@@ -237,7 +233,7 @@ export default function Header() {
                 <div className="relative" ref={notifRef}>
                   <button
                     onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false) }}
-                    className="relative p-2.5 rounded-xl text-white/90 hover:text-white hover:bg-white/20 transition hidden sm:flex"
+                    className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (
@@ -312,18 +308,18 @@ export default function Header() {
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false) }}
-                    className="flex items-center gap-2 p-1.5 pr-2 rounded-xl hover:bg-white/20 transition"
+                    className="flex items-center gap-2 p-1.5 pr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition"
                   >
                     {user.avatar_url ? (
-                      <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-lg object-cover ring-2 ring-white/40" />
+                      <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
                     ) : (
-                      <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
-                        <span className="text-[var(--accent)] text-xs font-bold">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">
                           {(user.display_name || user.email || 'U').charAt(0).toUpperCase()}
                         </span>
                       </div>
                     )}
-                    <ChevronDown className="w-3.5 h-3.5 text-white/70 hidden sm:block" />
+                    <ChevronDown className="w-3.5 h-3.5 text-gray-400 hidden sm:block" />
                   </button>
 
                   {userMenuOpen && (
@@ -381,13 +377,13 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-white/20 rounded-xl transition whitespace-nowrap"
+                  className="px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition whitespace-nowrap"
                 >
                   {t('header.login')}
                 </Link>
                 <Link
                   to="/register"
-                  className="hidden sm:block px-4 py-2.5 text-sm font-semibold bg-white hover:bg-white/90 text-[var(--accent)] rounded-xl transition shadow-sm whitespace-nowrap"
+                  className="hidden sm:block px-4 py-2.5 text-sm font-semibold bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white rounded-xl transition shadow-sm shadow-[rgb(var(--accent-rgb)/0.2)] whitespace-nowrap"
                 >
                   {t('header.register')}
                 </Link>
@@ -397,7 +393,7 @@ export default function Header() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={t('nav.main')}
-              className="p-2.5 rounded-xl text-white/90 hover:text-white hover:bg-white/20 transition md:hidden"
+              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition md:hidden"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -406,23 +402,19 @@ export default function Header() {
 
         <form onSubmit={handleSearch} className="md:hidden pb-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/70" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('header.searchPlaceholder')}
-              className="w-full pl-10 pr-4 py-2.5 bg-white/15 border border-white/25 rounded-xl text-sm text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-transparent transition"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
             />
           </div>
         </form>
       </div>
 
-      {/* The category strip keeps the old glass look — its own plate so the
-          accent bar above doesn't tint it. */}
-      <div className="bg-white/95 dark:bg-[#0b0f19]/95 backdrop-blur-xl">
-        <SubNavbar />
-      </div>
+      <SubNavbar />
 
       <MobileSidebar open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
 

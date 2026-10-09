@@ -193,7 +193,9 @@ export default function SubNavbar() {
       ref={barRef}
       className="border-t border-gray-100 dark:border-white/[0.07] bg-gray-50/80 dark:bg-white/[0.02]"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      {/* Same full-bleed rule as the top row so the categories button lines
+          up with the logo above it. */}
+      <div className="px-4 sm:px-6">
         <div className="flex items-center h-11 md:h-12">
           {/* ── Все категории (mega menu) ───────────────────────── */}
           <div className="relative shrink-0">
