@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Crown, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { topPromotions, wallet } from '../../api';
+import { topPromotions } from '../../api';
 import type { Listing, TopPlan } from '../../api';
 import { formatAmount } from '../../utils/format';
 
@@ -12,15 +12,13 @@ import { formatAmount } from '../../utils/format';
  *
  * The price and duration shown here are whatever the admin configured, read
  * from the public plan list — the form posts only `listing_id` + `plan_id`.
- * The wallet balance (when the balance switch is on) is shown so an
- * unaffordable plan is visibly "will wait for the admin" instead of a
- * surprise charge; if the wallet endpoint is unavailable the row simply
- * does not render and the same pending note still applies.
  *
- * Two ways to pay, both priced by the server: the wallet (instant, or an
- * admin's approval when the balance falls short) and DC Wallet — Dushanbe
- * City, which opens a checkout for the plan's price and turns the pending
- * record into a live window when the reference comes back.
+ * One way to pay, decided by the product: DC Wallet — Dushanbe City. The
+ * browser only follows the link the server built for the plan's price, and
+ * the window becomes live when the reference comes back (the callback, or an
+ * admin confirming it in the panel) — never because this click said so. No
+ * wallet balance is shown or spent anywhere in this flow: a price of 0 (an
+ * admin's free plan) activates directly, without money at all.
  */
 export function TopModal({
   listing,
@@ -46,17 +44,7 @@ export function TopModal({
     retry: false,
   });
 
-  const { data: summary } = useQuery({
-    queryKey: ['wallet-summary'],
-    queryFn: wallet.get,
-    staleTime: 30 * 1000,
-    retry: false,
-  });
-  const balance = typeof summary?.balance === 'number' ? summary.balance : null;
-
   const selected = plans.find((p) => p.id === planId) ?? null;
-  const insufficient =
-    selected !== null && selected.price > 0 && balance !== null && balance < selected.price;
 
   /** Every refusal the two purchase endpoints can answer, in the user's
    *  language instead of the backend's English detail string. */
@@ -70,6 +58,9 @@ export function TopModal({
     return t('top.requestFailed');
   };
 
+  // An admin's free plan (price 0): no money anywhere — the server flips
+  // the record to a live window on the spot. Paid plans never come through
+  // here; they only ever go through the DC checkout below.
   const mutation = useMutation({
     mutationFn: (chosenPlanId: number) => topPromotions.request(listing.id, chosenPlanId),
     onSuccess: (data) => {
@@ -184,23 +175,8 @@ export function TopModal({
                 {t(`top.dur_${selected.duration_key}`)}
               </span>
             </div>
-            {balance !== null && (
-              <div className="flex items-center justify-between">
-                <span className="text-gray-500 dark:text-gray-400">{t('top.balanceLabel')}</span>
-                <span className="font-semibold tabular-nums text-[#1A1A2E] dark:text-white">
-                  {formatAmount(balance)} {t('common.currency')}
-                </span>
-              </div>
-            )}
-            <p
-              className={`text-xs leading-relaxed pt-1 border-t border-gray-100 dark:border-white/10 ${
-                insufficient
-                  ? 'text-amber-600 dark:text-amber-400 font-semibold'
-                  : 'text-gray-500 dark:text-gray-400'
-              }`}
-              data-testid={insufficient ? 'top-insufficient-note' : undefined}
-            >
-              {insufficient ? t('top.insufficientNote') : t('top.pendingNote')}
+            <p className="text-xs leading-relaxed pt-1 border-t border-gray-100 dark:border-white/10 text-gray-500 dark:text-gray-400">
+              {selected.price > 0 ? t('top.payDcNote') : t('top.freeNote')}
             </p>
           </div>
         )}
@@ -235,16 +211,18 @@ export function TopModal({
               {t('top.payDc')}
             </button>
           )}
-          <button
-            type="button"
-            onClick={() => planId !== null && mutation.mutate(planId)}
-            disabled={chooseDisabled}
-            className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60 transition inline-flex items-center gap-2"
-            data-testid="top-confirm-button"
-          >
-            {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-            {t('top.confirm')}
-          </button>
+          {selected !== null && selected.price === 0 && !notOwner && (
+            <button
+              type="button"
+              onClick={() => planId !== null && mutation.mutate(planId)}
+              disabled={chooseDisabled}
+              className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60 transition inline-flex items-center gap-2"
+              data-testid="top-confirm-button"
+            >
+              {mutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+              {t('top.confirm')}
+            </button>
+          )}
         </div>
       </div>
     </div>

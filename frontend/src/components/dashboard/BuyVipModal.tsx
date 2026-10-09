@@ -125,7 +125,12 @@ export default function BuyVipModal({ open, onClose }: BuyVipModalProps) {
               </Link>
             </div>
           ) : (
-            active.map((l) => (
+            active.map((l) => {
+              const img =
+                l.images?.find((i) => i.is_primary)?.image_url ||
+                l.images?.[0]?.image_url ||
+                null;
+              return (
               <button
                 key={l.id}
                 type="button"
@@ -133,7 +138,19 @@ export default function BuyVipModal({ open, onClose }: BuyVipModalProps) {
                 className="w-full flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-gray-200 dark:border-white/10 hover:border-amber-300 dark:hover:border-amber-500/50 hover:bg-amber-500/10 text-left transition"
                 data-testid="buy-vip-listing-row"
               >
-                <span className="min-w-0">
+                {img ? (
+                  <img
+                    src={img}
+                    alt=""
+                    className="w-11 h-11 rounded-lg object-cover shrink-0 bg-gray-100 dark:bg-white/5"
+                    data-testid="buy-vip-row-image"
+                  />
+                ) : (
+                  <span className="w-11 h-11 rounded-lg bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
+                    <Crown className="w-5 h-5" />
+                  </span>
+                )}
+                <span className="min-w-0 flex-1">
                   <span className="block text-sm font-semibold text-gray-900 dark:text-white truncate">
                     {l.title}
                   </span>
@@ -144,7 +161,8 @@ export default function BuyVipModal({ open, onClose }: BuyVipModalProps) {
                 </span>
                 <Crown className="w-4 h-4 text-amber-500 shrink-0" />
               </button>
-            ))
+              );
+            })
           )}
         </div>
       </div>
