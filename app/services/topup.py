@@ -81,6 +81,59 @@ async def prepare(db: AsyncSession, user_id: int, amount: float) -> dict:
     }
 
 
+async def open_promotion_intent(
+    db: AsyncSession, *, user_id: int, promotion_id: int, amount: float
+) -> dict:
+    """The same waiting room as a balance top-up, bound to a TOP promotion.
+
+    Identical reference, identical link, identical settle - the only
+    difference is ``promotion_id``, which is how the callback knows the
+    money buys a TOP window instead of adding to a balance.
+    """
+    amount = money(amount)
+    if amount <= 0:
+        raise HTTPException(status_code=400, detail="BAD_AMOUNT")
+    if amount > MAX_AMOUNT:
+        raise HTTPException(status_code=400, detail="AMOUNT_TOO_LARGE")
+
+    settings = get_settings()
+    if not settings.PAYDC_ENABLED:
+        raise HTTPException(status_code=400, detail="TOPUP_DISABLED")
+
+    reference = uuid.uuid4().hex[:24].upper()
+    intent = TopupIntent(
+        user_id=user_id,
+        amount=amount,
+        reference=reference,
+        promotion_id=promotion_id,
+    )
+    db.add(intent)
+    await db.flush()
+
+    return {
+        "reference": reference,
+        "amount": amount,
+        "status": intent.status,
+        "provider": intent.provider,
+        "url": payment_url(user_id, amount, reference),
+        "created_at": intent.created_at,
+    }
+
+
+async def pending_promotion_intent(
+    db: AsyncSession, promotion_id: int
+) -> TopupIntent | None:
+    """The un-paid link already opened for this promotion, if any - so a
+    second click hands back the *same* link instead of a second waiting row."""
+    result = await db.execute(
+        select(TopupIntent).where(
+            TopupIntent.promotion_id == promotion_id,
+            TopupIntent.status == "PENDING",
+        )
+    )
+    return result.scalars().first()
+
+
 async def find(db: AsyncSession, reference: str) -> TopupIntent | None:
     """The one top-up a reference points at — the lookup shared by the
     callback, an operator confirming by hand, and anyone asking what a
@@ -103,6 +156,17 @@ async def intents(db: AsyncSession, user_id: int, limit: int = 20) -> list[Topup
     return list(result.scalars().all())
 
 
+async def _settle_promotion(db: AsyncSession, row: TopupIntent) -> str:
+    """Hand a settled payment to the promotion it was opened for.
+
+    Imported late on purpose: the promotion service builds its DC links with
+    the helpers of this module, so it may not be loading while this one is.
+    """
+    from app.services.promotion import complete_dc_payment
+
+    return await complete_dc_payment(db, promo_id=row.promotion_id)
+
+
 async def settle(
     db: AsyncSession,
     *,
@@ -110,11 +174,14 @@ async def settle(
     amount: float | None = None,
     raw: dict | None = None,
 ) -> tuple[bool, str]:
-    """Put a confirmed payment into the wallet. Idempotent by construction.
+    """Put a confirmed payment where it was headed. Idempotent by construction.
 
-    Returns ``(credited, reason)`` — a webhook retries are answered with
-    ``ALREADY_PAID`` rather than a second credit, and a callback we cannot
-    place is refused instead of guessed at.
+    Two destinations share this one function: a NULL ``promotion_id`` credits
+    the wallet (``CREDITED``), a bound one activates the TOP promotion it was
+    opened for (``PROMOTION_ACTIVATED`` / ``PROMOTION_PAID``). Either way the
+    intent closes once - a webhook retries are answered with ``ALREADY_PAID``
+    rather than a second credit, and a callback we cannot place is refused
+    instead of guessed at.
     """
     if not reference:
         return False, "NO_REFERENCE"
@@ -127,6 +194,17 @@ async def settle(
     if amount is not None and abs(money(amount) - money(row.amount)) > TOLERANCE:
         # keep it PENDING: a corrected retry must still be able to settle it
         return False, "AMOUNT_MISMATCH"
+
+    if row.promotion_id:
+        # money for a TOP window, not for the balance. It arrived either way,
+        # so the intent closes here; what the promotion does with it is its
+        # own business (a promotion rejected mid-flight grants no window).
+        reason = await _settle_promotion(db, row)
+        row.status = "PAID"
+        row.paid_at = datetime.utcnow()
+        row.raw_response = json.dumps(raw, ensure_ascii=False)[:4000] if raw else None
+        await db.flush()
+        return reason in ("PROMOTION_ACTIVATED", "PROMOTION_PAID"), reason
 
     try:
         await WalletService(db).topup(

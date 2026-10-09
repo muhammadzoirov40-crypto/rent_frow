@@ -592,6 +592,17 @@ export const topPromotions = {
       })
       .then(unwrap),
 
+  /** Open a DC Wallet (Dushanbe City) checkout for this plan: the server
+   *  creates (or re-links) the pending record and returns the link; the
+   *  reference in it is what turns the record into a live window. */
+  payDc: (listingId: number, planId: number) =>
+    client
+      .post<APIResponse<{ url: string; reference: string; promotion: TopPromotion }>>(
+        '/promotions/pay-dc',
+        { listing_id: listingId, plan_id: planId },
+      )
+      .then(unwrap),
+
   admin: {
     plans: () => client.get<APIResponse<TopPlan[]>>('/promotions/admin/plans').then(unwrap),
 

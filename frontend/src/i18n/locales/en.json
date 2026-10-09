@@ -96,7 +96,6 @@
   "home": {
     "heroCountry": "Tajikistan",
     "heroFallbackTag": "RENT",
-
     "heroTitle": "Everything you need to rent at",
     "heroSubtitle": "Real listings for renting homes, cars and professional equipment — straight from the owners.",
     "find": "Find",
@@ -1305,6 +1304,10 @@
     "alreadyExists": "This listing already has a TOP request",
     "listingNotActive": "Only active listings can be promoted",
     "requestFailed": "Request failed",
+    "payDc": "Pay with DC Wallet (Dushanbe City)",
+    "dcDisabled": "DC payments are disabled",
+    "notOwner": "Only the listing owner can promote it",
+    "notOwnerNote": "TOP plans can only be bought by the listing owner.",
     "activeUntilShort": "TOP until {{date}}",
     "pendingChip": "TOP request",
     "dur_3h": "3 hours",

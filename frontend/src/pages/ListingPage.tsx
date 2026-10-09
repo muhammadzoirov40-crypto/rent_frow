@@ -26,6 +26,7 @@ import {
   Maximize2,
   X,
   Check,
+  Crown,
 } from 'lucide-react';
 import { formatDate } from '../utils/dates';
 import { previousPath } from '../utils/navHistory';
@@ -35,6 +36,7 @@ import { wallet, canAfford, openTopUp, topUpFor } from '../utils/wallet';
 import { WALLET_ENABLED } from '../config/features';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 import LocationMap from '../components/search/LocationMap';
+import { TopModal } from '../components/dashboard/TopModal';
 
 /** Days between two yyyy-mm-dd dates (at least one). */
 function rentalDays(startDate: string, endDate: string): number {
@@ -94,6 +96,9 @@ export default function ListingPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showDeleteListing, setShowDeleteListing] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  // The TOP/VIP chooser, openable from the listing itself — anyone may open
+  // it, only the owner (or an admin) may actually buy through it.
+  const [showTopPlans, setShowTopPlans] = useState(false);
   // The backend wallet — available vs reserved. A top-up invalidates it so the
   // panel shows the new number without reloading the page.
   const { data: walletSummary, refetch: refetchWallet } = useQuery({
@@ -554,6 +559,27 @@ export default function ListingPage() {
                   </span>
                 </div>
 
+                {/* TOP/VIP purchase lives inside the listing too - visible to
+                    every viewer; the backend still decides who may buy. */}
+                {listing.status === 'ACTIVE' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!isAuthenticated) {
+                        toast.error(t('listing.loginRequired'));
+                        navigate('/login');
+                        return;
+                      }
+                      setShowTopPlans(true);
+                    }}
+                    className="w-full mb-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-amber-600 dark:text-amber-400 bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 border border-amber-200 dark:border-amber-500/30 transition"
+                    data-testid="listing-make-top-button"
+                  >
+                    <Crown className="w-4 h-4" />
+                    {t('dashboard.listings.makeTop')}
+                  </button>
+                )}
+
                 {bookingSuccess && !isOwner ? (
                   <div className="text-center py-4" data-testid="booking-success">
                     <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-500/15 flex items-center justify-center mb-3">
@@ -990,6 +1016,15 @@ export default function ListingPage() {
           </div>
         )}
       </div>
+
+      {showTopPlans && (
+        <TopModal
+          listing={listing}
+          onClose={() => setShowTopPlans(false)}
+          onDone={() => queryClient.invalidateQueries({ queryKey: ['topListings'] })}
+          notOwner={!(isOwner || user?.role === 'ADMIN')}
+        />
+      )}
 
       {showConfirm && (
         <div

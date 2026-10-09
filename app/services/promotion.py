@@ -41,6 +41,7 @@ from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.promotion import TopPromotionResponse
 from app.services.notification import NotificationService
+from app.services import topup as topup_service
 from app.services.wallet import WalletService, money
 
 logger = logging.getLogger("rentflow.top_promotions")
@@ -372,6 +373,202 @@ async def create_promotion(
 
     await db.flush()
     return promo
+
+
+async def create_dc_payment(
+    db: AsyncSession,
+    *,
+    user_id: int,
+    is_admin: bool,
+    listing_id: int,
+    plan_id: int,
+) -> tuple[TopPromotion, dict]:
+    """Open a DC Wallet (Dushanbe City) checkout for a TOP promotion.
+
+    Same guards as :func:`create_promotion` - owner/admin, ACTIVE listing,
+    enabled plan, at most one open request - but no wallet charge: the money
+    arrives through the provider, and the webhook (or an operator confirming
+    the reference) is what flips this record to PAID + ACTIVE. The price,
+    like everywhere else, comes from the plan row.
+
+    A promotion that is already waiting (PENDING + UNPAID, same plan) is
+    *reused* rather than refused: the checkout link for it is handed out
+    again, so abandoning the payment page and coming back cannot dead-end
+    the listing behind a 409 the user cannot act on.
+    """
+    if not get_settings().PAYDC_ENABLED:
+        raise HTTPException(status_code=400, detail="TOPUP_DISABLED")
+
+    listing = await db.get(Listing, listing_id)
+    if not listing:
+        raise HTTPException(status_code=404, detail="Listing not found")
+    if listing.owner_id != user_id and not is_admin:
+        raise HTTPException(status_code=403, detail="Not your listing")
+    if listing.status != ListingStatus.ACTIVE:
+        raise HTTPException(status_code=400, detail="LISTING_NOT_ACTIVE")
+
+    plan = await db.get(TopPlan, plan_id)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    if not plan.is_active:
+        raise HTTPException(status_code=400, detail="PLAN_DISABLED")
+
+    existing = await db.execute(
+        select(TopPromotion).where(
+            TopPromotion.listing_id == listing_id,
+            TopPromotion.status.in_(OPEN_STATUSES),
+        )
+    )
+    promo = existing.scalars().first()
+    created = False
+    if promo is not None:
+        if (
+            promo.status != TopPromotionStatus.PENDING
+            or promo.payment_status != TopPromotionPayment.UNPAID
+            or promo.plan_id != plan.id
+        ):
+            # a live window or an approved/paid request: nothing to sell here
+            raise HTTPException(status_code=409, detail="PROMOTION_EXISTS")
+    else:
+        price = money(plan.price)
+        if price <= 0:
+            # an admin's free plan activates on the spot through the normal
+            # path - a checkout for 0 would have nothing to pay
+            raise HTTPException(status_code=400, detail="FREE_PLAN")
+        promo = TopPromotion(
+            listing_id=listing.id,
+            user_id=listing.owner_id,
+            plan_id=plan.id,
+            plan_name=plan.name,
+            duration_key=plan.duration_key,
+            price=price,
+            status=TopPromotionStatus.PENDING,
+            payment_status=TopPromotionPayment.UNPAID,
+        )
+        db.add(promo)
+        try:
+            await db.flush()
+        except IntegrityError:
+            await db.rollback()
+            raise HTTPException(status_code=409, detail="PROMOTION_EXISTS")
+        created = True
+
+    price = money(promo.price)
+    if price <= 0:
+        raise HTTPException(status_code=400, detail="FREE_PLAN")
+
+    # Pin the related rows on the instance before the locals of this function
+    # go out of scope (same identity-map/weakref rule as create_promotion):
+    # to_response and the notifications read them out of __dict__ only.
+    promo.listing = listing
+    promo.plan = plan
+    owner = listing.owner
+    promo.user = owner
+
+    # One checkout per pending promotion: a repeat click reopens the very
+    # same link instead of stacking second waiting rows behind it.
+    intent = await topup_service.pending_promotion_intent(db, promo.id)
+    if intent is not None:
+        reference = intent.reference
+        url = topup_service.payment_url(
+            user_id, float(intent.amount), intent.reference
+        )
+    else:
+        opened = await topup_service.open_promotion_intent(
+            db, user_id=user_id, promotion_id=promo.id, amount=price
+        )
+        reference = opened["reference"]
+        url = opened["url"]
+
+    if created:
+        # "to the admin as well": the request lands in Admin -> TOP as a row
+        # and as a notification carrying the very price that went to DC City.
+        user_name = None
+        if owner:
+            user_name = owner.display_name or (owner.email or "").split("@")[0]
+        await _notify_admins(
+            db,
+            ntype="top_request",
+            title="TOP promotion via DC Wallet",
+            message=(
+                f"TOP payment opened via DC Wallet (Dushanbe City): "
+                f"'{listing.title}'. "
+                f"Plan: {plan.name} ({duration_label(plan.duration_key)}). "
+                f"Price: {price} TJS. Reference: {reference}. "
+                "Status: waiting for the payment to be confirmed."
+            ),
+            promo=promo,
+            extra={"user_name": user_name, "owner_id": listing.owner_id},
+        )
+
+    await db.flush()
+    return promo, {"url": url, "reference": reference}
+
+
+async def complete_dc_payment(
+    db: AsyncSession,
+    *,
+    promo_id: int,
+) -> str:
+    """A DC Wallet payment for this promotion has actually landed.
+
+    Called from :func:`app.services.topup.settle` - the webhook, or an
+    operator confirming the reference - which has already checked the
+    reference, the amount and that this intent was not settled before.
+    Idempotent on its own too: a promotion that is already PAID is reported,
+    never re-activated, so a window keeps the start it was given.
+
+    Returns ``PROMOTION_ACTIVATED`` (pending window now live),
+    ``PROMOTION_PAID`` (activated by hand earlier, now settled),
+    ``PROMOTION_CLOSED`` (rejected/expired/cancelled mid-flight: no window,
+    the money stays on the intent for an operator to settle out of band) or
+    ``UNKNOWN_PROMOTION``.
+    """
+    promo = await db.get(TopPromotion, promo_id)
+    if promo is None:
+        return "UNKNOWN_PROMOTION"
+    if promo.payment_status == TopPromotionPayment.PAID:
+        return "ALREADY_PAID"
+
+    now = datetime.utcnow()
+    if promo.status == TopPromotionStatus.PENDING:
+        promo.status = TopPromotionStatus.ACTIVE
+        promo.payment_status = TopPromotionPayment.PAID
+        promo.started_at = now
+        promo.expires_at = add_duration(now, promo.duration_key)
+        result = "PROMOTION_ACTIVATED"
+    elif promo.status == TopPromotionStatus.ACTIVE:
+        promo.payment_status = TopPromotionPayment.PAID
+        result = "PROMOTION_PAID"
+    else:
+        return "PROMOTION_CLOSED"
+
+    # Pin for the notification and any response built after us, while the
+    # caller's frame is still alive (see create_promotion).
+    listing = (
+        await db.execute(select(Listing).where(Listing.id == promo.listing_id))
+    ).scalar_one_or_none()
+    promo.listing = listing
+    plan = await db.get(TopPlan, promo.plan_id)
+    promo.plan = plan
+    owner = listing.owner if listing else None
+    promo.user = owner
+
+    if result == "PROMOTION_ACTIVATED":
+        await _notify(
+            db,
+            user_id=promo.user_id,
+            ntype="top_activated",
+            title="TOP promotion active",
+            message=(
+                f"Payment received (DC Wallet / Dushanbe City): your listing "
+                f'"{listing.title if listing else promo.listing_id}" is now TOP '
+                f"until {promo.expires_at:%Y-%m-%d %H:%M} UTC."
+            ),
+            promo=promo,
+        )
+    await db.flush()
+    return result
 
 
 # ------------------------------------------------------------- admin actions

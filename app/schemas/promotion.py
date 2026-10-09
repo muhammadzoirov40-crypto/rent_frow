@@ -75,6 +75,16 @@ class TopCreateResponse(BaseModel):
     active: bool
 
 
+class TopDcPayResponse(BaseModel):
+    """The DC Wallet (Dushanbe City) checkout for a TOP promotion: the link
+    to open, the reference the callback will echo back, and the still-pending
+    record that reference activates - the price never leaves the server."""
+
+    url: str
+    reference: str
+    promotion: TopPromotionResponse
+
+
 class TopStatsResponse(BaseModel):
     total: int
     active: int

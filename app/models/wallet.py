@@ -109,6 +109,12 @@ class TopupIntent(Base):
         String(16), nullable=False, default="PENDING", index=True
     )
     provider: Mapped[str] = mapped_column(String(32), nullable=False, default="paydc")
+    # set when this waiting row settles a TOP promotion instead of topping up
+    # the wallet: same reference, same webhook, different destination for the
+    # money. NULL = a plain balance top-up (the original meaning).
+    promotion_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("top_promotions.id"), nullable=True, index=True
+    )
     # whatever the callback sent, kept verbatim for the audit trail
     raw_response: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

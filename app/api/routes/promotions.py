@@ -27,6 +27,7 @@ from app.schemas.promotion import (
     TopPlanUpdate,
     TopPromotionCreate,
     TopPromotionResponse,
+    TopDcPayResponse,
     TopReject,
     TopStatsResponse,
 )
@@ -75,6 +76,35 @@ async def request_top(
         data=TopCreateResponse(
             promotion=promo_service.to_response(promo),
             active=promo.status.value == "ACTIVE",
+        )
+    )
+
+
+@router.post("/pay-dc", response_model=APIResponse[TopDcPayResponse])
+async def pay_top_with_dc(
+    data: TopPromotionCreate,
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Open a DC Wallet (Dushanbe City) checkout for a TOP plan.
+
+    Two ids go out, the link comes back: the price is the plan's, the record
+    the link will activate is created (or re-linked) here, and nothing moves
+    until the provider confirms the reference - the webhook or an operator
+    closing it by hand is what turns the record into a live window.
+    """
+    promo, payment = await promo_service.create_dc_payment(
+        db,
+        user_id=current_user.user_id,
+        is_admin=current_user.is_admin,
+        listing_id=data.listing_id,
+        plan_id=data.plan_id,
+    )
+    return APIResponse(
+        data=TopDcPayResponse(
+            url=payment["url"],
+            reference=payment["reference"],
+            promotion=promo_service.to_response(promo),
         )
     )
 
