@@ -4,6 +4,7 @@ import {
   Bell,
   CalendarX,
   CheckCircle,
+  Clock,
   EyeOff,
   FileText,
   Heart,
@@ -128,6 +129,14 @@ const TYPE_META: Record<string, TypeMeta> = {
     titleKey: 'notifications.types.listing_request_info.title',
     bodyKey: 'notifications.types.listing_request_info.body',
   },
+  rental_ending_soon: {
+    titleKey: 'notifications.types.rental_ending_soon.title',
+    bodyKey: 'notifications.types.rental_ending_soon.body',
+  },
+  rental_ended: {
+    titleKey: 'notifications.types.rental_ended.title',
+    bodyKey: 'notifications.types.rental_ended.body',
+  },
 };
 
 interface TypeStyle {
@@ -206,6 +215,16 @@ export const NOTIFICATION_TYPE_STYLE: Record<string, TypeStyle> = {
     icon: <Bell className="w-5 h-5" />,
     color: 'text-blue-600',
     bgColor: 'bg-blue-100',
+  },
+  rental_ending_soon: {
+    icon: <Clock className="w-5 h-5" />,
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+  },
+  rental_ended: {
+    icon: <CalendarX className="w-5 h-5" />,
+    color: 'text-[var(--accent-hover)]',
+    bgColor: 'bg-[rgb(var(--accent-rgb)/0.1)]',
   },
   default: {
     icon: <Bell className="w-5 h-5" />,
@@ -319,6 +338,9 @@ export function getNotificationRoute(notification: NotificationLike): string | n
       return listingId ? `/listing/${listingId}` : null;
     case 'listing_deactivated':
       return '/profile';
+    case 'rental_ending_soon':
+    case 'rental_ended':
+      return listingId ? `/listing/${listingId}` : '/rental-requests';
     default:
       return null;
   }

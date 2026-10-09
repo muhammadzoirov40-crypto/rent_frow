@@ -521,6 +521,14 @@
       "listing_request_info": {
         "title": "More information required",
         "body": "A moderator requested more information about your listing \"{{listing}}\"."
+      },
+      "rental_ending_soon": {
+        "title": "Rental ending soon",
+        "body": "The rental of \"{{listing}}\" ends today at 23:59."
+      },
+      "rental_ended": {
+        "title": "Rental period over",
+        "body": "The rental period for \"{{listing}}\" has ended."
       }
     },
     "markAllReadSuccess": "All notifications marked as read",

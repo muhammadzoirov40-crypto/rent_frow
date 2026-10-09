@@ -332,6 +332,59 @@ def renter_rejected(
     return subject, text, _card(f"Здравствуйте, {renter_name}!", lead, rows, tail, buttons)
 
 
+# ─── rental deadline emails ──────────────────────────────────────────────────
+
+
+def _deadline_buttons(conversation_id: int | None) -> list[tuple[str, str]]:
+    if conversation_id:
+        return [("Открыть чат", chat_url(conversation_id))]
+    return [("Мои запросы", request_url())]
+
+
+def rental_ending_soon(
+    *,
+    name: str,
+    listing_title: str,
+    end_date,
+    conversation_id: int | None,
+) -> tuple[str, str, str]:
+    subject = "Аренда заканчивается через час — RentHub"
+    rows = [
+        ("Объект", listing_title),
+        ("Окончание", f"{end_date.strftime('%d.%m.%Y')} до 24:00"),
+    ]
+    lead = "Срок аренды подходит к концу — осталось около часа."
+    tail = "Верните объект вовремя или свяжитесь с партнёром в чате RentHub."
+    buttons = _deadline_buttons(conversation_id)
+    text = (
+        f"Здравствуйте, {name}!\n\n"
+        + _card_text(lead, rows, tail, [b[0] for b in buttons])
+    )
+    return subject, text, _card(f"Здравствуйте, {name}!", lead, rows, tail, buttons)
+
+
+def rental_ended(
+    *,
+    name: str,
+    listing_title: str,
+    end_date,
+    conversation_id: int | None,
+) -> tuple[str, str, str]:
+    subject = "Срок аренды завершён — RentHub"
+    rows = [
+        ("Объект", listing_title),
+        ("Дата окончания", end_date.strftime("%d.%m.%Y")),
+    ]
+    lead = "Срок аренды истёк."
+    tail = "Если объект ещё не возвращён — напишите партнёру в чате RentHub."
+    buttons = _deadline_buttons(conversation_id)
+    text = (
+        f"Здравствуйте, {name}!\n\n"
+        + _card_text(lead, rows, tail, [b[0] for b in buttons])
+    )
+    return subject, text, _card(f"Здравствуйте, {name}!", lead, rows, tail, buttons)
+
+
 def dispatch(to: str, template: tuple[str, str, str]) -> bool:
     """Fire one of the tuples above off the request thread."""
     subject, text, html = template
