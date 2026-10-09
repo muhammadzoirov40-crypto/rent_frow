@@ -138,8 +138,8 @@ def test_a_database_the_old_startup_code_built_is_recognised_and_caught_up(
         asyncio.run(async_engine.dispose())
 
     assert any("never stamped" in note for note in notes), notes
-    # the catch-up must land on the current head (the TOP promotion revision)
-    assert any("c7d2e5a9f3b1" in note for note in notes), notes
+    # the catch-up must land on the current head (the TOP seed revision)
+    assert any("e2c4f7a91b3d" in note for note in notes), notes
 
     engine = create_engine(f"sqlite:///{alembic_db}")
     try:
@@ -150,7 +150,7 @@ def test_a_database_the_old_startup_code_built_is_recognised_and_caught_up(
             ).scalar_one()
     finally:
         engine.dispose()
-    assert stamped == "c7d2e5a9f3b1"
+    assert stamped == "e2c4f7a91b3d"
 
 
 def test_running_the_migrations_again_changes_nothing(alembic_db):
@@ -174,3 +174,49 @@ def test_running_the_migrations_again_changes_nothing(alembic_db):
         engine.dispose()
 
     assert second == first
+
+
+def test_the_top_plan_catalogue_is_seeded_exactly_once(alembic_db):
+    """The four plans must land on a database the migrations built.
+
+    ``c7d2e5a9f3b1`` created the tables but its seed sat behind
+    ``inspector.has_table`` - and SQLAlchemy 2.0 caches that answer per
+    connection, so the freshly created table still read as "missing" and
+    the inserts never ran. The follow-up revision ``e2c4f7a91b3d`` seeds
+    by live count instead; this test is what keeps both honest: a fresh
+    upgrade ends with the catalogue, a re-run doubles nothing.
+    """
+    from alembic import command
+
+    from app.core.migrations import alembic_config
+
+    command.upgrade(alembic_config(), "head")
+    engine = create_engine(f"sqlite:///{alembic_db}")
+    try:
+        with engine.connect() as conn:
+            plans = conn.execute(
+                text(
+                    "SELECT duration_key, price, is_active FROM top_plans ORDER BY id"
+                )
+            ).fetchall()
+    finally:
+        engine.dispose()
+
+    assert [
+        (key, float(price), bool(active)) for key, price, active in plans
+    ] == [
+        ("3h", 0.0, False),
+        ("1d", 0.0, False),
+        ("1w", 0.0, False),
+        ("1m", 0.0, False),
+    ], plans
+
+    command.upgrade(alembic_config(), "head")
+    engine = create_engine(f"sqlite:///{alembic_db}")
+    try:
+        with engine.connect() as conn:
+            count = conn.execute(text("SELECT COUNT(*) FROM top_plans")).scalar_one()
+    finally:
+        engine.dispose()
+
+    assert count == 4, "re-running the chain must not duplicate the catalogue"
