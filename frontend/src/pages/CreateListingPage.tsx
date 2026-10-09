@@ -222,6 +222,30 @@ export default function CreateListingPage() {
     }
   };
 
+  // Ctrl+V anywhere on this page: an image in the clipboard goes through the
+  // very same upload pipeline as the picker and the drop zone; text pastes
+  // keep their default behaviour.
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const files: File[] = [];
+      for (const item of Array.from(items)) {
+        if (item.kind === 'file' && item.type.startsWith('image/')) {
+          const file = item.getAsFile();
+          if (file) files.push(file);
+        }
+      }
+      if (files.length > 0) {
+        e.preventDefault();
+        void handleImageUpload(files);
+      }
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.image_urls.length, previews.length]);
+
   const removeImage = (index: number) => {
     updateForm({ image_urls: form.image_urls.filter((_, i) => i !== index) });
   };

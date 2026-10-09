@@ -128,6 +128,24 @@ export default function ChatInput({
     if (file) onAttach(file, kind);
   };
 
+  // Ctrl+V with an image in the clipboard sends it as an attachment, the same
+  // path the paperclip button uses; text pastes are untouched.
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    if (disabled) return;
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of Array.from(items)) {
+      if (item.kind === 'file' && item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          e.preventDefault();
+          onAttach(file, 'image');
+          return;
+        }
+      }
+    }
+  };
+
   const startRecording = async () => {
     if (disabled || recording) return;
     if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
@@ -322,6 +340,7 @@ export default function ChatInput({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
             placeholder={t('messages.typeMessage')}
             disabled={disabled}
             className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] border border-transparent bg-gray-100/90 dark:bg-white/[0.06] px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:bg-white dark:focus:bg-white/[0.09] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"

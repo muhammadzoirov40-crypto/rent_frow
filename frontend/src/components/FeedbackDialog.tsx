@@ -97,6 +97,23 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
     }
   };
 
+  // Ctrl+V with a screenshot/image in the clipboard attaches it, anywhere in
+  // the dialog — plain text pastes keep their default behaviour.
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData?.items;
+    if (!items || uploading) return;
+    for (const item of Array.from(items)) {
+      if (item.kind === 'file' && item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          e.preventDefault();
+          void handleImage(file);
+          return;
+        }
+      }
+    }
+  };
+
   if (!open) return null;
 
   const canSubmit = title.trim().length > 0 && content.trim().length > 0 && !uploading && !mutation.isPending;
@@ -122,6 +139,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-label={t('feedback.dialogTitle')}
+        onPaste={handlePaste}
         className="relative w-full max-w-lg bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
       >
         <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/10">
