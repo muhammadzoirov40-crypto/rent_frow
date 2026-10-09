@@ -6,7 +6,7 @@ import {
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
   ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
   PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail, Crown, Pencil, Play,
-  MessageSquareQuote, ZoomIn,
+  MessageSquareQuote, ZoomIn, PieChart as PieChartIcon, Wallet,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -562,10 +562,10 @@ export default function AdminPage() {
   ];
 
   const statCards = [
-    { label: t('admin.platformStats') || t('admin.overview'), value: stats?.totalUsers ?? 0, icon: <Users className="w-6 h-6" />, color: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/20' },
-    { label: t('admin.activeListings') || t('admin.overview'), value: stats?.activeListings ?? 0, icon: <FileText className="w-6 h-6" />, color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/20' },
-    { label: t('admin.rentalRequests') || t('admin.overview'), value: stats?.rentalRequests ?? 0, icon: <ClipboardList className="w-6 h-6" />, color: 'from-amber-500 to-[var(--accent-hover)]', shadow: 'shadow-amber-500/20' },
-    { label: t('admin.completedRentals') || t('admin.overview'), value: stats?.completedRentals ?? 0, icon: <TrendingUp className="w-6 h-6" />, color: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/20' },
+    { label: t('admin.totalUsers'), value: stats?.totalUsers ?? 0, icon: <Users className="w-6 h-6" />, color: 'from-blue-500 to-indigo-600', shadow: 'shadow-blue-500/20' },
+    { label: t('admin.activeListings'), value: stats?.activeListings ?? 0, icon: <FileText className="w-6 h-6" />, color: 'from-emerald-500 to-teal-600', shadow: 'shadow-emerald-500/20' },
+    { label: t('admin.rentalRequests'), value: stats?.rentalRequests ?? 0, icon: <ClipboardList className="w-6 h-6" />, color: 'from-amber-500 to-[var(--accent-hover)]', shadow: 'shadow-amber-500/20' },
+    { label: t('admin.completedRentals'), value: stats?.completedRentals ?? 0, icon: <TrendingUp className="w-6 h-6" />, color: 'from-purple-500 to-pink-600', shadow: 'shadow-purple-500/20' },
   ];
 
   return (
@@ -634,7 +634,10 @@ export default function AdminPage() {
           {activeTab === 'dashboard' && (
             <div>
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.overview')}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                  <LayoutDashboard className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                  {t('admin.overview')}
+                </h1>
                 <p className="text-sm text-gray-500 mt-0.5">{t('admin.platformStats')}</p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -654,7 +657,10 @@ export default function AdminPage() {
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
                 <div className="lg:col-span-2 bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-4">{t('admin.chartRequests')}</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                    {t('admin.chartRequests')}
+                  </h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={chartData?.requestsByDay || []} margin={{ top: 5, right: 10, left: -18, bottom: 0 }}>
@@ -685,7 +691,10 @@ export default function AdminPage() {
                 </div>
 
                 <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
-                  <h3 className="font-bold text-gray-900 dark:text-white mb-4">{t('admin.chartListingsStatus')}</h3>
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
+                    <PieChartIcon className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                    {t('admin.chartListingsStatus')}
+                  </h3>
                   <div className="h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -723,7 +732,10 @@ export default function AdminPage() {
               </div>
 
               <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
-                <h3 className="font-bold text-gray-900 dark:text-white mb-4">{t('admin.recentActivity')}</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                  {t('admin.recentActivity')}
+                </h3>
                 <div className="space-y-3">
                   {[
                     { icon: <Users className="w-4 h-4" />, text: t('admin.newUser'), time: `5 ${t('admin.minutesAgo')}`, color: 'bg-blue-100 text-blue-600' },
@@ -752,7 +764,10 @@ export default function AdminPage() {
           {activeTab === 'crm' && (
             <div>
               <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.crm')}</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                  <BarChart3 className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                  {t('admin.crm')}
+                </h1>
                 <p className="text-sm text-gray-500 mt-0.5">{t('admin.crmSubtitle')}</p>
               </div>
 
@@ -791,7 +806,10 @@ export default function AdminPage() {
                   </div>
 
                   <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-4">{t('admin.pipeline')}</h3>
+                    <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                      {t('admin.pipeline')}
+                    </h3>
                     {crm.pipeline.length === 0 ? (
                       <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
                     ) : (
@@ -828,7 +846,10 @@ export default function AdminPage() {
 
                   <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
-                      <h3 className="font-bold text-gray-900 dark:text-white">{t('admin.recentRequests')}</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
+                        <ClipboardList className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                        {t('admin.recentRequests')}
+                      </h3>
                     </div>
                     {crm.recentRequests.length === 0 ? (
                       <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
@@ -864,7 +885,10 @@ export default function AdminPage() {
 
                   <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
-                      <h3 className="font-bold text-gray-900 dark:text-white">{t('admin.recentPayments')}</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
+                        <Wallet className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                        {t('admin.recentPayments')}
+                      </h3>
                     </div>
                     {crm.recentPayments.length === 0 ? (
                       <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
@@ -898,7 +922,10 @@ export default function AdminPage() {
 
                   <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
-                      <h3 className="font-bold text-gray-900 dark:text-white">{t('admin.recentUsers')}</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
+                        <Users className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
+                        {t('admin.recentUsers')}
+                      </h3>
                     </div>
                     {crm.recentUsers.length === 0 ? (
                       <div className="py-8 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
@@ -944,7 +971,10 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.usersManagement')}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                    <Users className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                    {t('admin.usersManagement')}
+                  </h1>
                   <p className="text-sm text-gray-500 mt-0.5">{t('admin.platformManagement')}</p>
                 </div>
                 <div className="relative">
@@ -1059,7 +1089,10 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.listingsManagement')}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                    <FileText className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                    {t('admin.listingsManagement')}
+                  </h1>
                   <p className="text-sm text-gray-500 mt-0.5">{t('admin.platformManagement')}</p>
                 </div>
                 <div className="relative">
@@ -1161,7 +1194,10 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.requestsManagement')}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                    <ClipboardList className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                    {t('admin.requestsManagement')}
+                  </h1>
                   <p className="text-sm text-gray-500 mt-0.5">{t('admin.platformManagement')}</p>
                 </div>
                 <div className="relative">
@@ -1423,7 +1459,10 @@ export default function AdminPage() {
 
               {/* Plans */}
               <div className="flex items-center justify-between mb-3">
-                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin.topPlansTitle')}</h2>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                  {t('admin.topPlansTitle')}
+                </h2>
               </div>
               <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                 <div className="overflow-x-auto">
@@ -1679,7 +1718,10 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.categoriesManagement')}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                    <FolderTree className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                    {t('admin.categoriesManagement')}
+                  </h1>
                   <p className="text-sm text-gray-500 mt-0.5">{t('admin.platformManagement')}</p>
                 </div>
                 <button
@@ -1747,7 +1789,10 @@ export default function AdminPage() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('admin.postsManagement')}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2.5">
+                    <MessageSquare className="w-6 h-6 text-[var(--accent)] shrink-0" aria-hidden="true" />
+                    {t('admin.postsManagement')}
+                  </h1>
                   <p className="text-sm text-gray-500 mt-0.5">{t('admin.postsSubtitle')}</p>
                 </div>
                 <div className="relative">
