@@ -38,7 +38,8 @@
     "myRentals": "My Rentals",
     "collapseSidebar": "Collapse menu",
     "expandSidebar": "Expand menu",
-    "menuSubtitle": "Main menu"
+    "menuSubtitle": "Main menu",
+    "buyVip": "Buy VIP"
   },
   "sidebar": {
     "brand": "RentHub",
@@ -1314,5 +1315,12 @@
     "dur_1d": "1 day",
     "dur_1w": "1 week",
     "dur_1m": "1 month"
+  },
+  "vip": {
+    "title": "Buy VIP",
+    "pickHint": "Choose one of your active listings to promote it",
+    "empty": "No active listings",
+    "emptyHint": "Create an active listing first, then buy it here",
+    "create": "Create a listing"
   }
 }

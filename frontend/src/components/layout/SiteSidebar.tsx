@@ -4,12 +4,14 @@ import { useTranslation } from 'react-i18next';
 import {
   Bell,
   ClipboardList,
+  Crown,
   Heart,
   Home,
   LayoutDashboard,
   LogOut,
   MessageSquare,
   MessageSquareQuote,
+  Package,
   PanelLeft,
   PanelLeftClose,
   Search,
@@ -19,6 +21,7 @@ import {
 } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import FeedbackDialog from '../FeedbackDialog';
+import BuyVipModal from '../dashboard/BuyVipModal';
 import { useQuery } from '@tanstack/react-query';
 import { notifications as notificationsApi } from '../../api/index';
 
@@ -29,9 +32,10 @@ interface SiteSidebarProps {
 
 export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   const { t } = useTranslation();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [vipOpen, setVipOpen] = useState(false);
 
   const { data: unreadNotifData } = useQuery({
     queryKey: ['unread-count'],
@@ -41,7 +45,14 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   });
   const unreadNotifs = unreadNotifData?.count || 0;
 
-  const isActive = (to: string) => (to === '/' ? pathname === '/' : pathname.startsWith(to));
+  const isActive = (to: string) => {
+    const [path, query] = to.split('?');
+    const pathOk = path === '/' ? pathname === '/' : pathname.startsWith(path);
+    if (!pathOk) return false;
+    if (query) return search === `?${query}`;
+    // /dashboard steps aside while its listings tab is the one on screen
+    return !(path === '/dashboard' && search.includes('tab=listings'));
+  };
 
   const linkClass = (to: string) =>
     `w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 ${
@@ -64,6 +75,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
 
   const userItems = [
     { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: isAuthenticated },
+    { to: '/dashboard?tab=listings', label: t('dashboard.nav.listings'), icon: Package, show: isAuthenticated },
     { to: '/profile', label: t('nav.profile'), icon: User, show: isAuthenticated },
     { to: '/settings', label: t('nav.settings'), icon: Settings, show: isAuthenticated },
     { to: '/admin', label: t('nav.adminDashboard'), icon: Shield, show: user?.role === 'ADMIN' },
@@ -144,6 +156,25 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
               </Link>
             ))}
 
+          {/* VIP purchase — opens the listing picker + plan chooser right
+              here, without hunting through the dashboard first */}
+          {isAuthenticated && (
+            <button
+              type="button"
+              onClick={() => setVipOpen(true)}
+              title={collapsed ? t('nav.buyVip') : undefined}
+              data-testid="nav-buy-vip"
+              className={`w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 ${
+                collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
+              } text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-300/50 dark:border-amber-500/30`}
+            >
+              <span className="shrink-0">
+                <Crown className="w-5 h-5" />
+              </span>
+              {!collapsed && <span className="truncate">{t('nav.buyVip')}</span>}
+            </button>
+          )}
+
           {/* Feedback — sent as a pending post, moderated in Admin → Постҳо */}
           {isAuthenticated && (
             <button
@@ -183,6 +214,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
         </div>
       </aside>
       <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <BuyVipModal open={vipOpen} onClose={() => setVipOpen(false)} />
     </>
   );
 }

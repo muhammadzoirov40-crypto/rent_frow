@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import {
   Bell,
   ClipboardList,
+  Crown,
   Heart,
   Home,
   LayoutDashboard,
@@ -12,6 +13,7 @@ import {
   MessageSquare,
   MessageSquareQuote,
   Moon,
+  Package,
   Search,
   Settings,
   Shield,
@@ -22,6 +24,7 @@ import {
 import useAuthStore from '../../store/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
 import FeedbackDialog from '../FeedbackDialog';
+import BuyVipModal from '../dashboard/BuyVipModal';
 
 const LANGUAGES = [
   { code: 'tj', label: 'Тоҷикӣ', flag: '🇹🇯' },
@@ -36,15 +39,16 @@ interface MobileSidebarProps {
 
 export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const { t, i18n } = useTranslation();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [vipOpen, setVipOpen] = useState(false);
 
   useEffect(() => {
     onClose();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, search]);
 
   useEffect(() => {
     if (!open) return;
@@ -60,7 +64,14 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     localStorage.setItem('language', code);
   };
 
-  const isActive = (to: string) => (to === '/' ? pathname === '/' : pathname.startsWith(to));
+  const isActive = (to: string) => {
+    const [path, query] = to.split('?');
+    const pathOk = path === '/' ? pathname === '/' : pathname.startsWith(path);
+    if (!pathOk) return false;
+    if (query) return search === `?${query}`;
+    // /dashboard steps aside while its listings tab is the one on screen
+    return !(path === '/dashboard' && search.includes('tab=listings'));
+  };
 
   const linkClass = (to: string) =>
     `w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
@@ -83,6 +94,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
   const userItems = [
     { to: '/dashboard', label: t('nav.dashboard'), icon: LayoutDashboard, show: isAuthenticated },
+    { to: '/dashboard?tab=listings', label: t('dashboard.nav.listings'), icon: Package, show: isAuthenticated },
     { to: '/profile', label: t('nav.profile'), icon: User, show: isAuthenticated },
     { to: '/settings', label: t('nav.settings'), icon: Settings, show: isAuthenticated },
     { to: '/admin', label: t('nav.adminDashboard'), icon: Shield, show: user?.role === 'ADMIN' },
@@ -184,6 +196,22 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                     <span className="truncate">{item.label}</span>
                   </Link>
                 ))}
+              {/* VIP purchase — same chooser as the dashboard's TOP modal,
+                  reachable without leaving the menu */}
+              <button
+                type="button"
+                onClick={() => {
+                  setVipOpen(true);
+                  onClose();
+                }}
+                data-testid="nav-buy-vip"
+                className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-500/10 transition"
+              >
+                <span className="text-amber-500">
+                  <Crown className="w-5 h-5" />
+                </span>
+                <span className="truncate">{t('nav.buyVip')}</span>
+              </button>
               {/* Feedback — sent as a pending post, moderated in Admin → Постҳо */}
               <button
                 type="button"
@@ -248,6 +276,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
         </div>
       </aside>
       <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <BuyVipModal open={vipOpen} onClose={() => setVipOpen(false)} />
     </>
   );
 }

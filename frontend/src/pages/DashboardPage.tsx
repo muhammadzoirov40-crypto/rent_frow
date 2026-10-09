@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { WALLET_ENABLED } from '../config/features';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { AlertCircle, ArrowDownRight, ArrowUpRight, CalendarCheck, CheckCircle2, ClipboardList, Clock, DollarSign, Home, Inbox, LayoutGrid, MessageSquare, Percent, PlusCircle, Ticket } from 'lucide-react';
 import {
   AreaChart,
@@ -147,6 +147,23 @@ export default function DashboardPage() {
   const isOwnerLike = !!user && (user.role === 'OWNER' || user.role === 'ADMIN');
 
   const [active, setActive] = useState<DashboardSection>('dashboard');
+  // Deep link (?tab=listings) from the sidebar menu, kept in sync both ways:
+  // the URL names the section, so the menu always knows which of its own
+  // entries is on screen even after navigating inside the dashboard.
+  const [searchParams, setSearchParams] = useSearchParams();
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (
+      tab &&
+      ['dashboard', 'listings', 'bookings', 'calendar', 'messages', 'reviews', 'earnings', 'wallet', 'profile', 'settings'].includes(tab)
+    ) {
+      setActive(tab as DashboardSection);
+    }
+  }, [searchParams]);
+  const navigateTo = (section: DashboardSection) => {
+    setActive(section);
+    setSearchParams(section === 'dashboard' ? {} : { tab: section }, { replace: true });
+  };
   const [period, setPeriod] = useState<RevenuePeriod>('30days');
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [revenue, setRevenue] = useState<RevenueChartResponse | null>(null);
@@ -447,7 +464,7 @@ export default function DashboardPage() {
             <h2 className="font-semibold">{t('dashboard.overview.recentBookings')}</h2>
             <button
               type="button"
-              onClick={() => setActive('bookings')}
+              onClick={() => navigateTo('bookings')}
               className="text-xs font-semibold text-[var(--accent)] hover:underline"
             >
               {t('dashboard.overview.viewAll')}
@@ -533,7 +550,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <DashboardLayout active={active} onNavigate={setActive}>
+    <DashboardLayout active={active} onNavigate={navigateTo}>
       {renderSection()}
     </DashboardLayout>
   );
