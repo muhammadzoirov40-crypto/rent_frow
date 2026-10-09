@@ -6,7 +6,7 @@ import {
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
   ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
   PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail, Crown, Pencil, Play,
-  MessageSquareQuote,
+  MessageSquareQuote, ZoomIn,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -1816,7 +1816,25 @@ export default function AdminPage() {
                             >
                               <div className="flex items-center gap-3">
                                 {p.image_url ? (
-                                  <img src={p.image_url} alt="" className="w-12 h-12 rounded-xl object-cover shrink-0" />
+                                  /* The 48px thumbnail can never show a real
+                                     screenshot, so it wears a zoom badge that
+                                     says out loud: click me, the full photo
+                                     lives in the detail sheet. */
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setPostDetail(p);
+                                    }}
+                                    title={t('admin.viewPhoto')}
+                                    className="relative w-12 h-12 rounded-xl overflow-hidden shrink-0 group"
+                                    data-testid={`post-photo-${p.id}`}
+                                  >
+                                    <img src={p.image_url} alt="" className="w-full h-full object-cover" />
+                                    <span className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                                      <ZoomIn className="w-4 h-4 text-white" aria-hidden="true" />
+                                    </span>
+                                  </button>
                                 ) : (
                                   <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0">
                                     <ImageIcon className="w-5 h-5 text-gray-400" />
@@ -1905,7 +1923,7 @@ export default function AdminPage() {
                     role="dialog"
                     aria-modal="true"
                     data-testid="post-detail-modal"
-                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto"
+                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-2xl shadow-2xl max-h-[85vh] overflow-y-auto"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
@@ -1933,12 +1951,16 @@ export default function AdminPage() {
                     </div>
 
                     {postDetail.image_url && (
-                      <a href={postDetail.image_url} target="_blank" rel="noreferrer" className="block mb-3">
+                      <a href={postDetail.image_url} target="_blank" rel="noreferrer" className="block mb-3 group">
                         <img
                           src={postDetail.image_url}
                           alt=""
-                          className="w-full max-h-80 object-contain rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
+                          className="w-full max-h-[60vh] object-contain rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
                         />
+                        <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent)]">
+                          <ZoomIn className="w-3.5 h-3.5" aria-hidden="true" />
+                          {t('admin.viewPhoto')}
+                        </span>
                       </a>
                     )}
 

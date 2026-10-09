@@ -968,7 +968,8 @@
     "feedbackBadge": "Фидбек",
     "filterAll": "Все",
     "filterEmpty": "В этой вкладке ничего нет",
-    "postDetail": "Открыть детали поста"
+    "postDetail": "Открыть детали поста",
+    "viewPhoto": "Просмотр фото"
   },
   "feedback": {
     "title": "Обратная связь",

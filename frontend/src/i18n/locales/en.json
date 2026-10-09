@@ -968,7 +968,8 @@
     "feedbackBadge": "Feedback",
     "filterAll": "All",
     "filterEmpty": "Nothing in this filter",
-    "postDetail": "Open post details"
+    "postDetail": "Open post details",
+    "viewPhoto": "View photo"
   },
   "feedback": {
     "title": "Feedback",
