@@ -529,6 +529,25 @@
       "rental_ended": {
         "title": "Срок аренды завершён",
         "body": "Срок аренды «{{listing}}» истёк."
+      },
+      "top_request": {
+        "title": "Новый запрос TOP"
+      },
+      "top_activated": {
+        "title": "TOP активирован",
+        "body": "«{{listing}}» теперь в разделе TOP"
+      },
+      "top_approved": {
+        "title": "Запрос TOP одобрен",
+        "body": "Продвижение «{{listing}}» одобрено"
+      },
+      "top_rejected": {
+        "title": "Запрос TOP отклонён",
+        "body": "Продвижение «{{listing}}» отклонено"
+      },
+      "top_cancelled": {
+        "title": "TOP отменён",
+        "body": "Продвижение «{{listing}}» отменено"
       }
     },
     "markAllReadSuccess": "Все уведомления отмечены как прочитанные",
@@ -539,7 +558,8 @@
       "message": "Сообщение",
       "comment": "Комментарий",
       "rating": "Оценка",
-      "reason": "Причина"
+      "reason": "Причина",
+      "plan": "Тариф"
     },
     "reasons": {
       "deleted_by_owner": "удалено владельцем",
@@ -882,7 +902,69 @@
     "chartRequests": "Заявки на аренду — последние 30 дней",
     "chartListingsStatus": "Объявления по статусам",
     "rejectReasonLabel": "Причина отклонения (необязательно)",
-    "menu": "Меню"
+    "menu": "Меню",
+    "topTab": "TOP",
+    "topManagement": "Управление TOP-продвижением",
+    "topHint": "Тарифы, запросы и финансовая отчётность",
+    "topAddPlan": "Новый тариф",
+    "topEditPlan": "Редактировать тариф",
+    "topPlanName": "Название тарифа",
+    "topPlanVisible": "Показывать тариф пользователям",
+    "topPlanSaved": "Тариф сохранён",
+    "topEdit": "Изменить",
+    "topRevenue": "Выручка (оплачено)",
+    "topFilterAll": "Все",
+    "topSearchPlaceholder": "ID объявления",
+    "topDetailTitle": "Детали TOP",
+    "topRejectTitle": "Отклонить запрос",
+    "topRejectPlaceholder": "Причина отказа (необязательно)",
+    "topApproved": "Запрос одобрен",
+    "topRejected": "Запрос отклонён",
+    "topCancelled": "TOP отменён (возврат выполнен)",
+    "topActivated": "TOP активирован",
+    "topPlansTitle": "Тарифы",
+    "topStats": {
+      "total": "Всего",
+      "active": "Активных",
+      "pending": "Ожидают",
+      "expired": "Истёк",
+      "rejected": "Отклонено"
+    },
+    "topTable": {
+      "listing": "Объявление",
+      "user": "Пользователь",
+      "plan": "Тариф",
+      "price": "Цена",
+      "status": "Статус",
+      "payment": "Оплата"
+    },
+    "topStatus": {
+      "PENDING": "Ожидает",
+      "ACTIVE": "Активен",
+      "EXPIRED": "Истёк",
+      "REJECTED": "Отклонён",
+      "CANCELLED": "Отменён"
+    },
+    "topPayment": {
+      "UNPAID": "Не оплачено",
+      "PAID": "Оплачено",
+      "APPROVED": "Одобрено",
+      "REFUNDED": "Возвращено"
+    },
+    "topActions": {
+      "detail": "Детали",
+      "approve": "Одобрить",
+      "reject": "Отклонить",
+      "cancel": "Отменить (возврат)",
+      "activate": "Активировать"
+    },
+    "topField": {
+      "created": "Дата запроса",
+      "started": "Начало",
+      "expires": "Окончание",
+      "listingId": "ID объявления",
+      "rejectReason": "Причина отказа"
+    }
   },
   "feedback": {
     "title": "Обратная связь",
@@ -994,7 +1076,8 @@
       "yesDelete": "Да, удалить",
       "pauseTitle": "Снять объявление с публикации?",
       "pauseText": "Объявление перестанет отображаться в поиске.",
-      "yesPause": "Да, поставить на паузу"
+      "yesPause": "Да, поставить на паузу",
+      "makeTop": "Сделать TOP"
     },
     "bookings": {
       "filterAll": "Все",
@@ -1197,5 +1280,31 @@
     "sugExplore": "Что можно взять в аренду в Душанбе?",
     "found": "Найдено",
     "disclaimer": "Ответы ИИ. Всегда сверяйтесь со страницей объявления."
+  },
+  "top": {
+    "sectionTitle": "Лучшие (TOP)",
+    "sectionHint": "Продвигаемые объявления, которые активны сейчас",
+    "badge": "TOP",
+    "modalTitle": "Тариф TOP",
+    "modalHint": "Выберите длительность и тариф. Цену установил администратор.",
+    "plansEmpty": "Активных тарифов нет",
+    "free": "Бесплатно",
+    "priceLabel": "Цена",
+    "durationLabel": "Длительность",
+    "balanceLabel": "Баланс",
+    "pendingNote": "Если баланса не хватит, запрос уйдёт на подтверждение администратора.",
+    "insufficientNote": "Недостаточно баланса — запрос уйдёт на подтверждение администратора.",
+    "confirm": "Подтвердить",
+    "createdActive": "TOP активирован",
+    "createdPending": "Запрос отправлен на подтверждение администратора",
+    "alreadyExists": "Для этого объявления уже есть запрос TOP",
+    "listingNotActive": "Продвигать можно только активные объявления",
+    "requestFailed": "Не удалось отправить запрос",
+    "activeUntilShort": "TOP до {{date}}",
+    "pendingChip": "Запрос TOP",
+    "dur_3h": "3 часа",
+    "dur_1d": "1 день",
+    "dur_1w": "1 неделя",
+    "dur_1m": "1 месяц"
   }
 }

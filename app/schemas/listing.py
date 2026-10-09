@@ -122,6 +122,9 @@ class ListingResponse(BaseModel):
     district_name: Optional[str] = None
     is_favorited: bool = False
     average_rating: float = 0
+    # True while a paid TOP window is live - drives the badge on the detail
+    # page, same server-side rule as the list flag.
+    is_top: bool = False
 
 
 class ListingListResponse(BaseModel):
@@ -143,6 +146,10 @@ class ListingListResponse(BaseModel):
     is_verified: bool = False
     created_at: datetime
     is_favorited: bool = False
+    # True while a paid TOP window is live (expires_at in the future). The
+    # badge and the homepage TOP section are both driven by this flag - the
+    # browser never decides it.
+    is_top: bool = False
     # Map position: the listing's own pin, or the city centroid as fallback.
     latitude: Optional[float] = None
     longitude: Optional[float] = None

@@ -529,6 +529,25 @@
       "rental_ended": {
         "title": "Мӯҳлати иҷора тамом шуд",
         "body": "Мӯҳлати иҷораи «{{listing}}» тамом шуд."
+      },
+      "top_request": {
+        "title": "Дархости TOP нав"
+      },
+      "top_activated": {
+        "title": "TOP фаъол шуд",
+        "body": "«{{listing}}» ҳоло дар бахши TOP аст"
+      },
+      "top_approved": {
+        "title": "Дархости TOP тасдиқ шуд",
+        "body": "Таблиғи «{{listing}}» тасдиқ карда шуд"
+      },
+      "top_rejected": {
+        "title": "Дархости TOP рад шуд",
+        "body": "Таблиғи «{{listing}}» рад карда шуд"
+      },
+      "top_cancelled": {
+        "title": "TOP бекор карда шуд",
+        "body": "Таблиғи «{{listing}}» бекор карда шуд"
       }
     },
     "markAllReadSuccess": "Ҳамаи хабардиҳиҳо ҳамчун хондашуда нишон дода шуд",
@@ -539,7 +558,8 @@
       "message": "Паём",
       "comment": "Шарҳ",
       "rating": "Баҳо",
-      "reason": "Сабаб"
+      "reason": "Сабаб",
+      "plan": "Барнома"
     },
     "reasons": {
       "deleted_by_owner": "аз ҷониби соҳиб нест карда шуд",
@@ -882,7 +902,69 @@
     "chartRequests": "Дархостҳои иҷора — 30 рӯзи охир",
     "chartListingsStatus": "Эълонҳо аз рӯи ҳолат",
     "rejectReasonLabel": "Сабаби рад кардан (ихтиёрӣ)",
-    "menu": "Меню"
+    "menu": "Меню",
+    "topTab": "TOP",
+    "topManagement": "Идоракунии TOP таблиғ",
+    "topHint": "Барномаҳо, дархостҳо ва ҳисоботи молиявӣ",
+    "topAddPlan": "Барномаи нав",
+    "topEditPlan": "Таҳрири барнома",
+    "topPlanName": "Номи барнома",
+    "topPlanVisible": "Барнома барои корбарон намоён бошад",
+    "topPlanSaved": "Барнома нигоҳ дошта шуд",
+    "topEdit": "Ислоҳ",
+    "topRevenue": "Даромад (пардохтшуда)",
+    "topFilterAll": "Ҳама",
+    "topSearchPlaceholder": "ID-и эълон",
+    "topDetailTitle": "Тафсилоти TOP",
+    "topRejectTitle": "Дархостро рад кардан",
+    "topRejectPlaceholder": "Сабаби радкунӣ (ихтиёрӣ)",
+    "topApproved": "Дархост тасдиқ шуд",
+    "topRejected": "Дархост рад шуд",
+    "topCancelled": "TOP бекор шуд (пул баргардонида шуд)",
+    "topActivated": "TOP фаъол карда шуд",
+    "topPlansTitle": "Барномаҳои нархгузорӣ",
+    "topStats": {
+      "total": "Ҳамумӣ",
+      "active": "Фаъол",
+      "pending": "Дар интизор",
+      "expired": "Анҷомёфта",
+      "rejected": "Радшуда"
+    },
+    "topTable": {
+      "listing": "Эълон",
+      "user": "Корбар",
+      "plan": "Барнома",
+      "price": "Нарх",
+      "status": "Ҳолат",
+      "payment": "Пардохт"
+    },
+    "topStatus": {
+      "PENDING": "Дар интизор",
+      "ACTIVE": "Фаъол",
+      "EXPIRED": "Анҷомёфта",
+      "REJECTED": "Радшуда",
+      "CANCELLED": "Бекоршуда"
+    },
+    "topPayment": {
+      "UNPAID": "Пардохт нашуда",
+      "PAID": "Пардохтшуда",
+      "APPROVED": "Тасдиқшуда",
+      "REFUNDED": "Баргардонида шуд"
+    },
+    "topActions": {
+      "detail": "Тафсилот",
+      "approve": "Тасдиқ",
+      "reject": "Рад",
+      "cancel": "Бекор (баргардонидан)",
+      "activate": "Фаъол кардан"
+    },
+    "topField": {
+      "created": "Санаи дархост",
+      "started": "Оғоз",
+      "expires": "Анҷом",
+      "listingId": "ID-и эълон",
+      "rejectReason": "Сабаби радкунӣ"
+    }
   },
   "feedback": {
     "title": "Фидбэк",
@@ -994,7 +1076,8 @@
       "yesDelete": "Ҳа, нест кун",
       "pauseTitle": "Эълон аз нашр гирифта шавад?",
       "pauseText": "Эълон аз ҷустуҷӯ хориҷ мешавад.",
-      "yesPause": "Ҳа, истодан"
+      "yesPause": "Ҳа, истодан",
+      "makeTop": "TOP кардан"
     },
     "bookings": {
       "filterAll": "Ҳама",
@@ -1197,5 +1280,31 @@
     "sugExplore": "Дар Душанбе чӣ чизҳо барои иҷора ҳаст?",
     "found": "Дарёфт шуд",
     "disclaimer": "Ҷавоби AI. Ҳамеша дар саҳифаи объект санҷед."
+  },
+  "top": {
+    "sectionTitle": "Беҳтаринҳо (TOP)",
+    "sectionHint": "Эълонҳои таблиғшуда, ки ҳоло фаъоланд",
+    "badge": "TOP",
+    "modalTitle": "Барномаи TOP",
+    "modalHint": "Дарозӣ ва барномаро интихоб кунед. Нархро администратор муқаррар кардааст.",
+    "plansEmpty": "Барномаҳои фаъол вуҷуд надоранд",
+    "free": "Ройгон",
+    "priceLabel": "Нарх",
+    "durationLabel": "Дарозӣ",
+    "balanceLabel": "Баланс",
+    "pendingNote": "Агар баланс кофӣ набошад, дархост ба тасдиқи админ меравад.",
+    "insufficientNote": "Баланс кофӣ нест — дархост ба тасдиқи админ меравад.",
+    "confirm": "Тасдиқ кардан",
+    "createdActive": "TOP фаъол шуд",
+    "createdPending": "Дархост ба тасдиқи админ фиристода шуд",
+    "alreadyExists": "Барои ин эълон аллакай дархости TOP вуҷуд дорад",
+    "listingNotActive": "Танҳо эълонҳои фаъолро TOP кардан мумкин аст",
+    "requestFailed": "Дархост иҷро нашуд",
+    "activeUntilShort": "TOP то {{date}}",
+    "pendingChip": "Дархости TOP",
+    "dur_3h": "3 соат",
+    "dur_1d": "1 рӯз",
+    "dur_1w": "1 ҳафта",
+    "dur_1m": "1 моҳ"
   }
 }

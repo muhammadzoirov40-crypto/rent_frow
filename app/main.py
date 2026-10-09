@@ -36,14 +36,17 @@ async def lifespan(app: FastAPI):
 
     from app.services.listing_expiry import run_expiry_loop
     from app.services.rental_expiry import run_rental_expiry_loop
+    from app.services.top_expiry import run_top_expiry_loop
     expiry_task = asyncio.create_task(run_expiry_loop())
     rental_expiry_task = asyncio.create_task(run_rental_expiry_loop())
+    top_expiry_task = asyncio.create_task(run_top_expiry_loop())
     try:
         yield
     finally:
         expiry_task.cancel()
         rental_expiry_task.cancel()
-        for task in (expiry_task, rental_expiry_task):
+        top_expiry_task.cancel()
+        for task in (expiry_task, rental_expiry_task, top_expiry_task):
             try:
                 await task
             except asyncio.CancelledError:

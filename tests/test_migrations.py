@@ -138,7 +138,8 @@ def test_a_database_the_old_startup_code_built_is_recognised_and_caught_up(
         asyncio.run(async_engine.dispose())
 
     assert any("never stamped" in note for note in notes), notes
-    assert any("b4e9d2c7f1a8" in note for note in notes), notes
+    # the catch-up must land on the current head (the TOP promotion revision)
+    assert any("c7d2e5a9f3b1" in note for note in notes), notes
 
     engine = create_engine(f"sqlite:///{alembic_db}")
     try:
@@ -149,7 +150,7 @@ def test_a_database_the_old_startup_code_built_is_recognised_and_caught_up(
             ).scalar_one()
     finally:
         engine.dispose()
-    assert stamped == "b4e9d2c7f1a8"
+    assert stamped == "c7d2e5a9f3b1"
 
 
 def test_running_the_migrations_again_changes_nothing(alembic_db):

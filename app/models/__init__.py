@@ -24,6 +24,7 @@ from app.models.otp_code import OtpCode
 from app.models.post import Post
 from app.models.comment import Comment
 from app.models.like import Like
+from app.models.promotion import TopPlan, TopPromotion
 
 __all__ = [
     "User",
@@ -54,4 +55,6 @@ __all__ = [
     "Post",
     "Comment",
     "Like",
+    "TopPlan",
+    "TopPromotion",
 ]

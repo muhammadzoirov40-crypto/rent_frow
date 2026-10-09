@@ -529,6 +529,25 @@
       "rental_ended": {
         "title": "Rental period over",
         "body": "The rental period for \"{{listing}}\" has ended."
+      },
+      "top_request": {
+        "title": "New TOP request"
+      },
+      "top_activated": {
+        "title": "TOP activated",
+        "body": "«{{listing}}» is now in the TOP section"
+      },
+      "top_approved": {
+        "title": "TOP request approved",
+        "body": "The promotion of «{{listing}}» was approved"
+      },
+      "top_rejected": {
+        "title": "TOP request rejected",
+        "body": "The promotion of «{{listing}}» was rejected"
+      },
+      "top_cancelled": {
+        "title": "TOP cancelled",
+        "body": "The promotion of «{{listing}}» was cancelled"
       }
     },
     "markAllReadSuccess": "All notifications marked as read",
@@ -539,7 +558,8 @@
       "message": "Message",
       "comment": "Comment",
       "rating": "Rating",
-      "reason": "Reason"
+      "reason": "Reason",
+      "plan": "Plan"
     },
     "reasons": {
       "deleted_by_owner": "deleted by owner",
@@ -882,7 +902,69 @@
     "chartRequests": "Rental requests — last 30 days",
     "chartListingsStatus": "Listings by status",
     "rejectReasonLabel": "Rejection reason (optional)",
-    "menu": "Menu"
+    "menu": "Menu",
+    "topTab": "TOP",
+    "topManagement": "TOP promotion management",
+    "topHint": "Plans, requests and financial stats",
+    "topAddPlan": "New plan",
+    "topEditPlan": "Edit plan",
+    "topPlanName": "Plan name",
+    "topPlanVisible": "Visible to users",
+    "topPlanSaved": "Plan saved",
+    "topEdit": "Edit",
+    "topRevenue": "Revenue (paid)",
+    "topFilterAll": "All",
+    "topSearchPlaceholder": "Listing ID",
+    "topDetailTitle": "TOP details",
+    "topRejectTitle": "Reject request",
+    "topRejectPlaceholder": "Rejection reason (optional)",
+    "topApproved": "Request approved",
+    "topRejected": "Request rejected",
+    "topCancelled": "TOP cancelled (refunded)",
+    "topActivated": "TOP activated",
+    "topPlansTitle": "Pricing plans",
+    "topStats": {
+      "total": "Total",
+      "active": "Active",
+      "pending": "Pending",
+      "expired": "Expired",
+      "rejected": "Rejected"
+    },
+    "topTable": {
+      "listing": "Listing",
+      "user": "User",
+      "plan": "Plan",
+      "price": "Price",
+      "status": "Status",
+      "payment": "Payment"
+    },
+    "topStatus": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "EXPIRED": "Expired",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Cancelled"
+    },
+    "topPayment": {
+      "UNPAID": "Unpaid",
+      "PAID": "Paid",
+      "APPROVED": "Approved",
+      "REFUNDED": "Refunded"
+    },
+    "topActions": {
+      "detail": "Details",
+      "approve": "Approve",
+      "reject": "Reject",
+      "cancel": "Cancel (refund)",
+      "activate": "Activate"
+    },
+    "topField": {
+      "created": "Requested",
+      "started": "Started",
+      "expires": "Expires",
+      "listingId": "Listing ID",
+      "rejectReason": "Rejection reason"
+    }
   },
   "feedback": {
     "title": "Feedback",
@@ -994,7 +1076,8 @@
       "yesDelete": "Yes, delete",
       "pauseTitle": "Unpublish listing?",
       "pauseText": "The listing will no longer appear in search.",
-      "yesPause": "Yes, pause"
+      "yesPause": "Yes, pause",
+      "makeTop": "Make TOP"
     },
     "bookings": {
       "filterAll": "All",
@@ -1197,5 +1280,31 @@
     "sugExplore": "What can I rent in Dushanbe?",
     "found": "Found",
     "disclaimer": "AI answers. Always double-check the details on the listing page."
+  },
+  "top": {
+    "sectionTitle": "Top listings",
+    "sectionHint": "Promoted listings that are live right now",
+    "badge": "TOP",
+    "modalTitle": "TOP plan",
+    "modalHint": "Pick a duration and plan. The price is set by the admin.",
+    "plansEmpty": "No active plans yet",
+    "free": "Free",
+    "priceLabel": "Price",
+    "durationLabel": "Duration",
+    "balanceLabel": "Balance",
+    "pendingNote": "If the balance is not enough, the request goes to the admin for approval.",
+    "insufficientNote": "Not enough balance — the request goes to the admin for approval.",
+    "confirm": "Confirm",
+    "createdActive": "TOP is active",
+    "createdPending": "Request sent for admin approval",
+    "alreadyExists": "This listing already has a TOP request",
+    "listingNotActive": "Only active listings can be promoted",
+    "requestFailed": "Request failed",
+    "activeUntilShort": "TOP until {{date}}",
+    "pendingChip": "TOP request",
+    "dur_3h": "3 hours",
+    "dur_1d": "1 day",
+    "dur_1w": "1 week",
+    "dur_1m": "1 month"
   }
 }

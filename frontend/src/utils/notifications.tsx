@@ -11,6 +11,7 @@ import {
   MessageCircle,
   MessageSquare,
   Star,
+  Crown,
   XCircle,
 } from 'lucide-react';
 
@@ -137,6 +138,31 @@ const TYPE_META: Record<string, TypeMeta> = {
     titleKey: 'notifications.types.rental_ended.title',
     bodyKey: 'notifications.types.rental_ended.body',
   },
+  top_request: {
+    titleKey: 'notifications.types.top_request.title',
+    detailKeys: [
+      ['user_name', 'notifications.labels.user'],
+      ['listing_title', 'notifications.labels.listing'],
+      ['plan_name', 'notifications.labels.plan'],
+    ],
+  },
+  top_activated: {
+    titleKey: 'notifications.types.top_activated.title',
+    bodyKey: 'notifications.types.top_activated.body',
+  },
+  top_approved: {
+    titleKey: 'notifications.types.top_approved.title',
+    bodyKey: 'notifications.types.top_approved.body',
+  },
+  top_rejected: {
+    titleKey: 'notifications.types.top_rejected.title',
+    bodyKey: 'notifications.types.top_rejected.body',
+    detailKeys: [['reason', 'notifications.labels.reason']],
+  },
+  top_cancelled: {
+    titleKey: 'notifications.types.top_cancelled.title',
+    bodyKey: 'notifications.types.top_cancelled.body',
+  },
 };
 
 interface TypeStyle {
@@ -225,6 +251,31 @@ export const NOTIFICATION_TYPE_STYLE: Record<string, TypeStyle> = {
     icon: <CalendarX className="w-5 h-5" />,
     color: 'text-[var(--accent-hover)]',
     bgColor: 'bg-[rgb(var(--accent-rgb)/0.1)]',
+  },
+  top_request: {
+    icon: <Crown className="w-5 h-5" />,
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+  },
+  top_activated: {
+    icon: <Crown className="w-5 h-5" />,
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+  },
+  top_approved: {
+    icon: <Crown className="w-5 h-5" />,
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+  },
+  top_rejected: {
+    icon: <XCircle className="w-5 h-5" />,
+    color: 'text-red-600',
+    bgColor: 'bg-red-100',
+  },
+  top_cancelled: {
+    icon: <XCircle className="w-5 h-5" />,
+    color: 'text-gray-600',
+    bgColor: 'bg-gray-100',
   },
   default: {
     icon: <Bell className="w-5 h-5" />,
@@ -341,6 +392,16 @@ export function getNotificationRoute(notification: NotificationLike): string | n
     case 'rental_ending_soon':
     case 'rental_ended':
       return listingId ? `/listing/${listingId}` : '/rental-requests';
+    case 'top_request':
+      // The admin is sent to the TOP management tab to approve or reject.
+      return '/admin';
+    case 'top_activated':
+    case 'top_approved':
+      // The owner sees the live badge on the listing itself.
+      return listingId ? `/listing/${listingId}` : '/dashboard';
+    case 'top_rejected':
+    case 'top_cancelled':
+      return '/dashboard';
     default:
       return null;
   }

@@ -112,6 +112,8 @@ class WalletTransactionType(str, enum.Enum):
               payment exists) and is now given back.
     COMPLETED the reserved rent is settled: it leaves the wallet for good when
               the rental is completed.
+    PROMO     a TOP promotion was bought: the price leaves the available
+              balance for good, recorded once per promotion.
     """
 
     TOPUP = "TOPUP"
@@ -119,6 +121,7 @@ class WalletTransactionType(str, enum.Enum):
     RELEASED = "RELEASED"
     REFUNDED = "REFUNDED"
     COMPLETED = "COMPLETED"
+    PROMO = "PROMO"
 
 
 class MaintenanceStatus(str, enum.Enum):
@@ -149,3 +152,35 @@ class NotificationType(str, enum.Enum):
     LISTING_DEACTIVATED = "listing_deactivated"
     LISTING_REQUEST_INFO = "listing_request_info"
     RENTAL_ENDING = "rental_ending"
+
+
+class TopPromotionStatus(str, enum.Enum):
+    """Lifecycle of one paid TOP window.
+
+    PENDING   requested, not paid and not yet approved - never shown as TOP.
+    ACTIVE    paid or approved: ``expires_at`` is live, the badge shows.
+    EXPIRED   the window ran out server-side; history, no badge, no re-charge.
+    REJECTED  admin declined the request (``reject_reason`` says why).
+    CANCELLED admin deactivated an active window by hand.
+    """
+
+    PENDING = "PENDING"
+    ACTIVE = "ACTIVE"
+    EXPIRED = "EXPIRED"
+    REJECTED = "REJECTED"
+    CANCELLED = "CANCELLED"
+
+
+class TopPromotionPayment(str, enum.Enum):
+    """How (and whether) the promotion was paid for.
+
+    UNPAID   awaiting money or an admin decision - status stays PENDING.
+    PAID     charged from the wallet at request time (server-side CAS).
+    APPROVED an admin authorised it without a wallet charge.
+    REFUNDED PAID, then given back when an admin deactivated the window.
+    """
+
+    UNPAID = "UNPAID"
+    PAID = "PAID"
+    APPROVED = "APPROVED"
+    REFUNDED = "REFUNDED"

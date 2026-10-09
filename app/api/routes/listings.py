@@ -11,6 +11,7 @@ from app.schemas.listing import (
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.listing import ListingService
 from app.services.favorite import FavoriteService
+from app.services.promotion import get_active_top_ids, top_listings
 from app.utils.s3 import get_presigned_url
 
 router = APIRouter(prefix="/listings", tags=["Listings"])
@@ -35,7 +36,9 @@ def _resolve_image_url(img_url: str | None) -> str | None:
         return img_url if not img_url.startswith('local:') else None
 
 
-def _listing_to_response(listing, is_favorited: bool = False) -> ListingResponse:
+def _listing_to_response(
+    listing, is_favorited: bool = False, is_top: bool = False
+) -> ListingResponse:
     images = [
         ListingImageResponse(
             id=img.id,
@@ -109,11 +112,14 @@ def _listing_to_response(listing, is_favorited: bool = False) -> ListingResponse
         city_name=city_name,
         district_name=district_name,
         is_favorited=is_favorited,
+        is_top=is_top,
         average_rating=listing.average_rating,
     )
 
 
-def _listing_to_list_response(listing, is_favorited: bool = False) -> ListingListResponse:
+def _listing_to_list_response(
+    listing, is_favorited: bool = False, is_top: bool = False
+) -> ListingListResponse:
     primary = listing.primary_image
     if primary and 'placeholder' in primary:
         primary = None
@@ -139,6 +145,7 @@ def _listing_to_list_response(listing, is_favorited: bool = False) -> ListingLis
         is_verified=listing.is_verified,
         created_at=listing.created_at,
         is_favorited=is_favorited,
+        is_top=is_top,
         latitude=_as_float(listing.latitude) if listing.latitude is not None else (
             _as_float(listing.city_rel.latitude)
             if listing.city_rel is not None and listing.city_rel.latitude is not None
@@ -153,8 +160,10 @@ def _listing_to_list_response(listing, is_favorited: bool = False) -> ListingLis
     )
 
 
-def _listing_to_nearby_response(listing, is_favorited: bool = False) -> NearbyListingResponse:
-    resp = _listing_to_list_response(listing, is_favorited)
+def _listing_to_nearby_response(
+    listing, is_favorited: bool = False, is_top: bool = False
+) -> NearbyListingResponse:
+    resp = _listing_to_list_response(listing, is_favorited, is_top)
     distance = getattr(listing, "distance_km", None)
     resp.distance_km = distance
     return resp
@@ -219,11 +228,16 @@ async def search_listings(
         limit=page_size,
     )
     items = []
+    top_ids = await get_active_top_ids(
+        db, [l.id for l in listings]
+    )
     for listing in listings:
         is_fav = False
         if current_user:
             is_fav = await fav_service.is_favorited(current_user.user_id, listing.id)
-        items.append(_listing_to_list_response(listing, is_fav))
+        items.append(
+            _listing_to_list_response(listing, is_fav, listing.id in top_ids)
+        )
 
     return PaginatedResponse(
         data=items,
@@ -281,11 +295,29 @@ async def get_nearby_listings(
         limit=limit,
     )
     items = []
+    top_ids = await get_active_top_ids(db, [l.id for l in listings])
     for listing in listings:
         is_fav = False
         if current_user:
             is_fav = await fav_service.is_favorited(current_user.user_id, listing.id)
-        items.append(_listing_to_nearby_response(listing, is_fav))
+        items.append(
+            _listing_to_nearby_response(listing, is_fav, listing.id in top_ids)
+        )
+    return APIResponse(data=items)
+
+
+@router.get("/top", response_model=APIResponse[list[ListingListResponse]])
+async def get_top_listings(
+    limit: int = Query(12, ge=1, le=50),
+    db: AsyncSession = Depends(get_db),
+):
+    """The homepage TOP section. Only live windows: ``expires_at > now`` is
+    part of the query, so a promotion whose time ran out disappears even if
+    the background expiry loop has not ticked yet. The section simply comes
+    back empty (frontend hides it) when nobody is promoted."""
+    listings = await top_listings(db, limit=limit)
+    top_ids = {l.id for l in listings}
+    items = [_listing_to_list_response(l, False, l.id in top_ids) for l in listings]
     return APIResponse(data=items)
 
 
@@ -323,7 +355,8 @@ async def get_my_listings(
     service = ListingService(db)
     skip = (page - 1) * page_size
     listings, total = await service.get_by_owner(current_user.user_id, skip, page_size)
-    items = [_listing_to_response(l) for l in listings]
+    top_ids = await get_active_top_ids(db, [l.id for l in listings])
+    items = [_listing_to_response(l, is_top=l.id in top_ids) for l in listings]
     return PaginatedResponse(data=items, total=total, page=page, page_size=page_size)
 
 
@@ -342,7 +375,8 @@ async def get_listing(
         fav_service = FavoriteService(db)
         is_fav = await fav_service.is_favorited(current_user.user_id, listing_id)
 
-    return APIResponse(data=_listing_to_response(listing, is_fav))
+    is_top = listing_id in await get_active_top_ids(db, [listing_id])
+    return APIResponse(data=_listing_to_response(listing, is_fav, is_top))
 
 
 @router.post("", response_model=APIResponse[ListingResponse])

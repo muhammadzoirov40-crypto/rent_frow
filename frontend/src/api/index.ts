@@ -81,6 +81,8 @@ export interface Listing {
   is_favorited: boolean;
   average_rating: number;
   available?: boolean;
+  /** True while a paid TOP window is live — server-computed, drives the badge. */
+  is_top?: boolean;
 }
 
 export interface ListingListItem {
@@ -102,6 +104,8 @@ export interface ListingListItem {
   longitude?: number | null;
   city_id?: number | null;
   distance_km?: number | null;
+  /** Live paid TOP window — the badge and the homepage section read this. */
+  is_top?: boolean;
 }
 
 export interface SubCategory {
@@ -278,6 +282,11 @@ export const listings = {
 
   nearby: (params: { lat: number; lng: number; radius?: number; limit?: number } & Record<string, unknown>) =>
     client.get<APIResponse<(ListingListItem & { distance_km?: number | null })[]>>('/listings/nearby', { params }).then(unwrap),
+
+  /** The homepage TOP section: live paid windows only. Comes back empty
+   *  (the section hides itself) when nobody is promoted. */
+  top: (limit = 12) =>
+    client.get<APIResponse<ListingListItem[]>>('/listings/top', { params: { limit } }).then(unwrap),
 
   getOne: (id: number) =>
     client.get<APIResponse<Listing>>(`/listings/${id}`).then(unwrap),
@@ -523,6 +532,110 @@ export const wallet = {
    *  real payment. Kept for seeding and for the admin panel. */
   topUp: (amount: number, description?: string) =>
     client.post<APIResponse<WalletSummary>>('/wallet/topup', { amount, description }).then(unwrap),
+};
+
+// ---------------------------------------------------------------- TOP promo
+export interface TopPlan {
+  id: number;
+  name: string;
+  duration_key: string;
+  price: number;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface TopPromotion {
+  id: number;
+  listing_id: number;
+  listing_title: string | null;
+  user_id: number;
+  user_name: string | null;
+  plan_id: number;
+  plan_name: string;
+  duration_key: string;
+  price: number;
+  status: 'PENDING' | 'ACTIVE' | 'EXPIRED' | 'REJECTED' | 'CANCELLED';
+  payment_status: 'UNPAID' | 'PAID' | 'APPROVED' | 'REFUNDED';
+  started_at: string | null;
+  expires_at: string | null;
+  reject_reason: string | null;
+  created_at: string;
+}
+
+export interface TopStats {
+  total: number;
+  active: number;
+  pending: number;
+  expired: number;
+  rejected: number;
+  cancelled: number;
+  /** Sum of PAID promotions — money that actually moved, never a projection. */
+  revenue: number;
+  plans: TopPlan[];
+}
+
+export const topPromotions = {
+  /** Public: only plans an admin switched on (a disabled plan with a
+   *  placeholder price is never visible or purchasable). */
+  plans: () => client.get<APIResponse<TopPlan[]>>('/promotions/plans').then(unwrap),
+
+  mine: () => client.get<APIResponse<TopPromotion[]>>('/promotions/mine').then(unwrap),
+
+  /** Buy (wallet balance) or request (admin approval). Two ids go out —
+   *  price, status and expiry are computed by the server, so this form
+   *  cannot discount, fast-track or pre-date anything. */
+  request: (listingId: number, planId: number) =>
+    client
+      .post<APIResponse<{ promotion: TopPromotion; active: boolean }>>('/promotions', {
+        listing_id: listingId,
+        plan_id: planId,
+      })
+      .then(unwrap),
+
+  admin: {
+    plans: () => client.get<APIResponse<TopPlan[]>>('/promotions/admin/plans').then(unwrap),
+
+    createPlan: (data: { name: string; duration_key: string; price: number; is_active: boolean }) =>
+      client.post<APIResponse<TopPlan>>('/promotions/admin/plans', data).then(unwrap),
+
+    updatePlan: (
+      planId: number,
+      data: Partial<{ name: string; duration_key: string; price: number; is_active: boolean }>,
+    ) => client.put<APIResponse<TopPlan>>(`/promotions/admin/plans/${planId}`, data).then(unwrap),
+
+    list: (
+      params: {
+        status?: string;
+        listing_id?: number;
+        user_id?: number;
+        date_from?: string;
+        date_to?: string;
+        page?: number;
+        page_size?: number;
+      } = {},
+    ) =>
+      client
+        .get<PaginatedResponse<TopPromotion>>('/promotions/admin/list', { params })
+        .then(unwrapPaginated),
+
+    stats: () => client.get<APIResponse<TopStats>>('/promotions/admin/stats').then(unwrap),
+
+    approve: (id: number) =>
+      client.post<APIResponse<TopPromotion>>(`/promotions/admin/${id}/approve`).then(unwrap),
+
+    reject: (id: number, reason?: string) =>
+      client
+        .post<APIResponse<TopPromotion>>(`/promotions/admin/${id}/reject`, { reason })
+        .then(unwrap),
+
+    /** Manual deactivation of a live window (a wallet-charged one is refunded once). */
+    cancel: (id: number) =>
+      client.post<APIResponse<TopPromotion>>(`/promotions/admin/${id}/cancel`).then(unwrap),
+
+    /** Manual (re)activation — the window starts fresh, from this moment. */
+    activate: (id: number) =>
+      client.post<APIResponse<TopPromotion>>(`/promotions/admin/${id}/activate`).then(unwrap),
+  },
 };
 
 export const payments = {

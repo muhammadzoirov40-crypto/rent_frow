@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Image as ImageIcon } from 'lucide-react';
+import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Crown, Image as ImageIcon } from 'lucide-react';
 import { listings, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -74,6 +74,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
   const districtName = getDistrictName(listing);
   const reviewCount = listing.rating_count;
   const isVerified = 'is_verified' in listing && listing.is_verified === true;
+  // The server says a paid TOP window is live for this listing (expires_at > now
+  // was checked server-side) - the badge never appears on its own initiative.
+  const isTop = 'is_top' in listing && listing.is_top === true;
   const imageCount =
     'images' in listing && Array.isArray(listing.images) ? listing.images.length : 0;
 
@@ -126,12 +129,24 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
         )}
 
-        {isVerified && (
-          <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
-            <BadgeCheck className="w-3.5 h-3.5 text-[var(--accent-light)]" aria-hidden="true" />
-            {t('listing.verified')}
-          </span>
-        )}
+        <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5 z-10">
+          {isTop && (
+            <span
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 shadow-md ring-1 ring-amber-200/70"
+              aria-label={t('top.badge')}
+            >
+              <Crown className="w-3.5 h-3.5" aria-hidden="true" />
+              TOP
+            </span>
+          )}
+
+          {isVerified && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
+              <BadgeCheck className="w-3.5 h-3.5 text-[var(--accent-light)]" aria-hidden="true" />
+              {t('listing.verified')}
+            </span>
+          )}
+        </div>
 
         <button
           type="button"

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { stats } from '../api/index';
 import CategoryExplorer from '../components/home/CategoryExplorer';
+import TopListings from '../components/home/TopListings';
 import ListingsShowcase from '../components/home/ListingsShowcase';
 import { NearYouSection, RecentlyViewedSection } from '../components/home/DiscoverySections';
 import { HowItWorksSection, BecomeSection } from '../components/home/JourneySections';
@@ -44,6 +45,9 @@ export default function HomePage() {
 
 
       <CategoryExplorer />
+
+      {/* Paid TOP placements: renders nothing while no window is live */}
+      <TopListings />
 
       <ListingsShowcase />
 

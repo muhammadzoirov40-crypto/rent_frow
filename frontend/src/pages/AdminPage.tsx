@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Users, FileText, ClipboardList, FolderTree,
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
   ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
-  PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail,
+  PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail, Crown, Pencil, Play,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -13,7 +13,8 @@ import {
   PieChart, Pie, Cell,
 } from 'recharts';
 import client from '../api/client';
-import type { User, Listing, RentalRequest, Category } from '../api';
+import { topPromotions } from '../api';
+import type { User, Listing, RentalRequest, Category, TopPlan, TopPromotion, TopStats } from '../api';
 import { formatDate } from '../utils/dates';
 import { formatAmount } from '../utils/format';
 
@@ -179,7 +180,20 @@ const adminApi = {
   deleteCategory: (id: number) => client.delete(`/categories/${id}`).then((r) => r.data),
 };
 
-type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'categories' | 'posts';
+type TabKey = 'dashboard' | 'crm' | 'users' | 'listings' | 'requests' | 'top' | 'categories' | 'posts';
+
+/** Status/payment colour chips for the TOP tables — one shared vocabulary. */
+const TOP_BADGE_STYLES: Record<string, string> = {
+  PENDING: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+  ACTIVE: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+  EXPIRED: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10',
+  REJECTED: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20',
+  CANCELLED: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-white/5 dark:text-gray-400 dark:border-white/10',
+  PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20',
+  APPROVED: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+  UNPAID: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20',
+  REFUNDED: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20',
+};
 
 function StatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   const styles: Record<string, string> = {
@@ -218,6 +232,16 @@ export default function AdminPage() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [categoryName, setCategoryName] = useState('');
   const [profileUser, setProfileUser] = useState<AdminUserProfile | null>(null);
+
+  // TOP promotion management: one status filter, one open detail/reject
+  // sheet, and a plan editor (create vs edit is told apart by `mode`).
+  const [topStatus, setTopStatus] = useState<'all' | 'PENDING' | 'ACTIVE' | 'EXPIRED' | 'REJECTED' | 'CANCELLED'>('all');
+  const [topListingId, setTopListingId] = useState('');
+  const [topSelected, setTopSelected] = useState<TopPromotion | null>(null);
+  const [topRejectTarget, setTopRejectTarget] = useState<TopPromotion | null>(null);
+  const [topRejectReason, setTopRejectReason] = useState('');
+  const [planModal, setPlanModal] = useState<null | { mode: 'new' } | { mode: 'edit'; plan: TopPlan }>(null);
+  const [planForm, setPlanForm] = useState({ name: '', duration_key: '1d', price: '0', is_active: true });
   const queryClient = useQueryClient();
 
   const { data: stats, isLoading: statsLoading } = useQuery<AdminStats>({
@@ -265,6 +289,27 @@ export default function AdminPage() {
     queryKey: ['admin-posts'],
     queryFn: adminApi.getPosts,
     enabled: activeTab === 'posts',
+  });
+
+  // TOP: only fetched while the tab is open — nothing here loads for a
+  // browser that never asks, and every value is read straight from the API.
+  const { data: topStats, isLoading: topStatsLoading } = useQuery<TopStats>({
+    queryKey: ['admin-top-stats'],
+    queryFn: topPromotions.admin.stats,
+    enabled: activeTab === 'top',
+  });
+
+  const { data: topRows = [], isLoading: topListLoading } = useQuery({
+    queryKey: ['admin-top-list', topStatus, topListingId],
+    queryFn: () =>
+      topPromotions.admin.list({
+        status: topStatus === 'all' ? undefined : topStatus,
+        listing_id: topListingId ? Number(topListingId) : undefined,
+        page: 1,
+        page_size: 200,
+      }),
+    enabled: activeTab === 'top',
+    select: (page) => page.items,
   });
 
   const blockMutation = useMutation({
@@ -361,6 +406,104 @@ export default function AdminPage() {
     });
   };
 
+  // ---- TOP promotions ----------------------------------------------------
+  // Every action goes straight to the API and then re-reads the lists; the
+  // UI never flips a status or a price on its own.
+  const invalidateTop = () => {
+    queryClient.invalidateQueries({ queryKey: ['admin-top-list'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-top-stats'] });
+    queryClient.invalidateQueries({ queryKey: ['topListings'] });
+    queryClient.invalidateQueries({ queryKey: ['top-mine'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-listings'] });
+  };
+
+  const topApproveMutation = useMutation({
+    mutationFn: topPromotions.admin.approve,
+    onSuccess: () => {
+      toast.success(t('admin.topApproved'));
+      invalidateTop();
+      setTopSelected(null);
+    },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const topRejectMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: number; reason?: string }) =>
+      topPromotions.admin.reject(id, reason),
+    onSuccess: () => {
+      toast.success(t('admin.topRejected'));
+      invalidateTop();
+      setTopRejectTarget(null);
+      setTopRejectReason('');
+      setTopSelected(null);
+    },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const topCancelMutation = useMutation({
+    mutationFn: topPromotions.admin.cancel,
+    onSuccess: () => {
+      toast.success(t('admin.topCancelled'));
+      invalidateTop();
+      setTopSelected(null);
+    },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const topActivateMutation = useMutation({
+    mutationFn: topPromotions.admin.activate,
+    onSuccess: () => {
+      toast.success(t('admin.topActivated'));
+      invalidateTop();
+      setTopSelected(null);
+    },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const planSaveMutation = useMutation({
+    mutationFn: () => {
+      const payload = {
+        name: planForm.name.trim(),
+        duration_key: planForm.duration_key,
+        price: Number(planForm.price) || 0,
+        is_active: planForm.is_active,
+      };
+      return planModal && planModal.mode === 'edit'
+        ? topPromotions.admin.updatePlan(planModal.plan.id, payload)
+        : topPromotions.admin.createPlan(payload);
+    },
+    onSuccess: () => {
+      toast.success(t('admin.topPlanSaved'));
+      queryClient.invalidateQueries({ queryKey: ['admin-top-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['top-plans'] });
+      setPlanModal(null);
+    },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  const openPlanModal = (mode: 'new' | { mode: 'edit'; plan: TopPlan }) => {
+    if (mode === 'new') {
+      setPlanForm({ name: '', duration_key: '1d', price: '0', is_active: true });
+      setPlanModal({ mode: 'new' });
+    } else {
+      setPlanForm({
+        name: mode.plan.name,
+        duration_key: mode.plan.duration_key,
+        price: String(mode.plan.price),
+        is_active: mode.plan.is_active,
+      });
+      setPlanModal({ mode: 'edit', plan: mode.plan });
+    }
+  };
+
+  const handleSavePlan = () => {
+    if (!planForm.name.trim()) {
+      toast.error(t('admin.fillAllFields'));
+      return;
+    }
+    planSaveMutation.mutate();
+  };
+
   const filteredUsers = users.filter(
     (u) => (u.display_name || '').toLowerCase().includes(searchQuery.toLowerCase()) || u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -401,6 +544,7 @@ export default function AdminPage() {
     { key: 'users', label: t('admin.users'), icon: <Users className="w-5 h-5" /> },
     { key: 'listings', label: t('admin.listings'), icon: <FileText className="w-5 h-5" /> },
     { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" /> },
+    { key: 'top', label: t('admin.topTab'), icon: <Crown className="w-5 h-5" /> },
     { key: 'categories', label: t('admin.categories'), icon: <FolderTree className="w-5 h-5" /> },
     { key: 'posts', label: t('admin.posts'), icon: <MessageSquare className="w-5 h-5" /> },
   ];
@@ -1065,6 +1209,455 @@ export default function AdminPage() {
                   {filteredRequests.length === 0 && (
                     <div className="py-12 text-center text-sm text-gray-400">{adminApiDown ? t('common.error') : t('admin.notFound')}</div>
                   )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'top' && (
+            <div>
+              <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
+                    <Crown className="w-6 h-6 text-amber-500" aria-hidden="true" />
+                    {t('admin.topManagement')}
+                  </h1>
+                  <p className="text-sm text-gray-500 mt-0.5">{t('admin.topHint')}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => openPlanModal('new')}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 transition"
+                  data-testid="top-add-plan"
+                >
+                  <Plus className="w-4 h-4" />
+                  {t('admin.topAddPlan')}
+                </button>
+              </div>
+
+              {/* Stats — read from /promotions/admin/stats, revenue counts PAID only */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+                {[
+                  { label: t('admin.topStats.total'), value: topStats?.total ?? 0, cls: 'from-blue-500 to-indigo-600' },
+                  { label: t('admin.topStats.active'), value: topStats?.active ?? 0, cls: 'from-emerald-500 to-teal-600' },
+                  { label: t('admin.topStats.pending'), value: topStats?.pending ?? 0, cls: 'from-amber-500 to-orange-500' },
+                  { label: t('admin.topStats.expired'), value: topStats?.expired ?? 0, cls: 'from-gray-400 to-gray-500' },
+                  { label: t('admin.topStats.rejected'), value: topStats?.rejected ?? 0, cls: 'from-red-400 to-rose-500' },
+                  {
+                    label: t('admin.topRevenue'),
+                    value: `${formatAmount(topStats?.revenue ?? 0)} ${t('common.currency')}`,
+                    cls: 'from-amber-400 to-yellow-500',
+                  },
+                ].map((c) => (
+                  <div key={c.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-4">
+                    <div className={`inline-flex w-9 h-9 rounded-xl bg-gradient-to-r ${c.cls} text-white items-center justify-center mb-2`}>
+                      <Crown className="w-4 h-4" aria-hidden="true" />
+                    </div>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{c.label}</p>
+                    <p className="text-xl font-extrabold text-gray-900 dark:text-white tabular-nums">
+                      {topStatsLoading ? '…' : c.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Filters: status chips + optional listing id lookup */}
+              <div className="flex items-center gap-2 flex-wrap mb-4">
+                {(['all', 'PENDING', 'ACTIVE', 'EXPIRED', 'REJECTED', 'CANCELLED'] as const).map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setTopStatus(s)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition ${
+                      topStatus === s
+                        ? 'bg-[var(--accent)] text-white border-transparent shadow'
+                        : 'bg-white dark:bg-white/5 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-amber-300'
+                    }`}
+                  >
+                    {s === 'all' ? t('admin.topFilterAll') : t(`admin.topStatus.${s}`)}
+                  </button>
+                ))}
+                <div className="relative ml-auto">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder={t('admin.topSearchPlaceholder')}
+                    value={topListingId}
+                    onChange={(e) => setTopListingId(e.target.value.replace(/[^0-9]/g, ''))}
+                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-44"
+                  />
+                </div>
+              </div>
+
+              {/* Promotions table */}
+              {topListLoading ? (
+                <div className="flex justify-center py-16">
+                  <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden mb-8">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-white/10">
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.listing')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.user')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.plan')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.price')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.status')}</th>
+                          <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.payment')}</th>
+                          <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                        {topRows.map((p) => (
+                          <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition" data-testid={`top-row-${p.id}`}>
+                            <td className="px-6 py-4">
+                              <div>
+                                <p className="font-medium text-sm text-gray-900 dark:text-white">{p.listing_title ?? `#${p.listing_id}`}</p>
+                                <p className="text-xs text-gray-400">#{p.id} · {formatDate(p.created_at)}</p>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                              {p.user_name ?? `#${p.user_id}`}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                              {p.plan_name}
+                              <span className="block text-xs text-gray-400">{t(`top.dur_${p.duration_key}`)}</span>
+                            </td>
+                            <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-white tabular-nums">
+                              {formatAmount(p.price)} {t('common.currency')}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${TOP_BADGE_STYLES[p.status] || TOP_BADGE_STYLES.CANCELLED}`}>
+                                {t(`admin.topStatus.${p.status}`)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${TOP_BADGE_STYLES[p.payment_status] || TOP_BADGE_STYLES.UNPAID}`}>
+                                {t(`admin.topPayment.${p.payment_status}`)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => setTopSelected(p)}
+                                  title={t('admin.topActions.detail')}
+                                  className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 transition"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                {p.status === 'PENDING' && (
+                                  <>
+                                    <button
+                                      type="button"
+                                      onClick={() => topApproveMutation.mutate(p.id)}
+                                      disabled={topApproveMutation.isPending}
+                                      title={t('admin.topActions.approve')}
+                                      className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition disabled:opacity-50"
+                                      data-testid={`top-approve-${p.id}`}
+                                    >
+                                      <CheckCircle className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => { setTopRejectTarget(p); setTopRejectReason(''); }}
+                                      title={t('admin.topActions.reject')}
+                                      className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition"
+                                      data-testid={`top-reject-${p.id}`}
+                                    >
+                                      <X className="w-4 h-4" />
+                                    </button>
+                                  </>
+                                )}
+                                {p.status === 'ACTIVE' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => topCancelMutation.mutate(p.id)}
+                                    disabled={topCancelMutation.isPending}
+                                    title={t('admin.topActions.cancel')}
+                                    className="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition disabled:opacity-50"
+                                    data-testid={`top-cancel-${p.id}`}
+                                  >
+                                    <Ban className="w-4 h-4" />
+                                  </button>
+                                )}
+                                {(p.status === 'EXPIRED' || p.status === 'REJECTED' || p.status === 'CANCELLED') && (
+                                  <button
+                                    type="button"
+                                    onClick={() => topActivateMutation.mutate(p.id)}
+                                    disabled={topActivateMutation.isPending}
+                                    title={t('admin.topActions.activate')}
+                                    className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition disabled:opacity-50"
+                                    data-testid={`top-activate-${p.id}`}
+                                  >
+                                    <Play className="w-4 h-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  {topRows.length === 0 && (
+                    <div className="py-12 text-center text-sm text-gray-400">{t('admin.notFound')}</div>
+                  )}
+                </div>
+              )}
+
+              {/* Plans */}
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin.topPlansTitle')}</h2>
+              </div>
+              <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-white/10">
+                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.plan')}</th>
+                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.topTable.price')}</th>
+                        <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.status')}</th>
+                        <th className="text-right px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{t('admin.actions')}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                      {(topStats?.plans ?? []).map((plan) => (
+                        <tr key={plan.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition" data-testid={`top-plan-${plan.id}`}>
+                          <td className="px-6 py-4">
+                            <p className="font-medium text-sm text-gray-900 dark:text-white">{plan.name}</p>
+                            <p className="text-xs text-gray-400">{t(`top.dur_${plan.duration_key}`)}</p>
+                          </td>
+                          <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-white tabular-nums">
+                            {plan.price > 0 ? `${formatAmount(plan.price)} ${t('common.currency')}` : t('top.free')}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${plan.is_active ? TOP_BADGE_STYLES.ACTIVE : TOP_BADGE_STYLES.CANCELLED}`}>
+                              {plan.is_active ? t('admin.active') : t('admin.inactive')}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button
+                              type="button"
+                              onClick={() => openPlanModal({ mode: 'edit', plan })}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-[var(--accent)] bg-[var(--accent)]/10 hover:bg-[var(--accent)]/20 transition"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                              {t('admin.topEdit')}
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {(topStats?.plans ?? []).length === 0 && !topStatsLoading && (
+                  <div className="py-10 text-center text-sm text-gray-400">{t('top.plansEmpty')}</div>
+                )}
+              </div>
+
+              {/* Detail sheet */}
+              {topSelected && (
+                <div
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  onClick={() => setTopSelected(null)}
+                >
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    data-testid="top-detail-modal"
+                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex items-start justify-between gap-3 mb-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white inline-flex items-center gap-2">
+                          <Crown className="w-5 h-5 text-amber-500" aria-hidden="true" />
+                          {t('admin.topDetailTitle')} #{topSelected.id}
+                        </h3>
+                        <p className="text-sm text-gray-500 truncate">{topSelected.listing_title ?? `#${topSelected.listing_id}`}</p>
+                      </div>
+                      <button type="button" onClick={() => setTopSelected(null)} className="p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10">
+                        <X className="w-5 h-5" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topTable.user')}</span><span className="font-medium text-[#1A1A2E] dark:text-white">{topSelected.user_name ?? `#${topSelected.user_id}`}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topTable.plan')}</span><span className="font-medium text-[#1A1A2E] dark:text-white">{topSelected.plan_name}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('top.durationLabel')}</span><span className="font-medium text-[#1A1A2E] dark:text-white">{t(`top.dur_${topSelected.duration_key}`)}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topTable.price')}</span><span className="font-bold text-[#1A1A2E] dark:text-white tabular-nums">{formatAmount(topSelected.price)} {t('common.currency')}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.status')}</span><span className={`text-xs font-semibold px-2.5 py-1 rounded-full border inline-block ${TOP_BADGE_STYLES[topSelected.status] || ''}`}>{t(`admin.topStatus.${topSelected.status}`)}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topTable.payment')}</span><span className={`text-xs font-semibold px-2.5 py-1 rounded-full border inline-block ${TOP_BADGE_STYLES[topSelected.payment_status] || ''}`}>{t(`admin.topPayment.${topSelected.payment_status}`)}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topField.created')}</span><span className="text-[#1A1A2E] dark:text-white">{formatDate(topSelected.created_at)}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topField.started')}</span><span className="text-[#1A1A2E] dark:text-white">{topSelected.started_at ? formatDate(topSelected.started_at) : '—'}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topField.expires')}</span><span className="text-[#1A1A2E] dark:text-white">{topSelected.expires_at ? formatDate(topSelected.expires_at) : '—'}</span></div>
+                      <div><span className="text-gray-400 text-xs block">{t('admin.topField.listingId')}</span><span className="text-[#1A1A2E] dark:text-white">#{topSelected.listing_id}</span></div>
+                      {topSelected.reject_reason && (
+                        <div className="col-span-2 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 p-3">
+                          <span className="text-xs text-red-500 block">{t('admin.topField.rejectReason')}</span>
+                          <span className="text-sm text-red-700 dark:text-red-300">{topSelected.reject_reason}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex justify-end gap-2 mt-5">
+                      {topSelected.status === 'PENDING' && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => topRejectMutation.mutate({ id: topSelected.id, reason: '' })}
+                            className="px-4 py-2.5 rounded-xl text-sm font-semibold text-red-600 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 transition"
+                          >
+                            {t('admin.topActions.reject')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => topApproveMutation.mutate(topSelected.id)}
+                            className="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 transition"
+                          >
+                            {t('admin.topActions.approve')}
+                          </button>
+                        </>
+                      )}
+                      {topSelected.status === 'ACTIVE' && (
+                        <button
+                          type="button"
+                          onClick={() => topCancelMutation.mutate(topSelected.id)}
+                          className="px-4 py-2.5 rounded-xl text-sm font-semibold text-amber-600 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 transition"
+                        >
+                          {t('admin.topActions.cancel')}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Reject with a reason */}
+              {topRejectTarget && (
+                <div
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  onClick={() => setTopRejectTarget(null)}
+                >
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    data-testid="top-reject-modal"
+                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">{t('admin.topRejectTitle')}</h3>
+                    <p className="text-sm text-gray-500 mb-3">{topRejectTarget.listing_title ?? `#${topRejectTarget.listing_id}`}</p>
+                    <textarea
+                      value={topRejectReason}
+                      onChange={(e) => setTopRejectReason(e.target.value)}
+                      rows={3}
+                      placeholder={t('admin.topRejectPlaceholder')}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
+                      data-testid="top-reject-reason"
+                    />
+                    <div className="flex justify-end gap-2 mt-4">
+                      <button
+                        type="button"
+                        onClick={() => setTopRejectTarget(null)}
+                        className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition"
+                      >
+                        {t('common.cancel')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => topRejectMutation.mutate({ id: topRejectTarget.id, reason: topRejectReason.trim() })}
+                        disabled={topRejectMutation.isPending}
+                        className="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-red-500 hover:bg-red-600 disabled:opacity-60 transition"
+                        data-testid="top-reject-confirm"
+                      >
+                        {t('common.confirm')}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Plan create / edit */}
+              {planModal && (
+                <div
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  onClick={() => setPlanModal(null)}
+                >
+                  <div
+                    role="dialog"
+                    aria-modal="true"
+                    data-testid="top-plan-modal"
+                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl space-y-4"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white">
+                      {planModal.mode === 'new' ? t('admin.topAddPlan') : t('admin.topEditPlan')}
+                    </h3>
+                    <label className="block text-sm">
+                      <span className="text-gray-500 dark:text-gray-400 text-xs">{t('admin.topPlanName')}</span>
+                      <input
+                        type="text"
+                        value={planForm.name}
+                        onChange={(e) => setPlanForm((f) => ({ ...f, name: e.target.value }))}
+                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                      />
+                    </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <label className="block text-sm">
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">{t('top.durationLabel')}</span>
+                        <select
+                          value={planForm.duration_key}
+                          onChange={(e) => setPlanForm((f) => ({ ...f, duration_key: e.target.value }))}
+                          className="mt-1 w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                        >
+                          {['3h', '1d', '1w', '1m'].map((d) => (
+                            <option key={d} value={d}>{t(`top.dur_${d}`)}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="block text-sm">
+                        <span className="text-gray-500 dark:text-gray-400 text-xs">{t('top.priceLabel')}</span>
+                        <input
+                          type="number"
+                          min={0}
+                          step={1}
+                          value={planForm.price}
+                          onChange={(e) => setPlanForm((f) => ({ ...f, price: e.target.value }))}
+                          className="mt-1 w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                        />
+                      </label>
+                    </div>
+                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                      <input
+                        type="checkbox"
+                        checked={planForm.is_active}
+                        onChange={(e) => setPlanForm((f) => ({ ...f, is_active: e.target.checked }))}
+                        className="w-4 h-4 accent-[var(--accent)]"
+                      />
+                      {t('admin.topPlanVisible')}
+                    </label>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPlanModal(null)}
+                        className="px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition"
+                      >
+                        {t('common.cancel')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSavePlan}
+                        disabled={planSaveMutation.isPending}
+                        className="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 disabled:opacity-60 transition"
+                        data-testid="top-plan-save"
+                      >
+                        {t('common.confirm')}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

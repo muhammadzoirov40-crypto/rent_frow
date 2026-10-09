@@ -279,6 +279,45 @@ class WalletService:
                 description=description,
             )
 
+    async def spend(
+        self,
+        user_id: int,
+        amount: float,
+        description: str | None = None,
+    ) -> WalletTransaction | None:
+        """Money leaves the available balance for good - the buy path.
+
+        Unlike ``hold`` there is no second step: a TOP promotion (or any
+        other one-shot purchase) consumes the price outright, recorded once
+        in the ledger as PROMO. Raises INSUFFICIENT_BALANCE when the balance
+        cannot cover ``amount``; a non-positive amount is a no-op (price 0
+        never touches the wallet). The caller runs in the same transaction as
+        whatever it is paying for, so a rollback un-charges everything.
+        """
+        if not get_settings().WALLET_ENABLED:
+            return None
+        amount = money_d(amount)
+        if amount <= 0:
+            return None
+
+        def decide(wallet):
+            balance, held = money_d(wallet.balance), money_d(wallet.held)
+            if balance < amount:
+                raise HTTPException(status_code=400, detail="INSUFFICIENT_BALANCE")
+            return balance - amount, held, amount
+
+        async with _wallet_lock(user_id):
+            wallet, effective = await self._cas_apply(user_id, decide)
+            if wallet is None:
+                return None
+            return await self._record(
+                wallet,
+                tx_type=WalletTransactionType.PROMO,
+                amount=-float(effective),
+                held_amount=0.0,
+                description=description or "TOP promotion",
+            )
+
     async def settle(
         self,
         user_id: int,
