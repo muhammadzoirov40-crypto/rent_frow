@@ -62,15 +62,13 @@ def upgrade() -> None:
         }
 
     if "promotion_id" not in columns:
-        op.add_column(
-            "topup_intents",
-            sa.Column(
-                "promotion_id",
-                sa.Integer(),
-                sa.ForeignKey("top_promotions.id"),
-                nullable=True,
-            ),
-        )
+        # A plain column, no REFERENCES in the ALTER - exactly what the
+        # catch-up revision's LATE_COLUMNS do, and what SQLite dialects
+        # demand: alembic refuses to ALTER a constraint on this dialect
+        # ("No support for ALTER of constraints"), while a plain ADD COLUMN
+        # works everywhere. The foreign key stays what the model declares on
+        # databases built from it; SQLite enforces nothing extra here anyway.
+        op.execute(sa.text("ALTER TABLE topup_intents ADD COLUMN promotion_id INTEGER"))
     if "ix_topup_intents_promotion_id" not in indexes:
         op.create_index(
             "ix_topup_intents_promotion_id", "topup_intents", ["promotion_id"]

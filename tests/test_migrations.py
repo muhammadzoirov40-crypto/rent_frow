@@ -220,3 +220,81 @@ def test_the_top_plan_catalogue_is_seeded_exactly_once(alembic_db):
         engine.dispose()
 
     assert count == 4, "re-running the chain must not duplicate the catalogue"
+
+
+def test_the_dc_intent_column_is_added_to_a_database_that_already_has_the_table(
+    alembic_db,
+):
+    """The path the production server actually takes.
+
+    ``topup_intents`` exists from before - created by the catch-up revision
+    or by the old startup code - without ``promotion_id``, and this revision
+    is the only thing that can add it. Two traps wait here: the ALTER must
+    be plain (a SQLite dialect refuses to ALTER a constraint at all), and
+    the table's existing index must survive the statement.
+
+    A fresh database never reaches this code - there the catch-up revision
+    creates the table from the model, column included - which is exactly
+    why this test has to exist: it is the only one that runs the ALTER.
+    """
+    from alembic import command
+
+    from app.core.migrations import alembic_config
+
+    engine = create_engine(f"sqlite:///{alembic_db}")
+    with engine.connect() as conn:
+        conn.execute(
+            text(
+                "CREATE TABLE alembic_version ("
+                "version_num VARCHAR(32) NOT NULL, "
+                "PRIMARY KEY (version_num))"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE TABLE topup_intents ("
+                "id INTEGER NOT NULL, "
+                "user_id INTEGER NOT NULL, "
+                "amount NUMERIC NOT NULL, "
+                "reference VARCHAR(40) NOT NULL, "
+                "status VARCHAR(16) NOT NULL, "
+                "provider VARCHAR(32) NOT NULL, "
+                "raw_response TEXT, "
+                "created_at TIMESTAMP NOT NULL, "
+                "paid_at TIMESTAMP, "
+                "PRIMARY KEY (id))"
+            )
+        )
+        conn.execute(
+            text(
+                "CREATE INDEX idx_topup_user_created "
+                "ON topup_intents (user_id, created_at)"
+            )
+        )
+        conn.execute(
+            text(
+                "INSERT INTO alembic_version (version_num) "
+                "VALUES ('e2c4f7a91b3d')"
+            )
+        )
+        conn.commit()
+    engine.dispose()
+
+    command.upgrade(alembic_config(), "head")
+
+    engine = create_engine(f"sqlite:///{alembic_db}")
+    try:
+        inspector = inspect(engine)
+        columns = {c["name"] for c in inspector.get_columns("topup_intents")}
+        indexes = {i["name"] for i in inspector.get_indexes("topup_intents")}
+        with engine.connect() as conn:
+            stamped = conn.execute(
+                text("SELECT version_num FROM alembic_version")
+            ).scalar_one()
+    finally:
+        engine.dispose()
+
+    assert "promotion_id" in columns, columns
+    assert "ix_topup_intents_promotion_id" in indexes, indexes
+    assert "idx_topup_user_created" in indexes, "the pre-existing index must survive"
+    assert stamped == "f4b8d2c71e9a"
