@@ -107,6 +107,10 @@ class TopPromotion(Base):
     expires_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, index=True)
 
     reject_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # The receipt (screenshot) the customer sends after paying at DC Wallet
+    # - a storage key like a post image (S3 or the local fallback), never a
+    # signed URL: keys do not expire, the links built from them do.
+    check_image_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )

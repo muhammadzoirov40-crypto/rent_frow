@@ -6,7 +6,7 @@ import {
   Shield, Ban, CheckCircle, Trash2, Eye, Search, X, Plus,
   ChevronLeft, ChevronRight, BarChart3, TrendingUp, Clock, AlertTriangle, ImageIcon,
   PanelLeft, PanelLeftClose, MessageSquare, UserCircle, Star, Phone, Mail, Crown, Pencil, Play,
-  MessageSquareQuote, ZoomIn, PieChart as PieChartIcon, Wallet,
+  MessageSquareQuote, ZoomIn, PieChart as PieChartIcon, Wallet, Banknote,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
@@ -462,6 +462,21 @@ export default function AdminPage() {
     mutationFn: topPromotions.admin.activate,
     onSuccess: () => {
       toast.success(t('admin.topActivated'));
+      invalidateTop();
+      setTopSelected(null);
+    },
+    onError: () => toast.error(t('admin.failedAction')),
+  });
+
+  // The money is in the DC statement under this reference - close it. The
+  // server runs the idempotent settle, so a double click (or the callback
+  // arriving later) answers ALREADY_PAID instead of activating twice.
+  const topConfirmMutation = useMutation({
+    mutationFn: topPromotions.admin.confirmPayment,
+    onSuccess: (res) => {
+      toast.success(
+        res.already ? t('admin.topPaymentAlreadyPaid') : t('admin.topPaymentConfirmed'),
+      );
       invalidateTop();
       setTopSelected(null);
     },
@@ -1386,6 +1401,21 @@ export default function AdminPage() {
                               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full border ${TOP_BADGE_STYLES[p.payment_status] || TOP_BADGE_STYLES.UNPAID}`}>
                                 {t(`admin.topPayment.${p.payment_status}`)}
                               </span>
+                              {p.payment_reference && (
+                                <span className="block text-[10px] font-mono text-gray-400 dark:text-gray-500 mt-1" title={t('admin.topField.reference')}>
+                                  {p.payment_reference}
+                                </span>
+                              )}
+                              {p.check_image_url && (
+                                <a href={p.check_image_url} target="_blank" rel="noreferrer" title={t('admin.topField.check')}>
+                                  <img
+                                    src={p.check_image_url}
+                                    alt={t('admin.topField.check')}
+                                    className="mt-1 w-8 h-8 object-cover rounded border border-gray-200 dark:border-white/10 hover:opacity-80 transition"
+                                    data-testid={`top-check-thumb-${p.id}`}
+                                  />
+                                </a>
+                              )}
                             </td>
                             <td className="px-6 py-4">
                               <div className="flex items-center justify-end gap-1.5">
@@ -1419,6 +1449,18 @@ export default function AdminPage() {
                                       <X className="w-4 h-4" />
                                     </button>
                                   </>
+                                )}
+                                {p.payment_status === 'UNPAID' && p.payment_reference && (
+                                  <button
+                                    type="button"
+                                    onClick={() => topConfirmMutation.mutate(p.id)}
+                                    disabled={topConfirmMutation.isPending}
+                                    title={t('admin.topActions.confirmPayment')}
+                                    className="p-1.5 rounded-lg text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-500/10 transition disabled:opacity-50"
+                                    data-testid={`top-confirm-payment-${p.id}`}
+                                  >
+                                    <Banknote className="w-4 h-4" />
+                                  </button>
                                 )}
                                 {p.status === 'ACTIVE' && (
                                   <button
@@ -1542,6 +1584,9 @@ export default function AdminPage() {
                       <div><span className="text-gray-400 text-xs block">{t('admin.topTable.price')}</span><span className="font-bold text-[#1A1A2E] dark:text-white tabular-nums">{formatAmount(topSelected.price)} {t('common.currency')}</span></div>
                       <div><span className="text-gray-400 text-xs block">{t('admin.status')}</span><span className={`text-xs font-semibold px-2.5 py-1 rounded-full border inline-block ${TOP_BADGE_STYLES[topSelected.status] || ''}`}>{t(`admin.topStatus.${topSelected.status}`)}</span></div>
                       <div><span className="text-gray-400 text-xs block">{t('admin.topTable.payment')}</span><span className={`text-xs font-semibold px-2.5 py-1 rounded-full border inline-block ${TOP_BADGE_STYLES[topSelected.payment_status] || ''}`}>{t(`admin.topPayment.${topSelected.payment_status}`)}</span></div>
+                      {topSelected.payment_reference && (
+                        <div><span className="text-gray-400 text-xs block">{t('admin.topField.reference')}</span><span className="font-mono text-sm text-[#1A1A2E] dark:text-white">{topSelected.payment_reference}</span></div>
+                      )}
                       <div><span className="text-gray-400 text-xs block">{t('admin.topField.created')}</span><span className="text-[#1A1A2E] dark:text-white">{formatDate(topSelected.created_at)}</span></div>
                       <div><span className="text-gray-400 text-xs block">{t('admin.topField.started')}</span><span className="text-[#1A1A2E] dark:text-white">{topSelected.started_at ? formatDate(topSelected.started_at) : '—'}</span></div>
                       <div><span className="text-gray-400 text-xs block">{t('admin.topField.expires')}</span><span className="text-[#1A1A2E] dark:text-white">{topSelected.expires_at ? formatDate(topSelected.expires_at) : '—'}</span></div>
@@ -1552,8 +1597,32 @@ export default function AdminPage() {
                           <span className="text-sm text-red-700 dark:text-red-300">{topSelected.reject_reason}</span>
                         </div>
                       )}
+                      {topSelected.check_image_url && (
+                        <div className="col-span-2">
+                          <span className="text-gray-400 text-xs block mb-1">{t('admin.topField.check')}</span>
+                          <a href={topSelected.check_image_url} target="_blank" rel="noreferrer">
+                            <img
+                              src={topSelected.check_image_url}
+                              alt={t('admin.topField.check')}
+                              className="max-h-52 rounded-xl border border-gray-200 dark:border-white/10 object-contain"
+                              data-testid="top-detail-check"
+                            />
+                          </a>
+                        </div>
+                      )}
                     </div>
                     <div className="flex justify-end gap-2 mt-5">
+                      {topSelected.payment_status === 'UNPAID' && topSelected.payment_reference && (
+                        <button
+                          type="button"
+                          onClick={() => topConfirmMutation.mutate(topSelected.id)}
+                          disabled={topConfirmMutation.isPending}
+                          className="px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 transition disabled:opacity-50"
+                          data-testid="top-confirm-payment-modal"
+                        >
+                          {t('admin.topActions.confirmPayment')}
+                        </button>
+                      )}
                       {topSelected.status === 'PENDING' && (
                         <>
                           <button

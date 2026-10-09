@@ -13,6 +13,7 @@ import {
   Pencil,
   Pause,
   Play,
+  Receipt,
   Trash2,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -95,6 +96,19 @@ export default function ListingsSection() {
     onError: () => toast.error(t('dashboard.listings.submitFailed')),
   });
 
+  // The receipt (screenshot) for a TOP request still waiting for its DC
+  // payment: one upload, re-sendable, shown to the admin next to the
+  // reference this very request is tracked by.
+  const checkMutation = useMutation({
+    mutationFn: ({ promoId, file }: { promoId: number; file: File }) =>
+      topPromotions.sendCheck(promoId, file),
+    onSuccess: () => {
+      invalidateTop();
+      toast.success(t('top.check.sent'));
+    },
+    onError: () => toast.error(t('top.check.failed')),
+  });
+
   const rows = all.filter((l) => filter === 'all' || l.status === filter);
   const countBy = (s: StatusFilter) => (s === 'all' ? all.length : all.filter((l) => l.status === s).length);
 
@@ -148,6 +162,7 @@ export default function ListingsSection() {
         <div className="space-y-3">
           {rows.map((l) => {
             const img = l.images?.find((i) => i.is_primary)?.image_url || l.images?.[0]?.image_url || null;
+            const promo = openPromoFor(l.id);
             return (
               <div
                 key={l.id}
@@ -184,15 +199,15 @@ export default function ListingsSection() {
                       >
                         {t(`dashboard.listings.status${l.status.charAt(0)}${l.status.slice(1).toLowerCase()}`)}
                       </span>
-                      {openPromoFor(l.id)?.status === 'ACTIVE' && (
+                      {promo?.status === 'ACTIVE' && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 shadow-sm">
                           <Crown className="w-3.5 h-3.5" aria-hidden="true" />
                           {t('top.activeUntilShort', {
-                            date: formatTopTime(openPromoFor(l.id)!.expires_at),
+                            date: formatTopTime(promo!.expires_at),
                           })}
                         </span>
                       )}
-                      {openPromoFor(l.id)?.status === 'PENDING' && (
+                      {promo?.status === 'PENDING' && (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
                           {t('top.pendingChip')}
                         </span>
@@ -255,7 +270,7 @@ export default function ListingsSection() {
                         {t('dashboard.listings.activate')}
                       </button>
                     ) : null}
-                    {l.status === 'ACTIVE' && !openPromoFor(l.id) && (
+                    {l.status === 'ACTIVE' && !promo && (
                       <button
                         type="button"
                         onClick={() => setTopTarget(l)}
@@ -265,6 +280,37 @@ export default function ListingsSection() {
                         <Crown className="w-4 h-4" />
                         {t('dashboard.listings.makeTop')}
                       </button>
+                    )}
+                    {promo && promo.payment_status === 'UNPAID' && (
+                      <label
+                        className="inline-flex items-center gap-1.5 text-sm font-semibold text-sky-600 bg-sky-50 hover:bg-sky-100 dark:bg-sky-500/10 dark:hover:bg-sky-500/20 px-3.5 py-1.5 rounded-lg transition cursor-pointer"
+                        data-testid={`send-check-${l.id}`}
+                      >
+                        <Receipt className="w-4 h-4" />
+                        {t('top.check.send')}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            e.target.value = '';
+                            if (file) checkMutation.mutate({ promoId: promo.id, file });
+                          }}
+                        />
+                      </label>
+                    )}
+                    {promo?.check_image_url && (
+                      <a
+                        href={promo.check_image_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] transition"
+                        data-testid={`view-check-${l.id}`}
+                      >
+                        <Receipt className="w-4 h-4" />
+                        {t('top.check.view')}
+                      </a>
                     )}
                     {!l.is_verified && l.status !== 'REMOVED' && (
                       <button

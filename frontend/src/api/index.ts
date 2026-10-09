@@ -559,6 +559,11 @@ export interface TopPromotion {
   started_at: string | null;
   expires_at: string | null;
   reject_reason: string | null;
+  /** The DC Wallet reference this request is (or was) paid under — the
+   *  string in the checkout's `f3` and in the statement the admin checks. */
+  payment_reference: string | null;
+  /** The receipt (screenshot) the owner attached after paying. */
+  check_image_url: string | null;
   created_at: string;
 }
 
@@ -603,6 +608,19 @@ export const topPromotions = {
       )
       .then(unwrap),
 
+  /** Send the payment receipt (screenshot) for a waiting request: the file
+   *  goes straight to storage, only the key is stored, and the response
+   *  carries a fresh link to it. Owner-only while still open and unpaid. */
+  sendCheck: (promoId: number, file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return client
+      .post<APIResponse<TopPromotion>>(`/promotions/${promoId}/check`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(unwrap);
+  },
+
   admin: {
     plans: () => client.get<APIResponse<TopPlan[]>>('/promotions/admin/plans').then(unwrap),
 
@@ -646,6 +664,17 @@ export const topPromotions = {
     /** Manual (re)activation — the window starts fresh, from this moment. */
     activate: (id: number) =>
       client.post<APIResponse<TopPromotion>>(`/promotions/admin/${id}/activate`).then(unwrap),
+
+    /** The DC money is visible in the statement: close the payment through
+     *  the same idempotent settle the callback uses — once, never twice.
+     *  Returns the flag too: the second click honestly says "already". */
+    confirmPayment: (id: number) =>
+      client
+        .post<APIResponse<TopPromotion>>(`/promotions/admin/${id}/confirm-payment`)
+        .then((r) => ({
+          already: r.data.message === 'ALREADY_PAID',
+          promotion: r.data.data,
+        })),
   },
 };
 

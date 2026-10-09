@@ -63,6 +63,13 @@ class TopPromotionResponse(BaseModel):
     started_at: Optional[datetime] = None
     expires_at: Optional[datetime] = None
     reject_reason: Optional[str] = None
+    # Pinned by the service from the DC Wallet intent behind this request:
+    # the string that appears in pay.dc.tj's ``f3`` and in the statement the
+    # operator checks. Absent for wallet/manual requests.
+    payment_reference: Optional[str] = None
+    # The receipt (screenshot) the owner attached after paying - a fresh
+    # link to the stored picture, built the same way post images are.
+    check_image_url: Optional[str] = None
     created_at: datetime
 
 

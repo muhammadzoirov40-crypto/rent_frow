@@ -922,6 +922,8 @@
     "topRejected": "Дархост рад шуд",
     "topCancelled": "TOP бекор шуд (пул баргардонида шуд)",
     "topActivated": "TOP фаъол карда шуд",
+    "topPaymentConfirmed": "Пардохт тасдиқ шуд",
+    "topPaymentAlreadyPaid": "Пардохт аллакай тасдиқ шуда буд",
     "topPlansTitle": "Барномаҳои нархгузорӣ",
     "topStats": {
       "total": "Ҳамумӣ",
@@ -956,14 +958,17 @@
       "approve": "Тасдиқ",
       "reject": "Рад",
       "cancel": "Бекор (баргардонидан)",
-      "activate": "Фаъол кардан"
+      "activate": "Фаъол кардан",
+      "confirmPayment": "Тасдиқи пардохт"
     },
     "topField": {
       "created": "Санаи дархост",
       "started": "Оғоз",
       "expires": "Анҷом",
       "listingId": "ID-и эълон",
-      "rejectReason": "Сабаби радкунӣ"
+      "rejectReason": "Сабаби радкунӣ",
+      "reference": "Референси пардохт",
+      "check": "Чеки пардохт"
     },
     "feedbackBadge": "Фидбек",
     "filterAll": "Ҳама",
@@ -1299,6 +1304,8 @@
     "balanceLabel": "Баланс",
     "pendingNote": "Агар баланс кофӣ набошад, дархост ба тасдиқи админ меравад.",
     "insufficientNote": "Баланс кофӣ нест — дархост ба тасдиқи админ меравад.",
+    "payDcNote": "Пардохт тавассути DC Wallet (Dushanbe City) сурат мегирад ва окни TOP пас аз тасдиқи пардохт фаъол мешавад.",
+    "freeNote": "Ройгон — бевосита фаъол мешавад.",
     "confirm": "Тасдиқ кардан",
     "createdActive": "TOP фаъол шуд",
     "createdPending": "Дархост ба тасдиқи админ фиристода шуд",
@@ -1311,6 +1318,12 @@
     "notOwnerNote": "Хариди TOP танҳо аз ҷониби соҳиби эълон амалӣ мешавад.",
     "activeUntilShort": "TOP то {{date}}",
     "pendingChip": "Дархости TOP",
+    "check": {
+      "send": "Чек фиристодан",
+      "sent": "Чек фиристода шуд",
+      "view": "Чекро дидан",
+      "failed": "Чек нодуруст фиристода шуд"
+    },
     "dur_3h": "3 соат",
     "dur_1d": "1 рӯз",
     "dur_1w": "1 ҳафта",

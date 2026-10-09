@@ -138,8 +138,8 @@ def test_a_database_the_old_startup_code_built_is_recognised_and_caught_up(
         asyncio.run(async_engine.dispose())
 
     assert any("never stamped" in note for note in notes), notes
-    # the catch-up must land on the current head (the DC-TOP intent revision)
-    assert any("f4b8d2c71e9a" in note for note in notes), notes
+    # the catch-up must land on the current head (the check-receipt revision)
+    assert any("d3f7a1c95e28" in note for note in notes), notes
 
     engine = create_engine(f"sqlite:///{alembic_db}")
     try:
@@ -150,7 +150,7 @@ def test_a_database_the_old_startup_code_built_is_recognised_and_caught_up(
             ).scalar_one()
     finally:
         engine.dispose()
-    assert stamped == "f4b8d2c71e9a"
+    assert stamped == "d3f7a1c95e28"
 
 
 def test_running_the_migrations_again_changes_nothing(alembic_db):
@@ -297,4 +297,4 @@ def test_the_dc_intent_column_is_added_to_a_database_that_already_has_the_table(
     assert "promotion_id" in columns, columns
     assert "ix_topup_intents_promotion_id" in indexes, indexes
     assert "idx_topup_user_created" in indexes, "the pre-existing index must survive"
-    assert stamped == "f4b8d2c71e9a"
+    assert stamped == "d3f7a1c95e28"

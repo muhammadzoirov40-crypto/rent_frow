@@ -385,6 +385,44 @@ def rental_ended(
     return subject, text, _card(f"Здравствуйте, {name}!", lead, rows, tail, buttons)
 
 
+def admin_top_dc_request(
+    *,
+    user_name: str,
+    listing_title: str,
+    plan_name: str,
+    duration: str,
+    price,
+    reference: str,
+) -> tuple[str, str, str]:
+    """One template, sent to every admin: a TOP plan was opened at DC Wallet.
+
+    Carries exactly what the operator needs to close the payment without
+    opening anything else - the price and the reference that appears in the
+    DC statement. Built once and handed to :func:`send_in_background` per
+    address, so a dozen admins cost a dozen sends of one string.
+    """
+    subject = "Оплата TOP через DC Wallet — RentHub"
+    rows = [
+        ("Объект", listing_title),
+        ("Тариф", f"{plan_name} ({duration})"),
+        ("Сумма", f"{money(price)} сомони"),
+        ("Референс", reference),
+        ("Статус", "Ожидает подтверждения оплаты"),
+    ]
+    lead = (
+        f"Пользователь {user_name} открыл оплату TOP через DC Wallet "
+        "(Душанбе Сити):"
+    )
+    tail = (
+        "Проверьте поступление по этому референсу в выписке DC и подтвердите "
+        "оплату в RentHub: админка → TOP. Пока оплата не подтверждена, окно "
+        "TOP не активно."
+    )
+    buttons = [("Открыть админку", f"{_base_url()}/admin")]
+    text = "Здравствуйте!\n\n" + _card_text(lead, rows, tail, [b[0] for b in buttons])
+    return subject, text, _card("Здравствуйте!", lead, rows, tail, buttons)
+
+
 def dispatch(to: str, template: tuple[str, str, str]) -> bool:
     """Fire one of the tuples above off the request thread."""
     subject, text, html = template

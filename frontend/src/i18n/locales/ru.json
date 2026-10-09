@@ -922,6 +922,8 @@
     "topRejected": "Запрос отклонён",
     "topCancelled": "TOP отменён (возврат выполнен)",
     "topActivated": "TOP активирован",
+    "topPaymentConfirmed": "Оплата подтверждена",
+    "topPaymentAlreadyPaid": "Оплата уже была подтверждена",
     "topPlansTitle": "Тарифы",
     "topStats": {
       "total": "Всего",
@@ -956,14 +958,17 @@
       "approve": "Одобрить",
       "reject": "Отклонить",
       "cancel": "Отменить (возврат)",
-      "activate": "Активировать"
+      "activate": "Активировать",
+      "confirmPayment": "Подтвердить оплату"
     },
     "topField": {
       "created": "Дата запроса",
       "started": "Начало",
       "expires": "Окончание",
       "listingId": "ID объявления",
-      "rejectReason": "Причина отказа"
+      "rejectReason": "Причина отказа",
+      "reference": "Референс оплаты",
+      "check": "Чек об оплате"
     },
     "feedbackBadge": "Фидбек",
     "filterAll": "Все",
@@ -1299,6 +1304,8 @@
     "balanceLabel": "Баланс",
     "pendingNote": "Если баланса не хватит, запрос уйдёт на подтверждение администратора.",
     "insufficientNote": "Недостаточно баланса — запрос уйдёт на подтверждение администратора.",
+    "payDcNote": "Оплата через DC Wallet (Dushanbe City); окно TOP активируется после подтверждения оплаты.",
+    "freeNote": "Бесплатно — активируется сразу.",
     "confirm": "Подтвердить",
     "createdActive": "TOP активирован",
     "createdPending": "Запрос отправлен на подтверждение администратора",
@@ -1311,6 +1318,12 @@
     "notOwnerNote": "Тариф TOP может купить только владелец объявления.",
     "activeUntilShort": "TOP до {{date}}",
     "pendingChip": "Запрос TOP",
+    "check": {
+      "send": "Отправить чек",
+      "sent": "Чек отправлен",
+      "view": "Посмотреть чек",
+      "failed": "Не удалось отправить чек"
+    },
     "dur_3h": "3 часа",
     "dur_1d": "1 день",
     "dur_1w": "1 неделя",

@@ -41,8 +41,10 @@ from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.promotion import TopPromotionResponse
 from app.services.notification import NotificationService
+from app.services import email as mailer
 from app.services import topup as topup_service
 from app.services.wallet import WalletService, money
+from app.utils.s3 import get_presigned_url
 
 logger = logging.getLogger("rentflow.top_promotions")
 
@@ -110,8 +112,50 @@ def to_response(promo: TopPromotion) -> TopPromotionResponse:
         started_at=promo.started_at,
         expires_at=promo.expires_at,
         reject_reason=promo.reject_reason,
+        payment_reference=promo.__dict__.get("payment_reference"),
+        check_image_url=_check_url(promo),
         created_at=promo.created_at,
     )
+
+
+def _check_url(promo: TopPromotion) -> str | None:
+    """A fresh link to the attached receipt, the way post images do it.
+
+    ``__dict__.get`` again: a column that was never loaded (a transient
+    instance) reads as None instead of touching the database from a sync
+    context.
+    """
+    key = promo.__dict__.get("check_image_key")
+    if not key:
+        return None
+    try:
+        return get_presigned_url(key, expires_in=86400)
+    except Exception:
+        return key
+
+
+async def _pin_reference(db: AsyncSession, promo: TopPromotion) -> None:
+    """Attach the DC Wallet reference this promotion is (or was) paid under.
+
+    Same rule as the relationship pins: set on ``__dict__`` so the sync
+    to_response never has to query. Called wherever a single promotion is
+    about to be answered with.
+    """
+    intents = await topup_service.latest_promotion_intents(db, [promo.id])
+    intent = intents.get(promo.id)
+    if intent is not None:
+        promo.__dict__["payment_reference"] = intent.reference
+
+
+async def _pin_references(db: AsyncSession, promos: list[TopPromotion]) -> None:
+    """The same, for a list: one query for the whole page, not one per row."""
+    if not promos:
+        return
+    intents = await topup_service.latest_promotion_intents(db, [p.id for p in promos])
+    for promo in promos:
+        intent = intents.get(promo.id)
+        if intent is not None:
+            promo.__dict__["payment_reference"] = intent.reference
 
 
 # ------------------------------------------------------------ notifications
@@ -191,6 +235,45 @@ async def _notify_admins(
         )
         sent += 1
     return sent
+
+
+async def _email_admins_dc_request(
+    db: AsyncSession,
+    *,
+    listing: Listing,
+    plan: TopPlan,
+    price: float,
+    reference: str,
+    user_name: str | None,
+) -> None:
+    """The admin hears about a DC Wallet request by email, not only in-app.
+
+    The body carries the two things an operator acts on - the price and the
+    reference - so an unpaid request is visible without opening the panel.
+    Best effort by construction: the mailer queues sends on its own thread
+    and swallows failures, and a mail outage never rolls back the purchase.
+    """
+    try:
+        admins = await UserRepository(db).get_by_role(UserRole.ADMIN)
+    except Exception:
+        logger.exception("Could not load admins for the TOP payment email")
+        return
+    addresses = [admin.email for admin in admins if admin.email]
+    if not addresses:
+        return
+    try:
+        template = mailer.admin_top_dc_request(
+            user_name=user_name or "—",
+            listing_title=listing.title,
+            plan_name=plan.name,
+            duration=duration_label(plan.duration_key),
+            price=price,
+            reference=reference,
+        )
+        for address in addresses:
+            mailer.send_in_background(address, template)
+    except Exception:
+        logger.exception("Could not queue the TOP payment email to the admins")
 
 
 # -------------------------------------------------------------------- plans
@@ -480,6 +563,11 @@ async def create_dc_payment(
         reference = opened["reference"]
         url = opened["url"]
 
+    # The reference belongs on the response the checkout hands back, and on
+    # every later one (admin list, owner's own list) - pinned as plain data
+    # so the sync to_response never has to query for it.
+    promo.__dict__["payment_reference"] = reference
+
     if created:
         # "to the admin as well": the request lands in Admin -> TOP as a row
         # and as a notification carrying the very price that went to DC City.
@@ -499,6 +587,15 @@ async def create_dc_payment(
             ),
             promo=promo,
             extra={"user_name": user_name, "owner_id": listing.owner_id},
+        )
+        # ...and by email: price + reference in the body, to every admin.
+        await _email_admins_dc_request(
+            db,
+            listing=listing,
+            plan=plan,
+            price=price,
+            reference=reference,
+            user_name=user_name,
         )
 
     await db.flush()
@@ -572,6 +669,76 @@ async def complete_dc_payment(
 
 
 # ------------------------------------------------------------- admin actions
+async def confirm_dc_payment(
+    db: AsyncSession,
+    *,
+    promo_id: int,
+    admin_id: int,
+) -> tuple[TopPromotion, str]:
+    """An operator confirmed the DC payment by hand (statement checked).
+
+    Production's real path until DC City registers the callback: the admin
+    finds the reference in the statement and closes it here. Runs through the
+    very same idempotent settle the webhook uses, so a second click - or the
+    callback turning up later - answers ``ALREADY_PAID`` and activates
+    nothing twice.
+
+    Refuses with ``NOT_DC_PAYMENT`` when this request never opened a DC
+    checkout (there is no reference to match, and stamping it "paid" would
+    be a fiction).
+    """
+    promo = await _get_promotion(db, promo_id)
+    intents = await topup_service.latest_promotion_intents(db, [promo.id])
+    intent = intents.get(promo.id)
+    if intent is None:
+        raise HTTPException(status_code=400, detail="NOT_DC_PAYMENT")
+
+    credited, reason = await topup_service.settle(
+        db,
+        reference=intent.reference,
+        amount=None,
+        raw={"by": admin_id, "via": "admin_promo"},
+    )
+    if not credited and reason != "ALREADY_PAID":
+        # still settleable: the operator can simply try again later
+        raise HTTPException(status_code=400, detail=reason)
+
+    await db.flush()
+    promo = await _get_promotion(db, promo_id)
+    return promo, reason
+
+
+async def check_target(
+    db: AsyncSession,
+    *,
+    promo_id: int,
+    user_id: int,
+    is_admin: bool,
+) -> TopPromotion:
+    """Who may attach a receipt to this request, checked *before* the file
+    is stored: owner or admin, and only while the request is still open and
+    unpaid - once settled there is nothing left to prove."""
+    promo = await _get_promotion(db, promo_id)
+    if promo.user_id != user_id and not is_admin:
+        raise HTTPException(status_code=403, detail="Not your promotion")
+    if promo.status not in OPEN_STATUSES:
+        raise HTTPException(status_code=400, detail="PROMOTION_CLOSED")
+    if promo.payment_status != TopPromotionPayment.UNPAID:
+        raise HTTPException(status_code=400, detail="ALREADY_PAID")
+    return promo
+
+
+async def attach_check(
+    db: AsyncSession, promo: TopPromotion, image_key: str
+) -> TopPromotion:
+    """Store the receipt's key (the file itself is already uploaded by the
+    route, which validated the type and size the way posts do). Re-sending
+    simply replaces the key: one receipt at a time."""
+    promo.check_image_key = image_key
+    await db.flush()
+    return promo
+
+
 async def _get_promotion(db: AsyncSession, promo_id: int) -> TopPromotion:
     promo = await db.get(TopPromotion, promo_id)
     if not promo:
@@ -592,6 +759,7 @@ async def _get_promotion(db: AsyncSession, promo_id: int) -> TopPromotion:
         plan = await db.get(TopPlan, promo.plan_id)
         if plan is not None:
             promo.plan = plan
+    await _pin_reference(db, promo)
     return promo
 
 
@@ -804,7 +972,11 @@ async def my_promotions(db: AsyncSession, user_id: int) -> list[TopPromotion]:
         .order_by(TopPromotion.created_at.desc())
         .limit(100)
     )
-    return list(result.scalars().all())
+    promos = list(result.scalars().all())
+    # the owner sees their own reference too - it is what they watch in the
+    # DC statement while the request waits
+    await _pin_references(db, promos)
+    return promos
 
 
 # ------------------------------------------------------------------- admin
@@ -843,7 +1015,11 @@ async def admin_list(
         .offset((page - 1) * page_size)
         .limit(page_size)
     )
-    return list(result.scalars().all()), total
+    promos = list(result.scalars().all())
+    # every row carries its DC reference: this is the list the operator
+    # matches against the statement before confirming a payment
+    await _pin_references(db, promos)
+    return promos, total
 
 
 async def admin_stats(db: AsyncSession) -> dict:

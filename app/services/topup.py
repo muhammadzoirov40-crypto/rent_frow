@@ -134,6 +134,29 @@ async def pending_promotion_intent(
     return result.scalars().first()
 
 
+async def latest_promotion_intents(
+    db: AsyncSession, promotion_ids: list[int]
+) -> dict[int, TopupIntent]:
+    """The newest intent per promotion, paid or not.
+
+    Unlike :func:`pending_promotion_intent` this deliberately ignores the
+    status: it is how a response learns the reference a DC payment was
+    *made* under (confirming the operator needs it even after it settled),
+    and how an admin confirm endpoint finds the reference to settle.
+    """
+    if not promotion_ids:
+        return {}
+    result = await db.execute(
+        select(TopupIntent)
+        .where(TopupIntent.promotion_id.in_(promotion_ids))
+        .order_by(TopupIntent.created_at, TopupIntent.id)
+    )
+    newest: dict[int, TopupIntent] = {}
+    for row in result.scalars().all():
+        newest[row.promotion_id] = row  # ordered oldest first: the last wins
+    return newest
+
+
 async def find(db: AsyncSession, reference: str) -> TopupIntent | None:
     """The one top-up a reference points at — the lookup shared by the
     callback, an operator confirming by hand, and anyone asking what a

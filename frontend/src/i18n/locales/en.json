@@ -922,6 +922,8 @@
     "topRejected": "Request rejected",
     "topCancelled": "TOP cancelled (refunded)",
     "topActivated": "TOP activated",
+    "topPaymentConfirmed": "Payment confirmed",
+    "topPaymentAlreadyPaid": "The payment was already confirmed",
     "topPlansTitle": "Pricing plans",
     "topStats": {
       "total": "Total",
@@ -956,14 +958,17 @@
       "approve": "Approve",
       "reject": "Reject",
       "cancel": "Cancel (refund)",
-      "activate": "Activate"
+      "activate": "Activate",
+      "confirmPayment": "Confirm payment"
     },
     "topField": {
       "created": "Requested",
       "started": "Started",
       "expires": "Expires",
       "listingId": "Listing ID",
-      "rejectReason": "Rejection reason"
+      "rejectReason": "Rejection reason",
+      "reference": "Payment reference",
+      "check": "Payment check"
     },
     "feedbackBadge": "Feedback",
     "filterAll": "All",
@@ -1299,6 +1304,8 @@
     "balanceLabel": "Balance",
     "pendingNote": "If the balance is not enough, the request goes to the admin for approval.",
     "insufficientNote": "Not enough balance — the request goes to the admin for approval.",
+    "payDcNote": "Payment goes through DC Wallet (Dushanbe City); the TOP window activates once the payment is confirmed.",
+    "freeNote": "Free — activates immediately.",
     "confirm": "Confirm",
     "createdActive": "TOP is active",
     "createdPending": "Request sent for admin approval",
@@ -1311,6 +1318,12 @@
     "notOwnerNote": "TOP plans can only be bought by the listing owner.",
     "activeUntilShort": "TOP until {{date}}",
     "pendingChip": "TOP request",
+    "check": {
+      "send": "Send check",
+      "sent": "Check sent",
+      "view": "View check",
+      "failed": "The check could not be sent"
+    },
     "dur_3h": "3 hours",
     "dur_1d": "1 day",
     "dur_1w": "1 week",
