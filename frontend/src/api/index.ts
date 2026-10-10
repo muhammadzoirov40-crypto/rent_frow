@@ -358,6 +358,9 @@ export interface ListingCreateData {
   contact_phone?: string;
   contact_name?: string;
   image_urls?: string[];
+  /** Collected while posting and folded into the owner's profile: one
+   *  wallet per person, not one per listing. Omitted, it is left alone. */
+  dc_account?: string;
 }
 
 export const categories = {

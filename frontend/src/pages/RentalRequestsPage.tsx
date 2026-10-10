@@ -85,6 +85,10 @@ export function RequestCard({
 
   const paymentError = (error: any) => {
     const detail = error?.response?.data?.detail;
+    // The server names the reason rather than translating it, and this is the
+    // one the renter can actually do something about: the owner has to fill
+    // the wallet in, nobody else can.
+    if (detail === 'OWNER_HAS_NO_DC_ACCOUNT') return t('payment.ownerHasNoDcAccount');
     return typeof detail === 'string' && detail ? detail : t('payment.failed');
   };
 

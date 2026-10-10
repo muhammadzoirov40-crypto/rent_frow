@@ -18,7 +18,6 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from urllib.parse import parse_qs, urlparse
 
-from app.core.config import get_settings
 from app.core.enums import PaymentStatus, PaymentType, RentalRequestStatus
 from app.models.user import User
 from app.schemas.payment import PaymentCreate
@@ -38,8 +37,12 @@ def _dest(url: str) -> str:
 
 async def _seed(db: AsyncSession, renter_id: int, **kwargs):
     """An accepted request the fixture customer can pay for - committed, so
-    the app's own sessions see it."""
+    the app's own sessions see it. The owner has a DC wallet on file, which
+    is what makes a checkout payable at all; the one test that needs the
+    opposite clears it again."""
     owner_id = await _make_user(db, "owner")
+    owner = await db.get(User, owner_id)
+    owner.dc_account = "992900111222"
     request = await _seed_accepted_request(db, renter_id, owner_id, **kwargs)
     await db.commit()
     return request
@@ -287,15 +290,33 @@ async def test_rent_is_collected_under_the_owners_own_dc_account(
 
 
 @pytest.mark.asyncio
-async def test_an_owner_with_no_account_falls_back_to_the_platform(
+async def test_an_owner_with_no_account_refuses_the_checkout(
     customer_client: AsyncClient, db_session: AsyncSession, customer_id: int
 ):
-    """A blank field must never stall a checkout: no account registered
-    means the platform's merchant account - the only one always recognised."""
+    """Money that cannot reach the owner must not move at all.
+
+    Falling back to the platform's merchant account would take the rent from
+    the renter and leave the owner with nothing and no way of noticing, so
+    the checkout stops with a code instead — and stops before a payment row
+    exists, so there is nothing to unwind. The moment the owner registers a
+    wallet, the very same checkout goes through.
+    """
     request = await _seed(db_session, customer_id, total=200.0)
 
-    opened = await _open(customer_client, request.id)
-    platform = get_settings().PAYDC_ACCOUNT
+    owner = await db_session.get(User, request.owner_id)
+    owner.dc_account = None
+    await db_session.commit()
 
-    assert _dest(opened["url"]) == platform
-    assert _dest(opened["url"]) != "None"
+    resp = await customer_client.post(
+        f"{API}/pay-dc",
+        json={"rental_request_id": request.id, "payment_type": "BOOKING"},
+    )
+    assert resp.status_code == 400, resp.text
+    assert resp.json()["detail"] == "OWNER_HAS_NO_DC_ACCOUNT"
+    assert await _lines(customer_client, request.id) == []
+
+    owner.dc_account = "992900111222"
+    await db_session.commit()
+
+    opened = await _open(customer_client, request.id)
+    assert _dest(opened["url"]) == "992900111222"

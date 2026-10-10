@@ -367,6 +367,9 @@
     "contactNamePlaceholder": "Your name",
     "contactPhone": "Phone",
     "contactPhonePlaceholder": "+992 (002) 119-831",
+    "dcAccount": "DC account for payments",
+    "dcAccountHint": "Rent is collected under this DC account. Leave it blank to use the one already saved on your profile.",
+    "dcAccountPlaceholder": "DC account number",
     "photos": "Photos ({{count}}/8)",
     "uploadHint": "PNG, JPG up to 10MB. Max 8 photos.",
     "uploading": "Uploading...",
@@ -1223,6 +1226,7 @@
     "created": "Payment requested — the listing owner confirms it",
     "confirmed": "Payment confirmed",
     "failed": "Payment failed",
+    "ownerHasNoDcAccount": "The listing owner has not registered a DC account, so this payment cannot go through. Ask them to add it while posting the listing or in their profile.",
     "reference": "Payment reference"
   },
   "accents": {

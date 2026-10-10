@@ -772,6 +772,9 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
 
   const paymentError = (error: any) => {
     const detail = error?.response?.data?.detail;
+    // Same as the requests page: the server names the reason, and this one
+    // the renter can only pass on — the owner has to register the wallet.
+    if (detail === 'OWNER_HAS_NO_DC_ACCOUNT') return t('payment.ownerHasNoDcAccount');
     return typeof detail === 'string' && detail ? detail : t('payment.failed');
   };
 

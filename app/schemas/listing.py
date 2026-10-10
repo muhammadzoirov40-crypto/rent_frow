@@ -50,6 +50,15 @@ class ListingCreate(BaseModel):
     contact_phone: Optional[str] = None
     contact_name: Optional[str] = None
     image_urls: list[str] = Field(default_factory=list)
+    dc_account: Optional[str] = Field(
+        None,
+        max_length=50,
+        description=(
+            "The owner's DC wallet, collected while they post. Not a column on "
+            "the listing - one person has one wallet however many listings - so "
+            "the service folds it into the owner's profile instead."
+        ),
+    )
 
 
 class ListingUpdate(BaseModel):
@@ -77,6 +86,11 @@ class ListingUpdate(BaseModel):
     rental_rules: Optional[str] = None
     contact_phone: Optional[str] = None
     contact_name: Optional[str] = None
+    dc_account: Optional[str] = Field(
+        None,
+        max_length=50,
+        description="Same wallet as on create: folded into the owner's profile.",
+    )
 
 
 class ListingResponse(BaseModel):

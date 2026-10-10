@@ -117,18 +117,27 @@ class PaymentService:
             amount = float(request.total_price)
         return request, amount
 
-    async def _rental_dc_account(self, request: RentalRequest) -> str | None:
+    async def _rental_dc_account(self, request: RentalRequest) -> str:
         """The DC account a rental payment is collected under: the listing
-        owner's own registered account, else ``None`` (platform account).
+        owner's own registered account, and nothing else.
 
         Routing rent to the person who actually rents the thing out is the
-        whole point — but an owner who never filled the field in must not be
-        able to stall a checkout, so blank/missing simply means "use the
-        platform's merchant account", which is always recognised.
+        whole point, and the only alternative — quietly handing the money to
+        the platform instead — is worse than refusing outright: the renter
+        would pay, the owner would never see it, and both would have to sort
+        it out by hand afterwards. So an owner who has not registered a wallet
+        stops the checkout with a code the front end turns into a sentence the
+        renter can act on. The fix is one field, on the owner's own profile or
+        typed while posting the listing.
         """
         owner = await self.db.get(User, request.owner_id)
         account = (owner.dc_account or "").strip() if owner else ""
-        return account or None
+        if not account:
+            raise HTTPException(
+                status_code=400,
+                detail="OWNER_HAS_NO_DC_ACCOUNT",
+            )
+        return account
 
     async def pay_dc(self, customer_id: int, data: PaymentCreate) -> dict:
         """The same payment as :meth:`create`, pointed at the DC checkout.

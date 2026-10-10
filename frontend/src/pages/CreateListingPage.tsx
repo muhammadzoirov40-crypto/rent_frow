@@ -39,6 +39,7 @@ interface FormData {
   latitude: number | null;
   longitude: number | null;
   rules: string;
+  dc_account: string;
 }
 
 const initialFormData: FormData = {
@@ -57,6 +58,7 @@ const initialFormData: FormData = {
   latitude: null,
   longitude: null,
   rules: '',
+  dc_account: '',
 };
 
 export default function CreateListingPage() {
@@ -135,6 +137,10 @@ export default function CreateListingPage() {
       latitude: editListing.latitude ?? null,
       longitude: editListing.longitude ?? null,
       rules: editListing.rental_rules || '',
+      // Deliberately left blank: the wallet lives on the owner's profile, not
+      // on this listing, and an untouched field is omitted from the request —
+      // which is what keeps the number already on file from being wiped.
+      dc_account: '',
     });
   }, [editListing]);
 
@@ -159,6 +165,9 @@ export default function CreateListingPage() {
         contact_name: formData.contact_name || undefined,
         contact_phone: formData.contact_phone || undefined,
         image_urls: formData.image_urls,
+        // Blank is omitted, not sent as empty: posting without touching the
+        // field must not clear the wallet already on the owner's profile.
+        dc_account: formData.dc_account.trim() || undefined,
       };
       return editId ? listings.update(editId, payload) : listings.create(payload);
     },
@@ -372,6 +381,18 @@ export default function CreateListingPage() {
                     className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                   />
                 </div>
+              </div>
+              <div className="mt-4">
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.dcAccount')}</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={form.dc_account}
+                  onChange={(e) => updateForm({ dc_account: e.target.value })}
+                  placeholder={t('createListing.dcAccountPlaceholder')}
+                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                />
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('createListing.dcAccountHint')}</p>
               </div>
             </div>
           )}

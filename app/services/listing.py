@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy import select, func, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.listing import Listing, ListingStatus
+from app.models.user import User
 from app.models.conversation import Conversation
 from app.models.listing_image import ListingImage
 from app.models.rental_request import RentalRequest, RentalRequestStatus
@@ -30,9 +31,25 @@ class ListingService:
         self.fav_repo = FavoriteRepository(db)
         self.notif_service = NotificationService(db)
 
+    async def _remember_dc_account(self, owner_id: int, dc_account: str | None) -> None:
+        """Fold a wallet typed while posting into the owner's profile.
+
+        A person has one DC wallet however many listings they post, so the
+        number belongs to the user row and not to any one listing — which is
+        also exactly where the payment already looks for it. ``None`` means
+        "not sent at all" and leaves whatever is on file alone, the same way
+        the profile field distinguishes "not sent" from "cleared".
+        """
+        if dc_account is None:
+            return
+        owner = await self.db.get(User, owner_id)
+        if not owner:
+            return
+        owner.dc_account = dc_account.strip() or None
+
     async def create(self, owner_id: int, data: ListingCreate) -> Listing:
         image_urls = data.image_urls
-        data_dict = data.model_dump(exclude={"image_urls"})
+        data_dict = data.model_dump(exclude={"image_urls", "dc_account"})
         listing = await self.repo.create(
             owner_id=owner_id,
             status=ListingStatus.ACTIVE,
@@ -49,6 +66,7 @@ class ListingService:
                     sort_order=i,
                 )
             )
+        await self._remember_dc_account(owner_id, data.dc_account)
         await self.db.flush()
         await self.db.refresh(listing)
         return listing
@@ -71,6 +89,9 @@ class ListingService:
             raise HTTPException(status_code=403, detail="Not authorized to update this listing")
         moderated = listing.owner_id != owner_id
         update_data = data.model_dump(exclude_unset=True)
+        # not a listing column: the wallet belongs to the owner, so it is
+        # handled apart from the rest of the row below
+        dc_account = update_data.pop("dc_account", None)
 
         new_status = update_data.get("status")
         new_available = update_data.get("available")
@@ -82,6 +103,7 @@ class ListingService:
         )
 
         updated = await self.repo.update(listing, **update_data)
+        await self._remember_dc_account(listing.owner_id, dc_account)
 
         if was_visible and now_deactivated:
             await self.notif_service.create(
