@@ -51,7 +51,12 @@ class Settings(BaseSettings):
     PAYDC_ENABLED: bool = True
     PAYDC_URL: str = "https://pay.dc.tj/"
     PAYDC_ACCOUNT: str = "9762000220865843"
-    PAYDC_ARTICUL: str = "133"
+    # The articul is the service code, and it is the only thing on the page
+    # that decides WHICH route DC Wallet takes the money down. 331 is the
+    # wallet one - a transfer to a phone number, which is what a DC account
+    # is; 133 was the card route, so the rent was collected as a card
+    # transfer however correct the destination beside it happened to be.
+    PAYDC_ARTICUL: str = "331"
     PAYDC_DESCRIPTION: str = "DANAT.TJ"
     PAYDC_WEBHOOK_SECRET: str = ""
     # Handing yourself money is an admin action. The browser may only *ask*
