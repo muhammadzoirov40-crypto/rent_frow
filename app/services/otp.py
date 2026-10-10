@@ -265,15 +265,21 @@ def _smtp_send(msg: MIMEMultipart) -> bool:
                 pass
 
 
-def _resend_send(email: str, code: str) -> bool:
+def _resend_send(to: str, subject: str, text: str, html: str) -> bool:
+    """Post one message through Resend's HTTP API.
+
+    Takes any subject and body rather than an OTP code: the rental notices
+    go out through this same door, and leaving them on the Gmail account
+    would keep spam-foldering exactly the mail the owner is waiting for.
+    """
     settings = get_settings()
     payload = json.dumps(
         {
             "from": settings.EMAIL_FROM,
-            "to": [email],
-            "subject": _otp_subject(code),
-            "text": _text_body(code),
-            "html": _html_body(code),
+            "to": [to],
+            "subject": subject,
+            "text": text,
+            "html": html,
         }
     ).encode("utf-8")
     req = urllib.request.Request(
@@ -303,7 +309,7 @@ def send_otp_email(email: str, code: str) -> bool:
     if settings.RESEND_API_KEY:
         for attempt in range(1, RESEND_MAX_RETRIES + 1):
             try:
-                _resend_send(email, code)
+                _resend_send(email, _otp_subject(code), _text_body(code), _html_body(code))
                 _log(f"[OTP EMAIL] Sent via Resend to {email} (attempt {attempt})")
                 return True
             except Exception as e:

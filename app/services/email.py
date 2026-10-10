@@ -17,7 +17,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 from app.core.config import get_settings
-from app.services.otp import _smtp_send  # the one and only transport
+from app.services.otp import _resend_send, _smtp_send  # the two transports
 
 SMTP_RETRIES = 3
 SMTP_RETRY_DELAY = 2
@@ -46,13 +46,32 @@ def enabled() -> bool:
 
 def send_email(to: str, subject: str, text: str, html: str) -> bool:
     """Deliver one email. Never raises — an empty or unreachable address is
-    logged and swallowed so the flow that triggered it can finish."""
+    logged and swallowed so the flow that triggered it can finish.
+
+    Resend goes first when it is configured. The rental notices were the one
+    kind of traffic still tied to the Gmail account, and that account's mail
+    was landing in Spam — a poor place for "your rental request was accepted".
+    SMTP stays as the fallback, so a Resend outage costs a retry and nothing
+    else."""
     if not enabled():
         _log(f"[email] disabled — not sending {subject!r} to {to or '<no recipient>'}")
         return False
     if not to:
         _log(f"[email] skipped — no recipient for {subject!r}")
         return False
+
+    settings = get_settings()
+    if settings.RESEND_API_KEY:
+        for attempt in range(1, SMTP_RETRIES + 1):
+            try:
+                _resend_send(to, subject, text, html)
+                _log(f"[email] sent via Resend to {to} — {subject}")
+                return True
+            except Exception as exc:  # noqa: BLE001 - delivery must not propagate
+                _log(f"[email] Resend attempt {attempt}/{SMTP_RETRIES} to {to} failed: {exc}")
+                if attempt < SMTP_RETRIES:
+                    time.sleep(SMTP_RETRY_DELAY)
+        _log(f"[email] Resend gave up on {to}, falling back to SMTP — {subject}")
 
     msg = build_email(to, subject, text, html)
     for attempt in range(1, SMTP_RETRIES + 1):
