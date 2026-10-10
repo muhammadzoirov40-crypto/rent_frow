@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { invalidateListingQueries } from '../utils/invalidateListings';
 import { useTranslation } from 'react-i18next';
 import { listings, reviews, rentalRequests, messages } from '../api';
 import useAuthStore from '../store/authStore';
@@ -305,9 +306,7 @@ export default function ListingPage() {
     mutationFn: () => listings.delete(Number(id)),
     onSuccess: () => {
       toast.success(t('listing.listingDeleted'));
-      queryClient.invalidateQueries({ queryKey: ['listings'] });
-      queryClient.invalidateQueries({ queryKey: ['search'] });
-      queryClient.invalidateQueries({ queryKey: ['similarListings'] });
+      invalidateListingQueries(queryClient);
       navigate('/dashboard');
     },
     onError: (error: any) => {

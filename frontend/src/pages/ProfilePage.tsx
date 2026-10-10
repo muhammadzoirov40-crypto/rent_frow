@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { invalidateListingQueries } from '../utils/invalidateListings';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   User, Mail, Phone, Star, Calendar, Camera, Save, Loader2,
@@ -93,7 +94,9 @@ export default function ProfilePage() {
   const deleteListingMutation = useMutation({
     mutationFn: listings.deleteListing,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['owner-listings'] });
+      // The listing is gone from the owner's list and from everywhere else
+      // it was being shown, not only from the dashboard.
+      invalidateListingQueries(queryClient);
       toast.success(t('profile.deleted'));
     },
     onError: () => toast.error(t('profile.failedToDelete')),

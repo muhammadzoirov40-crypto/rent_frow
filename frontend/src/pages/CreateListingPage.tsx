@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { invalidateListingQueries } from '../utils/invalidateListings';
 import { listings, categories, cities, upload } from '../api';
 import { compressImage } from '../utils/compressImage';
 import { previousPath } from '../utils/navHistory';
@@ -175,8 +176,9 @@ export default function CreateListingPage() {
     },
     onSuccess: (data) => {
       toast.success(editId ? t('createListing.updated') : t('createListing.published'));
-      queryClient.invalidateQueries({ queryKey: ['listings'] });
-      queryClient.invalidateQueries({ queryKey: ['listing', editId] });
+      // Every page that shows listings has to hear about this one — the
+      // invalidation list lives in one place for that reason.
+      invalidateListingQueries(queryClient);
       navigate(`/listing/${data.id}`);
     },
     onError: (error: any) => {

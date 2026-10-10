@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { invalidateListingQueries } from '../utils/invalidateListings';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard, Users, FileText, ClipboardList, FolderTree,
@@ -358,19 +359,19 @@ export default function AdminPage() {
 
   const approveMutation = useMutation({
     mutationFn: adminApi.approveListing,
-    onSuccess: () => { toast.success(t('admin.approvedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); },
+    onSuccess: () => { toast.success(t('admin.approvedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); invalidateListingQueries(queryClient); },
     onError: () => toast.error(t('admin.failedAction')),
   });
 
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }: { id: number; reason?: string }) => adminApi.rejectListing(id, reason),
-    onSuccess: () => { toast.success(t('admin.rejectedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); },
+    onSuccess: () => { toast.success(t('admin.rejectedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); invalidateListingQueries(queryClient); },
     onError: () => toast.error(t('admin.failedAction')),
   });
 
   const deleteListingMutation = useMutation({
     mutationFn: adminApi.deleteListing,
-    onSuccess: () => { toast.success(t('admin.deletedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); },
+    onSuccess: () => { toast.success(t('admin.deletedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-listings'] }); invalidateListingQueries(queryClient); },
     onError: () => toast.error(t('admin.failedAction')),
   });
 
