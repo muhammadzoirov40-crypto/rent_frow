@@ -26,6 +26,7 @@ from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
+from app.core.dc import normalize_dc_account
 from app.models.wallet import TopupIntent
 from app.services.wallet import WalletService, money
 
@@ -47,11 +48,15 @@ def payment_url(user_id: int, amount: float, reference: str, account: str | None
     account) it falls back to the platform's merchant account, which is the
     only one guaranteed to be recognised, so a blank field can never break a
     checkout.
+
+    Whatever the owner typed is reduced on the way out as well as on the way
+    in: a wallet saved before that reduction existed still has to reach DC in
+    the form DC routes by.
     """
     settings = get_settings()
     return settings.PAYDC_URL + "?" + urlencode(
         [
-            ("a", account or settings.PAYDC_ACCOUNT),
+            ("a", normalize_dc_account(account) or settings.PAYDC_ACCOUNT),
             ("f1", settings.PAYDC_ARTICUL),
             ("c", settings.PAYDC_DESCRIPTION),
             ("s", "%0.2f" % money(amount)),

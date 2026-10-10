@@ -276,17 +276,20 @@ async def test_rent_is_collected_under_the_owners_own_dc_account(
     request = await _seed(db_session, customer_id, total=200.0, deposit=50.0)
 
     owner = await db_session.get(User, request.owner_id)
+    # Written straight to the column, the way an account saved before the
+    # nine-digit rule existed would be: the checkout is what has to cope.
     owner.dc_account = "992900111222"
     await db_session.commit()
 
     opened = await _open(customer_client, request.id)
-    assert _dest(opened["url"]) == "992900111222", (
-        "the checkout must be pointed at the owner's own DC account"
+    assert _dest(opened["url"]) == "900111222", (
+        "the checkout must be pointed at the owner's own DC account, in the "
+        "form DC routes a transfer by"
     )
 
     # the deposit is theirs too - it is held against their listing
     deposit = await _open(customer_client, request.id, "DEPOSIT")
-    assert _dest(deposit["url"]) == "992900111222"
+    assert _dest(deposit["url"]) == "900111222"
 
 
 @pytest.mark.asyncio
@@ -319,4 +322,4 @@ async def test_an_owner_with_no_account_refuses_the_checkout(
     await db_session.commit()
 
     opened = await _open(customer_client, request.id)
-    assert _dest(opened["url"]) == "992900111222"
+    assert _dest(opened["url"]) == "900111222"

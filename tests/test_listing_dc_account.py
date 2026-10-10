@@ -47,8 +47,9 @@ async def test_a_wallet_typed_while_posting_lands_on_the_owner(
     await service.create(customer_id, ListingCreate(**payload))
 
     owner = await db_session.get(User, customer_id)
-    assert owner.dc_account == "992900111222", (
-        "the wallet belongs to the person, which is where the payment looks"
+    assert owner.dc_account == "900111222", (
+        "the wallet belongs to the person, which is where the payment looks - "
+        "and it is stored in the nine-digit form DC routes a transfer by"
     )
     assert "dc_account" not in Listing.__table__.columns, (
         "one wallet per person, however many listings - not a listing column"
@@ -69,7 +70,7 @@ async def test_an_edit_that_omits_the_field_leaves_the_number_on_file(
     await service.update(listing.id, customer_id, ListingUpdate(title="Номи нав"))
 
     owner = await db_session.get(User, customer_id)
-    assert owner.dc_account == "992900111222"
+    assert owner.dc_account == "900111222"
 
 
 @pytest.mark.asyncio

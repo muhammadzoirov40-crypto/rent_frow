@@ -11,6 +11,7 @@ from app.repositories.listing import ListingRepository
 from app.repositories.favorite import FavoriteRepository
 from app.schemas.listing import ListingCreate, ListingUpdate
 from app.services.notification import NotificationService
+from app.core.dc import normalize_dc_account
 from app.core.enums import VerificationStatus
 
 LISTING_TTL_DAYS = 30
@@ -45,7 +46,7 @@ class ListingService:
         owner = await self.db.get(User, owner_id)
         if not owner:
             return
-        owner.dc_account = dc_account.strip() or None
+        owner.dc_account = normalize_dc_account(dc_account)
 
     async def create(self, owner_id: int, data: ListingCreate) -> Listing:
         image_urls = data.image_urls

@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt
 from app.core.config import get_settings
+from app.core.dc import normalize_dc_account
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, UserBrief, GoogleAuthRequest
@@ -180,7 +181,7 @@ class AuthService:
         if phone is not None:
             changes["phone"] = phone.strip() or None
         if dc_account is not None:
-            changes["dc_account"] = dc_account.strip() or None
+            changes["dc_account"] = normalize_dc_account(dc_account)
         if changes:
             user = await self.user_repo.update(user, **changes)
 

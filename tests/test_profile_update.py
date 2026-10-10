@@ -70,4 +70,7 @@ async def test_every_field_the_screen_offers_is_writable(
     assert body["phone"] == "+992900000002", (
         "the phone came back as it went in - it was never saved before"
     )
-    assert body["dc_account"] == "992900111222"
+    assert body["dc_account"] == "900111222", (
+        "saved in the nine-digit form DC routes a transfer by, not the "
+        "international one the owner typed"
+    )
