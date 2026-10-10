@@ -139,6 +139,32 @@ async def _notif(user_id: int, ntype: str) -> list[Notification]:
 
 
 # --------------------------------------------------- 18 + 19: the link itself
+async def test_a_checkout_over_someone_elses_listing_still_names_its_owner(
+    admin_client: AsyncClient, customer_id: int
+):
+    """An admin may buy TOP for any listing, which is the one path where the
+    person paying and the person who owns the listing are two different
+    people. Reaching the owner off the listing row used to ask the database
+    from inside a *sync* context - `db.get` does not carry the eager loader
+    that `db.execute` does - and every such checkout answered 500 in
+    production while the identical call from the owner's own browser passed.
+    The owner is fetched now, so there is nothing left to reach for.
+    """
+    plan_id = await _seed_plan(price=40)
+    listing_id = await _seed_listing(customer_id)
+
+    resp = await _open_dc(admin_client, listing_id, plan_id)
+    assert resp.status_code == 200, resp.text
+    data = resp.json()["data"]
+
+    assert data["url"].startswith("https://pay.dc.tj/?a="), (
+        "the checkout has to open at all, which is the whole point"
+    )
+    assert data["promotion"]["user_id"] == customer_id, (
+        "the promotion belongs to the owner, not to whoever opened the link"
+    )
+
+
 async def test_the_link_carries_the_plan_price_and_nothing_moves(
     customer_client: AsyncClient, customer_id: int
 ):

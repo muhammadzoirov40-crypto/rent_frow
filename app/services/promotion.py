@@ -134,6 +134,22 @@ def _check_url(promo: TopPromotion) -> str | None:
         return key
 
 
+async def _owner_of(db: AsyncSession, listing: Listing | None) -> User | None:
+    """The listing's owner, fetched rather than reached for.
+
+    ``listing.owner`` is a relationship, and reading it off a row that came
+    from ``db.get`` has to go and query for the user - from inside a *sync*
+    context, which is the MissingGreenlet crash behind every TOP checkout
+    answering 500. ``db.execute`` happens to carry the eager loader with it
+    and ``db.get`` does not, so which of the two loaded the row is the whole
+    bug. One explicit get keeps the read in the async context it belongs in,
+    and costs the same single query either way.
+    """
+    if listing is None:
+        return None
+    return await db.get(User, listing.owner_id)
+
+
 async def _pin_reference(db: AsyncSession, promo: TopPromotion) -> None:
     """Attach the DC Wallet reference this promotion is (or was) paid under.
 
@@ -421,7 +437,7 @@ async def create_promotion(
     # final flush writes nothing extra.
     promo.listing = listing
     promo.plan = plan
-    promo.user = listing.owner
+    promo.user = await _owner_of(db, listing)
 
     if status == TopPromotionStatus.ACTIVE:
         await _notify(
@@ -436,7 +452,7 @@ async def create_promotion(
             promo=promo,
         )
     else:
-        owner = listing.owner
+        owner = await _owner_of(db, listing)
         user_name = None
         if owner:
             user_name = owner.display_name or (owner.email or "").split("@")[0]
@@ -545,7 +561,7 @@ async def create_dc_payment(
     # to_response and the notifications read them out of __dict__ only.
     promo.listing = listing
     promo.plan = plan
-    owner = listing.owner
+    owner = await _owner_of(db, listing)
     promo.user = owner
 
     # One checkout per pending promotion: a repeat click reopens the very
@@ -648,7 +664,7 @@ async def complete_dc_payment(
     promo.listing = listing
     plan = await db.get(TopPlan, promo.plan_id)
     promo.plan = plan
-    owner = listing.owner if listing else None
+    owner = await _owner_of(db, listing)
     promo.user = owner
 
     if result == "PROMOTION_ACTIVATED":
