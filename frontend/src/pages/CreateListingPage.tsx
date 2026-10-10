@@ -21,6 +21,8 @@ import {
   Gavel,
   Check,
   Loader2,
+  Wallet,
+  AlertCircle,
 } from 'lucide-react';
 
 interface FormData {
@@ -383,7 +385,12 @@ export default function CreateListingPage() {
                 </div>
               </div>
               <div className="mt-4">
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.dcAccount')}</label>
+                {/* The owner has to understand two things before they post:
+                    where the money lands, and that nothing lands without it. */}
+                <label className="flex items-center gap-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  <Wallet className="w-3.5 h-3.5" />
+                  {t('createListing.dcAccount')}
+                </label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -392,7 +399,11 @@ export default function CreateListingPage() {
                   placeholder={t('createListing.dcAccountPlaceholder')}
                   className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                 />
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{t('createListing.dcAccountHint')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed">{t('createListing.dcAccountHint')}</p>
+                <div className="mt-2 flex items-start gap-2 rounded-xl border border-red-200 dark:border-red-500/25 bg-red-50 dark:bg-red-500/10 px-3 py-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+                  <p className="text-xs leading-relaxed text-red-600 dark:text-red-400">{t('createListing.dcAccountWarning')}</p>
+                </div>
               </div>
             </div>
           )}
