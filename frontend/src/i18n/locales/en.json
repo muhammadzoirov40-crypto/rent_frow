@@ -614,6 +614,7 @@
     "dcAccount": "DC account for payments",
     "dcAccountHint": "The rent goes to this account. If you leave it blank, payments on all your listings are blocked.",
     "dcAccountPlaceholder": "DC account number",
+    "phonePlaceholder": "+992 (000) 000 000",
     "admin": "Admin",
     "user": "User",
     "signOut": "Sign out of account",

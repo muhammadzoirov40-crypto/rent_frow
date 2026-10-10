@@ -75,6 +75,10 @@ export default function ProfilePage() {
     mutationFn: auth.updateProfile,
     onSuccess: (data) => {
       updateUser(data as any);
+      // The header reads the cached `me` query first, so updating the store
+      // alone leaves the screen showing the number that was just replaced -
+      // which is exactly how a saved change looked like it had not taken.
+      queryClient.invalidateQueries({ queryKey: ['me'] });
       setIsEditing(false);
       toast.success(t('profile.profileUpdated'));
     },
@@ -223,7 +227,7 @@ export default function ProfilePage() {
                     type="tel"
                     value={editPhone}
                     onChange={(e) => setEditPhone(e.target.value)}
-                    placeholder={t('profile.fullName')}
+                    placeholder={t('profile.phonePlaceholder')}
                     className="text-sm border-b border-gray-300 dark:border-white/20 outline-none bg-transparent dark:text-white"
                   />
                 </div>
