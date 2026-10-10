@@ -265,7 +265,7 @@ export const auth = {
   getMe: () =>
     client.get<APIResponse<User>>('/auth/me').then(unwrap),
 
-  updateProfile: (data: { display_name?: string; dc_account?: string }) =>
+  updateProfile: (data: { display_name?: string; phone?: string; dc_account?: string }) =>
     client.patch<APIResponse<User>>('/auth/profile', data).then(unwrap),
 
   uploadAvatar: (file: File) => {

@@ -142,7 +142,7 @@ export default function ProfilePage() {
   };
 
   const handleSaveProfile = () => {
-    updateProfileMutation.mutate({ display_name: editName, phone: editPhone } as any);
+    updateProfileMutation.mutate({ display_name: editName, phone: editPhone });
   };
 
   const handleLogout = () => {

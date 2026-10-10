@@ -161,13 +161,14 @@ class AuthService:
         self,
         user_id: int,
         display_name: str | None = None,
+        phone: str | None = None,
         dc_account: str | None = None,
     ) -> UserResponse:
         """Partial update: a field left as ``None`` is not touched at all.
 
         ``dc_account`` distinguishes "not sent" (leave alone) from an empty
-        string (clear it) — an owner who blanks the field drops back to the
-        platform account rather than being locked to a stale number.
+        string (clear it). Clearing it does not hand the rent to anyone else:
+        with no wallet on file the checkout refuses, which is the point.
         """
         user = await self.user_repo.get_by_id(user_id)
         if not user:
@@ -176,6 +177,8 @@ class AuthService:
         changes: dict = {}
         if display_name is not None:
             changes["display_name"] = display_name
+        if phone is not None:
+            changes["phone"] = phone.strip() or None
         if dc_account is not None:
             changes["dc_account"] = dc_account.strip() or None
         if changes:

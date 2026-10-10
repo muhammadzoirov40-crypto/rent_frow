@@ -25,8 +25,12 @@ class UserResponse(BaseModel):
 
 
 class UpdateProfileRequest(BaseModel):
-    # both partial: a client that only sends one field leaves the other alone.
+    # all partial: a client that only sends one field leaves the others alone.
     display_name: Optional[str] = Field(None, min_length=1, max_length=255)
+    # Editable here and nowhere else. The profile screen has always offered
+    # this field; the schema simply never listed it, so the number was dropped
+    # on the way in and the screen showed the old one back as if it had stuck.
+    phone: Optional[str] = Field(None, max_length=32)
     dc_account: Optional[str] = Field(None, max_length=50)
 
 

@@ -133,6 +133,7 @@ async def update_profile(
     result = await service.update_profile(
         current_user.user_id,
         display_name=data.display_name,
+        phone=data.phone,
         dc_account=data.dc_account,
     )
     return APIResponse(message="Profile updated successfully", data=result)
