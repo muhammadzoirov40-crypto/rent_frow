@@ -100,6 +100,20 @@ export default function LocationPicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [latitude, longitude]);
 
+  // Choosing a city moves the map to it. The build above only ever ran once,
+  // on mount, so picking Душанбе after Истаравшан left the visitor looking at
+  // the wrong part of the country with no pin to explain why. A pin wins: if
+  // they have already said where the listing is, that is the place the map
+  // has to keep showing.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (isValidCoord(latitude, longitude)) return;
+    const center = cityCenter(cityName);
+    if (center) map.setView(center, 11);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cityName]);
+
   const runSearch = async () => {
     const q = query.trim();
     if (q.length < 4 || searching) return;

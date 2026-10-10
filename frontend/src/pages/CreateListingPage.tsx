@@ -26,6 +26,25 @@ import {
   AlertCircle,
 } from 'lucide-react';
 
+// A phone field takes what people write and nothing else: digits, the country
+// code, the brackets and dashes a number is normally written with. Letters
+// used to sail straight through and end up on the profile as an account
+// nobody could ever call or pay.
+const PHONE_ALLOWED = /[^0-9+()\-\s]/g;
+const asPhone = (v: string) => v.replace(PHONE_ALLOWED, '');
+const digitsOf = (v: string) => (v.match(/\d/g) || []).length;
+
+// A Tajik phone number is nine digits after the country code; seven is the
+// shortest string that could still be one once a typo is taken out.
+const MIN_PHONE_DIGITS = 9;
+const MIN_DC_DIGITS = 7;
+
+// The price is what the owner decides, free included, and the guarantee is
+// money held against that same price - so it can never be worth more than
+// the thing it is holding against.
+const MAX_PRICE = 1_000_000;
+const MIN_PRICE = 0;
+
 interface FormData {
   category_id: number | null;
   title: string;
@@ -85,7 +104,7 @@ export default function CreateListingPage() {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<FormData>(initialFormData);
   const [uploadingImages, setUploadingImages] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number; percent: number } | null>(null);
   const [previews, setPreviews] = useState<{ key: string; url: string }[]>([]);
   const [dragOver, setDragOver] = useState(false);
 
@@ -232,15 +251,34 @@ export default function CreateListingPage() {
     }));
     setPreviews((p) => [...p, ...locals]);
     setUploadingImages(true);
-    setUploadProgress({ done: 0, total: toUpload.length });
+    setUploadProgress({ done: 0, total: toUpload.length, percent: 0 });
     try {
       const prepared = await Promise.all(toUpload.map((f) => compressImage(f)));
       let done = 0;
+      // Every file owns an equal share of the bar: the percent is the mean of
+      // what each upload has reported, so eight slow pictures and one quick
+      // one still climb from 0 to 100 as a single movement rather than
+      // jumping a whole eighth at a time.
+      const perFile = new Array(prepared.length).fill(0);
+      const report = () =>
+        setUploadProgress({
+          done,
+          total: prepared.length,
+          percent: Math.min(
+            100,
+            Math.round(perFile.reduce((a, b) => a + b, 0) / prepared.length),
+          ),
+        });
+      report();
       const urls = await Promise.all(
-        prepared.map(async (file) => {
-          const result = await upload.uploadImage(file);
+        prepared.map(async (file, index) => {
+          const result = await upload.uploadImage(file, (pct) => {
+            perFile[index] = pct;
+            report();
+          });
+          perFile[index] = 100;
           done += 1;
-          setUploadProgress({ done, total: prepared.length });
+          report();
           return result.image_url;
         }),
       );
@@ -297,12 +335,34 @@ export default function CreateListingPage() {
     updateForm({ image_urls: form.image_urls.filter((_, i) => i !== index) });
   };
 
+  // What each field is willing to say, whether or not anyone has asked yet.
+  const phoneTooShort =
+    form.contact_phone.trim() !== '' && digitsOf(form.contact_phone) < MIN_PHONE_DIGITS;
+  const dcTooShort =
+    form.dc_account.trim() !== '' && digitsOf(form.dc_account) < MIN_DC_DIGITS;
+  const priceValue = form.price === '' ? null : Number(form.price);
+  const priceTooHigh = priceValue !== null && priceValue > MAX_PRICE;
+  const depositTooHigh =
+    form.deposit !== '' && priceValue !== null && Number(form.deposit) > priceValue;
+
   const canProceed = () => {
     switch (step) {
       case 0: return form.category_id !== null;
-      case 1: return form.title.trim().length > 0;
+      case 1:
+        // A listing nobody can call is a listing nobody can rent. The phone
+        // is how the renter reaches the owner, so a number too short to be
+        // one holds the step back rather than the whole listing.
+        return form.title.trim().length > 0 && !phoneTooShort && !dcTooShort;
       case 2: return form.image_urls.length > 0;
-      case 3: return form.price !== '' && Number(form.price) > 0;
+      case 3:
+        // Free is a price - zero goes through. Over the ceiling, or a
+        // guarantee held against an item it is worth more than, is not.
+        return (
+          priceValue !== null &&
+          priceValue >= MIN_PRICE &&
+          priceValue <= MAX_PRICE &&
+          !depositTooHigh
+        );
       case 4: return form.city_id !== null;
       case 5: return true;
       default: return true;
@@ -401,11 +461,21 @@ export default function CreateListingPage() {
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.contactPhone')}</label>
                   <input
                     type="tel"
+                    inputMode="tel"
                     value={form.contact_phone}
-                    onChange={(e) => updateForm({ contact_phone: e.target.value })}
+                    onChange={(e) => updateForm({ contact_phone: asPhone(e.target.value) })}
                     placeholder={t('createListing.contactPhonePlaceholder')}
-                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                    className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                      phoneTooShort
+                        ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
+                        : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                    }`}
                   />
+                  {phoneTooShort && (
+                    <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-1.5">
+                      {t('createListing.phoneTooShort', { count: MIN_PHONE_DIGITS })}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="mt-4">
@@ -421,11 +491,20 @@ export default function CreateListingPage() {
                   value={form.dc_account}
                   onChange={(e) => {
                     setDcTouched(true);
-                    updateForm({ dc_account: e.target.value });
+                    updateForm({ dc_account: asPhone(e.target.value) });
                   }}
                   placeholder={t('createListing.dcAccountPlaceholder')}
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                  className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                    dcTooShort
+                      ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
+                      : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                  }`}
                 />
+                {dcTooShort && (
+                  <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-1.5">
+                    {t('createListing.dcTooShort', { count: MIN_DC_DIGITS })}
+                  </p>
+                )}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed">{t('createListing.dcAccountHint')}</p>
                 <div className="mt-2 flex items-start gap-2 rounded-xl border border-red-200 dark:border-red-500/25 bg-red-50 dark:bg-red-500/10 px-3 py-2.5">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
@@ -462,10 +541,18 @@ export default function CreateListingPage() {
                 <Upload size={32} className={`mx-auto mb-3 ${dragOver ? 'text-[var(--accent)]' : 'text-gray-400'}`} />
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
                   {uploadingImages
-                    ? `${t('createListing.uploading')}${uploadProgress ? ` ${uploadProgress.done}/${uploadProgress.total}` : ''}`
+                    ? `${t('createListing.uploading')}${uploadProgress ? ` ${uploadProgress.percent}%` : ''}`
                     : t('createListing.uploadHint')}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">{t('createListing.uploadFormatHint')}</p>
+                {uploadingImages && uploadProgress && (
+                  <div className="mt-3 mx-auto max-w-xs h-2 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-200"
+                      style={{ width: `${uploadProgress.percent}%` }}
+                    />
+                  </div>
+                )}
               </div>
 
               {(form.image_urls.length > 0 || previews.length > 0) && (
@@ -515,9 +602,19 @@ export default function CreateListingPage() {
                     value={form.price}
                     onChange={(e) => updateForm({ price: e.target.value })}
                     placeholder="0"
-                    min="0"
-                    className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                    min={MIN_PRICE}
+                    max={MAX_PRICE}
+                    className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                      priceTooHigh
+                        ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
+                        : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                    }`}
                   />
+                  {priceTooHigh && (
+                    <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-1.5">
+                      {t('createListing.priceTooHigh', { max: MAX_PRICE })}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.period')}</label>
@@ -536,8 +633,17 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ deposit: e.target.value })}
                   placeholder={t('createListing.depositPlaceholder')}
                   min="0"
-                  className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                  className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                    depositTooHigh
+                      ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
+                      : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                  }`}
                 />
+                {depositTooHigh && (
+                  <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-1.5">
+                    {t('createListing.depositTooHigh')}
+                  </p>
+                )}
               </div>
               <p className="text-xs text-gray-400">{t('createListing.currencyNote')}</p>
             </div>
@@ -552,6 +658,8 @@ export default function CreateListingPage() {
               <div>
                 <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.city')} *</label>
                 <CustomSelect
+                  searchable
+                  searchPlaceholder={t('createListing.citySearchPlaceholder')}
                   options={[
                     { value: '', label: t('createListing.selectCity') },
                     ...cityList.map((c) => ({ value: String(c.id), label: c.name })),
@@ -567,6 +675,8 @@ export default function CreateListingPage() {
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.district')}</label>
                   <CustomSelect
+                    searchable={districtList.length > 6}
+                    searchPlaceholder={t('createListing.districtSearchPlaceholder')}
                     options={[
                       { value: '', label: t('createListing.selectDistrict') },
                       ...districtList.map((d) => ({ value: String(d.id), label: d.name })),

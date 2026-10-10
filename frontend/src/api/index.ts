@@ -757,11 +757,19 @@ export const reviews = {
 };
 
 export const upload = {
-  uploadImage: (file: File) => {
+  /** `onProgress` reports the percent of THIS file that has reached the
+      server - 0 to 100 - which is the only number a progress bar can be
+      built out of. */
+  uploadImage: (file: File, onProgress?: (percent: number) => void) => {
     const formData = new FormData();
     formData.append('file', file);
     return client.post<APIResponse<{ image_url: string; image_key: string }>>('/upload/image', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (e) => {
+        if (!onProgress) return;
+        if (e.total) onProgress(Math.min(100, Math.round((e.loaded * 100) / e.total)));
+        else onProgress(100);
+      },
     }).then(unwrap);
   },
   uploadFile: (file: File) => {
