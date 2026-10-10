@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { MapPin, Compass, Star, BadgeCheck, Flame, Sparkles, Clock, Package } from 'lucide-react';
 import { listings, type ListingListItem } from '../../api/index';
-import ListingGrid from '../listings/ListingGrid';
+import ListingCarousel from '../listings/ListingCarousel';
 import EmptyState from '../ui/EmptyState';
 import Section from './Section';
 
@@ -27,7 +27,9 @@ const TABS: Record<ShowcaseTab, ShowcaseSpec> = {
 
 const TAB_ORDER: ShowcaseTab[] = ['popular', 'recommended', 'topRated', 'verified', 'recent'];
 
-const PAGE_SIZE = 6;
+// The home page shows a scrollable shelf, not a grid: a dozen cards in a row
+// people swipe through, so there is more to fetch than a two-row grid's six.
+const PAGE_SIZE = 12;
 
 interface ListingsShowcaseProps {
   /** Which tabs to offer. Defaults to the full discovery set. */
@@ -148,7 +150,7 @@ export default function ListingsShowcase({ tabs, coords, initialTab }: ListingsS
           />
         </div>
       ) : (
-        <ListingGrid listings={items} loading={isLoading} />
+        <ListingCarousel listings={items} loading={isLoading} />
       )}
     </Section>
   );
