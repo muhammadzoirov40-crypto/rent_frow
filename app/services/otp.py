@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.utils import parseaddr
+from email.utils import formatdate, make_msgid, parseaddr
+from urllib.parse import urlparse
 from fastapi import HTTPException, status
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -236,6 +237,18 @@ def _smtp_send(msg: MIMEMultipart) -> bool:
     settings = get_settings()
     server = None
     try:
+        # RFC 5322 wants a Date and a Message-ID on every message, and a mail
+        # filter that finds neither has a ready excuse to doubt the sender.
+        # Neither the OTP builder nor the rental notices set them, so the one
+        # transport they both go through stamps them here. The id is keyed to
+        # our own domain rather than the machine's hostname, and the guard
+        # keeps a retry from minting a second one: it is the same message, so
+        # it should carry the same id.
+        if msg["Date"] is None:
+            msg["Date"] = formatdate(localtime=True)
+        if msg["Message-ID"] is None:
+            domain = urlparse(settings.PUBLIC_BASE_URL).netloc or "localhost"
+            msg["Message-ID"] = make_msgid(domain=domain)
         server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=15)
         server.ehlo()
         server.starttls()
