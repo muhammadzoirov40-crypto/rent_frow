@@ -5,6 +5,7 @@ import { listings, categories, cities, upload } from '../api';
 import { compressImage } from '../utils/compressImage';
 import { previousPath } from '../utils/navHistory';
 import CustomSelect from '../components/ui/CustomSelect';
+import LocationPicker from '../components/search/LocationPicker';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import {
@@ -35,6 +36,8 @@ interface FormData {
   city_id: number | null;
   district_id: number | null;
   address: string;
+  latitude: number | null;
+  longitude: number | null;
   rules: string;
 }
 
@@ -51,6 +54,8 @@ const initialFormData: FormData = {
   city_id: null,
   district_id: null,
   address: '',
+  latitude: null,
+  longitude: null,
   rules: '',
 };
 
@@ -127,6 +132,8 @@ export default function CreateListingPage() {
       city_id: editListing.city_id ?? null,
       district_id: editListing.district_id ?? null,
       address: editListing.address || '',
+      latitude: editListing.latitude ?? null,
+      longitude: editListing.longitude ?? null,
       rules: editListing.rental_rules || '',
     });
   }, [editListing]);
@@ -143,6 +150,11 @@ export default function CreateListingPage() {
         price_unit: formData.price_unit as any,
         deposit: formData.deposit ? Number(formData.deposit) : 0,
         address: formData.address || undefined,
+        // Sent even when null: on edit that is how an owner clears a pin
+        // they placed by mistake (the API treats an explicit null as "set
+        // to nothing", not as "leave it alone").
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         rental_rules: formData.rules || undefined,
         contact_name: formData.contact_name || undefined,
         contact_phone: formData.contact_phone || undefined,
@@ -513,6 +525,15 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ address: e.target.value })}
                   placeholder={t('createListing.addressPlaceholder')}
                   className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.exactLocation')}</label>
+                <LocationPicker
+                  latitude={form.latitude}
+                  longitude={form.longitude}
+                  cityName={cityList.find((c) => c.id === form.city_id)?.name}
+                  onChange={(coords) => updateForm(coords)}
                 />
               </div>
             </div>

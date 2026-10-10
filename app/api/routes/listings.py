@@ -1,5 +1,5 @@
 from datetime import date
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_auth, CurrentUser
@@ -11,6 +11,7 @@ from app.schemas.listing import (
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.listing import ListingService
 from app.services.favorite import FavoriteService
+from app.services.geocode import schedule_geocode
 from app.services.promotion import get_active_top_ids, top_listings
 from app.utils.s3 import get_presigned_url
 
@@ -363,12 +364,19 @@ async def get_my_listings(
 @router.get("/{listing_id}", response_model=APIResponse[ListingResponse])
 async def get_listing(
     listing_id: int,
+    background_tasks: BackgroundTasks,
     current_user: CurrentUser = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     service = ListingService(db)
     listing = await service.get_by_id(listing_id)
     await service.increment_views(listing_id)
+
+    # If the owner typed a street address but no exact pin, resolve it once
+    # against Nominatim *after* this response is sent and store it on the row —
+    # from the next view on, the map shows the real building instead of the
+    # city centre. Best-effort and never on the critical path of the page.
+    schedule_geocode(background_tasks, listing)
 
     is_fav = False
     if current_user:

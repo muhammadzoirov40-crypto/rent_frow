@@ -305,7 +305,7 @@ export const listings = {
   create: (data: ListingCreateData) =>
     client.post<APIResponse<Listing>>('/listings', data).then(unwrap),
 
-  update: (id: number, data: Partial<ListingCreateData> & { status?: string; available?: boolean }) =>
+  update: (id: number, data: Partial<ListingCreateData> & { status?: string; available?: boolean; latitude?: number | null; longitude?: number | null }) =>
     client.patch<APIResponse<Listing>>(`/listings/${id}`, data).then(unwrap),
 
   delete: (id: number) =>
@@ -327,6 +327,19 @@ export const listings = {
     client.get<PaginatedResponse<Listing>>('/listings/owner/my', { params: { page, page_size } }).then((r) => r.data.data || []),
 };
 
+export interface GeocodeSearchResult {
+  latitude: number;
+  longitude: number;
+  label: string;
+}
+
+export const geocode = {
+  // The browser never calls the geocoder itself: the server does, under its
+  // own User-Agent and rate limit. A miss comes back as data: null.
+  search: (q: string) =>
+    client.get<APIResponse<GeocodeSearchResult | null>>('/geocode/search', { params: { q } }).then(unwrap),
+};
+
 export interface ListingCreateData {
   title: string;
   description?: string;
@@ -338,6 +351,8 @@ export interface ListingCreateData {
   city_id: number;
   district_id?: number;
   address?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   rental_rules?: string;
   contact_phone?: string;
   contact_name?: string;

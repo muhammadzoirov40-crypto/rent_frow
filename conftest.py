@@ -10,6 +10,10 @@ os.environ.setdefault("EMAIL_ENABLED", "false")
 # Production keeps manual top-ups admin-only (the webhook is what credits a
 # real payment); tests drive the ledger directly, so they open that gate here.
 os.environ.setdefault("WALLET_ALLOW_MANUAL_TOPUP", "true")
+# Listing detail schedules a Nominatim lookup as a background task. A test run
+# must never reach out to an external service, so the geocoder is switched off
+# globally and only the dedicated geocode tests re-enable it (with _fetch stubbed).
+os.environ.setdefault("GEOCODE_ENABLED", "false")
 
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy import select
@@ -139,6 +143,17 @@ async def customer_client(customer_token: str):
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         ac.headers["Authorization"] = f"Bearer {customer_token}"
         yield ac
+
+
+@pytest.fixture
+def use_test_session_factory(monkeypatch):
+    """Point the listing-geocode background task at the test database.
+
+    The task deliberately opens its own session (the request's is closed by the
+    time it runs); in a test that session must be the same sqlite file the rest
+    of the run uses, not the real engine the app was built with.
+    """
+    monkeypatch.setattr("app.core.database.async_session_factory", TestSessionLocal)
 
 
 @pytest_asyncio.fixture

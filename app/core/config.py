@@ -117,6 +117,22 @@ class Settings(BaseSettings):
     AI_MAX_MESSAGE_CHARS: int = 2000
     AI_MAX_HISTORY: int = 30
 
+    # --- Listing location (Nominatim / OpenStreetMap) -----------------------
+    # A listing whose owner did not place a pin is shown at its city's centre,
+    # with a note saying so.  When they did type a street address we can do
+    # better: geocode it once against Nominatim - the same OpenStreetMap data
+    # the map already renders, key-free - and write the coordinates back onto
+    # the listing, so the pin lands on the real building and the "city centre
+    # shown" note disappears by itself.  Best effort only: any failure (offline,
+    # rate limit, no result) leaves the city-centre fallback exactly as it was.
+    GEOCODE_ENABLED: bool = True
+    GEOCODER_URL: str = "https://nominatim.openstreetmap.org/search"
+    # Nominatim refuses unidentified clients: the UA must name the app + site.
+    GEOCODER_USER_AGENT: str = "RentHub/1.0 (https://renthub.qobus.tj)"
+    GEOCODER_TIMEOUT_SECONDS: float = 6.0
+    # Their usage policy: never more than one request per second.
+    GEOCODER_MIN_INTERVAL_SECONDS: float = 1.0
+
     CORS_ORIGINS: list[str] = ["*"]
 
     model_config = {"env_file": ".env", "extra": "ignore"}

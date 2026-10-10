@@ -27,6 +27,7 @@ from app.api.routes import (
     wallet,
     webhooks,
     promotions,
+    geocode,
 )
 from app.utils.websocket import websocket_endpoint
 
@@ -59,6 +60,7 @@ api_router.include_router(stats.router)
 api_router.include_router(wallet.router)
 api_router.include_router(webhooks.router)
 api_router.include_router(promotions.router)
+api_router.include_router(geocode.router)
 
 
 @api_router.websocket("/ws/{user_id}")
