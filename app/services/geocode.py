@@ -9,10 +9,13 @@ Nominatim never hears about the same listing twice.
 It runs as a FastAPI background task, after the page's response has been sent,
 so a slow or unreachable geocoder can never hold up a page load: the visitor
 sees the city-centre pin they saw before, and the real one from the next view
-on.  Everything is best effort - timeout, HTTP error, empty answer all resolve
-to None and the city-centre fallback stays exactly as it was.  Queries that
-came back empty are remembered for the life of the process, so a listing with
-an unmatchable address is not re-asked on every single view.
+on.  The database transaction is closed *before* that round-trip is made -
+SQLite would otherwise hold a read lock across it and time out every view
+counter bump on the site.  Everything is best effort - timeout, HTTP error,
+empty answer all resolve to None and the city-centre fallback stays exactly as
+it was.  Queries that came back empty are remembered for the life of the
+process, so a listing with an unmatchable address is not re-asked on every
+single view.
 """
 
 from __future__ import annotations
@@ -140,24 +143,53 @@ async def ensure_listing_coordinates(db, listing: _ListingLike) -> bool:
     # merely dress the same city-centre pin up as an exact one.
     if len(address) < 4:
         return False
+    # Captured while the object is still live: after the rollback below it is
+    # expired, and reading an attribute off an expired row in async code is a
+    # synchronous load - which the greenlet underneath refuses to do.
+    listing_id = listing.id
     # Read the city through its own awaited lookup, never through the ORM
     # relationship: touching a not-yet-loaded lazy relation fires a *sync*
     # load, which is illegal (MissingGreenlet) on an async session.
     city_obj = await db.get(City, listing.city_id) if listing.city_id is not None else None
     city = city_obj.name if city_obj is not None else None
+
+    # Everything the query needs is in local variables now, so the transaction
+    # can go before the network is reached.  SQLite keeps this session's shared
+    # lock for the whole round-trip, and a page view writes on every request
+    # (the view counter), so a geocoder call made inside an open transaction
+    # parks every writer behind it until the driver gives up with "database is
+    # locked" - the page the visitor is already on would 500 waiting for the
+    # geocoder of the *previous* one.
+    try:
+        await db.rollback()
+    except Exception:  # noqa: BLE001 - releasing early is best effort too
+        pass
+
     query = f"{address}, {city}" if city else address
     hit = await geocode(query)
+
+    # The rollback above left the caller's row expired.  Every way out that
+    # returns to it therefore re-reads the row first: an expired attribute
+    # touched from async code would try to reload itself synchronously, which
+    # the greenlet underneath refuses.  This also re-checks the owner's pin -
+    # if one was dropped while the geocoder was being asked, theirs wins.
+    try:
+        await db.refresh(listing)
+    except Exception as exc:  # noqa: BLE001 - the row is gone, nothing to save
+        logger.warning("could not re-read listing %s after geocoding: %s", listing_id, exc)
+        return False
+
     if hit is None:
+        return False
+    if listing.latitude is not None and listing.longitude is not None:
         return False
     listing.latitude = round(hit[0], 6)
     listing.longitude = round(hit[1], 6)
     try:
         await db.commit()
     except Exception as exc:  # noqa: BLE001 - saving must never break the read
-        logger.warning("could not save geocoded coordinates for listing %s: %s", listing.id, exc)
+        logger.warning("could not save geocoded coordinates for listing %s: %s", listing_id, exc)
         await db.rollback()
-        listing.latitude = None
-        listing.longitude = None
         return False
     return True
 
@@ -190,6 +222,10 @@ def schedule_geocode(background_tasks: BackgroundTasks, listing: _ListingLike) -
     so a switched-off geocoder costs nothing beyond this one comparison.
     """
     if not get_settings().GEOCODE_ENABLED:
+        return
+    # An exact pin (from the owner, or an earlier run) means there is nothing
+    # left to look up - don't queue a task that would only re-read the row.
+    if listing.latitude is not None and listing.longitude is not None:
         return
     address = (listing.address or "").strip()
     if len(address) < 4:
