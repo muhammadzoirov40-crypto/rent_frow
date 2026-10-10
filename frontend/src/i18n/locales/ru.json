@@ -144,6 +144,7 @@
     "verifiedHint": "Проверены командой RentHub",
     "recentlyViewed": "Недавно просмотренные",
     "recentlyViewedHint": "Продолжите с того места, где остановились",
+    "recentlyViewedEmpty": "Пока нет просмотренных объявлений",
     "clearRecentlyViewed": "Очистить историю",
     "popularLocations": "Популярные города",
     "popularLocationsHint": "Ищите по городам",

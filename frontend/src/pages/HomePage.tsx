@@ -16,7 +16,7 @@ import { stats } from '../api/index';
 import CategoryExplorer from '../components/home/CategoryExplorer';
 import TopListings from '../components/home/TopListings';
 import ListingsShowcase from '../components/home/ListingsShowcase';
-import { NearYouSection, RecentlyViewedSection } from '../components/home/DiscoverySections';
+import { NearYouSection } from '../components/home/DiscoverySections';
 import { HowItWorksSection, BecomeSection } from '../components/home/JourneySections';
 import PopularLocations from '../components/home/PopularLocations';
 import Section from '../components/home/Section';
@@ -54,8 +54,6 @@ export default function HomePage() {
       <NearYouSection />
 
       <PopularLocations />
-
-      <RecentlyViewedSection />
 
       <HowItWorksSection />
 

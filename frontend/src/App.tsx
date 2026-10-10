@@ -17,6 +17,7 @@ const ListingPage = React.lazy(() => import('./pages/ListingPage'));
 const CreateListingPage = React.lazy(() => import('./pages/CreateListingPage'));
 const MessagesPage = React.lazy(() => import('./pages/MessagesPage'));
 const NotificationsPage = React.lazy(() => import('./pages/NotificationsPage'));
+const HistoryPage = React.lazy(() => import('./pages/HistoryPage'));
 const AdminPage = React.lazy(() => import('./pages/AdminPage'));
 const SettingsPage = React.lazy(() => import('./pages/SettingsPage'));
 const RevenloDashboard = React.lazy(() => import('./pages/RevenloDashboard'));
@@ -188,6 +189,8 @@ export default function App() {
           />
           <Route path="/terms" element={<LegalPage kind="terms" />} />
           <Route path="/privacy" element={<LegalPage kind="privacy" />} />
+          {/* Local, no account needed: the history never leaves the browser. */}
+          <Route path="/history" element={<SuspenseWrapper><HistoryPage /></SuspenseWrapper>} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>

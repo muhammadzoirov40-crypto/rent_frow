@@ -1,38 +1,12 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { MapPin, Compass } from 'lucide-react';
 import { listings, type ListingListItem } from '../../api/index';
-import { getRecentlyViewed, clearRecentlyViewed } from '../../utils/recentlyViewed';
 import ListingGrid from '../listings/ListingGrid';
 import EmptyState from '../ui/EmptyState';
 import Section from './Section';
 import { useGeolocation } from '../../hooks/useGeolocation';
-
-/** Recently viewed listings, straight from localStorage (no network cost). */
-export function RecentlyViewedSection() {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [revision, setRevision] = useState(0);
-  const items = getRecentlyViewed(revision);
-
-  if (items.length === 0) return null;
-
-  return (
-    <Section
-      title={t('home.recentlyViewed')}
-      hint={t('home.recentlyViewedHint')}
-      actionLabel={t('home.clearRecentlyViewed')}
-      onAction={() => {
-        clearRecentlyViewed();
-        setRevision((r) => r + 1);
-      }}
-    >
-      <ListingGrid listings={items as unknown as ListingListItem[]} loading={false} />
-    </Section>
-  );
-}
 
 /** Opt-in "near you" block: asks for location only when the user clicks. */
 export function NearYouSection({ radius = 25 }: { radius?: number }) {

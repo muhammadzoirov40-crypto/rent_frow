@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Crown,
   Heart,
+  History,
   Home,
   LayoutDashboard,
   LogOut,
@@ -87,6 +88,9 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     { to: '/', label: t('nav.home'), icon: Home },
     { to: '/search', label: t('nav.search'), icon: Search },
     { to: '/favorites', label: t('nav.favorites'), icon: Heart },
+    // History is kept in this browser only, so unlike the neighbours below it
+    // needs no account and is listed for guests too.
+    { to: '/history', label: t('home.recentlyViewed'), icon: History },
     { to: '/messages', label: t('nav.messages'), icon: MessageSquare },
     { to: '/notifications', label: t('nav.notifications'), icon: Bell },
     { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList },

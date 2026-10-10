@@ -144,6 +144,7 @@
     "verifiedHint": "Checked by the RentHub team",
     "recentlyViewed": "Recently viewed",
     "recentlyViewedHint": "Pick up where you left off",
+    "recentlyViewedEmpty": "No listings viewed yet",
     "clearRecentlyViewed": "Clear history",
     "popularLocations": "Popular locations",
     "popularLocationsHint": "Browse rentals by city",
