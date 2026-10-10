@@ -6,6 +6,7 @@ __pycache__/
 .venv/
 venv/
 *.db
+test_rentflow.db*
 *.sqlite3
 .pytest_cache/
 .mypy_cache/
