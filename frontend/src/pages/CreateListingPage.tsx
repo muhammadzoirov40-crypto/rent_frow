@@ -64,6 +64,11 @@ const initialFormData: FormData = {
   dc_account: '',
 };
 
+// A number typed for reading is not a number a payment rail can use: people
+// write phones the way they say them. Strip the spacing and punctuation, keep
+// the sign that says "country code".
+const asDcDestination = (raw: string) => raw.replace(/[\s\-().]/g, '');
+
 export default function CreateListingPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -72,6 +77,9 @@ export default function CreateListingPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prefilledRef = useRef(false);
+  // Whether the owner has taken the wallet field over from the phone number
+  // it started as. Once they have, the form stops writing into it.
+  const [dcTouched, setDcTouched] = useState(false);
   const { t } = useTranslation();
 
   const [step, setStep] = useState(0);
@@ -147,6 +155,20 @@ export default function CreateListingPage() {
     });
   }, [editListing]);
 
+  // For most owners the wallet and the phone are the same number, so on a new
+  // listing they start in step and nobody has to type it twice. The moment the
+  // owner edits the wallet they are telling us this one is different, so it
+  // stops following. On an edit it never follows at all: a wallet already on
+  // file must not be overwritten by a phone field nobody meant to change.
+  useEffect(() => {
+    if (editId || dcTouched) return;
+    setForm((current) =>
+      current.dc_account === current.contact_phone
+        ? current
+        : { ...current, dc_account: current.contact_phone },
+    );
+  }, [form.contact_phone, editId, dcTouched]);
+
   const createMutation = useMutation({
     mutationFn: (formData: FormData) => {
       const payload = {
@@ -170,7 +192,7 @@ export default function CreateListingPage() {
         image_urls: formData.image_urls,
         // Blank is omitted, not sent as empty: posting without touching the
         // field must not clear the wallet already on the owner's profile.
-        dc_account: formData.dc_account.trim() || undefined,
+        dc_account: asDcDestination(formData.dc_account) || undefined,
       };
       return editId ? listings.update(editId, payload) : listings.create(payload);
     },
@@ -394,10 +416,13 @@ export default function CreateListingPage() {
                   {t('createListing.dcAccount')}
                 </label>
                 <input
-                  type="text"
-                  inputMode="numeric"
+                  type="tel"
+                  inputMode="tel"
                   value={form.dc_account}
-                  onChange={(e) => updateForm({ dc_account: e.target.value })}
+                  onChange={(e) => {
+                    setDcTouched(true);
+                    updateForm({ dc_account: e.target.value });
+                  }}
                   placeholder={t('createListing.dcAccountPlaceholder')}
                   className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                 />
