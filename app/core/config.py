@@ -51,12 +51,12 @@ class Settings(BaseSettings):
     PAYDC_ENABLED: bool = True
     PAYDC_URL: str = "https://pay.dc.tj/"
     PAYDC_ACCOUNT: str = "9762000220865843"
-    # The articul is the service code, and it is the only thing on the page
-    # that decides WHICH route DC Wallet takes the money down. 331 is the
-    # wallet one - a transfer to a phone number, which is what a DC account
-    # is; 133 was the card route, so the rent was collected as a card
-    # transfer however correct the destination beside it happened to be.
-    PAYDC_ARTICUL: str = "331"
+    # The articul is the service code DC recognises this merchant under. Both
+    # values were tried on the live provider: 331 sent the payment nowhere at
+    # all, 133 is the one the checkout answers to, so the card route is the
+    # route this account is set up for and the number stays until DC City
+    # says otherwise.
+    PAYDC_ARTICUL: str = "133"
     PAYDC_DESCRIPTION: str = "DANAT.TJ"
     PAYDC_WEBHOOK_SECRET: str = ""
     # Handing yourself money is an admin action. The browser may only *ask*

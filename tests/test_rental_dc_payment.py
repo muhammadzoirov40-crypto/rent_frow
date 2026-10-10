@@ -293,21 +293,20 @@ async def test_rent_is_collected_under_the_owners_own_dc_account(
 
 
 @pytest.mark.asyncio
-async def test_the_rental_checkout_asks_dc_for_the_wallet_route(
+async def test_the_rental_checkout_carries_the_provider_articul(
     customer_client: AsyncClient, db_session: AsyncSession, customer_id: int
 ):
-    """The articul is the only thing on the page that decides WHICH route DC
-    Wallet takes the money down. 331 is the wallet one - a transfer to a
-    phone number, which is what an owner's DC account is. 133 was the card
-    route: the same money, collected as a card transfer, however correct the
-    destination beside it happened to be. A change of code here is invisible
-    everywhere except at the till, which is why the link has to carry it.
+    """The articul is the code DC recognises this merchant under, and it is
+    the one part of the link nobody can see from the platform's side - a
+    wrong one leaves the payment nowhere at all, which is what happened when
+    331 went out in place of 133. The value therefore has to be written down
+    here rather than left to whatever the config happens to hold.
     """
     request = await _seed(db_session, customer_id, total=200.0, deposit=50.0)
 
     opened = await _open(customer_client, request.id)
-    assert parse_qs(urlparse(opened["url"]).query)["f1"][0] == "331", (
-        "the rent must be asked for over the wallet route, not the card one"
+    assert parse_qs(urlparse(opened["url"]).query)["f1"][0] == "133", (
+        "the provider only answers to its own articul"
     )
 
 

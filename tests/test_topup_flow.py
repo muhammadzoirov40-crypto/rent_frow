@@ -78,11 +78,11 @@ async def test_prepare_builds_a_link_for_this_user(
     # the provider's own parameter order, plus the two free fields we use to
     # say whose payment this is
     assert url.startswith("https://pay.dc.tj/?a=")
-    # f1 is the articul: the one thing on the page that picks the route the
-    # money takes. 331 is the wallet route - a transfer to a phone number,
-    # which is what an owner's DC account is. Anything else here and the
-    # payment comes back as a card transfer instead.
-    assert "f1=331" in url
+    # f1 is the articul: the code DC recognises this merchant under. 133 is
+    # the one the checkout answers to - 331 was tried on the live provider
+    # and the payment went nowhere - so this is the value that has to leave
+    # the platform.
+    assert "f1=133" in url
     assert "s=75.00" in url
     # f2 = the RentHub user, f3 = the reference this callback must echo back
     assert "f2=%d" % customer_id in url
