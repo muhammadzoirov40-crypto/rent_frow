@@ -163,6 +163,17 @@ class ListingService:
         listing = await self.repo.get_by_id(listing_id)
         if listing:
             await self.repo.increment_views(listing)
+            # SQLite lets one writer in at a time, and this counter is the
+            # only write a page view performs. Left to the request's own
+            # commit, the lock then survived everything that follows - the
+            # favourite lookup, the TOP lookup, the image URLs - so concurrent
+            # views lined up behind one another and the driver eventually gave
+            # up with "database is locked", which surfaced as a 500 on the
+            # listing page. Committing here shrinks the lock from the length
+            # of the request to the length of one UPDATE. Nothing else has
+            # been written yet, so there is nothing to lose; the response
+            # keeps reading from this session afterwards.
+            await self.db.commit()
 
     async def get_by_owner(self, owner_id: int, skip: int = 0, limit: int = 20) -> tuple[list[Listing], int]:
         listings = await self.repo.get_by_owner(owner_id, skip, limit)
