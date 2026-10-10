@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, Link } from 'react-router-dom';
 import {
@@ -34,6 +34,7 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(user?.display_name || '');
   const [editPhone, setEditPhone] = useState('');
+  const [editDcAccount, setEditDcAccount] = useState('');
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { data: meData, isLoading: meLoading } = useQuery({
@@ -42,6 +43,12 @@ export default function ProfilePage() {
   });
 
   const meUser = meData || user;
+
+  // keep the DC account input in step with whatever the server last had,
+  // so opening settings never shows a stale number.
+  useEffect(() => {
+    setEditDcAccount(meUser?.dc_account || '');
+  }, [meUser?.dc_account]);
 
   const { data: userListings = [] } = useQuery<Listing[]>({
     queryKey: ['owner-listings'],
@@ -587,6 +594,27 @@ export default function ProfilePage() {
                 <div>
                   <p className="font-medium text-[#1A1A2E] dark:text-white">{t('profile.roleLabel')}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{meUser?.role === 'ADMIN' ? t('profile.admin') : t('profile.user')}</p>
+                </div>
+              </div>
+              <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+                <p className="font-medium text-[#1A1A2E] dark:text-white">{t('profile.dcAccount')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('profile.dcAccountHint')}</p>
+                <div className="mt-2 flex items-center gap-2 flex-wrap">
+                  <input
+                    type="text"
+                    value={editDcAccount}
+                    onChange={(e) => setEditDcAccount(e.target.value)}
+                    placeholder={t('profile.dcAccountPlaceholder')}
+                    className="flex-1 min-w-[180px] text-sm border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 bg-white dark:bg-[#0F0F1A] outline-none focus:border-[var(--accent)] dark:text-white"
+                  />
+                  <button
+                    onClick={() => updateProfileMutation.mutate({ dc_account: editDcAccount })}
+                    disabled={updateProfileMutation.isPending}
+                    className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[var(--accent-hover)] transition disabled:opacity-50"
+                  >
+                    {updateProfileMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    {t('profile.save')}
+                  </button>
                 </div>
               </div>
             </div>

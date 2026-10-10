@@ -149,6 +149,7 @@ class AuthService:
             display_name=user.display_name,
             avatar_url=avatar_url,
             phone=user.phone,
+            dc_account=user.dc_account,
             is_verified=user.is_verified,
             rating_sum=user.rating_sum,
             rating_count=user.rating_count,
@@ -156,12 +157,29 @@ class AuthService:
             updated_at=user.updated_at,
         )
 
-    async def update_profile(self, user_id: int, display_name: str) -> UserResponse:
+    async def update_profile(
+        self,
+        user_id: int,
+        display_name: str | None = None,
+        dc_account: str | None = None,
+    ) -> UserResponse:
+        """Partial update: a field left as ``None`` is not touched at all.
+
+        ``dc_account`` distinguishes "not sent" (leave alone) from an empty
+        string (clear it) — an owner who blanks the field drops back to the
+        platform account rather than being locked to a stale number.
+        """
         user = await self.user_repo.get_by_id(user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
 
-        user = await self.user_repo.update(user, display_name=display_name)
+        changes: dict = {}
+        if display_name is not None:
+            changes["display_name"] = display_name
+        if dc_account is not None:
+            changes["dc_account"] = dc_account.strip() or None
+        if changes:
+            user = await self.user_repo.update(user, **changes)
 
         avatar_url = None
         if user.avatar_url:
@@ -177,6 +195,11 @@ class AuthService:
             role=user.role,
             display_name=user.display_name,
             avatar_url=avatar_url,
+            phone=user.phone,
+            dc_account=user.dc_account,
+            is_verified=user.is_verified,
+            rating_sum=user.rating_sum,
+            rating_count=user.rating_count,
             created_at=user.created_at,
             updated_at=user.updated_at,
         )
@@ -213,6 +236,11 @@ class AuthService:
             role=user.role,
             display_name=user.display_name,
             avatar_url=avatar_url,
+            phone=user.phone,
+            dc_account=user.dc_account,
+            is_verified=user.is_verified,
+            rating_sum=user.rating_sum,
+            rating_count=user.rating_count,
             created_at=user.created_at,
             updated_at=user.updated_at,
         )

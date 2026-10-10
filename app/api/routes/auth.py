@@ -130,7 +130,11 @@ async def update_profile(
     db: AsyncSession = Depends(get_db),
 ):
     service = AuthService(db)
-    result = await service.update_profile(current_user.user_id, data.display_name)
+    result = await service.update_profile(
+        current_user.user_id,
+        display_name=data.display_name,
+        dc_account=data.dc_account,
+    )
     return APIResponse(message="Profile updated successfully", data=result)
 
 

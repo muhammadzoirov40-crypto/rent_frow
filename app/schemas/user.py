@@ -14,6 +14,7 @@ class UserResponse(BaseModel):
     display_name: Optional[str] = None
     avatar_url: Optional[str] = None
     phone: Optional[str] = None
+    dc_account: Optional[str] = None
     is_verified: bool = False
     is_active: bool = True
     rating_sum: float = 0
@@ -24,7 +25,9 @@ class UserResponse(BaseModel):
 
 
 class UpdateProfileRequest(BaseModel):
-    display_name: str = Field(..., min_length=1, max_length=255)
+    # both partial: a client that only sends one field leaves the other alone.
+    display_name: Optional[str] = Field(None, min_length=1, max_length=255)
+    dc_account: Optional[str] = Field(None, max_length=50)
 
 
 class UpdateAvatarResponse(BaseModel):

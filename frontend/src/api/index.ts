@@ -21,6 +21,7 @@ export interface User {
   display_name: string | null;
   avatar_url?: string;
   phone?: string;
+  dc_account?: string;
   external_user_id: string;
   is_verified: boolean;
   is_active: boolean;
@@ -264,7 +265,7 @@ export const auth = {
   getMe: () =>
     client.get<APIResponse<User>>('/auth/me').then(unwrap),
 
-  updateProfile: (data: { display_name: string }) =>
+  updateProfile: (data: { display_name?: string; dc_account?: string }) =>
     client.patch<APIResponse<User>>('/auth/profile', data).then(unwrap),
 
   uploadAvatar: (file: File) => {

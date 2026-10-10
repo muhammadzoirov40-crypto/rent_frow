@@ -16,6 +16,12 @@ class User(Base):
     role: Mapped[UserRole] = mapped_column(SAEnum(UserRole), default=UserRole.CUSTOMER, nullable=False)
     display_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    # the owner's own DC City account: rental payments (rent + deposit) are
+    # collected under this account instead of the platform's, so the money
+    # lands with the person who actually rents the thing out. Empty means the
+    # owner has not registered one — payments then fall back to the platform
+    # account so a checkout can never stall over a blank field.
+    dc_account: Mapped[str | None] = mapped_column(String(50), nullable=True)
     is_verified: Mapped[bool] = mapped_column(default=False, nullable=False)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
     rating_sum: Mapped[float] = mapped_column(default=0, nullable=False)

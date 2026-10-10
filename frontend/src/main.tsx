@@ -5,9 +5,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { startAutoUpdate } from './utils/autoUpdate';
 import './i18n';
 import App from './App';
 import './index.css';
+
+// Reload an open tab once a newer build goes live, so a deploy needs no F5.
+startAutoUpdate();
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -9,6 +9,7 @@ from app.repositories.audit_log import AuditLogRepository
 from app.schemas.payment import PaymentCreate
 from app.models.payment import Payment
 from app.models.rental_request import RentalRequest
+from app.models.user import User
 from app.core.enums import (
     BookingStatus,
     PaymentStatus,
@@ -116,6 +117,19 @@ class PaymentService:
             amount = float(request.total_price)
         return request, amount
 
+    async def _rental_dc_account(self, request: RentalRequest) -> str | None:
+        """The DC account a rental payment is collected under: the listing
+        owner's own registered account, else ``None`` (platform account).
+
+        Routing rent to the person who actually rents the thing out is the
+        whole point — but an owner who never filled the field in must not be
+        able to stall a checkout, so blank/missing simply means "use the
+        platform's merchant account", which is always recognised.
+        """
+        owner = await self.db.get(User, request.owner_id)
+        account = (owner.dc_account or "").strip() if owner else ""
+        return account or None
+
     async def pay_dc(self, customer_id: int, data: PaymentCreate) -> dict:
         """The same payment as :meth:`create`, pointed at the DC checkout.
 
@@ -190,7 +204,10 @@ class PaymentService:
             "payment": payment,
             "reference": reference,
             "url": topup_service.payment_url(
-                customer_id, float(payment.amount), reference
+                customer_id,
+                float(payment.amount),
+                reference,
+                account=await self._rental_dc_account(request),
             ),
         }
 

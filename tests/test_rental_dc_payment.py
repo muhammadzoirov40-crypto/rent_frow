@@ -16,8 +16,11 @@ pin the flow down:
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from urllib.parse import parse_qs, urlparse
 
+from app.core.config import get_settings
 from app.core.enums import PaymentStatus, PaymentType, RentalRequestStatus
+from app.models.user import User
 from app.schemas.payment import PaymentCreate
 from app.services.payment import PaymentService
 from tests.test_payments import _make_user, _seed_accepted_request
@@ -26,6 +29,11 @@ from tests.test_topup_flow import _Settings
 API = "/api/v1/payments"
 WEBHOOK = "/api/v1/webhooks/pay-dc"
 SECRET = "test-paydc-secret"
+
+
+def _dest(url: str) -> str:
+    """The account a checkout link collects under - the ``a`` parameter."""
+    return parse_qs(urlparse(url).query)["a"][0]
 
 
 async def _seed(db: AsyncSession, renter_id: int, **kwargs):
@@ -254,3 +262,40 @@ async def test_the_operator_sees_the_reference_and_can_close_it_by_hand(
 
     again = await admin_client.post(f"{API}/{mine[0]['id']}/confirm")
     assert again.status_code == 400, again.text
+
+
+# ------------------------------------------------ the destination account
+@pytest.mark.asyncio
+async def test_rent_is_collected_under_the_owners_own_dc_account(
+    customer_client: AsyncClient, db_session: AsyncSession, customer_id: int
+):
+    """The whole point: rent lands with the person who rented it out."""
+    request = await _seed(db_session, customer_id, total=200.0, deposit=50.0)
+
+    owner = await db_session.get(User, request.owner_id)
+    owner.dc_account = "992900111222"
+    await db_session.commit()
+
+    opened = await _open(customer_client, request.id)
+    assert _dest(opened["url"]) == "992900111222", (
+        "the checkout must be pointed at the owner's own DC account"
+    )
+
+    # the deposit is theirs too - it is held against their listing
+    deposit = await _open(customer_client, request.id, "DEPOSIT")
+    assert _dest(deposit["url"]) == "992900111222"
+
+
+@pytest.mark.asyncio
+async def test_an_owner_with_no_account_falls_back_to_the_platform(
+    customer_client: AsyncClient, db_session: AsyncSession, customer_id: int
+):
+    """A blank field must never stall a checkout: no account registered
+    means the platform's merchant account - the only one always recognised."""
+    request = await _seed(db_session, customer_id, total=200.0)
+
+    opened = await _open(customer_client, request.id)
+    platform = get_settings().PAYDC_ACCOUNT
+
+    assert _dest(opened["url"]) == platform
+    assert _dest(opened["url"]) != "None"

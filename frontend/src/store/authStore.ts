@@ -8,6 +8,7 @@ interface AuthUser {
   display_name: string | null;
   avatar_url?: string;
   phone?: string;
+  dc_account?: string;
   is_verified: boolean;
   is_active: boolean;
   rating_sum: number;

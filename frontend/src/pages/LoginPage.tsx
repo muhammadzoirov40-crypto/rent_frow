@@ -72,7 +72,7 @@ export default function LoginPage() {
       if (data.sent_via_email === false) {
         toast(t('auth.devMode'));
       } else {
-        toast.success(t('auth.otpSentTo'));
+        toast.success(t('auth.otpSentTo', { email }));
       }
       setTimeout(() => otpRefs.current[0]?.focus(), 300);
     },

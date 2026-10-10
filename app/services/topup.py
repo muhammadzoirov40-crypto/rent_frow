@@ -34,17 +34,24 @@ MAX_AMOUNT = 1_000_000.0
 TOLERANCE = 0.01
 
 
-def payment_url(user_id: int, amount: float, reference: str) -> str:
+def payment_url(user_id: int, amount: float, reference: str, account: str | None = None) -> str:
     """The DC City checkout link, in the parameter order the page expects.
 
     ``f2``/``f3`` are the free fields the provider passes through untouched,
     which is how "this payment belongs to this RentHub user" survives the
     trip to a page that knows nothing about us.
+
+    ``account`` is the destination the money is collected under — the listing
+    owner's own DC account for a rental, so the rent lands with them. Left
+    unset (top-ups, TOP windows, or an owner who never registered an
+    account) it falls back to the platform's merchant account, which is the
+    only one guaranteed to be recognised, so a blank field can never break a
+    checkout.
     """
     settings = get_settings()
     return settings.PAYDC_URL + "?" + urlencode(
         [
-            ("a", settings.PAYDC_ACCOUNT),
+            ("a", account or settings.PAYDC_ACCOUNT),
             ("f1", settings.PAYDC_ARTICUL),
             ("c", settings.PAYDC_DESCRIPTION),
             ("s", "%0.2f" % money(amount)),
