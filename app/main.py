@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.core.config import get_settings
-from app.core.database import engine
+from app.core.database import enable_sqlite_wal, engine
 from app.core.migrations import run_schema_migrations
 from app.api.router import api_router
 
@@ -16,6 +16,9 @@ UPLOAD_DIR = Path("uploads")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Readers and writers on one SQLite file need WAL to coexist; a property
+    # of the file, so one statement at startup sets it for every connection.
+    enable_sqlite_wal()
     # Alembic is the only thing that decides what the schema looks like:
     # an empty database is built from the revisions, one written by the old
     # startup code is stamped and caught up, an up-to-date one is left alone.
