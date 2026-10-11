@@ -118,9 +118,9 @@ function InfiniteCard({ item }: RealCardProps) {
   return (
     <Link
       to={`/listing/${item.id}`}
-      className="block group bg-slate-900/60 hover:bg-slate-800/85 border border-white/10 hover:border-[rgb(var(--accent-rgb)/0.5)] rounded-2xl p-2.5 shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
+      className="block group bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800/85 border border-slate-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.5)] rounded-2xl p-2.5 shadow-xl dark:shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
     >
-      <div className="h-24 sm:h-28 w-full rounded-xl overflow-hidden relative bg-slate-800">
+      <div className="h-24 sm:h-28 w-full rounded-xl overflow-hidden relative bg-slate-100 dark:bg-slate-800">
         <img
           src={image}
           alt={item.title}
@@ -136,18 +136,18 @@ function InfiniteCard({ item }: RealCardProps) {
       </div>
 
       <div className="mt-2">
-        <h4 className="text-[13px] font-bold text-white truncate group-hover:text-[var(--accent)] transition-colors">
+        <h4 className="text-[13px] font-bold text-slate-900 dark:text-white truncate group-hover:text-[var(--accent)] transition-colors">
           {item.title}
         </h4>
-        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
           {item.city_name || t('home.heroCountry')}
         </p>
 
-        <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-800">
+        <div className="mt-2 flex items-center justify-between pt-1.5 border-t border-slate-200 dark:border-slate-800">
           <span className="text-xs font-black text-[var(--accent)]">
-            {item.price} <span className="text-[10px] text-slate-400 font-normal">{t('home.heroPerDay')}</span>
+            {item.price} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">{t('home.heroPerDay')}</span>
           </span>
-          <span className="text-[10px] font-bold text-slate-400 group-hover:text-white transition-colors flex items-center gap-0.5">
+          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex items-center gap-0.5">
             {t('common.viewDetails')} &rarr;
           </span>
         </div>
