@@ -106,7 +106,7 @@ export default function BookingsSection() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 p-12 text-center">
+        <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-12 text-center">
           <CalendarCheck className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
           <h3 className="font-bold mb-1">{t('dashboard.bookings.empty')}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.bookings.emptyHint')}</p>
@@ -139,7 +139,7 @@ export default function BookingsSection() {
             role="dialog"
             aria-modal="true"
             data-testid="reject-confirm-modal"
-            className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl"
+            className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">{t('dashboard.bookings.rejectTitle')}</h3>

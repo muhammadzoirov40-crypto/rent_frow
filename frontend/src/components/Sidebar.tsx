@@ -119,7 +119,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`hidden md:flex fixed left-3 top-20 bottom-4 z-40 flex-col rounded-3xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#12122a] shadow-xl shadow-black/5 dark:shadow-black/40 overflow-hidden transition-all duration-300 ease-out ${
+      className={`hidden md:flex fixed left-3 top-20 bottom-4 z-40 flex-col rounded-3xl border border-gray-200 dark:border-white/10 glass-section shadow-xl shadow-black/5 dark:shadow-black/40 overflow-hidden transition-all duration-300 ease-out ${
         open ? 'w-[248px] p-3' : 'w-[76px] p-2.5'
       }`}
     >

@@ -100,7 +100,7 @@ export function TopModal({
         role="dialog"
         aria-modal="true"
         data-testid="top-plans-modal"
-        className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+        className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3 mb-1">
