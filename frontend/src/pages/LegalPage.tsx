@@ -38,7 +38,7 @@ export default function LegalPage({ kind }: { kind: LegalKind }) {
           {SECTIONS.map((n) => (
             <section
               key={n}
-              className="bg-white dark:bg-[#12121f] border border-gray-100 dark:border-white/10 rounded-2xl p-5 sm:p-6"
+              className="glass-section border border-gray-100 dark:border-white/10 rounded-2xl p-5 sm:p-6"
             >
               <h2 className="text-base font-semibold text-[#1A1A2E] dark:text-white mb-2">
                 {t(`${ns}.s${n}h`)}

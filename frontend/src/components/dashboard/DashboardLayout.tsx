@@ -108,7 +108,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
 
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex flex-col w-[264px] ${asideWidth}
-          bg-white dark:bg-[#1a1d24] border-r border-gray-200 dark:border-white/10
+          glass-section border-r border-gray-200 dark:border-white/10
           transition-[transform,width] duration-300 ease-in-out
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >

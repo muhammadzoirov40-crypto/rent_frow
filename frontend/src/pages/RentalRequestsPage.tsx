@@ -127,7 +127,7 @@ export function RequestCard({
   const busy = isMutating || payMutation.isPending || confirmMutation.isPending;
 
   return (
-    <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:shadow-md transition">
+    <div className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-4 sm:p-5 shadow-sm hover:shadow-md transition">
       <div className="flex items-start gap-4">
         <Link
           to={`/listing/${req.listing_id}`}
@@ -437,7 +437,7 @@ export default function RentalRequestsPage() {
             <p className="text-gray-500 dark:text-gray-400 text-sm">{t('common.loading')}</p>
           </div>
         ) : requests.length === 0 ? (
-          <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 p-16 text-center">
+          <div className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-16 text-center">
             <AlertCircle className="w-14 h-14 text-gray-200 dark:text-gray-600 mx-auto mb-4" />
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
               {activeTab === 'my-requests' ? t('booking.empty') : t('rentalRequests.emptyOwner')}
@@ -483,7 +483,7 @@ export default function RentalRequestsPage() {
             role="dialog"
             aria-modal="true"
             data-testid="confirm-modal"
-            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl"
+            className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">

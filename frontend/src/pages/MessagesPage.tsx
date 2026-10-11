@@ -433,7 +433,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh_-_var(--header-h)_-_7rem)] md:h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto bg-white dark:bg-[#121418] rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl my-4">
+    <div className="flex h-[calc(100vh_-_var(--header-h)_-_7rem)] md:h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto glass-section rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl my-4">
       <div className={`w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col bg-gray-50 dark:bg-[#1a1d24] ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center gap-2 mb-3">

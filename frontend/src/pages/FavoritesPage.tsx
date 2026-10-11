@@ -40,7 +40,7 @@ export default function FavoritesPage() {
         <p className="text-gray-500 dark:text-gray-400 mb-8">{t('favorites.count', { count: favs.length })}</p>
 
         {favs.length === 0 ? (
-          <div className="bg-white dark:bg-[#12121f] dark:border-white/10 rounded-2xl border border-gray-100 p-12 sm:p-16 text-center">
+          <div className="glass-section dark:border-white/10 rounded-2xl border border-gray-100 p-12 sm:p-16 text-center">
             <div className="w-20 h-20 rounded-full bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center mx-auto mb-5">
               <Heart className="w-10 h-10 text-[var(--accent)]" />
             </div>
@@ -58,7 +58,7 @@ export default function FavoritesPage() {
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {favs.map((listing) => (
-              <div key={listing.id} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group">
+              <div key={listing.id} className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group">
                 <div className="relative h-48 bg-gray-100">
                   {listing.primary_image ? (
                     <img

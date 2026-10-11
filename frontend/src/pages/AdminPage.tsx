@@ -677,7 +677,7 @@ export default function AdminPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {statCards.map((card) => (
-                  <div key={card.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
+                  <div key={card.label} className="glass-section rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
                       <div className="w-12 h-12 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center text-[var(--accent)]">
                         {card.icon}
@@ -691,7 +691,7 @@ export default function AdminPage() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-                <div className="lg:col-span-2 bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                <div className="lg:col-span-2 glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                   <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                     <BarChart3 className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                     {t('admin.chartRequests')}
@@ -725,7 +725,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                   <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                     <PieChartIcon className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                     {t('admin.chartListingsStatus')}
@@ -766,7 +766,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+              <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                   <Clock className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                   {t('admin.recentActivity')}
@@ -823,7 +823,7 @@ export default function AdminPage() {
                       { label: t('admin.totalPayments'), value: crm.stats.totalPayments, icon: <BarChart3 className="w-6 h-6" />, color: 'from-rose-500 to-red-600', shadow: 'shadow-rose-500/20' },
                       { label: t('admin.unverifiedListings'), value: crm.stats.unverifiedListings, icon: <AlertTriangle className="w-6 h-6" />, color: 'from-yellow-500 to-amber-600', shadow: 'shadow-yellow-500/20' },
                     ].map((card) => (
-                      <div key={card.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
+                      <div key={card.label} className="glass-section rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
                         <div className="flex items-center justify-between mb-3">
                           <div className="w-12 h-12 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center text-[var(--accent)]">
                             {card.icon}
@@ -840,7 +840,7 @@ export default function AdminPage() {
                     ))}
                   </div>
 
-                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                     <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                       {t('admin.pipeline')}
@@ -879,7 +879,7 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
                       <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
                         <ClipboardList className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
@@ -918,7 +918,7 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
                       <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
                         <Wallet className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
@@ -955,7 +955,7 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
                       <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
                         <Users className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
@@ -1029,7 +1029,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1147,7 +1147,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1252,7 +1252,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1312,7 +1312,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1432,7 +1432,7 @@ export default function AdminPage() {
                     cls: 'from-amber-400 to-yellow-500',
                   },
                 ].map((c) => (
-                  <div key={c.label} className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-4">
+                  <div key={c.label} className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-4">
                     <div className={`inline-flex w-9 h-9 rounded-xl bg-gradient-to-r ${c.cls} text-white items-center justify-center mb-2`}>
                       <Crown className="w-4 h-4" aria-hidden="true" />
                     </div>
@@ -1479,7 +1479,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden mb-8">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden mb-8">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1626,7 +1626,7 @@ export default function AdminPage() {
                   {t('admin.topPlansTitle')}
                 </h2>
               </div>
-              <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+              <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -1682,7 +1682,7 @@ export default function AdminPage() {
                     role="dialog"
                     aria-modal="true"
                     data-testid="top-detail-modal"
-                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto"
+                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-start justify-between gap-3 mb-4">
@@ -1785,7 +1785,7 @@ export default function AdminPage() {
                     role="dialog"
                     aria-modal="true"
                     data-testid="top-reject-modal"
-                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">{t('admin.topRejectTitle')}</h3>
@@ -1830,7 +1830,7 @@ export default function AdminPage() {
                     role="dialog"
                     aria-modal="true"
                     data-testid="top-plan-modal"
-                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl space-y-4"
+                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl space-y-4"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white">
@@ -1927,7 +1927,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -2028,7 +2028,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -2157,7 +2157,7 @@ export default function AdminPage() {
                     role="dialog"
                     aria-modal="true"
                     data-testid="post-detail-modal"
-                    className="bg-white dark:bg-[#1a1d24] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-2xl shadow-2xl max-h-[85vh] overflow-y-auto"
+                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-2xl shadow-2xl max-h-[85vh] overflow-y-auto"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
@@ -2247,7 +2247,7 @@ export default function AdminPage() {
 
       {showCategoryModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={closeCategoryModal}>
-          <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
+          <div className="glass-popover rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 {editingCategory ? t('admin.editCategory') : t('admin.newCategory')}
@@ -2288,7 +2288,7 @@ export default function AdminPage() {
       )}
       {profileUser && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
-          <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
+          <div className="glass-popover rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin.userProfile')}</h2>
               <button onClick={() => setProfileUser(null)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition">

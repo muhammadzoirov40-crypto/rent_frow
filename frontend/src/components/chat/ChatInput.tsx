@@ -209,7 +209,7 @@ export default function ChatInput({
       {emojiOpen && (
         <div
           ref={emojiRef}
-          className="absolute bottom-full left-3 sm:left-4 mb-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 shadow-2xl p-3 z-20"
+          className="absolute bottom-full left-3 sm:left-4 mb-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl glass-popover border border-gray-200 dark:border-white/10 p-3 z-20"
         >
           <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-2">{t('messages.emoji')}</p>
           <div className="grid grid-cols-8 gap-1">

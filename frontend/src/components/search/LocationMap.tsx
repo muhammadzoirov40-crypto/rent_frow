@@ -92,7 +92,7 @@ export default function LocationMap({
 
   return (
     <div
-      className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6"
+      className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6"
       data-testid="listing-location"
     >
       <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-3">
