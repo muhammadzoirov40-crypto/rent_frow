@@ -59,6 +59,15 @@ class Settings(BaseSettings):
     PAYDC_ARTICUL: str = "133"
     PAYDC_DESCRIPTION: str = "DANAT.TJ"
     PAYDC_WEBHOOK_SECRET: str = ""
+    # --- General event webhook (payment / rental status callbacks) ----------
+    # A second, provider-agnostic intake alongside the DC-specific one above:
+    # a JSON body {event, id, data} that moves a payment or a rental forward.
+    # The only thing that lets a request in is an HMAC-SHA256 signature over
+    # the raw body (X-RentHub-Signature: sha256=<hex>) or a matching bearer
+    # token - and, like PAYDC, it is refused outright while the secret is
+    # unset, so a half-configured deployment can never be talked into
+    # changing state by an anonymous POST.
+    WEBHOOK_SECRET: str = ""
     # Handing yourself money is an admin action. The browser may only *ask*
     # for a payment link; the ledger is credited by the webhook, or - during
     # tests - by this switch, never by the user's own POST.
