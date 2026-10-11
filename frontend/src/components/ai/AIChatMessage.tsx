@@ -21,7 +21,7 @@ function ListingRow({ listing }: { listing: AIListingCard }) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="group flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-2 transition hover:border-[var(--accent)]/50 hover:bg-white dark:hover:bg-white/10"
+      className="glass-inset group flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/10 p-2 transition hover:border-[var(--accent)]/50 hover:bg-white dark:hover:bg-white/10"
     >
       <div className="w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center">
         {listing.primary_image ? (
@@ -104,7 +104,7 @@ export default function AIChatMessage({ message }: { message: ChatMessage }) {
       </div>
 
       {isUser && (
-        <div className="w-7 h-7 shrink-0 mt-1 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center">
+        <div className="glass-panel w-7 h-7 shrink-0 mt-1 rounded-full flex items-center justify-center">
           <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
         </div>
       )}

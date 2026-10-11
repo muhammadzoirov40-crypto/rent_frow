@@ -73,7 +73,7 @@ export default function ListingCarousel({ listings, loading }: ListingCarouselPr
             type="button"
             onClick={() => nudge(-1)}
             aria-label={t('common.back')}
-            className="flex absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 dark:bg-[#1A1A2E]/95 border border-gray-200 dark:border-white/10 shadow-md items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
+            className="glass-popover flex absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 shadow-md items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
             data-testid="carousel-prev"
           >
             <ChevronLeft size={20} />
@@ -82,7 +82,7 @@ export default function ListingCarousel({ listings, loading }: ListingCarouselPr
             type="button"
             onClick={() => nudge(1)}
             aria-label={t('common.next')}
-            className="flex absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 dark:bg-[#1A1A2E]/95 border border-gray-200 dark:border-white/10 shadow-md items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
+            className="glass-popover flex absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 shadow-md items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
             data-testid="carousel-next"
           >
             <ChevronRight size={20} />

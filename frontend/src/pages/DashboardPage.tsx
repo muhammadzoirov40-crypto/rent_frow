@@ -90,7 +90,7 @@ function MetricCard({ title, value, change, icon }: MetricCardProps) {
   const hasChange = typeof change === 'number';
   const up = hasChange && change >= 0;
   return (
-    <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20 transition-all duration-200">
+    <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-black/20 transition-all duration-200">
       <div className="flex items-center justify-between mb-4">
         <span className="w-10 h-10 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] flex items-center justify-center">
           {icon}
@@ -121,7 +121,7 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
   const { t } = useTranslation();
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm shadow-lg dark:border-gray-700 dark:bg-gray-800">
+    <div className="glass-panel rounded-lg border border-gray-200 px-3 py-2 text-sm shadow-lg dark:border-gray-700">
       <p className="mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</p>
       {payload.map((entry, i) => (
         <p key={i} className="text-[var(--accent)] font-semibold tabular-nums">
@@ -248,7 +248,7 @@ export default function DashboardPage() {
   const renderOverview = () => {
     if (!user) {
       return (
-        <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
+        <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
           <AlertCircle className="w-12 h-12 mx-auto text-[var(--accent)] mb-4" />
           <h2 className="text-lg font-bold mb-1">{t('dashboard.overview.ownerOnly')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 max-w-md mx-auto">{t('dashboard.overview.ownerOnlyHint')}</p>
@@ -289,26 +289,26 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5" data-testid="customer-quick-actions">
+          <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-5" data-testid="customer-quick-actions">
             <h2 className="font-semibold mb-4">{t('dashboard.customer.quickActions')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Link
                 to="/rental-requests"
-                className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
+                className="glass-inset flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
               >
                 <CalendarCheck className="w-5 h-5 text-[var(--accent)] shrink-0" />
                 <span className="truncate">{t('rentalRequests.myRequests')}</span>
               </Link>
               <Link
                 to="/messages"
-                className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
+                className="glass-inset flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
               >
                 <MessageSquare className="w-5 h-5 text-[var(--accent)] shrink-0" />
                 <span className="truncate">{t('nav.messages')}</span>
               </Link>
               <Link
                 to="/create-listing"
-                className="flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
+                className="glass-inset flex items-center gap-3 rounded-xl border border-gray-200 dark:border-white/10 px-4 py-3.5 text-sm font-semibold text-gray-700 dark:text-slate-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)] transition"
               >
                 <PlusCircle className="w-5 h-5 text-[var(--accent)] shrink-0" />
                 <span className="truncate">{t('nav.createListing')}</span>
@@ -374,10 +374,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
+          <div className="glass-panel lg:col-span-2 rounded-2xl border border-gray-200 dark:border-white/10 p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5">
               <h2 className="font-semibold">{t('dashboard.overview.revenueChart')}</h2>
-              <div className="flex flex-wrap gap-1 rounded-xl bg-gray-100 p-1 dark:bg-white/5">
+              <div className="glass-inset flex flex-wrap gap-1 rounded-xl p-1">
                 {REVENUE_PERIODS.map((p) => (
                   <button
                     key={p}
@@ -423,7 +423,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-5">
+          <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-5">
             <h2 className="font-semibold mb-4">{t('dashboard.overview.bookingPerformance')}</h2>
             {perf && pieData.length > 0 ? (
               <>
@@ -459,7 +459,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 overflow-hidden">
+        <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-white/10">
             <h2 className="font-semibold">{t('dashboard.overview.recentBookings')}</h2>
             <button
@@ -516,7 +516,7 @@ export default function DashboardPage() {
   };
 
   const ownerOnlyPanel = (
-    <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
+    <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-10 text-center" data-testid="owner-only">
       <AlertCircle className="w-12 h-12 mx-auto text-[var(--accent)] mb-4" />
       <h2 className="text-lg font-bold mb-1">{t('dashboard.overview.ownerOnly')}</h2>
       <p className="text-sm text-gray-500 dark:text-gray-400 mb-5 max-w-md mx-auto">{t('dashboard.overview.ownerOnlyHint')}</p>
@@ -542,7 +542,7 @@ export default function DashboardPage() {
     if (active === 'profile') return <ProfileSection />;
     if (active === 'settings') return <SettingsSection />;
     return (
-      <div className="rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 p-10 text-center" data-testid={`section-${active}`}>
+      <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-10 text-center" data-testid={`section-${active}`}>
         <h2 className="text-lg font-bold mb-1">{t(`dashboard.nav.${active}`, { defaultValue: active })}</h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.overview.empty')}</p>
       </div>

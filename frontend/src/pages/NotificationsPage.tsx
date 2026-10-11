@@ -64,7 +64,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh_-_var(--header-h))] bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-[calc(100vh_-_var(--header-h))] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-2xl mx-auto">
         <BackButton className="mb-4" />
         <div className="flex items-center justify-between mb-8">
@@ -87,8 +87,8 @@ export default function NotificationsPage() {
         </div>
 
         {allNotifications.length === 0 ? (
-          <div className="text-center py-16 bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-8">
-            <div className="w-16 h-16 bg-gray-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="glass-panel text-center py-16 rounded-2xl border border-gray-200 dark:border-white/10 p-8">
+            <div className="glass-inset w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Bell className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('notifications.empty')}</h3>

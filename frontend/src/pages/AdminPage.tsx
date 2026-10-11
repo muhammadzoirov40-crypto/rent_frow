@@ -604,7 +604,7 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0f0f23]">
+    <div className="min-h-screen">
       <div className="flex">
         <aside
           className={`${
@@ -1019,7 +1019,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -1137,7 +1137,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -1166,7 +1166,7 @@ export default function AdminPage() {
                                 {(l as any).primary_image ? (
                                   <img src={(l as any).primary_image} alt="" className="w-12 h-12 rounded-xl object-cover" />
                                 ) : (
-                                  <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center">
+                                  <div className="glass-inset w-12 h-12 rounded-xl flex items-center justify-center">
                                     <ImageIcon className="w-5 h-5 text-gray-400" />
                                   </div>
                                 )}
@@ -1242,7 +1242,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -1348,7 +1348,7 @@ export default function AdminPage() {
                             <td className="px-6 py-4">
                               {p.payment_reference ? (
                                 <span
-                                  className="font-mono text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-2 py-1 rounded-lg"
+                                  className="glass-inset font-mono text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-white/10 px-2 py-1 rounded-lg"
                                   data-testid="payment-row-reference"
                                 >
                                   {p.payment_reference}
@@ -1468,7 +1468,7 @@ export default function AdminPage() {
                     placeholder={t('admin.topSearchPlaceholder')}
                     value={topListingId}
                     onChange={(e) => setTopListingId(e.target.value.replace(/[^0-9]/g, ''))}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-44"
+                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-44"
                   />
                 </div>
               </div>
@@ -1675,7 +1675,7 @@ export default function AdminPage() {
               {/* Detail sheet */}
               {topSelected && (
                 <div
-                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
                   onClick={() => setTopSelected(null)}
                 >
                   <div
@@ -1778,7 +1778,7 @@ export default function AdminPage() {
               {/* Reject with a reason */}
               {topRejectTarget && (
                 <div
-                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
                   onClick={() => setTopRejectTarget(null)}
                 >
                   <div
@@ -1795,7 +1795,7 @@ export default function AdminPage() {
                       onChange={(e) => setTopRejectReason(e.target.value)}
                       rows={3}
                       placeholder={t('admin.topRejectPlaceholder')}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
+                      className="glass-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
                       data-testid="top-reject-reason"
                     />
                     <div className="flex justify-end gap-2 mt-4">
@@ -1823,7 +1823,7 @@ export default function AdminPage() {
               {/* Plan create / edit */}
               {planModal && (
                 <div
-                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
                   onClick={() => setPlanModal(null)}
                 >
                   <div
@@ -1842,7 +1842,7 @@ export default function AdminPage() {
                         type="text"
                         value={planForm.name}
                         onChange={(e) => setPlanForm((f) => ({ ...f, name: e.target.value }))}
-                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                        className="glass-inset mt-1 w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                       />
                     </label>
                     <div className="grid grid-cols-2 gap-3">
@@ -1851,7 +1851,7 @@ export default function AdminPage() {
                         <select
                           value={planForm.duration_key}
                           onChange={(e) => setPlanForm((f) => ({ ...f, duration_key: e.target.value }))}
-                          className="mt-1 w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                          className="glass-inset mt-1 w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                         >
                           {['3h', '1d', '1w', '1m'].map((d) => (
                             <option key={d} value={d}>{t(`top.dur_${d}`)}</option>
@@ -1866,7 +1866,7 @@ export default function AdminPage() {
                           step={1}
                           value={planForm.price}
                           onChange={(e) => setPlanForm((f) => ({ ...f, price: e.target.value }))}
-                          className="mt-1 w-full px-3.5 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                          className="glass-inset mt-1 w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                         />
                       </label>
                     </div>
@@ -1991,7 +1991,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -2070,7 +2070,7 @@ export default function AdminPage() {
                                     </span>
                                   </button>
                                 ) : (
-                                  <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0">
+                                  <div className="glass-inset w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
                                     <ImageIcon className="w-5 h-5 text-gray-400" />
                                   </div>
                                 )}
@@ -2150,7 +2150,7 @@ export default function AdminPage() {
                   photo at a real size — the table only fits a preview line. */}
               {postDetail && (
                 <div
-                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
                   onClick={() => setPostDetail(null)}
                 >
                   <div
@@ -2189,7 +2189,7 @@ export default function AdminPage() {
                         <img
                           src={postDetail.image_url}
                           alt=""
-                          className="w-full max-h-[60vh] object-contain rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
+                          className="glass-inset w-full max-h-[60vh] object-contain rounded-xl border border-gray-100 dark:border-white/10"
                         />
                         <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent)]">
                           <ZoomIn className="w-3.5 h-3.5" aria-hidden="true" />
@@ -2246,7 +2246,7 @@ export default function AdminPage() {
       </div>
 
       {showCategoryModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={closeCategoryModal}>
+        <div className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4" onClick={closeCategoryModal}>
           <div className="glass-popover rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -2264,7 +2264,7 @@ export default function AdminPage() {
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   placeholder={t('admin.namePlaceholder')}
-                  className="w-full px-4 py-2.5 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+                  className="glass-input w-full px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
                 />
               </div>
               <div className="flex gap-3 pt-2">
@@ -2287,7 +2287,7 @@ export default function AdminPage() {
         </div>
       )}
       {profileUser && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
+        <div className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
           <div className="glass-popover rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin.userProfile')}</h2>
@@ -2320,7 +2320,7 @@ export default function AdminPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-5">
-              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+              <div className="glass-inset rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <Star className="w-3.5 h-3.5" /> {t('admin.rating')}
                 </p>
@@ -2330,19 +2330,19 @@ export default function AdminPage() {
                     : '—'}
                 </p>
               </div>
-              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+              <div className="glass-inset rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <FileText className="w-3.5 h-3.5" /> {t('admin.listingsCount')}
                 </p>
                 <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{profileUser.listing_count ?? 0}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+              <div className="glass-inset rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <Phone className="w-3.5 h-3.5" /> {t('admin.phone')}
                 </p>
                 <p className="text-sm font-bold text-gray-900 dark:text-white mt-1 truncate">{profileUser.phone || '—'}</p>
               </div>
-              <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+              <div className="glass-inset rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> {t('admin.joinedDate')}
                 </p>

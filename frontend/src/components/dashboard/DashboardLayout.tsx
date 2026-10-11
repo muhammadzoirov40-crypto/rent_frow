@@ -98,10 +98,10 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
   const asideWidth = collapsed ? 'md:w-[76px]' : 'md:w-[264px]';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#121418] text-gray-900 dark:text-white transition-colors duration-300">
+    <div className="min-h-screen text-gray-900 dark:text-white transition-colors duration-300">
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+          className="glass-scrim fixed inset-0 z-40 md:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -150,7 +150,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={t('dashboard.searchPlaceholder')}
-                className="w-full pl-9 pr-3 py-2 text-sm rounded-xl bg-gray-100 dark:bg-white/5 border border-transparent focus:border-[rgb(var(--accent-rgb)/0.5)] focus:bg-white dark:focus:bg-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition"
+                className="glass-inset w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-transparent focus:border-[rgb(var(--accent-rgb)/0.5)] focus:bg-white dark:focus:bg-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none transition"
               />
             </div>
           </div>
@@ -265,7 +265,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
       </aside>
 
       <div className={`flex flex-col min-h-screen transition-[padding] duration-300 ease-in-out ${collapsed ? 'md:pl-[76px]' : 'md:pl-[264px]'}`}>
-        <header className="sticky top-0 z-30 h-16 flex items-center gap-3 px-4 sm:px-6 bg-white/80 dark:bg-[#121418]/80 backdrop-blur border-b border-gray-200 dark:border-white/10 transition-colors duration-300">
+        <header className="glass-bar sticky top-0 z-30 h-16 flex items-center gap-3 px-4 sm:px-6 border-b border-gray-200 dark:border-white/10 transition-colors duration-300">
           <button
             type="button"
             onClick={goBack}

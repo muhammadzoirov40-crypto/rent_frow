@@ -33,7 +33,7 @@ export default function NotFoundPage() {
         <p className="mt-5 text-[11px] text-gray-400 dark:text-gray-500">{t('notFound.path')}</p>
         <p
           dir="ltr"
-          className="mt-1 inline-block max-w-full truncate px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-white/[0.06] border border-gray-200 dark:border-white/10 font-mono text-xs text-gray-600 dark:text-gray-300"
+          className="glass-inset mt-1 inline-block max-w-full truncate px-3 py-1.5 rounded-lg border border-gray-200 dark:border-white/10 font-mono text-xs text-gray-600 dark:text-gray-300"
         >
           {location.pathname}
         </p>
@@ -48,7 +48,7 @@ export default function NotFoundPage() {
           </Link>
           <Link
             to="/search"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/[0.04] text-sm font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-white/[0.08] transition"
+            className="glass-panel w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl border border-gray-200 dark:border-white/10 text-sm font-semibold text-gray-700 dark:text-slate-200 hover:bg-gray-50 dark:hover:bg-white/[0.08] transition"
           >
             <Search className="w-4 h-4" />
             {t('notFound.search')}

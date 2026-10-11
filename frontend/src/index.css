@@ -50,13 +50,24 @@
     --hero-hub-via: #5590ff;
     --hero-hub-to: #4475f0;
     --hero-hub-shadow: rgba(46, 99, 245, 0.4);
-    /* ===== Unified Glassmorphism tokens (Light) ===== */
+    /* ===== Unified Glassmorphism tokens (Light) =====
+       One token set drives every frosted surface. Opacity is tiered by role:
+       nested wells (.glass-inset) are the most transparent, panels sit in the
+       middle, floating layers (.glass-popover) and sticky bars (.glass-bar)
+       are the most opaque so text stays readable over scrolled content. */
+    --glass-blur: 12px;
+    --glass-saturate: 140%;
     --glass-bg: rgba(228, 231, 236, 0.60);
     --glass-bg-raised: rgba(233, 236, 240, 0.72);
     --glass-bg-hover: rgba(238, 241, 245, 0.86);
+    --glass-bg-inset: rgba(15, 23, 42, 0.05);
+    --glass-bg-input: rgba(255, 255, 255, 0.66);
+    --glass-bg-bar: rgba(238, 241, 246, 0.78);
+    --glass-scrim: rgba(11, 15, 25, 0.55);
     --glass-border: rgba(15, 23, 42, 0.08);
     --glass-highlight: rgba(255, 255, 255, 0.70);
     --glass-shadow: 0 12px 32px -16px rgba(15, 23, 42, 0.20);
+    --glass-shadow-float: 0 28px 64px -28px rgba(15, 23, 42, 0.38);
   }
 
   @media (max-width: 767px) {
@@ -122,12 +133,22 @@
     --hero-rent-to: #ffffff;
     --hero-rent-shadow: rgba(226, 232, 240, 0.3);
     /* ===== Unified Glassmorphism tokens (Dark) ===== */
+    /* ===== Unified Glassmorphism tokens (Dark) =====
+       Same tiering as Light, mirrored: insets lift the panel (white/6),
+       floating layers sit darkest so menu text holds contrast. */
+    --glass-blur: 12px;
+    --glass-saturate: 140%;
     --glass-bg: rgba(70, 70, 70, 0.65);
     --glass-bg-raised: rgba(62, 62, 62, 0.74);
     --glass-bg-hover: rgba(82, 82, 82, 0.84);
+    --glass-bg-inset: rgba(255, 255, 255, 0.06);
+    --glass-bg-input: rgba(255, 255, 255, 0.07);
+    --glass-bg-bar: rgba(24, 27, 34, 0.80);
+    --glass-scrim: rgba(0, 0, 0, 0.65);
     --glass-border: rgba(255, 255, 255, 0.14);
     --glass-highlight: rgba(255, 255, 255, 0.08);
     --glass-shadow: 0 12px 32px -14px rgba(0, 0, 0, 0.50);
+    --glass-shadow-float: 0 28px 64px -24px rgba(0, 0, 0, 0.65);
   }
 
   body {
@@ -166,56 +187,10 @@
     transform: translateY(-1px);
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 font-semibold py-2.5 px-5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white transition-all duration-200 shadow-sm active:scale-[0.98];
-  }
-
-  .dark .btn-secondary {
-    @apply bg-white/10 hover:bg-white/15 text-white border border-white/10;
-  }
-
-  .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 font-semibold py-2.5 px-5 rounded-xl border border-gray-300 dark:border-white/15 text-gray-700 dark:text-gray-200 hover:border-[var(--accent)] hover:text-[var(--accent)] bg-white/50 dark:bg-white/5 backdrop-blur-sm transition-all duration-200 active:scale-[0.98];
-  }
-
-  .input-field {
-    @apply w-full px-4 py-2.5 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30 focus:border-[var(--accent)];
-    background-color: var(--bg-input);
-    border-color: var(--border-page);
-    color: var(--text-page);
-  }
-
   /* Cards are frosted, not painted: the page's ambient wash shows through,
-     so every surface reads as glass instead of an opaque sheet. */
-  .card {
-    @apply rounded-2xl overflow-hidden backdrop-blur-xl transition-all duration-300;
-    background: rgba(255, 255, 255, 0.68);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    box-shadow: var(--shadow-card);
-  }
-
-  .dark .card {
-    background: rgba(17, 24, 39, 0.58);
-    border-color: rgba(255, 255, 255, 0.07);
-  }
-
-  .card:hover {
-    box-shadow: var(--shadow-card-hover);
-    border-color: rgba(var(--accent-rgb) / 0.35);
-  }
-
-  .glass-card {
-    @apply rounded-2xl border backdrop-blur-xl transition-all duration-300;
-    background: rgba(255, 255, 255, 0.85);
-    border-color: rgba(255, 255, 255, 0.7);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06);
-  }
-
-  .dark .glass-card {
-    background: rgba(17, 24, 39, 0.75);
-    border-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4);
-  }
+     so every surface reads as glass instead of an opaque sheet.
+     `.card` was never used by a component — the frosted definitions now live
+     unlayered in the glassmorphism block below, defined exactly once. */
 }
 
 @keyframes fadeIn {
@@ -282,35 +257,50 @@
 }
 
 /* ===== Unified Glassmorphism design system =====
-   One frosted surface everywhere: translucent gray, blur(12px), a hairline
-   border and a soft shadow. Tokens live in :root / .dark so Light and Dark
-   stay in sync; the @supports fallback near body::before covers browsers
-   without backdrop-filter. Components keep their own rounded-/border-width
-   classes, so no radius is pinned here. */
-.glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
-}
+   One frosted surface everywhere: translucent gray, blur(var(--glass-blur)),
+   a hairline border and a soft shadow. Every value is a custom property in
+   :root / .dark, so Light and Dark stay in sync and retuning one token
+   restyles the whole site.
 
-/* Theme-aware: the light variant lives in @layer components above; only the
-   dark override is unlayered so it beats the layer without hijacking a light
-   page with an opaque dark rgba(). */
-.dark .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  border-color: var(--glass-border);
-  box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
-}
+   Surfaces are tiered by role instead of painted on blindly — a nested well
+   must not re-blur the panel it sits in, and a sticky bar must be opaque
+   enough to read against content scrolling under it:
 
-/* Light-mode frost: translucent gray + blur, so the ambient wash reads through. */
+     .glass-surface   background + blur only; the component owns border/shadow
+     .glass-panel     complete card: background, blur, hairline border, shadow
+     .glass-card      the same, under the name the components already use
+     .glass-tile      card that supplies its own `border` width utility
+     .glass-section   content panel that supplies its own border utilities
+     .glass-popover   floating layer: menus and filter panels
+     .glass-dropdown  the same, named for what it is
+     .glass-modal     centre-stage dialog: lifts further off the page
+     .glass-bar       sticky header/toolbar; no border, the component owns it
+     .glass-input     form field: opaque end of the tier, so typed text holds
+     .glass-inset     nested well: tint only, no second blur
+     .glass-scrim     modal backdrop: dim + blur
+
+   Components keep their own rounded- and border-width utilities, so no radius
+   is pinned here.
+
+   Cascade note: these rules are unlayered, so they beat Tailwind's layered
+   utilities in Light mode. Tailwind emits its `dark:` variants later and
+   gives them `:is(.dark *)` (specificity 0,2,0), which outranks a bare
+   class — so a component must never keep a `dark:bg-*` beside a glass class
+   or the opaque value wins in Dark mode. The surface transform strips it. */
+
+/* Base tier: background + blur, nothing else. Grouped so the values that
+   genuinely are identical are declared once. */
+.glass-surface,
+.glass-panel,
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+/* Cards add the hairline border and the soft lift. */
+.glass-panel,
+.glass-card {
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
 }
@@ -336,14 +326,59 @@
    touch more opaque than .glass-tile so menu text stays readable over any
    content scrolled underneath. Border stays with the component's own
    border-* utilities; only background, blur and shadow live here. */
-.glass-popover {
+.glass-popover,
+.glass-dropdown {
   background: var(--glass-bg-raised);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
 }
-.dark .glass-popover {
+
+/* A dialog is centre-stage and much larger than a menu, so it lifts further
+   off the page than one. */
+.glass-modal {
   background: var(--glass-bg-raised);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--glass-shadow-float), inset 0 1px 0 var(--glass-highlight);
+}
+
+/* ===== Glass inset wells =====
+   Nested rows, chips and boxes inside a panel that is already frosted. Tint
+   only: re-blurring a blurred surface costs GPU time and muddies the parent
+   frost. The reduced opacity versus .glass-panel is the point — the panel
+   still reads through, so the row reads as part of the same sheet. */
+.glass-inset {
+  background: var(--glass-bg-inset);
+}
+
+/* ===== Glass inputs =====
+   Opaque end of the tier on purpose: typed text and placeholders must never
+   have the page's ambient wash moving behind them. */
+.glass-input {
+  background: var(--glass-bg-input);
+  backdrop-filter: blur(8px) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(8px) saturate(var(--glass-saturate));
+  border-color: var(--glass-border);
+}
+
+/* ===== Glass bars: sticky headers, toolbars, sub-navs =====
+   More opaque than a panel because content scrolls under them, and no border
+   of their own — the component owns its border-b / border-t. */
+.glass-bar {
+  background: var(--glass-bg-bar);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: var(--glass-shadow);
+}
+
+/* ===== Glass scrim: the layer behind a modal =====
+   Dims and softens the page rather than blanking it, so the dialog reads as
+   glass held above the content instead of a hole cut in it. */
+.glass-scrim {
+  background: var(--glass-scrim);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* ===== Glass section panels: dashboard cards, empty states, list rows =====
@@ -352,34 +387,37 @@
    Only background / blur / shadow live here; border stays with the component. */
 .glass-section {
   background: var(--glass-bg-raised);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--glass-shadow), inset 0 1px 0 var(--glass-highlight);
 }
-.dark .glass-section {
-  background: var(--glass-bg-raised);
-}
 
-/* ===== Faceted backdrop + glass tiles =====
-   The dark theme gets a low-poly field (public/geo-bg.svg) fixed behind the
-   page; cards then sit on it as frosted tiles, so the facets read *through*
-   them instead of being hidden by an opaque panel. Light mode keeps a plain
-   page — glass over flat white has nothing worth revealing.
-
-   Deliberately unlayered: Tailwind's utilities live in @layer utilities and
-   lose to this, which is what lets .glass-tile own the card's background and
-   border while the component keeps its own rounded-/padding utilities. */
 /* ===== backdrop-filter fallback =====
    Browsers without backdrop-filter get a flatter, more opaque surface so the
-   panels stay readable instead of turning into see-through sheets. */
+   panels stay readable instead of turning into see-through sheets. Every
+   frosted tier is listed here; the scrims keep their dim, and the inputs and
+   bars stay near-opaque because they carry text. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass-panel, .glass-card, .glass-tile, .glass-popover, .glass-section {
+  .glass-surface, .glass-panel, .glass-card, .glass-tile,
+  .glass-section, .glass-popover, .glass-dropdown, .glass-modal {
     background: var(--glass-bg-raised);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
+  .glass-bar { background: rgba(248, 250, 252, 0.96); }
+  .dark .glass-bar { background: rgba(15, 18, 26, 0.96); }
+  .glass-input { background: #ffffff; }
+  .dark .glass-input { background: rgba(255, 255, 255, 0.08); }
+  .glass-inset { background: var(--glass-bg-inset); }
+  .glass-scrim { background: var(--glass-scrim); }
 }
 
 /* Ambient wash behind everything: three soft light pools so the frosted
-   panels have something to reveal. Fixed, so cards blur it as you scroll. */
+   panels have something to reveal. Fixed, so cards blur it as you scroll.
+
+   This is what a page wrapper must NOT paint over: every route uses a plain
+   transparent `min-h-screen` so the wash stays visible and the glass on top
+   of it has something to frost. */
 body::before {
   content: '';
   position: fixed;
@@ -408,21 +446,15 @@ body::before {
   pointer-events: none;
 }
 
-/* Separate from .glass-card on purpose: that one pins an opaque dark rgba() in
-   every theme, which is simply wrong on a light page. */
+/* ===== Glass tiles =====
+   Separate from .glass-panel on purpose: a tile supplies its own `border`
+   width utility (and often a hover border colour), so only border-COLOR lives
+   here — no width is pinned and the component's radius and padding stay. */
 .glass-tile {
   background: var(--glass-bg);
   border-color: var(--glass-border);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
-  box-shadow: var(--glass-shadow);
-}
-
-.dark .glass-tile {
-  background: var(--glass-bg);
-  border-color: var(--glass-border);
-  backdrop-filter: blur(12px) saturate(140%);
-  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   box-shadow: var(--glass-shadow);
 }
 
@@ -449,8 +481,30 @@ body::before {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
+/* ===== Reduced motion =====
+   One global switch: animations and transitions collapse to a frame. Users who
+   ask for less motion get the same layout and the same states, just without the
+   travel — nothing depends on an animation finishing for its final styles. */
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
   [class*='renthubShine'] { animation: none !important; }
+}
+
+/* ===== Keyboard focus =====
+   A visible ring for anything the keyboard can reach. Components that already
+   style :focus/:focus-visible keep their own ring (their utilities outrank
+   this); this is the floor for everything else, so tabbing is never invisible
+   on a frosted surface. */
+:focus-visible {
+  outline: 2px solid rgb(var(--accent-rgb) / 0.75);
+  outline-offset: 2px;
 }
 
     /* Native <select> lists are painted by the OS popup: it ignores the page's

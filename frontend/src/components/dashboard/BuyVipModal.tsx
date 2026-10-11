@@ -69,7 +69,7 @@ export default function BuyVipModal({ open, onClose }: BuyVipModalProps) {
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="glass-scrim absolute inset-0"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -142,7 +142,7 @@ export default function BuyVipModal({ open, onClose }: BuyVipModalProps) {
                   <img
                     src={img}
                     alt=""
-                    className="w-11 h-11 rounded-lg object-cover shrink-0 bg-gray-100 dark:bg-white/5"
+                    className="glass-inset w-11 h-11 rounded-lg object-cover shrink-0"
                     data-testid="buy-vip-row-image"
                   />
                 ) : (

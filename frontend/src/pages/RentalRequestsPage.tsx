@@ -131,7 +131,7 @@ export function RequestCard({
       <div className="flex items-start gap-4">
         <Link
           to={`/listing/${req.listing_id}`}
-          className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-100 dark:bg-white/5 overflow-hidden flex-shrink-0 flex items-center justify-center"
+          className="glass-inset w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center"
           aria-label={t('booking.view')}
         >
           {image ? (
@@ -183,7 +183,7 @@ export function RequestCard({
           </div>
 
           {req.message && (
-            <div className="mt-3 flex items-start gap-2 bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+            <div className="glass-inset mt-3 flex items-start gap-2 rounded-xl p-3">
               <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-600 dark:text-gray-300">{req.message}</p>
             </div>
@@ -193,7 +193,7 @@ export function RequestCard({
             {payable && (
               <span className="flex flex-wrap items-center gap-2" data-testid="payment-strip">
                 {paymentLoading ? (
-                  <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-xl">
+                  <span className="glass-inset flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 px-4 py-2 rounded-xl">
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     {t('payment.checking')}
                   </span>
@@ -217,7 +217,7 @@ export function RequestCard({
 
             <Link
               to={`/listing/${req.listing_id}`}
-              className="flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 px-4 py-2 rounded-xl transition"
+              className="glass-inset flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 px-4 py-2 rounded-xl transition"
             >
               <Eye className="w-4 h-4" />
               {t('booking.view')}
@@ -365,7 +365,7 @@ export default function RentalRequestsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <BackButton className="mb-4" />
         <div className="mb-8">
@@ -373,7 +373,7 @@ export default function RentalRequestsPage() {
           <p className="text-gray-500 dark:text-gray-400 mt-1">{t('rentalRequests.subtitle')}</p>
         </div>
 
-        <div className="flex flex-wrap gap-1 bg-white dark:bg-[#1A1A2E] rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/10 mb-4">
+        <div className="glass-panel flex flex-wrap gap-1 rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/10 mb-4">
           <button
             onClick={() => setActiveTab('my-requests')}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition ${
@@ -471,7 +471,7 @@ export default function RentalRequestsPage() {
 
       {(cancelTarget !== null || rejectTarget !== null) && (
         <div
-          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
           onClick={() => {
             if (!cancelMutation.isPending && !rejectMutation.isPending) {
               setCancelTarget(null);

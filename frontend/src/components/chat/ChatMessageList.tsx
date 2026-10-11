@@ -244,7 +244,7 @@ export default function ChatMessageList({
 
   if (loading && messages.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-white dark:bg-[#121418]" style={WALLPAPER}>
+      <div className="glass-surface flex-1 flex items-center justify-center" style={WALLPAPER}>
         <Loader2 className="w-6 h-6 text-[var(--accent)] animate-spin" />
       </div>
     );
@@ -253,7 +253,7 @@ export default function ChatMessageList({
   if (messages.length === 0) {
     return (
       <div
-        className="flex-1 flex flex-col items-center justify-center bg-white dark:bg-[#121418] text-center px-6"
+        className="glass-surface flex-1 flex flex-col items-center justify-center text-center px-6"
         style={WALLPAPER}
       >
         <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-[rgb(var(--accent-rgb)/0.2)] to-[rgb(var(--accent-rgb)/0.05)] border border-[rgb(var(--accent-rgb)/0.2)] flex items-center justify-center text-3xl mb-4 shadow-lg shadow-[rgb(var(--accent-rgb)/0.1)]">
@@ -274,7 +274,7 @@ export default function ChatMessageList({
       <div
         ref={scrollRef}
         onClick={() => setMenu(null)}
-        className="flex-1 overflow-y-auto px-3 sm:px-5 py-4 bg-white dark:bg-[#121418] chat-scroll"
+        className="glass-surface flex-1 overflow-y-auto px-3 sm:px-5 py-4 chat-scroll"
         style={WALLPAPER}
       >
         <div>
@@ -299,7 +299,7 @@ export default function ChatMessageList({
 
             const dayDivider = newDay ? (
               <div className="flex justify-center my-4">
-                <span className="px-3 py-1 rounded-full bg-gray-100/90 dark:bg-white/10 backdrop-blur text-[11px] font-semibold text-gray-500 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 shadow-sm">
+                <span className="glass-panel px-3 py-1 rounded-full text-[11px] font-semibold text-gray-500 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 shadow-sm">
                   {formatDate(message.created_at)}
                 </span>
               </div>
@@ -313,7 +313,7 @@ export default function ChatMessageList({
                 <div key={message.id}>
                   {dayDivider}
                   <div className="flex justify-center my-2.5" data-testid="chat-system-message">
-                    <span className="max-w-[85%] px-3 py-1.5 rounded-xl bg-gray-100/90 dark:bg-white/10 backdrop-blur text-[11px] leading-relaxed text-gray-600 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 text-center">
+                    <span className="glass-panel max-w-[85%] px-3 py-1.5 rounded-xl text-[11px] leading-relaxed text-gray-600 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 text-center">
                       {stripSystemPrefix(message.content)}
                     </span>
                   </div>
@@ -471,7 +471,7 @@ export default function ChatMessageList({
           }}
         >
           <div
-            className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-60 rounded-3xl bg-white/95 dark:bg-[#1a1d24]/95 backdrop-blur-xl border border-white/60 dark:border-white/10 shadow-[0_24px_80px_-20px_rgba(16,24,40,0.55)] overflow-hidden p-2"
+            className="glass-popover fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-60 rounded-3xl border border-white/60 dark:border-white/10 shadow-[0_24px_80px_-20px_rgba(16,24,40,0.55)] overflow-hidden p-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-center gap-1.5 px-1 pb-2 mb-1.5 border-b border-gray-100 dark:border-white/10">
@@ -483,7 +483,7 @@ export default function ChatMessageList({
                     onReact?.(menuMsg.id, emoji);
                     closeMenu();
                   }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none bg-gray-50 dark:bg-white/[0.06] hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:scale-[1.35] active:scale-95 transition shadow-sm"
+                  className="glass-inset w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:scale-[1.35] active:scale-95 transition shadow-sm"
                 >
                   {emoji}
                 </button>

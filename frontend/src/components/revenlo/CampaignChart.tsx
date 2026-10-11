@@ -18,7 +18,7 @@ export default function CampaignChart() {
   let offset = 0
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 h-full flex flex-col">
+    <div className="glass-panel rounded-2xl border border-gray-100 p-5 sm:p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-base font-bold text-gray-900">Discount Campaign</h3>
         <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" aria-label="More options">

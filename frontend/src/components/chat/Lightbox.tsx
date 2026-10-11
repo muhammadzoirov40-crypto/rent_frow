@@ -39,7 +39,7 @@ export default function Lightbox({ src, onClose }: LightboxProps) {
           alt=""
           className="max-w-[92vw] max-h-[88vh] rounded-2xl object-contain shadow-2xl"
         />
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/60 text-white/80 text-xs">
+        <div className="glass-panel absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-white/80 text-xs">
           <ZoomIn className="w-3.5 h-3.5" />
           Esc
         </div>

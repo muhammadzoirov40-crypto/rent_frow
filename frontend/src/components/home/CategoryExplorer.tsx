@@ -124,7 +124,7 @@ export default function CategoryExplorer() {
             <button
               key={cat.id}
               onClick={() => navigate(`/search?category_id=${cat.id}`)}
-              className="group h-full flex flex-col items-center justify-center text-center rounded-2xl p-5 bg-white/60 dark:bg-[#111827]/40 backdrop-blur-xl border border-gray-200/60 dark:border-white/10 hover:border-[var(--accent)] hover:shadow-lg hover:shadow-[rgb(var(--accent-rgb)/0.25)] hover:bg-white/80 dark:hover:bg-[#1f293d]/50 transition-all duration-200 hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              className="glass-panel group h-full flex flex-col items-center justify-center text-center rounded-2xl p-5 border border-gray-200/60 dark:border-white/10 hover:border-[var(--accent)] hover:shadow-lg hover:shadow-[rgb(var(--accent-rgb)/0.25)] hover:bg-white/80 dark:hover:bg-[#1f293d]/50 transition-all duration-200 hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <div className="w-12 h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.08)] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-200">
                 {cat.image_url ? (

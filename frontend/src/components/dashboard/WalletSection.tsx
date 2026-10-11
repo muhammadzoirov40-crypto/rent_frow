@@ -190,7 +190,7 @@ export default function WalletSection() {
             {pendingRows.map((row) => (
               <li
                 key={row.id}
-                className="flex items-center justify-between gap-3 text-sm bg-white/70 dark:bg-black/20 rounded-xl px-3 py-2"
+                className="glass-panel flex items-center justify-between gap-3 text-sm rounded-xl px-3 py-2"
               >
                 <span className="text-amber-700 dark:text-amber-300 font-semibold tabular-nums">
                   +{formatAmount(row.amount, i18n.language)} {t('common.somoni')}
@@ -298,7 +298,7 @@ export default function WalletSection() {
           link never credits anything by itself. */}
       {showTopUp && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+          className="glass-scrim fixed inset-0 z-50 flex items-center justify-center p-4"
           onClick={() => setShowTopUp(false)}
           data-testid="wallet-topup-modal"
         >
@@ -338,7 +338,7 @@ export default function WalletSection() {
                 step={1}
                 value={amount}
                 onChange={(event) => setAmount(event.target.value)}
-                className="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-black/20 px-3 py-2.5 pr-16 text-sm font-semibold tabular-nums outline-none focus:border-[var(--accent)]"
+                className="glass-panel w-full rounded-xl border border-gray-200 dark:border-white/10 px-3 py-2.5 pr-16 text-sm font-semibold tabular-nums outline-none focus:border-[var(--accent)]"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-gray-500">
                 {t('common.somoni')}

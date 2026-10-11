@@ -333,7 +333,7 @@ export default function ListingPage() {
 
   if (listingLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center dark:bg-[#0a0a1a]">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -341,7 +341,7 @@ export default function ListingPage() {
 
   if (!listing) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 dark:bg-[#0a0a1a]">
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
         <AlertTriangle size={48} className="text-gray-400" />
         <h2 className="text-xl font-bold text-[#1A1A2E] dark:text-white">{t('common.error')}</h2>
         <Link to="/" className="text-[var(--accent)] hover:underline font-medium">
@@ -369,7 +369,7 @@ export default function ListingPage() {
     isAuthenticated && !!startDate && !!endDate && !canAfford(balance, total);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-6 px-4 sm:px-6 lg:px-8 pb-24 lg:pb-6">
+    <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8 pb-24 lg:pb-6">
       <div className="max-w-7xl mx-auto">
         <button onClick={() => navigate(previousPath(location.pathname) || '/')} className="flex items-center gap-2 text-sm text-gray-500 hover:text-[#1A1A2E] dark:hover:text-white mb-6 transition-colors">
           <ChevronLeft size={16} />
@@ -381,7 +381,7 @@ export default function ListingPage() {
             {images.length > 0 ? (
               <div className="space-y-3">
                 <div
-                  className="relative bg-white dark:bg-[#1A1A2E] rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 aspect-[4/3] touch-pan-y"
+                  className="glass-panel relative rounded-2xl overflow-hidden border border-gray-200 dark:border-white/10 aspect-[4/3] touch-pan-y"
                   onTouchStart={(e) => {
                     touchX.current = e.touches[0].clientX;
                   }}
@@ -402,14 +402,14 @@ export default function ListingPage() {
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-4 right-4 flex items-center gap-2">
-                    <div className="bg-black/65 text-white text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">
+                    <div className="glass-panel text-white text-xs font-semibold px-3 py-1.5 rounded-full">
                       {currentImageIndex + 1}/{images.length}
                     </div>
                     <button
                       type="button"
                       onClick={() => setFullscreen(true)}
                       aria-label={t('listing.fullscreen')}
-                      className="w-8 h-8 rounded-full bg-black/65 text-white flex items-center justify-center backdrop-blur-sm hover:bg-black/80 transition"
+                      className="glass-panel w-8 h-8 rounded-full text-white flex items-center justify-center hover:bg-black/80 transition"
                     >
                       <Maximize2 className="w-4 h-4" />
                     </button>
@@ -420,7 +420,7 @@ export default function ListingPage() {
                         type="button"
                         aria-label="Previous image"
                         onClick={() => setCurrentImageIndex((i) => (i - 1 + images.length) % images.length)}
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 dark:bg-black/60 text-gray-800 dark:text-white flex items-center justify-center shadow-md hover:scale-105 transition hidden sm:flex"
+                        className="glass-panel absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full text-gray-800 dark:text-white flex items-center justify-center shadow-md hover:scale-105 transition hidden sm:flex"
                       >
                         <ChevronLeft className="w-5 h-5" />
                       </button>
@@ -428,7 +428,7 @@ export default function ListingPage() {
                         type="button"
                         aria-label="Next image"
                         onClick={() => setCurrentImageIndex((i) => (i + 1) % images.length)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/90 dark:bg-black/60 text-gray-800 dark:text-white flex items-center justify-center shadow-md hover:scale-105 transition hidden sm:flex"
+                        className="glass-panel absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full text-gray-800 dark:text-white flex items-center justify-center shadow-md hover:scale-105 transition hidden sm:flex"
                       >
                         <ChevronRight className="w-5 h-5" />
                       </button>
@@ -455,12 +455,12 @@ export default function ListingPage() {
                 )}
               </div>
             ) : (
-              <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 aspect-[4/3] flex items-center justify-center">
+              <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 aspect-[4/3] flex items-center justify-center">
                 <Home size={64} className="text-gray-300" />
               </div>
             )}
 
-            <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+            <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-3">
                 <FileText size={20} className="text-[var(--accent)]" />
                 {t('listing.description')}
@@ -470,37 +470,37 @@ export default function ListingPage() {
               </p>
             </div>
 
-            <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+            <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <Tag size={20} className="text-[var(--accent)]" />
                 {t('listing.characteristics')}
               </h2>
               <div className="grid grid-cols-2 gap-4">
                 {listing.category_name && (
-                  <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                  <div className="glass-inset rounded-xl p-3">
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t('listing.category')}</span>
                     <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">{listing.category_name}</span>
                   </div>
                 )}
                 {listing.city_name && (
-                  <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                  <div className="glass-inset rounded-xl p-3">
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t('listing.city')}</span>
                     <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">{listing.city_name}</span>
                   </div>
                 )}
                 {listing.district_name && (
-                  <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                  <div className="glass-inset rounded-xl p-3">
                     <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t('listing.district')}</span>
                     <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">{listing.district_name}</span>
                   </div>
                 )}
-                <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                <div className="glass-inset rounded-xl p-3">
                   <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t('listing.datePosted')}</span>
                   <span className="text-sm font-semibold text-[#1A1A2E] dark:text-white">
                     {formatDate(listing.created_at)}
                   </span>
                 </div>
-                <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-3">
+                <div className="glass-inset rounded-xl p-3">
                   <span className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{t('listing.status')}</span>
                   <span className={`text-sm font-semibold ${listing.status === 'ACTIVE' ? 'text-emerald-600' : 'text-red-500'}`}>
                     {listing.status === 'ACTIVE' ? t('listing.available') : t('listing.unavailable')}
@@ -522,12 +522,12 @@ export default function ListingPage() {
 
           <div className="lg:w-[40%]">
             <div id="booking-card" className="sticky top-6 space-y-4">
-              <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+              <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                 <h1 className="text-xl font-bold text-[#1A1A2E] dark:text-white mb-3">{listing.title}</h1>
 
                 <div className="flex flex-wrap items-center gap-2 mb-3">
                   {listing.is_verified && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/70 text-white ring-1 ring-white/15">
+                    <span className="glass-panel inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold text-white ring-1 ring-white/15">
                       <BadgeCheck className="w-3.5 h-3.5 text-emerald-400" />
                       {t('listing.verified')}
                     </span>
@@ -646,7 +646,7 @@ export default function ListingPage() {
                         onChange={(event) => setPlaceNote(event.target.value)}
                         placeholder={t('booking.placePlaceholder')}
                         maxLength={200}
-                        className="w-full rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-[#1A1A2E] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                        className="glass-inset w-full rounded-lg border border-gray-200 dark:border-white/10 px-3 py-2 text-sm text-[#1A1A2E] dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                       />
                     </div>
                     <div className="flex items-center justify-between gap-3 text-gray-500 dark:text-gray-400">
@@ -803,7 +803,7 @@ export default function ListingPage() {
               </div>
 
               {listing.owner && (
-                <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-12 h-12 rounded-full bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center overflow-hidden">
                       {listing.owner.avatar_url ? (
@@ -851,14 +851,14 @@ export default function ListingPage() {
         </div>
 
         <div className="mt-12">
-          <div className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+          <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6">
             <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-6">
               <Star size={20} className="text-[var(--accent)]" />
               {t('listing.reviews')} ({listingReviews.length})
             </h2>
 
             {listingReviews.length > 0 && (
-              <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 dark:bg-white/5 rounded-xl">
+              <div className="glass-inset flex items-center gap-4 mb-6 p-4 rounded-xl">
                 <span className="text-4xl font-extrabold text-[var(--accent)]">{avgRating}</span>
                 <div>
                   <StarRating rating={avgRating} size={20} />
@@ -878,7 +878,7 @@ export default function ListingPage() {
                     <div key={review.id} className="border border-gray-100 dark:border-white/10 rounded-xl p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-[#1A1A2E]/10 dark:bg-white/10 flex items-center justify-center">
+                          <div className="glass-panel w-8 h-8 rounded-full bg-[#1A1A2E]/10 flex items-center justify-center">
                             <span className="text-xs font-bold text-[#1A1A2E] dark:text-white">
                               {(review.customer_name || 'U')[0]}
                             </span>
@@ -944,7 +944,7 @@ export default function ListingPage() {
                       onChange={(e) => setReviewComment(e.target.value)}
                       placeholder={t('listing.reviewPlaceholder')}
                       rows={3}
-                      className="w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
+                      className="glass-input w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
                     />
                     <div className="flex gap-2">
                       <button
@@ -985,9 +985,9 @@ export default function ListingPage() {
                 <Link
                   key={item.id}
                   to={`/listing/${item.id}`}
-                  className="flex-shrink-0 w-64 bg-white dark:bg-[#1A1A2E] rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300 group"
+                  className="glass-panel flex-shrink-0 w-64 rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-300 group"
                 >
-                  <div className="h-40 bg-gray-100 dark:bg-white/5 overflow-hidden">
+                  <div className="glass-inset h-40 overflow-hidden">
                     {item.primary_image ? (
                       <img src={item.primary_image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : null}
@@ -1027,7 +1027,7 @@ export default function ListingPage() {
 
       {showConfirm && (
         <div
-          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
           onClick={() => {
             if (!rentalMutation.isPending) setShowConfirm(false);
           }}
@@ -1037,14 +1037,14 @@ export default function ListingPage() {
             aria-modal="true"
             aria-labelledby="confirm-booking-title"
             data-testid="confirm-booking-modal"
-            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 id="confirm-booking-title" className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
               {t('booking.confirmTitle')}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('booking.confirmText')}</p>
-            <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4 space-y-1.5 text-sm mb-5">
+            <div className="glass-inset rounded-xl p-4 space-y-1.5 text-sm mb-5">
               <div className="flex justify-between gap-4">
                 <span className="text-gray-500 dark:text-gray-400">{t('booking.start')}</span>
                 <span className="font-semibold text-[#1A1A2E] dark:text-white">{formatDate(startDate)}</span>
@@ -1127,7 +1127,7 @@ export default function ListingPage() {
 
       {showDeleteListing && (
         <div
-          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
           onClick={() => {
             if (!deleteListingMutation.isPending) setShowDeleteListing(false);
           }}
@@ -1137,7 +1137,7 @@ export default function ListingPage() {
             aria-modal="true"
             aria-labelledby="confirm-delete-listing-title"
             data-testid="confirm-delete-listing-modal"
-            className="bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3
@@ -1230,7 +1230,7 @@ export default function ListingPage() {
 
       {!isOwner && listing.status === 'ACTIVE' && (
         <div className="lg:hidden fixed left-0 right-0 bottom-20 z-40 px-4">
-          <div className="bg-white dark:bg-[#151528] border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/10 px-3 py-2.5 flex items-center gap-3">
+          <div className="glass-panel border border-gray-200 dark:border-white/10 rounded-2xl shadow-xl shadow-black/10 px-3 py-2.5 flex items-center gap-3">
             <div className="min-w-0">
               <div className="text-lg font-extrabold text-[var(--accent)] leading-none">
                 {formatAmount(listing.price, i18n.language)}

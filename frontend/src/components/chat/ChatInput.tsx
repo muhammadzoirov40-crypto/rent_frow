@@ -205,7 +205,7 @@ export default function ChatInput({
   const canSend = Boolean(value.trim()) && !sending && !disabled;
 
   return (
-    <div className="relative px-3 sm:px-5 py-3 bg-white/95 dark:bg-[#1a1d24]/95 backdrop-blur border-t border-gray-200/70 dark:border-white/10">
+    <div className="glass-bar relative px-3 sm:px-5 py-3 border-t border-gray-200/70 dark:border-white/10">
       {emojiOpen && (
         <div
           ref={emojiRef}
@@ -246,7 +246,7 @@ export default function ChatInput({
       />
 
       {(replyTo || editing) && (
-        <div className="mb-2 flex items-start gap-3 pl-3 pr-2 py-2.5 rounded-2xl bg-[rgb(var(--accent-rgb)/0.07)] dark:bg-[rgb(var(--accent-rgb)/0.1)] border border-[rgb(var(--accent-rgb)/0.25)] shadow-sm">
+        <div className="glass-panel mb-2 flex items-start gap-3 pl-3 pr-2 py-2.5 rounded-2xl bg-[rgb(var(--accent-rgb)/0.07)] border border-[rgb(var(--accent-rgb)/0.25)] shadow-sm">
           <span className="w-1 self-stretch rounded-full bg-gradient-to-b from-[var(--accent)] to-[var(--accent-light)] shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-[var(--accent)]">
@@ -343,7 +343,7 @@ export default function ChatInput({
             onPaste={handlePaste}
             placeholder={t('messages.typeMessage')}
             disabled={disabled}
-            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] border border-transparent bg-gray-100/90 dark:bg-white/[0.06] px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:bg-white dark:focus:bg-white/[0.09] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
+            className="glass-input flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] border border-transparent px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:bg-white dark:focus:bg-white/[0.09] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
           />
 
           <button

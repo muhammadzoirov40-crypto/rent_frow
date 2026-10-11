@@ -53,7 +53,7 @@ export default function PaymentLine({
         </span>
         {payment.payment_reference && (
           <span
-            className="hidden sm:flex items-center gap-1 text-[11px] font-mono text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-2 py-1.5 rounded-lg"
+            className="glass-inset hidden sm:flex items-center gap-1 text-[11px] font-mono text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-white/10 px-2 py-1.5 rounded-lg"
             title={t('payment.reference')}
             data-testid="payment-reference"
           >
@@ -92,7 +92,7 @@ export default function PaymentLine({
   }
 
   return (
-    <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/5 px-4 py-2 rounded-xl">
+    <span className="glass-inset flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 px-4 py-2 rounded-xl">
       <Clock className="w-3.5 h-3.5" />
       {label} — {t('payment.waitingForRenter')}
     </span>

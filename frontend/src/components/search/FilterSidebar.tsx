@@ -113,7 +113,7 @@ function ToggleRow({
         onChange={(e) => onChange(e.target.checked)}
         className="peer sr-only"
       />
-      <span className="w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent)] peer-focus-visible:ring-2 peer-focus-visible:ring-[rgb(var(--accent-rgb)/0.4)] transition" />
+      <span className="glass-inset w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent)] peer-focus-visible:ring-2 peer-focus-visible:ring-[rgb(var(--accent-rgb)/0.4)] transition" />
       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
     </label>
   );

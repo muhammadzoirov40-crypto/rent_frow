@@ -174,7 +174,7 @@ export default function SearchPage() {
   }, [currentPage]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dark:bg-[#0a0a1a] min-h-screen">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-screen">
       <BackButton className="mb-4" />
       <div className="mb-6">
         <SearchBar
@@ -252,7 +252,7 @@ export default function SearchPage() {
             />
           </div>
 
-          <div className="flex items-center gap-1 border border-gray-200 dark:border-white/10 rounded-xl p-1 bg-white dark:bg-white/[0.03]">
+          <div className="glass-panel flex items-center gap-1 border border-gray-200 dark:border-white/10 rounded-xl p-1">
             <button
               onClick={() => setView('grid')}
               className={`p-2 rounded-lg transition ${
@@ -292,7 +292,7 @@ export default function SearchPage() {
 
       <div className="flex gap-6">
         <aside className="hidden lg:block w-[280px] flex-shrink-0">
-          <div className="bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl rounded-2xl border border-gray-100 dark:border-white/10 p-6 shadow-sm sticky top-24">
+          <div className="glass-bar rounded-2xl border border-gray-100 dark:border-white/10 p-6 shadow-sm sticky top-24">
             <h3 className="flex items-center gap-2 font-bold text-[#1A1A2E] dark:text-white mb-5">
               <SlidersHorizontal className="w-[18px] h-[18px] text-[var(--accent)]" />
               {t('search.filters')}
@@ -333,8 +333,8 @@ export default function SearchPage() {
               {listingsList.map((listing) => (
                 <div key={listing.id} className="w-full">
                   <Link to={`/listing/${listing.id}`} className="block">
-                    <div className="bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden flex hover:shadow-lg transition-all">
-                      <div className="w-56 flex-shrink-0 relative bg-gray-100">
+                    <div className="glass-panel rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden flex hover:shadow-lg transition-all">
+                      <div className="glass-inset w-56 flex-shrink-0 relative">
                         {listing.primary_image ? (
                           <img
                             src={listing.primary_image}
@@ -345,7 +345,7 @@ export default function SearchPage() {
                           />
                         ) : null}
                         {!listing.primary_image && (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                          <div className="glass-inset w-full h-full flex items-center justify-center">
                             <span className="text-gray-300">{t('search.noPhoto')}</span>
                           </div>
                         )}
@@ -414,7 +414,7 @@ export default function SearchPage() {
               <button
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage <= 1}
-                className="flex items-center gap-1 px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm font-medium text-gray-600 dark:text-white dark:bg-[#1A1A2E] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="glass-panel flex items-center gap-1 px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm font-medium text-gray-600 dark:text-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft className="w-4 h-4" />
                 {t('search.back')}
@@ -443,7 +443,7 @@ export default function SearchPage() {
               <button
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                className="flex items-center gap-1 px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm font-medium text-gray-600 dark:text-white dark:bg-[#1A1A2E] hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="glass-panel flex items-center gap-1 px-3 py-2 border border-gray-200 dark:border-white/10 rounded-lg text-sm font-medium text-gray-600 dark:text-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 {t('search.forward')}
                 <ChevronRight className="w-4 h-4" />
@@ -456,11 +456,11 @@ export default function SearchPage() {
       {mobileFiltersOpen && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className="glass-scrim fixed inset-0 z-40 lg:hidden"
             onClick={() => setMobileFiltersOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl z-50 lg:hidden overflow-y-auto shadow-2xl">
-            <div className="sticky top-0 bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl border-b border-gray-100 dark:border-white/10 p-4 flex items-center justify-between z-10">
+          <div className="glass-popover fixed inset-y-0 right-0 w-80 max-w-[85vw] z-50 lg:hidden overflow-y-auto shadow-2xl">
+            <div className="glass-bar sticky top-0 border-b border-gray-100 dark:border-white/10 p-4 flex items-center justify-between z-10">
               <h3 className="font-bold text-[#1A1A2E] dark:text-white">{t('search.filters')}</h3>
               <button
                 onClick={() => setMobileFiltersOpen(false)}

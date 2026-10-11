@@ -91,7 +91,7 @@ export function TopModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
       onClick={() => {
         if (!busy) onClose();
       }}
@@ -160,7 +160,7 @@ export function TopModal({
         )}
 
         {selected && (
-          <div className="mt-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 p-3.5 space-y-1.5 text-sm">
+          <div className="glass-inset mt-4 rounded-xl border border-gray-100 dark:border-white/10 p-3.5 space-y-1.5 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-gray-500 dark:text-gray-400">{t('top.priceLabel')}</span>
               <span className="font-bold text-[#1A1A2E] dark:text-white tabular-nums">

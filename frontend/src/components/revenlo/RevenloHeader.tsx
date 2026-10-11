@@ -8,7 +8,7 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="sticky top-0 z-30 h-[68px] bg-white border-b border-gray-100 flex items-center justify-between gap-3 px-4 sm:px-6">
+    <header className="glass-bar sticky top-0 z-30 h-[68px] border-b border-gray-100 flex items-center justify-between gap-3 px-4 sm:px-6">
       {/* Left: nav arrows + breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
         <button

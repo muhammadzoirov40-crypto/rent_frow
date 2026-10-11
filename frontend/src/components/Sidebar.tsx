@@ -166,7 +166,7 @@ export default function Sidebar() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('header.searchPlaceholder')}
-              className="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
+              className="glass-input w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
             />
           </div>
         </form>

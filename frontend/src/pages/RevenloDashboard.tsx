@@ -40,10 +40,10 @@ export default function RevenloDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-[#b4c9e8] via-[#c9d8ef] to-[#dde6f5] relative overflow-x-hidden">
       {/* Decorative diagonal stripes */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -top-24 -left-32 w-[420px] h-10 bg-white/70 rotate-45 rounded-full blur-[1px]" />
-        <div className="absolute top-40 -left-40 w-[500px] h-6 bg-white/50 rotate-45 rounded-full" />
-        <div className="absolute -bottom-20 -right-24 w-[380px] h-8 bg-white/60 -rotate-45 rounded-full" />
-        <div className="absolute bottom-40 -right-32 w-[300px] h-5 bg-white/40 -rotate-45 rounded-full" />
+        <div className="glass-panel absolute -top-24 -left-32 w-[420px] h-10 rotate-45 rounded-full blur-[1px]" />
+        <div className="glass-panel absolute top-40 -left-40 w-[500px] h-6 rotate-45 rounded-full" />
+        <div className="glass-panel absolute -bottom-20 -right-24 w-[380px] h-8 -rotate-45 rounded-full" />
+        <div className="glass-panel absolute bottom-40 -right-32 w-[300px] h-5 -rotate-45 rounded-full" />
       </div>
 
       {/* Brand row */}
@@ -58,7 +58,7 @@ export default function RevenloDashboard() {
 
       {/* Dashboard card */}
       <div className="relative z-10 px-3 sm:px-6 pb-6">
-        <div className="mx-auto max-w-[1440px] bg-white rounded-[28px] shadow-[0_24px_70px_-20px_rgba(30,50,100,0.35)] overflow-hidden flex min-h-[calc(100vh-7.5rem)]">
+        <div className="mx-auto max-w-[1440px] rounded-[28px] shadow-[0_24px_70px_-20px_rgba(30,50,100,0.35)] overflow-hidden flex min-h-[calc(100vh-7.5rem)]">
           <RevenloSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
           <div className="flex-1 flex flex-col min-w-0">
@@ -76,7 +76,7 @@ export default function RevenloDashboard() {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  <select className="px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 outline-none focus:border-blue-500/50 transition-all cursor-pointer shadow-sm">
+                  <select className="glass-panel px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 outline-none focus:border-blue-500/50 transition-all cursor-pointer shadow-sm">
                     <option value="month">Month</option>
                     <option value="week">Week</option>
                     <option value="day">Day</option>

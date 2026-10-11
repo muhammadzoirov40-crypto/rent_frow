@@ -171,7 +171,7 @@ export default function ListingsSection() {
               >
                 <Link
                   to={`/listing/${l.id}`}
-                  className="w-full sm:w-24 h-32 sm:h-24 rounded-xl bg-gray-100 dark:bg-white/5 overflow-hidden flex items-center justify-center shrink-0"
+                  className="glass-inset w-full sm:w-24 h-32 sm:h-24 rounded-xl overflow-hidden flex items-center justify-center shrink-0"
                 >
                   {img ? (
                     <img src={img} alt="" className="w-full h-full object-cover" />
@@ -237,7 +237,7 @@ export default function ListingsSection() {
                   <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-white/10">
                     <Link
                       to={`/listing/${l.id}`}
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 px-3.5 py-1.5 rounded-lg transition"
+                      className="glass-inset inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 px-3.5 py-1.5 rounded-lg transition"
                     >
                       <Eye className="w-4 h-4" />
                       {t('dashboard.listings.preview')}
@@ -342,7 +342,7 @@ export default function ListingsSection() {
 
       {(deleteTarget || pauseTarget) && (
         <div
-          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
           onClick={() => {
             if (!deleteMutation.isPending && !statusMutation.isPending) {
               setDeleteTarget(null);

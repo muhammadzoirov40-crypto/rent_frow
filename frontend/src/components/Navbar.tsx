@@ -54,7 +54,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
   const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0]
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/5 flex items-center justify-between px-6">
+    <header className="glass-bar sticky top-0 z-30 h-16 border-b border-gray-200/70 dark:border-white/5 flex items-center justify-between px-6">
       {/* Left */}
       <div className="flex items-center gap-3">
         <h2 className="text-sm font-semibold text-gray-700 dark:text-slate-300">
@@ -79,7 +79,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
             </svg>
           </button>
           {langOpen && (
-            <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-slate-800 border border-gray-200 dark:border-white/10 rounded-xl shadow-xl py-1 z-50">
+            <div className="glass-popover absolute right-0 mt-2 w-40 border border-gray-200 dark:border-white/10 rounded-xl shadow-xl py-1 z-50">
               {LANGUAGES.map((lang) => (
                 <button
                   key={lang.code}
@@ -131,7 +131,7 @@ export default function Topbar({ user, onLogout }: TopbarProps) {
         {/* User Card */}
         <Link
           to={isCustomer ? '/profile' : '/admin/profile'}
-          className="flex items-center gap-3 pl-3 pr-1 py-1.5 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/8 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200"
+          className="glass-inset flex items-center gap-3 pl-3 pr-1 py-1.5 rounded-xl border border-gray-200 dark:border-white/5 hover:bg-gray-200 dark:hover:bg-white/8 hover:border-gray-300 dark:hover:border-white/10 transition-all duration-200"
         >
           <div className="flex flex-col items-end">
             <span className="text-sm font-semibold text-gray-900 dark:text-white leading-tight max-w-[140px] truncate">

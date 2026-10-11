@@ -434,7 +434,7 @@ export default function MessagesPage() {
 
   return (
     <div className="flex h-[calc(100vh_-_var(--header-h)_-_7rem)] md:h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto glass-section rounded-3xl overflow-hidden border border-gray-200 dark:border-white/10 shadow-2xl my-4">
-      <div className={`w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col bg-gray-50 dark:bg-[#1a1d24] ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`glass-surface w-80 flex-shrink-0 border-r border-gray-200 dark:border-white/10 flex flex-col ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center gap-2 mb-3">
             <button
@@ -455,7 +455,7 @@ export default function MessagesPage() {
               placeholder={t('messages.searchPlaceholder')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-100/80 dark:bg-white/5 border border-transparent rounded-full text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)] focus:border-[rgb(var(--accent-rgb)/0.4)] transition"
+              className="glass-input w-full pl-10 pr-4 py-2.5 border border-transparent rounded-full text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)] focus:border-[rgb(var(--accent-rgb)/0.4)] transition"
             />
           </div>
         </div>
@@ -523,7 +523,7 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className={`relative flex-1 min-w-0 flex flex-col bg-white dark:bg-[#121418] ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`glass-surface relative flex-1 min-w-0 flex flex-col ${!selectedId ? 'hidden md:flex' : 'flex'}`}>
         {!selectedId ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
             <div className="w-24 h-24 bg-gradient-to-br from-[rgb(var(--accent-rgb)/0.2)] to-[rgb(var(--accent-rgb)/0.05)] rounded-[32px] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-5 shadow-xl shadow-[rgb(var(--accent-rgb)/0.1)]">
@@ -554,7 +554,7 @@ export default function MessagesPage() {
             )}
 
             {pinnedMessage && (
-              <div className="flex items-center gap-3 px-4 py-2.5 border-b border-[rgb(var(--accent-rgb)/0.15)] bg-gradient-to-r from-[rgb(var(--accent-rgb)/0.15)] via-[rgb(var(--accent-rgb)/0.07)] to-transparent backdrop-blur-sm">
+              <div className="glass-bar flex items-center gap-3 px-4 py-2.5 border-b border-[rgb(var(--accent-rgb)/0.15)] bg-gradient-to-r from-[rgb(var(--accent-rgb)/0.15)] via-[rgb(var(--accent-rgb)/0.07)] to-transparent">
                 <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shrink-0">
                   <Pin className="w-4 h-4" />
                 </span>
@@ -612,11 +612,11 @@ export default function MessagesPage() {
 
             {forwardMsg && (
               <div
-                className="absolute inset-0 z-40 bg-black/50 flex items-center justify-center p-4"
+                className="glass-scrim absolute inset-0 z-40 flex items-center justify-center p-4"
                 onClick={() => setForwardMsg(null)}
               >
                 <div
-                  className="w-full max-w-sm rounded-2xl bg-white/70 dark:bg-[#1a1d24]/70 backdrop-blur-xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
+                  className="glass-panel w-full max-w-sm rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-white/10">
@@ -696,9 +696,9 @@ function ListingContextBar({ listingId }: { listingId: number }) {
     <Link
       to={`/listing/${listingId}`}
       data-testid="chat-listing-card"
-      className="flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-white/[0.03] hover:bg-gray-100 dark:hover:bg-white/5 transition"
+      className="glass-bar flex items-center gap-3 px-4 py-2.5 border-b border-gray-100 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/5 transition"
     >
-      <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-200 dark:bg-white/10 flex-shrink-0 flex items-center justify-center">
+      <div className="glass-panel w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
         {img ? (
           <img src={img} alt="" className="w-full h-full object-cover" />
         ) : (
@@ -874,7 +874,7 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
       {statusKey === 'ACCEPTED' && (
         <span className="flex flex-wrap items-center gap-2 mt-2.5" data-testid="chat-payment-strip">
           {paymentLoading ? (
-            <span className="flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-white/5 px-3 py-1.5 rounded-xl">
+            <span className="glass-inset flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500 px-3 py-1.5 rounded-xl">
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
               {t('payment.checking')}
             </span>
@@ -933,7 +933,7 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
 
       {decision && (
         <div
-          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
           onClick={() => {
             if (!decideMutation.isPending) setDecision(null);
           }}
@@ -942,7 +942,7 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
             role="dialog"
             aria-modal="true"
             data-testid="confirm-chat-decision-modal"
-            className="bg-white/70 dark:bg-[#1a1a2e]/70 backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+            className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">

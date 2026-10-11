@@ -141,7 +141,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="glass-scrim absolute inset-0"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -188,7 +188,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t('feedback.titlePlaceholder')}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+              className="glass-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
             />
           </div>
 
@@ -205,7 +205,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={t('feedback.contentPlaceholder')}
-              className="w-full px-3.5 py-2.5 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition resize-none"
+              className="glass-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition resize-none"
             />
           </div>
 
@@ -230,7 +230,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
                   onClick={resetImage}
                   aria-label={t('feedback.removeImage')}
                   disabled={uploading}
-                  className="absolute top-0.5 right-0.5 p-1 rounded-md bg-black/60 text-white hover:bg-black/80 transition disabled:opacity-50"
+                  className="glass-panel absolute top-0.5 right-0.5 p-1 rounded-md text-white hover:bg-black/80 transition disabled:opacity-50"
                 >
                   <X className="w-3 h-3" />
                 </button>

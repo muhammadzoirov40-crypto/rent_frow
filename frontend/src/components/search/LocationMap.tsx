@@ -115,7 +115,7 @@ export default function LocationMap({
       <div
         ref={containerRef}
         style={{ height }}
-        className="relative z-0 w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden bg-gray-100 dark:bg-[#12141a]"
+        className="glass-inset relative z-0 w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden"
         aria-label={t('listing.location')}
       />
 

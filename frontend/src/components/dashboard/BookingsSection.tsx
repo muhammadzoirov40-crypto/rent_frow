@@ -130,7 +130,7 @@ export default function BookingsSection() {
 
       {rejectTarget !== null && (
         <div
-          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
           onClick={() => {
             if (!rejectMutation.isPending) setRejectTarget(null);
           }}

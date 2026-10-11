@@ -358,7 +358,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6">
-          <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4">
+          <div className="glass-inset rounded-xl p-4">
             <p className="text-xs text-gray-400 mb-1">{t('settings.personal.verification')}</p>
             <p
               className={`text-sm font-semibold flex items-center gap-1.5 ${meUser.is_verified ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400'}`}
@@ -368,14 +368,14 @@ export default function SettingsPage() {
               {meUser.is_verified ? t('settings.personal.verified') : t('settings.personal.notVerified')}
             </p>
           </div>
-          <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4">
+          <div className="glass-inset rounded-xl p-4">
             <p className="text-xs text-gray-400 mb-1">{t('settings.personal.memberSince')}</p>
             <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-gray-400" />
               {formatDate(meUser.created_at)}
             </p>
           </div>
-          <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4">
+          <div className="glass-inset rounded-xl p-4">
             <p className="text-xs text-gray-400 mb-1">{t('settings.personal.rating')}</p>
             <p className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-1.5">
               <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
@@ -384,7 +384,7 @@ export default function SettingsPage() {
                 : t('settings.personal.noRating')}
             </p>
           </div>
-          <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4">
+          <div className="glass-inset rounded-xl p-4">
             <p className="text-xs text-gray-400 mb-1">{t('settings.personal.role')}</p>
             <p className="text-sm font-semibold text-gray-900 dark:text-white">
               {t(`settings.personal.roles.${meUser.role}`)}
@@ -399,7 +399,7 @@ export default function SettingsPage() {
     <div className={CARD} data-testid="section-security">
       <SectionHeading icon={ShieldCheck} title={t('settings.nav.security')} desc={t('settings.security.desc')} />
       <div className="space-y-3">
-        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+        <div className="glass-inset flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10">
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">{t('settings.security.loginMethod')}</p>
             <p className="text-xs text-gray-500 dark:text-slate-400">{t('settings.security.loginMethodDesc')}</p>
@@ -408,7 +408,7 @@ export default function SettingsPage() {
             {t('settings.security.otp')}
           </span>
         </div>
-        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+        <div className="glass-inset flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10">
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">{t('settings.security.accountStatus')}</p>
             <p className="text-xs text-gray-500 dark:text-slate-400">{t('settings.security.accountStatusDesc')}</p>
@@ -420,7 +420,7 @@ export default function SettingsPage() {
             {meUser?.is_active ? t('settings.security.active') : t('settings.security.inactive')}
           </span>
         </div>
-        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+        <div className="glass-inset flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10">
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">{t('settings.personal.verification')}</p>
             <p className="text-xs text-gray-500 dark:text-slate-400">{t('settings.security.verificationDesc')}</p>
@@ -431,7 +431,7 @@ export default function SettingsPage() {
             {meUser?.is_verified ? t('settings.personal.verified') : t('settings.personal.notVerified')}
           </span>
         </div>
-        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+        <div className="glass-inset flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10">
           <div>
             <p className="text-sm font-medium text-gray-900 dark:text-white">{t('settings.security.lastUpdated')}</p>
             <p className="text-xs text-gray-500 dark:text-slate-400">{t('settings.security.lastUpdatedDesc')}</p>
@@ -449,7 +449,7 @@ export default function SettingsPage() {
     return (
       <div className={CARD} data-testid="section-notifications">
         <SectionHeading icon={Bell} title={t('settings.nav.notifications')} desc={t('settings.notificationsDesc')} />
-        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 mb-4">
+        <div className="glass-inset flex items-center justify-between p-4 rounded-xl border border-gray-200 dark:border-white/10 mb-4">
           <div className="flex items-center gap-3">
             <div className={`w-2.5 h-2.5 rounded-full ${unread > 0 ? 'bg-[var(--accent)]' : 'bg-gray-300 dark:bg-slate-600'}`} />
             <span className="text-sm font-medium text-gray-900 dark:text-white">{t('settings.notifications.unread')}</span>
@@ -475,7 +475,7 @@ export default function SettingsPage() {
     <div className={CARD} data-testid="section-privacy">
       <SectionHeading icon={Lock} title={t('settings.nav.privacy')} desc={t('settings.privacy.desc')} />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-200 dark:border-white/10">
+        <div className="glass-inset rounded-xl p-4 border border-gray-200 dark:border-white/10">
           <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{t('settings.privacy.publicTitle')}</p>
           <ul className="space-y-1.5 text-sm text-gray-600 dark:text-slate-400">
             <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />{t('settings.privacy.publicName')}</li>
@@ -484,7 +484,7 @@ export default function SettingsPage() {
             <li className="flex items-center gap-2"><Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />{t('settings.privacy.publicRating')}</li>
           </ul>
         </div>
-        <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-200 dark:border-white/10">
+        <div className="glass-inset rounded-xl p-4 border border-gray-200 dark:border-white/10">
           <p className="text-sm font-semibold text-gray-900 dark:text-white mb-2">{t('settings.privacy.privateTitle')}</p>
           <ul className="space-y-1.5 text-sm text-gray-600 dark:text-slate-400">
             <li className="flex items-center gap-2"><Lock className="w-3.5 h-3.5 text-gray-400 shrink-0" />{t('settings.privacy.privateBookings')}</li>
@@ -528,7 +528,7 @@ export default function SettingsPage() {
           {paymentsData.items.map((p) => (
             <div
               key={p.id}
-              className="flex flex-wrap items-center gap-3 px-3 py-3 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10 text-sm"
+              className="glass-inset flex flex-wrap items-center gap-3 px-3 py-3 rounded-xl border border-gray-200 dark:border-white/10 text-sm"
               data-testid="payment-row"
             >
               <span className="flex-1 min-w-[140px] text-gray-900 dark:text-white font-medium">
@@ -662,7 +662,7 @@ export default function SettingsPage() {
         <SectionHeading icon={LifeBuoy} title={t('settings.nav.help')} desc={t('settings.help.desc')} />
         <div className="space-y-3">
           {faq.map((item) => (
-            <div key={item.q} className="rounded-xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-200 dark:border-white/10">
+            <div key={item.q} className="glass-inset rounded-xl p-4 border border-gray-200 dark:border-white/10">
               <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{item.q}</p>
               <p className="text-sm text-gray-600 dark:text-slate-400">{item.a}</p>
             </div>
@@ -676,11 +676,11 @@ export default function SettingsPage() {
     <div className={CARD} data-testid="section-legal">
       <SectionHeading icon={FileText} title={t('settings.nav.legal')} desc={t('settings.legal.desc')} />
       <div className="space-y-4">
-        <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-200 dark:border-white/10">
+        <div className="glass-inset rounded-xl p-4 border border-gray-200 dark:border-white/10">
           <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{t('settings.legal.termsTitle')}</p>
           <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('settings.legal.termsBody')}</p>
         </div>
-        <div className="rounded-xl bg-gray-50 dark:bg-white/5 p-4 border border-gray-200 dark:border-white/10">
+        <div className="glass-inset rounded-xl p-4 border border-gray-200 dark:border-white/10">
           <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">{t('settings.legal.privacyTitle')}</p>
           <p className="text-sm text-gray-600 dark:text-slate-400 leading-relaxed">{t('settings.legal.privacyBody')}</p>
         </div>
@@ -692,21 +692,21 @@ export default function SettingsPage() {
     <div className={CARD} data-testid="section-account">
       <SectionHeading icon={AlertTriangle} title={t('settings.nav.account')} desc={t('settings.account.desc')} />
       <div className="space-y-2 mb-5">
-        <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-xl">
+        <div className="glass-inset flex items-center justify-between p-3.5 rounded-xl">
           <span className="text-sm text-gray-500 dark:text-slate-400">{t('settings.account.email')}</span>
           <span className="text-sm font-medium text-gray-900 dark:text-white truncate ml-3">{meUser?.email}</span>
         </div>
-        <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-xl">
+        <div className="glass-inset flex items-center justify-between p-3.5 rounded-xl">
           <span className="text-sm text-gray-500 dark:text-slate-400">{t('settings.account.role')}</span>
           <span className="text-sm font-medium text-gray-900 dark:text-white">
             {meUser ? t(`settings.personal.roles.${meUser.role}`) : '—'}
           </span>
         </div>
-        <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-xl">
+        <div className="glass-inset flex items-center justify-between p-3.5 rounded-xl">
           <span className="text-sm text-gray-500 dark:text-slate-400">{t('settings.account.listings')}</span>
           <span className="text-sm font-medium text-gray-900 dark:text-white tabular-nums">{meUser?.listing_count ?? 0}</span>
         </div>
-        <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-white/5 rounded-xl">
+        <div className="glass-inset flex items-center justify-between p-3.5 rounded-xl">
           <span className="text-sm text-gray-500 dark:text-slate-400">{t('settings.account.memberSince')}</span>
           <span className="text-sm font-medium text-gray-900 dark:text-white tabular-nums">
             {meUser?.created_at ? formatDate(meUser.created_at) : '—'}
@@ -779,13 +779,13 @@ export default function SettingsPage() {
 
       {isDesktop ? (
         <div className="flex gap-6 items-start" data-testid="settings-desktop">
-          <nav className="w-64 shrink-0 sticky top-6 space-y-1 p-3 rounded-2xl bg-white dark:bg-white/[0.03] backdrop-blur-xl border border-gray-200 dark:border-white/[0.06] shadow-xl shadow-black/10" data-testid="settings-nav">
+          <nav className="glass-bar w-64 shrink-0 sticky top-6 space-y-1 p-3 rounded-2xl border border-gray-200 dark:border-white/[0.06] shadow-xl shadow-black/10" data-testid="settings-nav">
             {SECTIONS.map((s) => navButton(s.id, s.icon, t(`settings.nav.${s.id}`)))}
           </nav>
           <div className="flex-1 min-w-0" data-testid="settings-panel">{renderSection(active)}</div>
         </div>
       ) : mobileList ? (
-        <div className="space-y-1 p-3 rounded-2xl bg-white dark:bg-white/[0.03] backdrop-blur-xl border border-gray-200 dark:border-white/[0.06] shadow-xl shadow-black/10" data-testid="settings-mobile-list">
+        <div className="glass-panel space-y-1 p-3 rounded-2xl border border-gray-200 dark:border-white/[0.06] shadow-xl shadow-black/10" data-testid="settings-mobile-list">
           {SECTIONS.map((s) => navButton(s.id, s.icon, t(`settings.nav.${s.id}`), true))}
         </div>
       ) : (
@@ -806,7 +806,7 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
       {/* Full-bleed: the panel stretches edge to edge instead of sitting in a
           centred 1024px column with dead margins on wide screens. */}
       {header}

@@ -26,7 +26,7 @@ export function NearYouSection({ radius = 25 }: { radius?: number }) {
   if (!coords) {
     return (
       <Section title={t('home.nearYou')} hint={t('home.nearYouHint')}>
-        <div className="rounded-2xl border border-dashed border-gray-300 dark:border-white/15 bg-gray-50 dark:bg-white/[0.03] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+        <div className="glass-inset rounded-2xl border border-dashed border-gray-300 dark:border-white/15 p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           <span className="w-12 h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center">
             <MapPin className="w-6 h-6 text-[var(--accent)]" />
           </span>

@@ -19,7 +19,7 @@ const monthlyData = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-xl">
+      <div className="glass-panel border border-gray-200 rounded-xl px-4 py-3 shadow-xl">
         <p className="text-xs font-medium text-gray-500 mb-0.5">{label}-Apr 2025</p>
         <p className="text-[11px] text-gray-400 mb-1">Total Revenue</p>
         <p className="text-sm font-bold text-gray-900">
@@ -33,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function PerformanceChart() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-5 sm:p-6 h-full">
+    <div className="glass-panel rounded-2xl border border-gray-100 p-5 sm:p-6 h-full">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
         <div>
           <h3 className="text-base font-bold text-gray-900">Performance Overview</h3>
@@ -48,7 +48,7 @@ export default function PerformanceChart() {
           </div>
         </div>
         <div className="flex flex-col items-start sm:items-end gap-2">
-          <select className="px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-700 outline-none focus:border-blue-400 cursor-pointer shadow-sm">
+          <select className="glass-panel px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 outline-none focus:border-blue-400 cursor-pointer shadow-sm">
             <option>Last year</option>
             <option>Last month</option>
             <option>Last 7 days</option>

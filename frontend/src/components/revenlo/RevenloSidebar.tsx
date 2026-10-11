@@ -36,7 +36,7 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
       {/* Mobile overlay */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
+          className="glass-scrim fixed inset-0 z-40 lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -77,7 +77,7 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
 
         {/* Search */}
         <div className="px-4 pb-4 shrink-0">
-          <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-gray-50 border border-gray-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+          <div className="glass-inset flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
             <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
@@ -130,7 +130,7 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
 
         {/* Plan Card */}
         <div className="p-4 shrink-0">
-          <div className="rounded-2xl bg-gray-50 border border-gray-100 p-4 text-center">
+          <div className="glass-inset rounded-2xl border border-gray-100 p-4 text-center">
             <div className="w-9 h-9 mx-auto mb-2.5 rounded-xl bg-blue-50 flex items-center justify-center">
               <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 16l2.37-4.74A2 2 0 019.15 10H20l-2.5 8H5.5L5 16zm0 0H3m17 0h2M7.5 10L9 5l3 3 3-5 2.5 7" />
@@ -138,7 +138,7 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
             </div>
             <p className="text-[15px] font-bold text-gray-900">Current Plan: Basic</p>
             <p className="text-xs text-gray-500 mt-1 mb-3">1,580 Credits Remaining</p>
-            <button className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-white border border-gray-200 hover:border-gray-300 hover:shadow-sm text-xs font-semibold text-gray-800 transition-all">
+            <button className="glass-panel w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm text-xs font-semibold text-gray-800 transition-all">
               Upgrade Pro Account
               <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
