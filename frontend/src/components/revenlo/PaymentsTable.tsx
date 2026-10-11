@@ -20,12 +20,12 @@ const paymentsData: Payment[] = [
 ]
 
 const statusColors = {
-  Done: 'bg-emerald-50 text-emerald-600 border-emerald-200/70',
-  Pending: 'bg-amber-50 text-amber-600 border-amber-200/70',
+  Done: 'bg-emerald-50 dark:bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-200/70 dark:border-emerald-500/30',
+  Pending: 'bg-amber-50 dark:bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-200/70 dark:border-amber-500/30',
 }
 
 const checkboxClass =
-  'w-4 h-4 rounded border-gray-300 bg-white text-blue-600 focus:ring-blue-500/30 focus:ring-2 cursor-pointer accent-blue-600'
+  'w-4 h-4 rounded border-gray-300 dark:border-white/20 bg-white dark:bg-white/10 text-blue-600 focus:ring-blue-500/30 focus:ring-2 cursor-pointer accent-blue-600'
 
 export default function PaymentsTable() {
   const [search, setSearch] = useState('')
@@ -70,16 +70,16 @@ export default function PaymentsTable() {
   }
 
   return (
-    <div className="glass-panel rounded-2xl border border-gray-100 shadow-sm">
+    <div className="glass-section rounded-2xl">
       <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-base font-bold text-gray-900">Payments</h3>
-            <p className="text-sm text-gray-500 mt-1">You processed 19 payouts this cycle.</p>
+            <h3 className="text-base font-bold text-gray-900 dark:text-white">Payments</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">You processed 19 payouts this cycle.</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <div className="relative">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -87,10 +87,10 @@ export default function PaymentsTable() {
                 placeholder="Search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="glass-input w-40 sm:w-48 pl-9 pr-3 py-2.5 rounded-xl border border-gray-100 text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all"
+                className="glass-input w-40 sm:w-48 pl-9 pr-3 py-2.5 rounded-xl text-sm transition-all"
               />
             </div>
-            <button className="glass-panel flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:border-gray-300 hover:bg-gray-50 transition-all">
+            <button className="glass-popover flex items-center gap-2 px-3.5 py-2.5 rounded-xl border border-[color:var(--glass-border)] text-sm font-medium text-gray-600 dark:text-gray-300 hover:border-gray-300 dark:hover:border-white/25 transition-all">
               Filter
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -99,7 +99,7 @@ export default function PaymentsTable() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="glass-panel px-3.5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 outline-none focus:border-blue-400 cursor-pointer hover:border-gray-300 transition-all"
+              className="glass-input px-3.5 py-2.5 rounded-xl text-sm cursor-pointer transition-all"
             >
               <option value="All">Monthly</option>
               <option value="Done">Done</option>
@@ -111,7 +111,7 @@ export default function PaymentsTable() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[820px]">
             <thead>
-              <tr className="border-b border-gray-100">
+              <tr className="border-b border-[color:var(--glass-border)]">
                 <th className="text-left px-4 py-3.5 w-12">
                   <input
                     type="checkbox"
@@ -124,20 +124,20 @@ export default function PaymentsTable() {
                     aria-label="Select all payments"
                   />
                 </th>
-                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500">Affiliate Name</th>
-                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500">Email</th>
-                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500">Referred By</th>
-                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500">Method</th>
-                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500">Payment</th>
-                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500">Status</th>
+                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Affiliate Name</th>
+                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Email</th>
+                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Referred By</th>
+                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Method</th>
+                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Payment</th>
+                <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-50 dark:divide-white/5">
               {filtered.map((payment) => (
                 <tr
                   key={payment.id}
-                  className={`hover:bg-gray-50/70 transition-colors ${
-                    selected.has(payment.id) ? 'bg-blue-50/50' : ''
+                  className={`hover:bg-gray-50/70 dark:hover:bg-white/5 transition-colors ${
+                    selected.has(payment.id) ? 'bg-blue-50/50 dark:bg-blue-500/10' : ''
                   }`}
                 >
                   <td className="px-4 py-4">
@@ -150,17 +150,17 @@ export default function PaymentsTable() {
                     />
                   </td>
                   <td className="px-4 py-4">
-                    <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
                       {payment.affiliateName}
                     </span>
                   </td>
-                  <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">{payment.email}</td>
-                  <td className="px-4 py-4 text-sm text-gray-500 whitespace-nowrap">{payment.referredBy}</td>
+                  <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{payment.email}</td>
+                  <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">{payment.referredBy}</td>
                   <td className="px-4 py-4">
-                    <span className="text-sm font-medium text-gray-700 whitespace-nowrap">{payment.method}</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">{payment.method}</span>
                   </td>
                   <td className="px-4 py-4">
-                    <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white whitespace-nowrap">
                       ${payment.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
                   </td>
@@ -177,7 +177,7 @@ export default function PaymentsTable() {
 
         {filtered.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-sm text-gray-500">No payments found</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">No payments found</p>
           </div>
         )}
       </div>

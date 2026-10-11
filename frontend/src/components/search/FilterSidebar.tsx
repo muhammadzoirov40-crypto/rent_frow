@@ -30,7 +30,7 @@ const BATHS_OPTIONS = ['1', '2', '3'];
 const labelCls =
   'block text-[11px] font-bold uppercase tracking-[0.1em] text-gray-400 dark:text-gray-500 mb-2';
 const inputCls =
-  'w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.4)] focus:border-[rgb(var(--accent-rgb)/0.5)] transition';
+  'w-full rounded-xl glass-input px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 transition';
 
 function pillCls(active: boolean) {
   return `px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition ${
@@ -104,7 +104,7 @@ function ToggleRow({
   return (
     <label
       htmlFor={id}
-      className="flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/[0.07] px-3.5 py-3 cursor-pointer select-none hover:border-[rgb(var(--accent-rgb)/0.4)] hover:bg-[rgb(var(--accent-rgb)/0.05)] transition"
+      className="flex glass-section items-center gap-3 rounded-xl border border-gray-100 dark:border-white/[0.07] px-3.5 py-3 cursor-pointer select-none hover:border-[rgb(var(--accent-rgb)/0.4)] transition"
     >
       <input
         id={id}
@@ -113,7 +113,7 @@ function ToggleRow({
         onChange={(e) => onChange(e.target.checked)}
         className="peer sr-only"
       />
-      <span className="glass-inset w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent)] peer-focus-visible:ring-2 peer-focus-visible:ring-[rgb(var(--accent-rgb)/0.4)] transition" />
+      <span className="w-[18px] h-[18px] shrink-0 rounded border border-gray-300 dark:border-white/20 bg-white dark:bg-white/5 peer-checked:border-[var(--accent)] peer-checked:bg-[var(--accent)] peer-focus-visible:ring-2 peer-focus-visible:ring-[rgb(var(--accent-rgb)/0.4)] transition" />
       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
     </label>
   );

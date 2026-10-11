@@ -96,7 +96,7 @@ export default function BookingsSection() {
             className={`px-4 py-2 rounded-xl text-sm font-semibold transition border ${
               filter === f.key
                 ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-sm shadow-[rgb(var(--accent-rgb)/0.25)]'
-                : 'bg-white dark:bg-[#1a1d24] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
+                : 'glass-popover text-gray-600 dark:text-gray-300 border-[color:var(--glass-border)] hover:border-[rgb(var(--accent-rgb)/0.4)]'
             }`}
           >
             {f.label}
@@ -106,7 +106,7 @@ export default function BookingsSection() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-12 text-center">
+        <div className="rounded-2xl glass-section p-12 text-center">
           <CalendarCheck className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
           <h3 className="font-bold mb-1">{t('dashboard.bookings.empty')}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.bookings.emptyHint')}</p>
@@ -130,7 +130,7 @@ export default function BookingsSection() {
 
       {rejectTarget !== null && (
         <div
-          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => {
             if (!rejectMutation.isPending) setRejectTarget(null);
           }}
@@ -139,7 +139,7 @@ export default function BookingsSection() {
             role="dialog"
             aria-modal="true"
             data-testid="reject-confirm-modal"
-            className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl"
+            className="glass-popover rounded-2xl p-6 w-full max-w-sm"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">{t('dashboard.bookings.rejectTitle')}</h3>

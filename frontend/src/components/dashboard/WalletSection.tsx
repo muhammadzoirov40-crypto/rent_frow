@@ -100,7 +100,7 @@ export default function WalletSection() {
 
   return (
     <div className="space-y-4" data-testid="wallet-section">
-      <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-5">
+      <div className="rounded-2xl glass-section p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <h2 className="text-lg font-bold">{t('dashboard.wallet.title')}</h2>
@@ -135,15 +135,15 @@ export default function WalletSection() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-5">
+        <div className="rounded-2xl glass-section p-5">
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.wallet.available')}</p>
           <p className="text-2xl font-extrabold tabular-nums mt-1 text-[#16a34a]">{som(available)}</p>
         </div>
-        <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-5">
+        <div className="rounded-2xl glass-section p-5">
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.wallet.reserved')}</p>
           <p className="text-2xl font-extrabold tabular-nums mt-1 text-amber-500">{som(reserved)}</p>
         </div>
-        <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-5">
+        <div className="rounded-2xl glass-section p-5">
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.wallet.ownTotal')}</p>
           <p className="text-2xl font-extrabold tabular-nums mt-1">{som(summary?.total ?? 0)}</p>
         </div>
@@ -190,7 +190,7 @@ export default function WalletSection() {
             {pendingRows.map((row) => (
               <li
                 key={row.id}
-                className="glass-panel flex items-center justify-between gap-3 text-sm rounded-xl px-3 py-2"
+                className="glass-section flex items-center justify-between gap-3 text-sm rounded-xl px-3 py-2"
               >
                 <span className="text-amber-700 dark:text-amber-300 font-semibold tabular-nums">
                   +{formatAmount(row.amount, i18n.language)} {t('common.somoni')}
@@ -217,7 +217,7 @@ export default function WalletSection() {
         </div>
       )}
 
-      <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-5">
+      <div className="rounded-2xl glass-section p-5">
         <h3 className="font-semibold mb-1">{t('dashboard.wallet.history')}</h3>
         {ledgerPending ? (
           <div className="flex justify-center py-8">
@@ -298,14 +298,14 @@ export default function WalletSection() {
           link never credits anything by itself. */}
       {showTopUp && (
         <div
-          className="glass-scrim fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
           onClick={() => setShowTopUp(false)}
           data-testid="wallet-topup-modal"
         >
           <div
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-sm rounded-2xl glass-popover border border-gray-200 dark:border-white/10 p-5 shadow-2xl"
+            className="w-full max-w-sm rounded-2xl glass-popover p-5"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3">
@@ -338,7 +338,7 @@ export default function WalletSection() {
                 step={1}
                 value={amount}
                 onChange={(event) => setAmount(event.target.value)}
-                className="glass-panel w-full rounded-xl border border-gray-200 dark:border-white/10 px-3 py-2.5 pr-16 text-sm font-semibold tabular-nums outline-none focus:border-[var(--accent)]"
+                className="glass-input w-full rounded-xl px-3 py-2.5 pr-16 text-sm font-semibold tabular-nums"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 dark:text-gray-500">
                 {t('common.somoni')}

@@ -32,7 +32,7 @@ export function HowItWorksSection() {
         {STEPS.map((step, idx) => (
           <div
             key={step.titleKey}
-            className="glass-tile rounded-2xl border p-5 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:-translate-y-1 transition-all duration-300"
+            className="glass-tile rounded-2xl border p-5 hover:-translate-y-1 transition-all duration-300"
           >
             <div className="flex items-center gap-3 mb-3">
               <span className="w-10 h-10 rounded-lg bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center">

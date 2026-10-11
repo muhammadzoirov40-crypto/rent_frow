@@ -146,7 +146,7 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className="glass-bar site-header fixed top-0 left-0 right-0 z-50 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)] border-b border-gray-200/60 dark:border-white/10 transition-colors"
+      className="site-header fixed top-0 left-0 right-0 z-50 glass-section border-b border-gray-200/60 dark:border-white/10 transition-colors"
     >
       {/* Full-bleed bar: logo pinned left, actions pinned right — true
           space-between across the viewport instead of a centred 1280px
@@ -165,7 +165,7 @@ export default function Header() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('header.searchPlaceholder')}
-                className="glass-input w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
+                className="w-full pl-10 pr-4 py-2.5 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
               />
             </div>
           </form>
@@ -413,7 +413,7 @@ export default function Header() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('header.searchPlaceholder')}
-              className="glass-input w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
+              className="w-full pl-10 pr-4 py-2.5 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
             />
           </div>
         </form>

@@ -38,20 +38,20 @@ export const GlassStatsCard: React.FC<GlassStatsCardProps> = ({
 
       <div className="flex items-center justify-between mb-3 relative z-10">
         <div>
-          <p className="text-xs sm:text-sm font-medium text-white/60 tracking-wide uppercase">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 dark:text-white/60 tracking-wide uppercase">
             {title}
           </p>
         </div>
 
         {Icon && (
-          <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[var(--accent,#FF6B35)] group-hover:border-[var(--accent,#FF6B35)]/40 transition-colors shadow-inner">
+          <div className="w-10 h-10 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] border border-[color:var(--glass-border)] flex items-center justify-center text-[var(--accent,#FF6B35)] group-hover:border-[var(--accent,#FF6B35)]/40 transition-colors">
             <Icon size={18} />
           </div>
         )}
       </div>
 
       <div className="relative z-10">
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight tabular-nums">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight tabular-nums">
           {value}
         </h2>
 
@@ -60,8 +60,8 @@ export const GlassStatsCard: React.FC<GlassStatsCardProps> = ({
             <span
               className={`inline-flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-lg border ${
                 isPositive
-                  ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
-                  : 'bg-rose-500/15 text-rose-400 border-rose-500/30'
+                  ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30'
+                  : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border-rose-500/30'
               }`}
             >
               {isPositive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
@@ -70,7 +70,7 @@ export const GlassStatsCard: React.FC<GlassStatsCardProps> = ({
           )}
 
           {subtitle && (
-            <span className="text-[11px] text-white/40 truncate">
+            <span className="text-[11px] text-gray-400 dark:text-white/40 truncate">
               {subtitle}
             </span>
           )}

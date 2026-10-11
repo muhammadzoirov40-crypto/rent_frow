@@ -137,7 +137,7 @@ export default function ListingsSection() {
             className={`px-4 py-2 rounded-xl text-sm font-semibold transition border ${
               filter === f.key
                 ? 'bg-[var(--accent)] text-white border-[var(--accent)] shadow-sm shadow-[rgb(var(--accent-rgb)/0.25)]'
-                : 'bg-white dark:bg-[#1a1d24] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)]'
+                : 'glass-popover text-gray-600 dark:text-gray-300 border-[color:var(--glass-border)] hover:border-[rgb(var(--accent-rgb)/0.4)]'
             }`}
           >
             {f.label}
@@ -153,7 +153,7 @@ export default function ListingsSection() {
       </div>
 
       {rows.length === 0 ? (
-        <div className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-12 text-center">
+        <div className="rounded-2xl glass-section p-12 text-center">
           <Package className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" />
           <h3 className="font-bold mb-1">{t('dashboard.listings.empty')}</h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.listings.emptyHint')}</p>
@@ -166,12 +166,12 @@ export default function ListingsSection() {
             return (
               <div
                 key={l.id}
-                className="rounded-2xl glass-section border border-gray-200 dark:border-white/10 p-4 flex flex-col sm:flex-row gap-4 hover:shadow-md transition"
+                className="rounded-2xl glass-section p-4 flex flex-col sm:flex-row gap-4 transition"
                 data-testid="listing-row"
               >
                 <Link
                   to={`/listing/${l.id}`}
-                  className="glass-inset w-full sm:w-24 h-32 sm:h-24 rounded-xl overflow-hidden flex items-center justify-center shrink-0"
+                  className="w-full sm:w-24 h-32 sm:h-24 rounded-xl bg-gray-100 dark:bg-white/5 overflow-hidden flex items-center justify-center shrink-0"
                 >
                   {img ? (
                     <img src={img} alt="" className="w-full h-full object-cover" />
@@ -237,7 +237,7 @@ export default function ListingsSection() {
                   <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-white/10">
                     <Link
                       to={`/listing/${l.id}`}
-                      className="glass-inset inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 px-3.5 py-1.5 rounded-lg transition"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-50 hover:bg-gray-100 dark:bg-white/5 dark:hover:bg-white/10 px-3.5 py-1.5 rounded-lg transition"
                     >
                       <Eye className="w-4 h-4" />
                       {t('dashboard.listings.preview')}
@@ -342,7 +342,7 @@ export default function ListingsSection() {
 
       {(deleteTarget || pauseTarget) && (
         <div
-          className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
+          className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => {
             if (!deleteMutation.isPending && !statusMutation.isPending) {
               setDeleteTarget(null);
@@ -354,7 +354,7 @@ export default function ListingsSection() {
             role="dialog"
             aria-modal="true"
             data-testid="listing-confirm-modal"
-            className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl"
+            className="glass-popover rounded-2xl p-6 w-full max-w-sm"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">

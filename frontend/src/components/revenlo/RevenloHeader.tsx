@@ -8,12 +8,12 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
   const { theme, toggleTheme } = useTheme()
 
   return (
-    <header className="glass-bar sticky top-0 z-30 h-[68px] border-b border-gray-100 flex items-center justify-between gap-3 px-4 sm:px-6">
+    <header className="glass-popover sticky top-0 z-30 h-[68px] border-b border-[color:var(--glass-border)] flex items-center justify-between gap-3 px-4 sm:px-6">
       {/* Left: nav arrows + breadcrumb */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all shrink-0"
+          className="lg:hidden p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all shrink-0"
           aria-label="Open menu"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,7 +23,7 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
 
         <div className="hidden sm:flex items-center gap-1.5 shrink-0">
           <button
-            className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-all"
+            className="glass-popover w-8 h-8 rounded-full border border-[color:var(--glass-border)] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-white/25 transition-all"
             aria-label="Go back"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +31,7 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
             </svg>
           </button>
           <button
-            className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-all"
+            className="glass-popover w-8 h-8 rounded-full border border-[color:var(--glass-border)] flex items-center justify-center text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-white/25 transition-all"
             aria-label="Go forward"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,11 +42,11 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
 
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-sm min-w-0">
-          <span className="text-gray-400 font-medium hidden sm:inline">RentHub</span>
-          <svg className="w-3.5 h-3.5 text-gray-300 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span className="text-gray-400 dark:text-gray-500 font-medium hidden sm:inline">RentHub</span>
+          <svg className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <span className="text-gray-700 font-semibold truncate">Dashboard</span>
+          <span className="text-gray-700 dark:text-gray-200 font-semibold truncate">Dashboard</span>
         </nav>
       </div>
 
@@ -54,7 +54,7 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
       <div className="flex items-center gap-1 sm:gap-2 shrink-0">
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all"
+          className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
           title={theme === 'dark' ? 'Light mode' : 'Dark mode'}
           aria-label="Toggle theme"
         >
@@ -71,7 +71,7 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
 
         <button
           onClick={toggleTheme}
-          className="hidden sm:block p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all"
+          className="hidden sm:block p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
           title="Theme"
           aria-label="Toggle theme"
         >
@@ -81,20 +81,20 @@ export default function RevenloHeader({ onMenuClick }: RevenloHeaderProps) {
         </button>
 
         <button
-          className="relative p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all"
+          className="relative p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
           title="Notifications"
           aria-label="Notifications"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
           </svg>
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white dark:ring-[#1c2333]" />
         </button>
 
-        <div className="w-px h-7 bg-gray-200 mx-1 hidden sm:block" />
+        <div className="w-px h-7 bg-gray-200 dark:bg-white/10 mx-1 hidden sm:block" />
 
-        <button className="flex items-center gap-2 pl-1 pr-1 sm:pr-2 py-1 rounded-xl hover:bg-gray-100 transition-all">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-gray-100">
+        <button className="flex items-center gap-2 pl-1 pr-1 sm:pr-2 py-1 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-all">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center overflow-hidden shrink-0 ring-2 ring-gray-100 dark:ring-white/10">
             <span className="text-white text-xs font-bold">AR</span>
           </div>
         </button>

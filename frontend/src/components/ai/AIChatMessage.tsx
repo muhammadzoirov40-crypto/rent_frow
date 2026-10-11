@@ -21,7 +21,7 @@ function ListingRow({ listing }: { listing: AIListingCard }) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="glass-inset group flex items-center gap-3 rounded-xl border border-gray-100 dark:border-white/10 p-2 transition hover:border-[var(--accent)]/50 hover:bg-white dark:hover:bg-white/10"
+      className="group flex items-center gap-3 rounded-xl glass-card glass-card-hover p-2 transition"
     >
       <div className="w-14 h-14 shrink-0 rounded-lg overflow-hidden bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center">
         {listing.primary_image ? (
@@ -85,7 +85,7 @@ export default function AIChatMessage({ message }: { message: ChatMessage }) {
           className={
             isUser
               ? 'px-3.5 py-2.5 rounded-2xl rounded-tr-sm bg-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.25)]'
-              : 'px-3.5 py-2.5 rounded-2xl rounded-tl-sm bg-white dark:bg-[#12121f] border border-gray-100 dark:border-white/10 text-[#1A1A2E] dark:text-white'
+              : 'px-3.5 py-2.5 rounded-2xl rounded-tl-sm glass-card text-[#1A1A2E] dark:text-white'
           }
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">{message.content}</p>
@@ -104,7 +104,7 @@ export default function AIChatMessage({ message }: { message: ChatMessage }) {
       </div>
 
       {isUser && (
-        <div className="glass-panel w-7 h-7 shrink-0 mt-1 rounded-full flex items-center justify-center">
+        <div className="w-7 h-7 shrink-0 mt-1 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center">
           <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
         </div>
       )}

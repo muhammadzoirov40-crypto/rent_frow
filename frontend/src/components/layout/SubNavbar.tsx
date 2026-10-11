@@ -22,13 +22,13 @@ import { PRICE_PRESETS } from '../../utils/searchPresets';
 type PanelId = 'mega' | 'city' | 'price';
 
 const panelCls =
-  'absolute top-full mt-2 bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-gray-200/70 dark:border-white/10 z-50 overflow-hidden';
+  'absolute top-full mt-2 glass-popover rounded-2xl border border-gray-200/70 dark:border-white/10 z-50 overflow-hidden';
 
 const dropdownBtnCls = (open: boolean) =>
   `h-8 md:h-9 px-2.5 inline-flex items-center gap-1.5 rounded-xl border text-[13px] font-bold whitespace-nowrap transition ${
     open
       ? 'border-[rgb(var(--accent-rgb)/0.5)] bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)]'
-      : 'border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.4)]'
+      : 'glass-section border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.4)]'
   }`;
 
 const rowCls = (active: boolean) =>
@@ -191,7 +191,7 @@ export default function SubNavbar() {
   return (
     <div
       ref={barRef}
-      className="glass-bar border-t border-gray-100 dark:border-white/[0.07]"
+      className="glass-section border-t border-gray-100 dark:border-white/[0.07]"
     >
       {/* Same full-bleed rule as the top row so the categories button lines
           up with the logo above it. */}
@@ -319,7 +319,7 @@ export default function SubNavbar() {
                 type="button"
                 onClick={() => scrollChips(-1)}
                 aria-label={t('search.scrollLeft')}
-                className="glass-panel hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-7 h-7 items-center justify-center rounded-full border border-gray-200 dark:border-white/10 text-gray-500 hover:text-[var(--accent)] shadow-sm transition"
+                className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 w-7 h-7 items-center justify-center rounded-full glass-popover border border-gray-200 dark:border-white/10 text-gray-500 hover:text-[var(--accent)] transition"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -329,7 +329,7 @@ export default function SubNavbar() {
                 type="button"
                 onClick={() => scrollChips(1)}
                 aria-label={t('search.scrollRight')}
-                className="glass-panel hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-7 h-7 items-center justify-center rounded-full border border-gray-200 dark:border-white/10 text-gray-500 hover:text-[var(--accent)] shadow-sm transition"
+                className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 w-7 h-7 items-center justify-center rounded-full glass-popover border border-gray-200 dark:border-white/10 text-gray-500 hover:text-[var(--accent)] transition"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -441,7 +441,7 @@ export default function SubNavbar() {
                       onChange={(e) => setMinInput(e.target.value)}
                       placeholder={t('search.priceFrom')}
                       aria-label={t('search.priceFrom')}
-                      className="glass-inset w-full min-w-0 rounded-xl border border-gray-200 dark:border-white/10 px-2.5 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
+                      className="w-full min-w-0 rounded-xl glass-input px-2.5 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
                     />
                     <span className="text-gray-300 dark:text-gray-600 text-xs">&mdash;</span>
                     <input
@@ -452,7 +452,7 @@ export default function SubNavbar() {
                       onChange={(e) => setMaxInput(e.target.value)}
                       placeholder={t('search.priceTo')}
                       aria-label={t('search.priceTo')}
-                      className="glass-inset w-full min-w-0 rounded-xl border border-gray-200 dark:border-white/10 px-2.5 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
+                      className="w-full min-w-0 rounded-xl glass-input px-2.5 py-2 text-xs text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
                     />
                     <button
                       type="submit"
@@ -471,7 +471,7 @@ export default function SubNavbar() {
           <button
             type="button"
             onClick={() => go({})}
-            className="glass-inset hidden sm:inline-flex ml-2 shrink-0 h-8 md:h-9 px-3 items-center gap-1.5 rounded-xl border border-gray-200 dark:border-white/10 text-[13px] font-bold text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.4)] transition whitespace-nowrap"
+            className="hidden sm:inline-flex ml-2 shrink-0 h-8 md:h-9 px-3 items-center gap-1.5 rounded-xl glass-section border border-gray-200 dark:border-white/10 text-[13px] font-bold text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.4)] transition whitespace-nowrap"
           >
             <SlidersHorizontal className="w-4 h-4 shrink-0" />
             {t('search.filters')}

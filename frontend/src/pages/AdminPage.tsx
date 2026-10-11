@@ -604,16 +604,16 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0f0f23]">
       <div className="flex">
         <aside
           className={`${
             adminSidebarCollapsed ? 'w-[76px]' : 'w-64'
-          } flex-shrink-0 bg-white dark:bg-gradient-to-b dark:from-[#1A1A2E] dark:via-[#171730] dark:to-[#12122a] border-r border-gray-200 dark:border-white/10 min-h-[calc(100vh_-_var(--header-h))] sticky top-[var(--header-h)] transition-[width] duration-300 ease-out overflow-hidden`}
+          } flex-shrink-0 glass-section border-r border-[color:var(--glass-border)] min-h-[calc(100vh_-_var(--header-h))] sticky top-[var(--header-h)] transition-[width] duration-300 ease-out overflow-hidden`}
         >
           <div className={adminSidebarCollapsed ? 'p-3' : 'p-4'}>
             <div
-              className={`relative overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.04] mb-5 ${
+              className={`relative overflow-hidden rounded-2xl glass-card mb-5 ${
                 adminSidebarCollapsed ? 'p-2.5 flex flex-col items-center gap-3' : 'p-4 flex items-center gap-3'
               }`}
             >
@@ -677,7 +677,7 @@ export default function AdminPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {statCards.map((card) => (
-                  <div key={card.label} className="glass-section rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
+                  <div key={card.label} className="glass-section rounded-2xl p-5 border border-[color:var(--glass-border)]">
                     <div className="flex items-center justify-between mb-3">
                       <div className="w-12 h-12 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center text-[var(--accent)]">
                         {card.icon}
@@ -691,7 +691,7 @@ export default function AdminPage() {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-                <div className="lg:col-span-2 glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                <div className="lg:col-span-2 glass-section rounded-2xl border border-[color:var(--glass-border)] p-6">
                   <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                     <BarChart3 className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                     {t('admin.chartRequests')}
@@ -725,7 +725,7 @@ export default function AdminPage() {
                   </div>
                 </div>
 
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] p-6">
                   <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                     <PieChartIcon className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                     {t('admin.chartListingsStatus')}
@@ -766,7 +766,7 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+              <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] p-6">
                 <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                   <Clock className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                   {t('admin.recentActivity')}
@@ -823,7 +823,7 @@ export default function AdminPage() {
                       { label: t('admin.totalPayments'), value: crm.stats.totalPayments, icon: <BarChart3 className="w-6 h-6" />, color: 'from-rose-500 to-red-600', shadow: 'shadow-rose-500/20' },
                       { label: t('admin.unverifiedListings'), value: crm.stats.unverifiedListings, icon: <AlertTriangle className="w-6 h-6" />, color: 'from-yellow-500 to-amber-600', shadow: 'shadow-yellow-500/20' },
                     ].map((card) => (
-                      <div key={card.label} className="glass-section rounded-2xl p-5 border border-gray-200 dark:border-white/10 shadow-sm">
+                      <div key={card.label} className="glass-section rounded-2xl p-5 border border-[color:var(--glass-border)]">
                         <div className="flex items-center justify-between mb-3">
                           <div className="w-12 h-12 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center text-[var(--accent)]">
                             {card.icon}
@@ -840,7 +840,7 @@ export default function AdminPage() {
                     ))}
                   </div>
 
-                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+                  <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] p-6">
                     <h3 className="font-bold text-gray-900 dark:text-white mb-4 inline-flex items-center gap-2">
                       <TrendingUp className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
                       {t('admin.pipeline')}
@@ -879,7 +879,7 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
                       <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
                         <ClipboardList className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
@@ -918,7 +918,7 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
                       <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
                         <Wallet className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
@@ -955,7 +955,7 @@ export default function AdminPage() {
                     )}
                   </div>
 
-                  <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                  <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                     <div className="px-6 py-4 border-b border-gray-200 dark:border-white/10">
                       <h3 className="font-bold text-gray-900 dark:text-white inline-flex items-center gap-2">
                         <Users className="w-5 h-5 text-[var(--accent)]" aria-hidden="true" />
@@ -1019,7 +1019,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="pl-10 pr-4 py-2 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -1029,7 +1029,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1137,7 +1137,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="pl-10 pr-4 py-2 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -1147,7 +1147,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1166,7 +1166,7 @@ export default function AdminPage() {
                                 {(l as any).primary_image ? (
                                   <img src={(l as any).primary_image} alt="" className="w-12 h-12 rounded-xl object-cover" />
                                 ) : (
-                                  <div className="glass-inset w-12 h-12 rounded-xl flex items-center justify-center">
+                                  <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center">
                                     <ImageIcon className="w-5 h-5 text-gray-400" />
                                   </div>
                                 )}
@@ -1242,7 +1242,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="pl-10 pr-4 py-2 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -1252,7 +1252,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1312,7 +1312,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1348,7 +1348,7 @@ export default function AdminPage() {
                             <td className="px-6 py-4">
                               {p.payment_reference ? (
                                 <span
-                                  className="glass-inset font-mono text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-white/10 px-2 py-1 rounded-lg"
+                                  className="font-mono text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 px-2 py-1 rounded-lg"
                                   data-testid="payment-row-reference"
                                 >
                                   {p.payment_reference}
@@ -1432,7 +1432,7 @@ export default function AdminPage() {
                     cls: 'from-amber-400 to-yellow-500',
                   },
                 ].map((c) => (
-                  <div key={c.label} className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 p-4">
+                  <div key={c.label} className="glass-section rounded-2xl border border-[color:var(--glass-border)] p-4">
                     <div className={`inline-flex w-9 h-9 rounded-xl bg-gradient-to-r ${c.cls} text-white items-center justify-center mb-2`}>
                       <Crown className="w-4 h-4" aria-hidden="true" />
                     </div>
@@ -1454,7 +1454,7 @@ export default function AdminPage() {
                     className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition ${
                       topStatus === s
                         ? 'bg-[var(--accent)] text-white border-transparent shadow'
-                        : 'bg-white dark:bg-white/5 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-amber-300'
+                        : 'glass-popover text-gray-600 dark:text-gray-300 border-[color:var(--glass-border)] hover:border-amber-300'
                     }`}
                   >
                     {s === 'all' ? t('admin.topFilterAll') : t(`admin.topStatus.${s}`)}
@@ -1468,7 +1468,7 @@ export default function AdminPage() {
                     placeholder={t('admin.topSearchPlaceholder')}
                     value={topListingId}
                     onChange={(e) => setTopListingId(e.target.value.replace(/[^0-9]/g, ''))}
-                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-44"
+                    className="pl-10 pr-4 py-2 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-44"
                   />
                 </div>
               </div>
@@ -1479,7 +1479,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden mb-8">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden mb-8">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1626,7 +1626,7 @@ export default function AdminPage() {
                   {t('admin.topPlansTitle')}
                 </h2>
               </div>
-              <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+              <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
@@ -1675,14 +1675,14 @@ export default function AdminPage() {
               {/* Detail sheet */}
               {topSelected && (
                 <div
-                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
                   onClick={() => setTopSelected(null)}
                 >
                   <div
                     role="dialog"
                     aria-modal="true"
                     data-testid="top-detail-modal"
-                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto"
+                    className="glass-popover rounded-2xl border border-[color:var(--glass-border)] p-6 w-full max-w-lg max-h-[85vh] overflow-y-auto"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-start justify-between gap-3 mb-4">
@@ -1778,14 +1778,14 @@ export default function AdminPage() {
               {/* Reject with a reason */}
               {topRejectTarget && (
                 <div
-                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
                   onClick={() => setTopRejectTarget(null)}
                 >
                   <div
                     role="dialog"
                     aria-modal="true"
                     data-testid="top-reject-modal"
-                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+                    className="glass-popover rounded-2xl border border-[color:var(--glass-border)] p-6 w-full max-w-md"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">{t('admin.topRejectTitle')}</h3>
@@ -1795,7 +1795,7 @@ export default function AdminPage() {
                       onChange={(e) => setTopRejectReason(e.target.value)}
                       rows={3}
                       placeholder={t('admin.topRejectPlaceholder')}
-                      className="glass-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
+                      className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
                       data-testid="top-reject-reason"
                     />
                     <div className="flex justify-end gap-2 mt-4">
@@ -1823,14 +1823,14 @@ export default function AdminPage() {
               {/* Plan create / edit */}
               {planModal && (
                 <div
-                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
                   onClick={() => setPlanModal(null)}
                 >
                   <div
                     role="dialog"
                     aria-modal="true"
                     data-testid="top-plan-modal"
-                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl space-y-4"
+                    className="glass-popover rounded-2xl border border-[color:var(--glass-border)] p-6 w-full max-w-md space-y-4"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <h3 className="text-lg font-bold text-[#1A1A2E] dark:text-white">
@@ -1842,7 +1842,7 @@ export default function AdminPage() {
                         type="text"
                         value={planForm.name}
                         onChange={(e) => setPlanForm((f) => ({ ...f, name: e.target.value }))}
-                        className="glass-inset mt-1 w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                        className="mt-1 w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                       />
                     </label>
                     <div className="grid grid-cols-2 gap-3">
@@ -1851,7 +1851,7 @@ export default function AdminPage() {
                         <select
                           value={planForm.duration_key}
                           onChange={(e) => setPlanForm((f) => ({ ...f, duration_key: e.target.value }))}
-                          className="glass-inset mt-1 w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                          className="mt-1 w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                         >
                           {['3h', '1d', '1w', '1m'].map((d) => (
                             <option key={d} value={d}>{t(`top.dur_${d}`)}</option>
@@ -1866,7 +1866,7 @@ export default function AdminPage() {
                           step={1}
                           value={planForm.price}
                           onChange={(e) => setPlanForm((f) => ({ ...f, price: e.target.value }))}
-                          className="glass-inset mt-1 w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                          className="mt-1 w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                         />
                       </label>
                     </div>
@@ -1927,7 +1927,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -1991,7 +1991,7 @@ export default function AdminPage() {
                     placeholder={t('admin.search')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="glass-input pl-10 pr-4 py-2 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
+                    className="pl-10 pr-4 py-2 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition w-64"
                   />
                 </div>
               </div>
@@ -2014,7 +2014,7 @@ export default function AdminPage() {
                     className={`px-3.5 py-1.5 rounded-full text-xs font-bold border transition ${
                       postStatus === key
                         ? 'bg-[var(--accent)] text-white border-transparent shadow'
-                        : 'bg-white dark:bg-white/5 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-white/10 hover:border-amber-300'
+                        : 'glass-popover text-gray-600 dark:text-gray-300 border-[color:var(--glass-border)] hover:border-amber-300'
                     }`}
                     data-testid={`post-filter-${key}`}
                   >
@@ -2028,7 +2028,7 @@ export default function AdminPage() {
                   <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
                 </div>
               ) : (
-                <div className="glass-section rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                <div className="glass-section rounded-2xl border border-[color:var(--glass-border)] overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -2070,7 +2070,7 @@ export default function AdminPage() {
                                     </span>
                                   </button>
                                 ) : (
-                                  <div className="glass-inset w-12 h-12 rounded-xl flex items-center justify-center shrink-0">
+                                  <div className="w-12 h-12 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0">
                                     <ImageIcon className="w-5 h-5 text-gray-400" />
                                   </div>
                                 )}
@@ -2150,14 +2150,14 @@ export default function AdminPage() {
                   photo at a real size — the table only fits a preview line. */}
               {postDetail && (
                 <div
-                  className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
+                  className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
                   onClick={() => setPostDetail(null)}
                 >
                   <div
                     role="dialog"
                     aria-modal="true"
                     data-testid="post-detail-modal"
-                    className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-2xl shadow-2xl max-h-[85vh] overflow-y-auto"
+                    className="glass-popover rounded-2xl border border-[color:var(--glass-border)] p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="flex items-start justify-between gap-3 mb-3">
@@ -2189,7 +2189,7 @@ export default function AdminPage() {
                         <img
                           src={postDetail.image_url}
                           alt=""
-                          className="glass-inset w-full max-h-[60vh] object-contain rounded-xl border border-gray-100 dark:border-white/10"
+                          className="w-full max-h-[60vh] object-contain rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10"
                         />
                         <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-[var(--accent)]">
                           <ZoomIn className="w-3.5 h-3.5" aria-hidden="true" />
@@ -2246,8 +2246,8 @@ export default function AdminPage() {
       </div>
 
       {showCategoryModal && (
-        <div className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4" onClick={closeCategoryModal}>
-          <div className="glass-popover rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={closeCategoryModal}>
+          <div className="glass-popover rounded-2xl max-w-md w-full p-6 border border-[color:var(--glass-border)]" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 {editingCategory ? t('admin.editCategory') : t('admin.newCategory')}
@@ -2264,7 +2264,7 @@ export default function AdminPage() {
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   placeholder={t('admin.namePlaceholder')}
-                  className="glass-input w-full px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+                  className="w-full px-4 py-2.5 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
                 />
               </div>
               <div className="flex gap-3 pt-2">
@@ -2287,8 +2287,8 @@ export default function AdminPage() {
         </div>
       )}
       {profileUser && (
-        <div className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
-          <div className="glass-popover rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-white/10" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[70] flex items-center justify-center p-4" onClick={() => setProfileUser(null)}>
+          <div className="glass-popover rounded-2xl max-w-lg w-full p-6 border border-[color:var(--glass-border)]" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('admin.userProfile')}</h2>
               <button onClick={() => setProfileUser(null)} className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition">
@@ -2320,7 +2320,7 @@ export default function AdminPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3 mb-5">
-              <div className="glass-inset rounded-xl p-3">
+              <div className="glass-card rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <Star className="w-3.5 h-3.5" /> {t('admin.rating')}
                 </p>
@@ -2330,19 +2330,19 @@ export default function AdminPage() {
                     : '—'}
                 </p>
               </div>
-              <div className="glass-inset rounded-xl p-3">
+              <div className="glass-card rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <FileText className="w-3.5 h-3.5" /> {t('admin.listingsCount')}
                 </p>
                 <p className="text-sm font-bold text-gray-900 dark:text-white mt-1">{profileUser.listing_count ?? 0}</p>
               </div>
-              <div className="glass-inset rounded-xl p-3">
+              <div className="glass-card rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <Phone className="w-3.5 h-3.5" /> {t('admin.phone')}
                 </p>
                 <p className="text-sm font-bold text-gray-900 dark:text-white mt-1 truncate">{profileUser.phone || '—'}</p>
               </div>
-              <div className="glass-inset rounded-xl p-3">
+              <div className="glass-card rounded-xl p-3">
                 <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> {t('admin.joinedDate')}
                 </p>

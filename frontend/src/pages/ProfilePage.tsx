@@ -164,17 +164,17 @@ export default function ProfilePage() {
 
   if (meLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center dark:bg-[#0a0a1a]">
         <Loader2 className="w-8 h-8 animate-spin text-[var(--accent)]" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <BackButton className="mb-4" />
-        <div className="glass-panel rounded-2xl shadow-sm border border-gray-100 dark:border-white/10 p-6 sm:p-8 mb-6">
+        <div className="glass-card rounded-2xl p-6 sm:p-8 mb-6">
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <div className="relative group" onClick={() => avatarInputRef.current?.click()}>
               {meUser?.avatar_url ? (
@@ -291,7 +291,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="glass-panel flex flex-wrap gap-1 rounded-xl p-1 shadow-sm border border-gray-100 dark:border-white/10 mb-6">
+        <div className="flex flex-wrap gap-1 glass-section rounded-xl p-1 border border-gray-100 dark:border-white/10 mb-6">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -318,7 +318,7 @@ export default function ProfilePage() {
         {activeTab === 'listings' && (
           <div className="space-y-4">
             {userListings.length === 0 ? (
-              <div className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
+              <div className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
                 <Package className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-[#1A1A2E] dark:text-white mb-1">{t('profile.myListingsEmpty')}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('profile.myListingsEmptyHint')}</p>
@@ -332,8 +332,8 @@ export default function ProfilePage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {userListings.map((listing) => (
-                  <div key={listing.id} className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition">
-                    <div className="glass-inset relative h-40">
+                  <div key={listing.id} className="glass-card glass-card-hover rounded-2xl overflow-hidden transition">
+                    <div className="relative h-40 bg-gray-100 dark:bg-white/5">
                       {listing.images?.[0]?.image_url ? (
                         <img
                           src={listing.images[0].image_url}
@@ -349,7 +349,7 @@ export default function ProfilePage() {
                       <div className="absolute top-3 right-3 flex gap-1.5">
                         <Link
                           to={`/create-listing?edit=${listing.id}`}
-                          className="glass-panel p-2 rounded-lg hover:bg-white dark:hover:bg-white/20 transition shadow-sm"
+                          className="bg-white/90 dark:bg-white/10 backdrop-blur-sm p-2 rounded-lg hover:bg-white dark:hover:bg-white/20 transition shadow-sm"
                         >
                           <Edit2 className="w-4 h-4 text-[#1A1A2E] dark:text-white" />
                         </Link>
@@ -359,7 +359,7 @@ export default function ProfilePage() {
                               deleteListingMutation.mutate(listing.id);
                             }
                           }}
-                          className="glass-panel p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm"
+                          className="bg-white/90 dark:bg-white/10 backdrop-blur-sm p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 transition shadow-sm"
                         >
                           <Trash2 className="w-4 h-4 text-red-500" />
                         </button>
@@ -396,7 +396,7 @@ export default function ProfilePage() {
         {activeTab === 'favorites' && (
           <div className="space-y-4">
             {favs.length === 0 ? (
-              <div className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
+              <div className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
                 <Heart className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-[#1A1A2E] dark:text-white mb-1">{t('profile.favoritesEmpty')}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('profile.favoritesEmptyHint')}</p>
@@ -410,8 +410,8 @@ export default function ProfilePage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {favs.map((listing) => (
-                  <div key={listing.id} className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition">
-                    <div className="glass-inset relative h-40">
+                  <div key={listing.id} className="glass-card glass-card-hover rounded-2xl overflow-hidden transition">
+                    <div className="relative h-40 bg-gray-100 dark:bg-white/5">
                       {listing.primary_image ? (
                         <img
                           src={listing.primary_image}
@@ -426,7 +426,7 @@ export default function ProfilePage() {
                       )}
                       <button
                         onClick={() => toggleFavMutation.mutate(listing.id)}
-                        className="glass-panel absolute top-3 right-3 p-2 rounded-lg hover:bg-white dark:hover:bg-white/20 transition shadow-sm"
+                        className="absolute top-3 right-3 bg-white/90 dark:bg-white/10 backdrop-blur-sm p-2 rounded-lg hover:bg-white dark:hover:bg-white/20 transition shadow-sm"
                       >
                         <Heart className="w-4 h-4 text-red-500 fill-red-500" />
                       </button>
@@ -457,7 +457,7 @@ export default function ProfilePage() {
         {activeTab === 'my-requests' && (
           <div className="space-y-3">
             {myRequests.length === 0 ? (
-              <div className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
+              <div className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
                 <ListChecks className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-[#1A1A2E] dark:text-white mb-1">{t('profile.requestsEmpty')}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('profile.requestsEmptyHint')}</p>
@@ -473,7 +473,7 @@ export default function ProfilePage() {
                 const statusKey = (req.status || 'pending').toLowerCase();
                 const status = statusConfig[statusKey] || statusConfig.pending;
                 return (
-                  <div key={req.id} className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
+                  <div key={req.id} className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
@@ -496,7 +496,7 @@ export default function ProfilePage() {
                           )}
                         </div>
                         {req.message && (
-                          <p className="glass-inset mt-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg p-3">{req.message}</p>
+                          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 glass-popover rounded-lg p-3">{req.message}</p>
                         )}
                       </div>
                       {statusKey === 'pending' && (
@@ -519,7 +519,7 @@ export default function ProfilePage() {
         {activeTab === 'owner-requests' && (
           <div className="space-y-3">
             {ownerRequests.length === 0 ? (
-              <div className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
+              <div className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-12 text-center">
                 <ChevronRight className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-[#1A1A2E] dark:text-white mb-1">{t('profile.ownerRequestsEmpty')}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{t('profile.ownerRequestsEmptyHint')}</p>
@@ -529,7 +529,7 @@ export default function ProfilePage() {
                 const statusKey = (req.status || 'pending').toLowerCase();
                 const status = statusConfig[statusKey] || statusConfig.pending;
                 return (
-                  <div key={req.id} className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 p-5 shadow-sm">
+                  <div key={req.id} className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-5">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-3 mb-2">
@@ -555,7 +555,7 @@ export default function ProfilePage() {
                           )}
                         </div>
                         {req.message && (
-                          <p className="glass-inset mt-2 text-sm text-gray-600 dark:text-gray-300 rounded-lg p-3">{req.message}</p>
+                          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 glass-popover rounded-lg p-3">{req.message}</p>
                         )}
                       </div>
                       {statusKey === 'pending' && (
@@ -587,23 +587,23 @@ export default function ProfilePage() {
         )}
 
         {activeTab === 'settings' && (
-          <div className="glass-panel rounded-2xl border border-gray-100 dark:border-white/10 p-6 shadow-sm space-y-4">
+          <div className="glass-card rounded-2xl p-6 space-y-4">
             <h3 className="font-bold text-[#1A1A2E] dark:text-white text-lg">{t('profile.accountSettings')}</h3>
             <div className="space-y-3">
-              <div className="glass-inset flex items-center justify-between p-4 rounded-xl">
+              <div className="glass-section flex items-center justify-between p-4 rounded-xl">
                 <div>
                   <p className="font-medium text-[#1A1A2E] dark:text-white">{t('profile.emailLabel')}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{meUser?.email}</p>
                 </div>
                 <span className="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">{t('profile.confirmed')}</span>
               </div>
-              <div className="glass-inset flex items-center justify-between p-4 rounded-xl">
+              <div className="glass-section flex items-center justify-between p-4 rounded-xl">
                 <div>
                   <p className="font-medium text-[#1A1A2E] dark:text-white">{t('profile.roleLabel')}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{meUser?.role === 'ADMIN' ? t('profile.admin') : t('profile.user')}</p>
                 </div>
               </div>
-              <div className="glass-inset p-4 rounded-xl">
+              <div className="glass-section p-4 rounded-xl">
                 <p className="font-medium text-[#1A1A2E] dark:text-white">{t('profile.dcAccount')}</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{t('profile.dcAccountHint')}</p>
                 <div className="mt-2 flex items-center gap-2 flex-wrap">
@@ -612,7 +612,7 @@ export default function ProfilePage() {
                     value={editDcAccount}
                     onChange={(e) => setEditDcAccount(e.target.value)}
                     placeholder={t('profile.dcAccountPlaceholder')}
-                    className="glass-panel flex-1 min-w-[180px] text-sm border border-gray-200 dark:border-white/10 rounded-lg px-3 py-2 outline-none focus:border-[var(--accent)] dark:text-white"
+                    className="glass-input flex-1 min-w-[180px] text-sm rounded-lg px-3 py-2 outline-none focus:border-[var(--accent)] dark:text-white"
                   />
                   <button
                     onClick={() => updateProfileMutation.mutate({ dc_account: editDcAccount })}

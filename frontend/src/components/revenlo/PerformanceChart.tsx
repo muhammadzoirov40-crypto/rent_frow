@@ -19,10 +19,10 @@ const monthlyData = [
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="glass-panel border border-gray-200 rounded-xl px-4 py-3 shadow-xl">
-        <p className="text-xs font-medium text-gray-500 mb-0.5">{label}-Apr 2025</p>
-        <p className="text-[11px] text-gray-400 mb-1">Total Revenue</p>
-        <p className="text-sm font-bold text-gray-900">
+      <div className="glass-popover rounded-xl px-4 py-3">
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-0.5">{label}-Apr 2025</p>
+        <p className="text-[11px] text-gray-400 dark:text-gray-500 mb-1">Total Revenue</p>
+        <p className="text-sm font-bold text-gray-900 dark:text-white">
           {formatAmount(payload[0].value)}
         </p>
       </div>
@@ -33,29 +33,29 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function PerformanceChart() {
   return (
-    <div className="glass-panel rounded-2xl border border-gray-100 p-5 sm:p-6 h-full">
+    <div className="glass-section rounded-2xl p-5 sm:p-6 h-full">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
         <div>
-          <h3 className="text-base font-bold text-gray-900">Performance Overview</h3>
+          <h3 className="text-base font-bold text-gray-900 dark:text-white">Performance Overview</h3>
           <div className="flex items-baseline gap-2 mt-2">
-            <span className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">
+            <span className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight">
               $8,435
-              <span className="text-lg font-bold text-gray-400">.00</span>
+              <span className="text-lg font-bold text-gray-400 dark:text-gray-500">.00</span>
             </span>
-            <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+            <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/15 px-1.5 py-0.5 rounded-md">
               -3.2%
             </span>
           </div>
         </div>
         <div className="flex flex-col items-start sm:items-end gap-2">
-          <select className="glass-panel px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700 outline-none focus:border-blue-400 cursor-pointer shadow-sm">
+          <select className="glass-input px-3 py-2 rounded-lg text-sm cursor-pointer">
             <option>Last year</option>
             <option>Last month</option>
             <option>Last 7 days</option>
           </select>
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-            <span className="text-xs font-medium text-gray-500">Total Revenue</span>
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Total Revenue</span>
           </div>
         </div>
       </div>

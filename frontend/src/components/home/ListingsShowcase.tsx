@@ -128,7 +128,7 @@ export default function ListingsShowcase({ tabs, coords, initialTab }: ListingsS
                 className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold border transition ${
                   isActive
                     ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-md shadow-[rgb(var(--accent-rgb)/0.3)]'
-                    : 'bg-white dark:bg-[#12141a] border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)]'
+                    : 'glass-popover border-[var(--glass-border)] text-gray-600 dark:text-gray-300 hover:border-[rgb(var(--accent-rgb)/0.5)] hover:text-[var(--accent)]'
                 }`}
               >
                 <Icon className="w-4 h-4" />

@@ -111,7 +111,7 @@ export default function SearchBar({ initial, onSubmit, compact = false }: Search
   return (
     <form
       onSubmit={submit}
-      className={`glass-section border border-gray-200/80 dark:border-[rgb(var(--accent-rgb)/0.28)] shadow-[0_18px_45px_-22px_rgba(15,23,42,0.25)] dark:shadow-[0_30px_70px_-30px_rgb(var(--accent-rgb)/0.55)] p-2 flex flex-col gap-1.5 md:flex-row md:flex-wrap md:items-center md:gap-1 backdrop-blur-md ${
+      className={`glass-section border border-gray-200/80 dark:border-[rgb(var(--accent-rgb)/0.28)] p-2 flex flex-col gap-1.5 md:flex-row md:flex-wrap md:items-center md:gap-1 ${
         compact ? 'rounded-xl' : 'rounded-3xl'
       }`}
     >

@@ -148,7 +148,7 @@ export default function LocationPicker({
             }
           }}
           placeholder={t('createListing.pinSearchPlaceholder')}
-          className="glass-inset flex-1 border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+          className="flex-1 glass-input rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white transition"
           data-testid="pin-search-input"
         />
         <button
@@ -173,7 +173,7 @@ export default function LocationPicker({
       <div
         ref={containerRef}
         style={{ height: '16rem' }}
-        className="glass-inset relative z-0 w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden"
+        className="relative z-0 w-full rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden bg-gray-100 dark:bg-[#12141a]"
         data-testid="pin-map"
       />
 

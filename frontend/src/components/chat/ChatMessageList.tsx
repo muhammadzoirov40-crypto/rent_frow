@@ -84,7 +84,7 @@ function FileCard({ parsed, mine }: { parsed: Attachment; mine: boolean }) {
       className={`flex items-center gap-3 min-w-[200px] max-w-[280px] px-3 py-2.5 rounded-xl border transition ${
         mine
           ? 'border-white/25 bg-white/15 hover:bg-white/20'
-          : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10'
+          : 'glass-section border-[color:var(--glass-border)] hover:border-[rgb(var(--accent-rgb)/0.45)]'
       }`}
     >
       <span className="w-9 h-9 rounded-lg bg-[rgb(var(--accent-rgb)/0.15)] text-[var(--accent)] flex items-center justify-center shrink-0">
@@ -152,7 +152,7 @@ function ReactionPills({
                 ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-[rgb(var(--accent-rgb)/0.3)]'
                 : mine
                   ? 'bg-white/20 border-white/30 text-white hover:bg-white/30'
-                  : 'bg-white dark:bg-white/10 border-gray-200 dark:border-white/15 text-gray-700 dark:text-gray-200 hover:border-[rgb(var(--accent-rgb)/0.6)]'
+                  : 'glass-popover border-[color:var(--glass-border)] text-gray-700 dark:text-gray-200 hover:border-[rgb(var(--accent-rgb)/0.6)]'
             }`}
             title={users.length > 1 ? String(users.length) : undefined}
           >
@@ -244,7 +244,7 @@ export default function ChatMessageList({
 
   if (loading && messages.length === 0) {
     return (
-      <div className="glass-surface flex-1 flex items-center justify-center" style={WALLPAPER}>
+      <div className="flex-1 flex items-center justify-center" style={WALLPAPER}>
         <Loader2 className="w-6 h-6 text-[var(--accent)] animate-spin" />
       </div>
     );
@@ -253,7 +253,7 @@ export default function ChatMessageList({
   if (messages.length === 0) {
     return (
       <div
-        className="glass-surface flex-1 flex flex-col items-center justify-center text-center px-6"
+        className="flex-1 flex flex-col items-center justify-center text-center px-6"
         style={WALLPAPER}
       >
         <div className="w-20 h-20 rounded-[28px] bg-gradient-to-br from-[rgb(var(--accent-rgb)/0.2)] to-[rgb(var(--accent-rgb)/0.05)] border border-[rgb(var(--accent-rgb)/0.2)] flex items-center justify-center text-3xl mb-4 shadow-lg shadow-[rgb(var(--accent-rgb)/0.1)]">
@@ -274,7 +274,7 @@ export default function ChatMessageList({
       <div
         ref={scrollRef}
         onClick={() => setMenu(null)}
-        className="glass-surface flex-1 overflow-y-auto px-3 sm:px-5 py-4 chat-scroll"
+        className="flex-1 overflow-y-auto px-3 sm:px-5 py-4 chat-scroll"
         style={WALLPAPER}
       >
         <div>
@@ -299,7 +299,7 @@ export default function ChatMessageList({
 
             const dayDivider = newDay ? (
               <div className="flex justify-center my-4">
-                <span className="glass-panel px-3 py-1 rounded-full text-[11px] font-semibold text-gray-500 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 shadow-sm">
+                <span className="px-3 py-1 rounded-full glass-popover border border-[color:var(--glass-border)] text-[11px] font-semibold text-gray-500 dark:text-gray-300">
                   {formatDate(message.created_at)}
                 </span>
               </div>
@@ -313,7 +313,7 @@ export default function ChatMessageList({
                 <div key={message.id}>
                   {dayDivider}
                   <div className="flex justify-center my-2.5" data-testid="chat-system-message">
-                    <span className="glass-panel max-w-[85%] px-3 py-1.5 rounded-xl text-[11px] leading-relaxed text-gray-600 dark:text-gray-300 border border-gray-200/70 dark:border-white/10 text-center">
+                    <span className="max-w-[85%] px-3 py-1.5 rounded-xl glass-popover border border-[color:var(--glass-border)] text-[11px] leading-relaxed text-gray-600 dark:text-gray-300 text-center">
                       {stripSystemPrefix(message.content)}
                     </span>
                   </div>
@@ -356,9 +356,9 @@ export default function ChatMessageList({
                         }}
                         title={t('common.more')}
                         aria-label={t('common.more')}
-                        className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center bg-white dark:bg-[#1a1d24] border border-gray-200 dark:border-white/10 text-gray-400 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.5)] transition group-hover:opacity-100 focus:opacity-100 ${
+                        className={`absolute top-1/2 -translate-y-1/2 z-10 w-7 h-7 rounded-full flex items-center justify-center glass-popover border border-[color:var(--glass-border)] text-gray-400 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.5)] transition group-hover:opacity-100 focus:opacity-100 ${
                           menu?.msg.id === message.id ? 'opacity-100' : 'opacity-0'
-                        } shadow-md ${mine ? '-left-9' : '-right-9'}`}
+                        } ${mine ? '-left-9' : '-right-9'}`}
                       >
                         <MoreVertical className="w-3.5 h-3.5" />
                       </button>
@@ -367,7 +367,7 @@ export default function ChatMessageList({
                       className={`${
                         mine
                           ? 'rounded-[20px] rounded-br-[7px] bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-[0_3px_14px_-4px_rgba(255,107,53,0.55)]'
-                          : 'rounded-[20px] rounded-bl-[7px] bg-white dark:bg-[#1a1f28] border border-gray-200/90 dark:border-white/[0.07] text-gray-900 dark:text-white shadow-[0_2px_10px_-4px_rgba(16,24,40,0.18)]'
+                          : 'rounded-[20px] rounded-bl-[7px] glass-card text-gray-900 dark:text-white'
                       }`}
                     >
                       {message.forwarded_from_name && (
@@ -443,7 +443,7 @@ export default function ChatMessageList({
 
                     {showTranslation && (
                       <div
-                        className={`mt-1.5 rounded-xl px-3 py-2 text-xs border bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-200 shadow-sm ${
+                        className={`mt-1.5 rounded-xl px-3 py-2 text-xs glass-popover border border-[color:var(--glass-border)] text-gray-700 dark:text-gray-200 ${
                           mine ? 'ml-auto' : ''
                         }`}
                       >
@@ -471,7 +471,7 @@ export default function ChatMessageList({
           }}
         >
           <div
-            className="glass-popover fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-60 rounded-3xl border border-white/60 dark:border-white/10 shadow-[0_24px_80px_-20px_rgba(16,24,40,0.55)] overflow-hidden p-2"
+            className="fixed z-50 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-60 rounded-3xl glass-popover border border-[color:var(--glass-border)] overflow-hidden p-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-center gap-1.5 px-1 pb-2 mb-1.5 border-b border-gray-100 dark:border-white/10">
@@ -483,7 +483,7 @@ export default function ChatMessageList({
                     onReact?.(menuMsg.id, emoji);
                     closeMenu();
                   }}
-                  className="glass-inset w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:scale-[1.35] active:scale-95 transition shadow-sm"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-lg leading-none bg-gray-50 dark:bg-white/[0.06] hover:bg-[rgb(var(--accent-rgb)/0.15)] hover:scale-[1.35] active:scale-95 transition shadow-sm"
                 >
                   {emoji}
                 </button>

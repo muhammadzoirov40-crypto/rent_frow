@@ -137,7 +137,7 @@ export default function AssistantWidget() {
         } bottom-20 md:bottom-6 flex items-center gap-2 group`}
       >
         {!open && (
-          <span className="glass-panel hidden sm:inline-block pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-1 group-hover:translate-x-0 px-3 py-1.5 rounded-xl text-xs font-semibold text-white shadow-lg border border-white/10 whitespace-nowrap">
+          <span className="hidden sm:inline-block pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-200 -translate-x-1 group-hover:translate-x-0 px-3 py-1.5 rounded-xl glass-popover border border-[color:var(--glass-border)] text-xs font-semibold text-gray-900 dark:text-white whitespace-nowrap">
             Ёрдамчии AI
           </span>
         )}
@@ -164,7 +164,7 @@ export default function AssistantWidget() {
           left edge), and staying at 50 keeps every z-[60]/z-[70] overlay — the
           fullscreen gallery, the modals — above it. */}
       {open && (
-        <div className="fixed z-50 right-3 sm:right-6 bottom-40 lg:right-0 lg:bottom-auto lg:top-0 w-[calc(100vw-1.5rem)] sm:w-[400px] max-w-[400px] lg:max-w-none lg:w-[360px] xl:w-[400px] h-[min(560px,64vh)] lg:h-screen flex flex-col rounded-2xl lg:rounded-none overflow-hidden glass-section border border-gray-200 dark:border-white/10">
+        <div className="fixed z-50 right-3 sm:right-6 bottom-40 lg:right-0 lg:bottom-auto lg:top-0 w-[calc(100vw-1.5rem)] sm:w-[400px] max-w-[400px] lg:max-w-none lg:w-[360px] xl:w-[400px] h-[min(560px,64vh)] lg:h-screen flex flex-col rounded-2xl lg:rounded-none overflow-hidden glass-section border border-[color:var(--glass-border)]">
           {/* Header */}
           <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-100 dark:border-white/10 bg-[rgb(var(--accent-rgb)/0.08)]">
             <div className="w-9 h-9 shrink-0 rounded-full bg-[var(--accent)] flex items-center justify-center shadow-md shadow-[rgb(var(--accent-rgb)/0.35)]">
@@ -240,7 +240,7 @@ export default function AssistantWidget() {
           )}
 
           {/* Composer */}
-          <div className="glass-bar px-3 py-3 border-t border-gray-100 dark:border-white/10">
+          <div className="px-3 py-3 border-t border-[color:var(--glass-border)]">
             <div className="flex items-end gap-2">
               <textarea
                 ref={inputRef}
@@ -249,7 +249,7 @@ export default function AssistantWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={onKeyDown}
                 placeholder={t('assistant.placeholder')}
-                className="glass-input flex-1 resize-none max-h-24 rounded-xl border border-gray-200 dark:border-white/10 px-3 py-2.5 text-sm text-[#1A1A2E] dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[var(--accent)] transition"
+                className="flex-1 resize-none max-h-24 rounded-xl glass-input px-3 py-2.5 text-sm text-[#1A1A2E] dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[var(--accent)] transition"
               />
               <button
                 type="button"

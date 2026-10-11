@@ -26,7 +26,7 @@ export function NearYouSection({ radius = 25 }: { radius?: number }) {
   if (!coords) {
     return (
       <Section title={t('home.nearYou')} hint={t('home.nearYouHint')}>
-        <div className="glass-inset rounded-2xl border border-dashed border-gray-300 dark:border-white/15 p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+        <div className="glass-section rounded-2xl border border-dashed border-[var(--glass-border)] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           <span className="w-12 h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center">
             <MapPin className="w-6 h-6 text-[var(--accent)]" />
           </span>
@@ -59,7 +59,7 @@ export function NearYouSection({ radius = 25 }: { radius?: number }) {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-72 rounded-2xl bg-gray-100 dark:bg-white/5 animate-skeleton" />
+            <div key={i} className="glass-tile h-72 rounded-2xl animate-skeleton" />
           ))}
         </div>
       ) : items.length === 0 ? (

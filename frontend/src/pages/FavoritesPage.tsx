@@ -33,7 +33,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-6xl mx-auto">
         <BackButton className="mb-4" />
         <h1 className="text-3xl font-bold text-[#1A1A2E] dark:text-white mb-2">{t('favorites.title')}</h1>
@@ -58,8 +58,8 @@ export default function FavoritesPage() {
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {favs.map((listing) => (
-              <div key={listing.id} className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-200 group">
-                <div className="glass-inset relative h-48">
+              <div key={listing.id} className="glass-card glass-card-hover rounded-2xl overflow-hidden transition-all duration-200 group">
+                <div className="relative h-48 bg-gray-100">
                   {listing.primary_image ? (
                     <img
                       src={listing.primary_image}
@@ -75,7 +75,7 @@ export default function FavoritesPage() {
                   <button
                     onClick={() => toggleFavMutation.mutate(listing.id)}
                     disabled={toggleFavMutation.isPending}
-                    className="glass-panel absolute top-3 right-3 p-2.5 rounded-xl hover:bg-white dark:hover:bg-white/20 transition shadow-md disabled:opacity-50"
+                    className="absolute top-3 right-3 bg-white/90 dark:bg-white/10 backdrop-blur-sm p-2.5 rounded-xl hover:bg-white dark:hover:bg-white/20 transition shadow-md disabled:opacity-50"
                   >
                     <Heart className="w-5 h-5 text-red-500 fill-red-500" />
                   </button>

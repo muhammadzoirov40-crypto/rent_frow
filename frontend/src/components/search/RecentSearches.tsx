@@ -30,7 +30,7 @@ export default function RecentSearches({
       {items.map((term) => (
         <span
           key={term}
-          className="glass-inset inline-flex items-center gap-1 pl-3 pr-1.5 py-1.5 rounded-full border border-gray-200 dark:border-white/10 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:border-[rgb(var(--accent-rgb)/0.45)] hover:text-[var(--accent)] transition cursor-pointer"
+          className="glass-popover inline-flex items-center gap-1 pl-3 pr-1.5 py-1.5 rounded-full border border-gray-200 dark:border-white/10 text-xs font-semibold text-gray-600 dark:text-gray-300 hover:border-[rgb(var(--accent-rgb)/0.45)] hover:text-[var(--accent)] transition cursor-pointer"
         >
           <button type="button" onClick={() => onSelect(term)} className="max-w-[14rem] truncate">
             {term}

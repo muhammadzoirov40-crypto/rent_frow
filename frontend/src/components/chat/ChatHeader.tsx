@@ -23,7 +23,7 @@ export default function ChatHeader({ name, avatar, online, onBack, onAudioCall, 
     .toUpperCase();
 
   return (
-    <div className="glass-bar flex items-center gap-3 px-4 py-3 border-b border-gray-200/70 dark:border-white/10">
+    <div className="flex items-center gap-3 px-4 py-3 glass-section border-b border-[color:var(--glass-border)]">
       {onBack && (
         <button
           type="button"

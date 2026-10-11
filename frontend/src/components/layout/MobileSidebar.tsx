@@ -75,10 +75,10 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   };
 
   const linkClass = (to: string) =>
-    `w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+    `w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium backdrop-blur-md transition ${
       isActive(to)
-        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)]'
-        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
+        ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.25)] border border-[rgb(var(--accent-rgb)/0.3)]'
+        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white/45 dark:bg-white/[0.06] border border-white/50 dark:border-white/10 hover:bg-white/65 dark:hover:bg-white/[0.1]'
     }`;
 
   const iconClass = (to: string) =>
@@ -117,8 +117,8 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
       <aside
         aria-hidden={!open}
         className={`fixed inset-y-0 left-0 z-[61] w-[290px] max-w-[85vw] flex flex-col
-          bg-white/80 dark:bg-[#0b0f19]/85 backdrop-blur-2xl border-r border-gray-200/60 dark:border-white/10
-          shadow-2xl transition-transform duration-300 ease-in-out md:hidden
+          glass-section border-r border-gray-200/60 dark:border-white/10
+          transition-transform duration-300 ease-in-out md:hidden
           ${open ? 'translate-x-0' : '-translate-x-full'}`}
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200/60 dark:border-white/10 shrink-0">
@@ -135,7 +135,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
         <div className="px-4 pt-4 pb-2 shrink-0">
           {isAuthenticated ? (
-            <Link to="/profile" onClick={onClose} className="glass-inset flex items-center gap-3 p-3 rounded-2xl border border-gray-200/60 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)] transition">
+            <Link to="/profile" onClick={onClose} className="flex items-center gap-3 p-3 rounded-2xl glass-section border border-gray-200/60 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.4)] transition">
               <span className="relative shrink-0">
                 <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0b2447] to-[var(--accent)] text-white text-sm font-bold flex items-center justify-center">
                   {(user?.display_name || user?.email || '?').charAt(0).toUpperCase()}
@@ -156,7 +156,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
               <Link
                 to="/login"
                 onClick={onClose}
-                className="glass-inset block w-full text-center px-4 py-2.5 border border-gray-200/60 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition"
+                className="block w-full text-center px-4 py-2.5 bg-white/50 dark:bg-white/5 border border-gray-200/60 dark:border-white/10 text-gray-700 dark:text-gray-300 text-sm font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition"
               >
                 {t('header.login')}
               </Link>
@@ -223,7 +223,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
                   setFeedbackOpen(true);
                   onClose();
                 }}
-                className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white transition"
+                className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-white/45 dark:bg-white/[0.06] border border-white/50 dark:border-white/10 hover:bg-white/65 dark:hover:bg-white/[0.1] backdrop-blur-md transition"
               >
                 <span className="text-gray-400 dark:text-gray-500">
                   <MessageSquareQuote className="w-5 h-5" />

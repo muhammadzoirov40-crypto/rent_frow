@@ -34,7 +34,7 @@ function ProtectedRoute({ children, adminOnly = false }: ProtectedRouteProps) {
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <LoadingSpinner />
       </div>
     );
@@ -89,7 +89,7 @@ export default function App() {
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <LoadingSpinner />
       </div>
     );

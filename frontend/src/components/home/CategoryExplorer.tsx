@@ -67,7 +67,7 @@ export default function CategoryExplorer() {
       <Section id="categories" title={t('home.popularCategories')} hint={t('home.categoriesHint')}>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="h-36 rounded-2xl bg-white/40 dark:bg-white/5 border border-gray-200/40 dark:border-white/10 animate-skeleton backdrop-blur-md" />
+            <div key={i} className="glass-tile h-36 rounded-2xl border animate-skeleton" />
           ))}
         </div>
       </Section>
@@ -92,10 +92,10 @@ export default function CategoryExplorer() {
         <div className="flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar py-1 px-1 sm:justify-center">
           <button
             onClick={() => setActiveGroup('')}
-            className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border backdrop-blur-md transition-all duration-200 cursor-pointer ${
+            className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-200 cursor-pointer ${
               !activeGroup
                 ? 'bg-[var(--accent)] border-[rgb(var(--accent-rgb)/0.4)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
-                : 'bg-white/50 dark:bg-slate-900/40 border-gray-200/80 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50 hover:bg-white/80 dark:hover:bg-slate-800/60'
+                : 'glass-popover border-[var(--glass-border)] text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50'
             }`}
           >
             {t('common.all')}
@@ -104,10 +104,10 @@ export default function CategoryExplorer() {
             <button
               key={g.key}
               onClick={() => setActiveGroup(g.key)}
-              className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border backdrop-blur-md transition-all duration-200 cursor-pointer ${
+              className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-200 cursor-pointer ${
                 activeGroup === g.key
                   ? 'bg-[var(--accent)] border-[rgb(var(--accent-rgb)/0.4)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
-                  : 'bg-white/50 dark:bg-slate-900/40 border-gray-200/80 dark:border-white/10 text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50 hover:bg-white/80 dark:hover:bg-slate-800/60'
+                  : 'glass-popover border-[var(--glass-border)] text-gray-700 dark:text-gray-300 hover:border-[var(--accent)]/50'
               }`}
             >
               {t(g.labelKey)}
@@ -124,7 +124,7 @@ export default function CategoryExplorer() {
             <button
               key={cat.id}
               onClick={() => navigate(`/search?category_id=${cat.id}`)}
-              className="glass-panel group h-full flex flex-col items-center justify-center text-center rounded-2xl p-5 border border-gray-200/60 dark:border-white/10 hover:border-[var(--accent)] hover:shadow-lg hover:shadow-[rgb(var(--accent-rgb)/0.25)] hover:bg-white/80 dark:hover:bg-[#1f293d]/50 transition-all duration-200 hover:-translate-y-1 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              className="glass-card glass-card-hover group h-full flex flex-col items-center justify-center text-center rounded-2xl p-5 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <div className="w-12 h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.08)] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-200">
                 {cat.image_url ? (

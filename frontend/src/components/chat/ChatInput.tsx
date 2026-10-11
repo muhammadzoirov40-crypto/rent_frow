@@ -205,11 +205,11 @@ export default function ChatInput({
   const canSend = Boolean(value.trim()) && !sending && !disabled;
 
   return (
-    <div className="glass-bar relative px-3 sm:px-5 py-3 border-t border-gray-200/70 dark:border-white/10">
+    <div className="relative px-3 sm:px-5 py-3 glass-section border-t border-[color:var(--glass-border)]">
       {emojiOpen && (
         <div
           ref={emojiRef}
-          className="absolute bottom-full left-3 sm:left-4 mb-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl glass-popover border border-gray-200 dark:border-white/10 p-3 z-20"
+          className="absolute bottom-full left-3 sm:left-4 mb-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl glass-popover border border-[color:var(--glass-border)] p-3 z-20"
         >
           <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 mb-2">{t('messages.emoji')}</p>
           <div className="grid grid-cols-8 gap-1">
@@ -246,7 +246,7 @@ export default function ChatInput({
       />
 
       {(replyTo || editing) && (
-        <div className="glass-panel mb-2 flex items-start gap-3 pl-3 pr-2 py-2.5 rounded-2xl bg-[rgb(var(--accent-rgb)/0.07)] border border-[rgb(var(--accent-rgb)/0.25)] shadow-sm">
+        <div className="mb-2 flex items-start gap-3 pl-3 pr-2 py-2.5 rounded-2xl bg-[rgb(var(--accent-rgb)/0.07)] dark:bg-[rgb(var(--accent-rgb)/0.1)] border border-[rgb(var(--accent-rgb)/0.25)] shadow-sm">
           <span className="w-1 self-stretch rounded-full bg-gradient-to-b from-[var(--accent)] to-[var(--accent-light)] shrink-0" />
           <div className="flex-1 min-w-0">
             <p className="text-xs font-bold text-[var(--accent)]">
@@ -343,7 +343,7 @@ export default function ChatInput({
             onPaste={handlePaste}
             placeholder={t('messages.typeMessage')}
             disabled={disabled}
-            className="glass-input flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] border border-transparent px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:bg-white dark:focus:bg-white/[0.09] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
+            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] glass-input px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
           />
 
           <button

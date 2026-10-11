@@ -18,10 +18,10 @@ export default function CampaignChart() {
   let offset = 0
 
   return (
-    <div className="glass-panel rounded-2xl border border-gray-100 p-5 sm:p-6 h-full flex flex-col">
+    <div className="glass-section rounded-2xl p-5 sm:p-6 h-full flex flex-col">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-base font-bold text-gray-900">Discount Campaign</h3>
-        <button className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors" aria-label="More options">
+        <h3 className="text-base font-bold text-gray-900 dark:text-white">Discount Campaign</h3>
+        <button className="p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors" aria-label="More options">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <circle cx="5" cy="12" r="1.8" />
             <circle cx="12" cy="12" r="1.8" />
@@ -31,11 +31,11 @@ export default function CampaignChart() {
       </div>
 
       <div className="flex items-baseline gap-2">
-        <span className="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">
           $7,820
-          <span className="text-lg font-bold text-gray-400">.00</span>
+          <span className="text-lg font-bold text-gray-400 dark:text-gray-500">.00</span>
         </span>
-        <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">
+        <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/15 px-1.5 py-0.5 rounded-md">
           ↑ 4.9%
         </span>
       </div>
@@ -66,8 +66,8 @@ export default function CampaignChart() {
             })}
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl font-extrabold text-gray-900">{performance}%</span>
-            <span className="text-xs font-medium text-gray-500 mt-0.5">Performance</span>
+            <span className="text-3xl font-extrabold text-gray-900 dark:text-white">{performance}%</span>
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400 mt-0.5">Performance</span>
           </div>
         </div>
 
@@ -76,7 +76,7 @@ export default function CampaignChart() {
           {legend.map((item) => (
             <div key={item.label} className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="text-xs font-medium text-gray-500">{item.label}</span>
+              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{item.label}</span>
             </div>
           ))}
         </div>

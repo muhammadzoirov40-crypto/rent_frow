@@ -110,9 +110,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
   return (
     <Link
       to={`/listing/${listing.id}`}
-      className="glass-panel group block rounded-2xl overflow-hidden border border-gray-200/60 dark:border-white/10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_4px_25px_-6px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[var(--accent)] hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.7)] hover:shadow-[rgb(var(--accent-rgb)/0.2)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+      className="group block glass-card glass-card-hover rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
     >
-      <div className="glass-inset relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/3] bg-gray-100 dark:bg-slate-800/60 overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -123,7 +123,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900">
-            <div className="glass-inset p-3.5 rounded-2xl ring-1 ring-black/5 shadow-sm">
+            <div className="p-3.5 rounded-2xl bg-white/80 dark:bg-white/5 ring-1 ring-black/5 shadow-sm">
               <ImageIcon className="w-7 h-7 text-gray-400 dark:text-slate-500" aria-hidden="true" />
             </div>
           </div>
@@ -141,7 +141,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           )}
 
           {isVerified && (
-            <span className="glass-panel inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold text-white ring-1 ring-white/20">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
               <BadgeCheck className="w-3.5 h-3.5 text-[var(--accent-light)]" aria-hidden="true" />
               {t('listing.verified')}
             </span>
@@ -153,7 +153,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
           onClick={toggleFavorite}
           aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
           aria-pressed={isFavorited}
-          className="glass-panel absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 hover:border-[var(--accent)] hover:scale-110 active:scale-95 transition-all group/fav focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 hover:border-[var(--accent)] hover:scale-110 active:scale-95 transition-all group/fav focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
@@ -180,7 +180,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
         )}
 
         {imageCount > 1 && (
-          <span className="glass-panel absolute bottom-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold text-white ring-1 ring-white/20">
+          <span className="absolute bottom-3 right-3 inline-flex items-center gap-1 px-2 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
             <Camera className="w-3.5 h-3.5" aria-hidden="true" />
             {imageCount}
           </span>

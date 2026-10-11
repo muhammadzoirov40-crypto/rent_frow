@@ -40,7 +40,7 @@ export default function TopListings() {
           ? [0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="shrink-0 w-[270px] sm:w-[300px] h-[320px] rounded-2xl bg-gray-100 dark:bg-slate-800/60 animate-pulse"
+                className="glass-tile shrink-0 w-[270px] sm:w-[300px] h-[320px] rounded-2xl animate-pulse"
                 aria-hidden="true"
               />
             ))

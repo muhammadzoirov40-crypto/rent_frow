@@ -141,7 +141,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
       <div
-        className="glass-scrim absolute inset-0"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -149,7 +149,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-label={t('feedback.dialogTitle')}
-        className="relative w-full max-w-lg glass-popover rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden"
+        className="relative w-full max-w-lg glass-popover rounded-2xl border border-[color:var(--glass-border)] overflow-hidden"
       >
         <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/10">
           <span className="w-9 h-9 rounded-xl bg-[rgb(var(--accent-rgb)/0.12)] text-[var(--accent)] flex items-center justify-center shrink-0">
@@ -188,7 +188,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={t('feedback.titlePlaceholder')}
-              className="glass-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+              className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
             />
           </div>
 
@@ -205,7 +205,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder={t('feedback.contentPlaceholder')}
-              className="glass-input w-full px-3.5 py-2.5 rounded-xl border border-gray-200 dark:border-white/10 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition resize-none"
+              className="w-full px-3.5 py-2.5 rounded-xl glass-input text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition resize-none"
             />
           </div>
 
@@ -216,7 +216,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-dashed border-gray-300 dark:border-white/15 text-sm font-semibold text-gray-600 dark:text-gray-300 hover:border-[var(--accent)] hover:text-[var(--accent)] transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-dashed border-[color:var(--glass-border)] text-sm font-semibold text-gray-600 dark:text-gray-300 hover:border-[var(--accent)] hover:text-[var(--accent)] transition disabled:opacity-50"
               >
                 {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
                 {uploading ? t('feedback.imageUploading') : t('feedback.addImage')}
@@ -230,7 +230,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
                   onClick={resetImage}
                   aria-label={t('feedback.removeImage')}
                   disabled={uploading}
-                  className="glass-panel absolute top-0.5 right-0.5 p-1 rounded-md text-white hover:bg-black/80 transition disabled:opacity-50"
+                  className="absolute top-0.5 right-0.5 p-1 rounded-md bg-black/60 text-white hover:bg-black/80 transition disabled:opacity-50"
                 >
                   <X className="w-3 h-3" />
                 </button>

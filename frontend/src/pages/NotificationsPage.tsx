@@ -64,7 +64,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh_-_var(--header-h))] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-[calc(100vh_-_var(--header-h))] bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-2xl mx-auto">
         <BackButton className="mb-4" />
         <div className="flex items-center justify-between mb-8">
@@ -87,8 +87,8 @@ export default function NotificationsPage() {
         </div>
 
         {allNotifications.length === 0 ? (
-          <div className="glass-panel text-center py-16 rounded-2xl border border-gray-200 dark:border-white/10 p-8">
-            <div className="glass-inset w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="glass-section text-center py-16 rounded-2xl border border-gray-200 dark:border-white/10 p-8">
+            <div className="glass-section w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
               <Bell className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{t('notifications.empty')}</h3>
@@ -103,8 +103,8 @@ export default function NotificationsPage() {
                 <button
                   key={notif.id}
                   onClick={() => handleClick(notif)}
-                  className={`w-full text-left bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 p-4 hover:shadow-md transition flex items-start gap-4 ${
-                    !notif.is_read ? 'border-l-4 border-l-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.02)]' : ''
+                  className={`glass-section w-full text-left rounded-2xl border border-gray-200 dark:border-white/10 p-4 hover:border-[rgb(var(--accent-rgb)/0.4)] transition flex items-start gap-4 ${
+                    !notif.is_read ? 'border-l-4 border-l-[var(--accent)]' : ''
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-xl ${config.bgColor} flex items-center justify-center flex-shrink-0 ${config.color}`}>

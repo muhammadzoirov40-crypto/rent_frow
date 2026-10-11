@@ -370,7 +370,7 @@ export default function CreateListingPage() {
   };
 
   return (
-    <div className="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-6 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <button
           onClick={() => (step === 0 ? navigate(previousPath(location.pathname) || '/') : setStep(step - 1))}
@@ -380,7 +380,7 @@ export default function CreateListingPage() {
           {step === 0 ? t('common.back') : STEPS[step - 1]}
         </button>
 
-        <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6 mb-6">
+        <div className="glass-card rounded-2xl p-6 mb-6">
           <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white mb-6">{editId ? t('createListing.editTitle') : t('createListing.title')}</h1>
           <div className="flex items-center gap-1 mb-2">
             {STEPS.map((label, i) => (
@@ -394,7 +394,7 @@ export default function CreateListingPage() {
           </div>
         </div>
 
-        <div className="glass-panel rounded-2xl border border-gray-200 dark:border-white/10 p-6">
+        <div className="glass-card rounded-2xl p-6">
           {step === 0 && (
             <div>
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
@@ -433,7 +433,7 @@ export default function CreateListingPage() {
                   value={form.title}
                   onChange={(e) => updateForm({ title: e.target.value })}
                   placeholder={t('createListing.titlePlaceholder')}
-                  className="glass-inset w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                  className="glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                 />
               </div>
               <div>
@@ -443,7 +443,7 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ description: e.target.value })}
                   rows={5}
                   placeholder={t('createListing.descriptionPlaceholder')}
-                  className="glass-input w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
+                  className="glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -454,7 +454,7 @@ export default function CreateListingPage() {
                     value={form.contact_name}
                     onChange={(e) => updateForm({ contact_name: e.target.value })}
                     placeholder={t('createListing.contactNamePlaceholder')}
-                    className="glass-inset w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                    className="glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                   />
                 </div>
                 <div>
@@ -465,10 +465,10 @@ export default function CreateListingPage() {
                     value={form.contact_phone}
                     onChange={(e) => updateForm({ contact_phone: asPhone(e.target.value) })}
                     placeholder={t('createListing.contactPhonePlaceholder')}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                    className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
                       phoneTooShort
                         ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
-                        : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                        : 'focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
                     }`}
                   />
                   {phoneTooShort && (
@@ -494,10 +494,10 @@ export default function CreateListingPage() {
                     updateForm({ dc_account: asPhone(e.target.value) });
                   }}
                   placeholder={t('createListing.dcAccountPlaceholder')}
-                  className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                  className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
                     dcTooShort
                       ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
-                      : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                      : 'focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
                   }`}
                 />
                 {dcTooShort && (
@@ -546,7 +546,7 @@ export default function CreateListingPage() {
                 </p>
                 <p className="text-xs text-gray-400 mt-1">{t('createListing.uploadFormatHint')}</p>
                 {uploadingImages && uploadProgress && (
-                  <div className="glass-panel mt-3 mx-auto max-w-xs h-2 rounded-full overflow-hidden">
+                  <div className="mt-3 mx-auto max-w-xs h-2 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-200"
                       style={{ width: `${uploadProgress.percent}%` }}
@@ -576,9 +576,9 @@ export default function CreateListingPage() {
                     </div>
                   ))}
                   {previews.map((pv) => (
-                    <div key={pv.key} className="glass-inset relative aspect-square rounded-xl overflow-hidden border border-[rgb(var(--accent-rgb)/0.4)]">
+                    <div key={pv.key} className="relative aspect-square rounded-xl overflow-hidden border border-[rgb(var(--accent-rgb)/0.4)] bg-gray-100 dark:bg-white/5">
                       <img src={pv.url} alt="" className="w-full h-full object-cover opacity-70" />
-                      <div className="glass-scrim absolute inset-0 flex items-center justify-center">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <Loader2 size={22} className="text-white animate-spin" />
                       </div>
                     </div>
@@ -604,10 +604,10 @@ export default function CreateListingPage() {
                     placeholder="0"
                     min={MIN_PRICE}
                     max={MAX_PRICE}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                    className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
                       priceTooHigh
                         ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
-                        : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                        : 'focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
                     }`}
                   />
                   {priceTooHigh && (
@@ -633,10 +633,10 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ deposit: e.target.value })}
                   placeholder={t('createListing.depositPlaceholder')}
                   min="0"
-                  className={`w-full border rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white dark:bg-white/5 focus:ring-2 outline-none transition ${
+                  className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
                     depositTooHigh
                       ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
-                      : 'border-gray-200 dark:border-white/10 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                      : 'focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
                   }`}
                 />
                 {depositTooHigh && (
@@ -693,7 +693,7 @@ export default function CreateListingPage() {
                   value={form.address}
                   onChange={(e) => updateForm({ address: e.target.value })}
                   placeholder={t('createListing.addressPlaceholder')}
-                  className="glass-inset w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
+                  className="glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition"
                 />
               </div>
               <div>
@@ -721,7 +721,7 @@ export default function CreateListingPage() {
                   onChange={(e) => updateForm({ rules: e.target.value })}
                   rows={5}
                   placeholder={t('createListing.rulesPlaceholder')}
-                  className="glass-input w-full border border-gray-200 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
+                  className="glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none transition resize-none"
                 />
               </div>
             </div>

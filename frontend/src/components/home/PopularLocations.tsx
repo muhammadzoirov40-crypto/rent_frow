@@ -61,7 +61,7 @@ export default function PopularLocations({ limit = 8 }: { limit?: number }) {
             <button
               key={city.id}
               onClick={() => navigate(`/search?city_id=${city.id}`)}
-              className="group glass-tile rounded-xl border p-4 text-left hover:border-[rgb(var(--accent-rgb)/0.4)] transition"
+              className="glass-card glass-card-hover group rounded-xl p-4 text-left transition"
             >
               <div className="flex items-center gap-3">
                 <span className="w-9 h-9 shrink-0 rounded-lg bg-[rgb(var(--accent-rgb)/0.1)] flex items-center justify-center group-hover:bg-[var(--accent)] transition">

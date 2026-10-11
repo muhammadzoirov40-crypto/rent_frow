@@ -24,7 +24,7 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="glass-bar text-gray-600 dark:text-gray-300 border-t border-gray-200/70 dark:border-white/10">
+    <footer className="glass-section text-gray-600 dark:text-gray-300 border-t border-gray-200/70 dark:border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-7">
           <div>
@@ -33,13 +33,13 @@ export default function Footer() {
               {t('footer.aboutText')}
             </p>
             <div className="flex items-center gap-2.5 mt-4">
-              <a href="#" className="glass-inset w-8 h-8 rounded-lg hover:bg-brand-500 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-white transition">
+              <a href="#" className="w-8 h-8 rounded-lg glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition">
                 <Globe className="w-4 h-4" />
               </a>
-              <a href="#" className="glass-inset w-8 h-8 rounded-lg hover:bg-brand-500 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-white transition">
+              <a href="#" className="w-8 h-8 rounded-lg glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition">
                 <MessageCircle className="w-4 h-4" />
               </a>
-              <a href="#" className="glass-inset w-8 h-8 rounded-lg hover:bg-brand-500 flex items-center justify-center text-gray-500 dark:text-gray-400 hover:text-white transition">
+              <a href="#" className="w-8 h-8 rounded-lg glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition">
                 <Send className="w-4 h-4" />
               </a>
             </div>

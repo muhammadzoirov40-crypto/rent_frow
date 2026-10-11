@@ -147,12 +147,12 @@ export default function MapView({ items, focus, className = '', height = '28rem'
       <div
         ref={containerRef}
         style={{ height }}
-        className="glass-inset w-full rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden z-0"
+        className="w-full rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden bg-gray-100 dark:bg-[#12141a] z-0"
         aria-label={t('search.mapView')}
       />
       {!hasPins && (
         <div className="pointer-events-none absolute inset-x-0 top-4 z-[500] flex justify-center">
-          <span className="glass-panel inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-xs font-semibold text-gray-600 dark:text-gray-300 shadow-sm">
+          <span className="glass-popover inline-flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 dark:border-white/10 text-xs font-semibold text-gray-600 dark:text-gray-300">
             <MapPin className="w-3.5 h-3.5 text-[var(--accent)]" />
             {t('search.mapNoPins')}
           </span>
@@ -160,7 +160,7 @@ export default function MapView({ items, focus, className = '', height = '28rem'
       )}
       {hasPins && (
         <div className="pointer-events-none absolute inset-x-0 bottom-4 z-[500] flex justify-center">
-          <span className="glass-panel inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 text-[11px] font-semibold text-gray-500 dark:text-gray-400 shadow-sm">
+          <span className="glass-popover inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 text-[11px] font-semibold text-gray-500 dark:text-gray-400">
             <ExternalLink className="w-3 h-3" />
             {t('search.mapHint')}
           </span>

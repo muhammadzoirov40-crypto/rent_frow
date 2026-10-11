@@ -91,7 +91,7 @@ export function TopModal({
 
   return (
     <div
-      className="glass-scrim fixed inset-0 z-[70] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={() => {
         if (!busy) onClose();
       }}
@@ -100,7 +100,7 @@ export function TopModal({
         role="dialog"
         aria-modal="true"
         data-testid="top-plans-modal"
-        className="glass-popover rounded-2xl border border-gray-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl"
+        className="glass-popover rounded-2xl p-6 w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start gap-3 mb-1">
@@ -160,7 +160,7 @@ export function TopModal({
         )}
 
         {selected && (
-          <div className="glass-inset mt-4 rounded-xl border border-gray-100 dark:border-white/10 p-3.5 space-y-1.5 text-sm">
+          <div className="mt-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/10 p-3.5 space-y-1.5 text-sm">
             <div className="flex items-center justify-between">
               <span className="text-gray-500 dark:text-gray-400">{t('top.priceLabel')}</span>
               <span className="font-bold text-[#1A1A2E] dark:text-white tabular-nums">

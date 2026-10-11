@@ -16,7 +16,7 @@ export default function LegalPage({ kind }: { kind: LegalKind }) {
   const ns: LegalKind = kind;
 
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="max-w-3xl mx-auto">
         <BackButton className="mb-5" />
 

@@ -118,9 +118,9 @@ function InfiniteCard({ item }: RealCardProps) {
   return (
     <Link
       to={`/listing/${item.id}`}
-      className="glass-panel block group hover:bg-slate-50 dark:hover:bg-slate-800/85 border border-slate-200 dark:border-white/10 hover:border-[rgb(var(--accent-rgb)/0.5)] rounded-2xl p-2.5 shadow-xl dark:shadow-2xl transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
+      className="glass-card glass-card-hover block group rounded-2xl p-2.5 transition-all duration-300 overflow-hidden cursor-pointer w-full text-left"
     >
-      <div className="glass-inset h-24 sm:h-28 w-full rounded-xl overflow-hidden relative">
+      <div className="h-24 sm:h-28 w-full rounded-xl overflow-hidden relative bg-slate-100 dark:bg-slate-800">
         <img
           src={image}
           alt={item.title}
@@ -215,21 +215,21 @@ export default function AnimatedHero() {
               <span className="text-xs font-semibold text-slate-400">{t('home.heroQuickJump')}</span>
               <a
                 href="#categories"
-                className="glass-inset inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-[var(--accent,#FF6B35)]/10 hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
+                className="glass-card glass-card-hover inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all"
               >
                 <Building2 className="w-3.5 h-3.5 text-[var(--accent,#FF6B35)]" />
                 {t('home.heroPillProperty')}
               </a>
               <a
                 href="#categories"
-                className="glass-inset inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
+                className="glass-card glass-card-hover inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all"
               >
                 <Car className="w-3.5 h-3.5 text-[var(--accent)]" />
                 {t('home.heroPillTransport')}
               </a>
               <a
                 href="#categories"
-                className="glass-inset inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:bg-[rgb(var(--accent-rgb)/0.1)] hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/60"
+                className="glass-card glass-card-hover inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all"
               >
                 <Wrench className="w-3.5 h-3.5 text-[var(--accent)]" />
                 {t('home.heroPillEquipment')}

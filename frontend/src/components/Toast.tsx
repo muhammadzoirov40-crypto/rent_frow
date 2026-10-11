@@ -20,8 +20,8 @@ export default function Toast({ message, type, onClose, duration = 4000 }: Toast
   }, [duration, onClose])
 
   const bgColor = type === 'success'
-    ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
-    : 'bg-red-50 dark:bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400'
+    ? 'text-emerald-600 dark:text-emerald-400'
+    : 'text-red-600 dark:text-red-400'
 
   const icon = type === 'success' ? (
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,7 +35,7 @@ export default function Toast({ message, type, onClose, duration = 4000 }: Toast
 
   return (
     <div
-      className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border backdrop-blur-xl shadow-2xl transition-all duration-300 ${bgColor} ${
+      className={`fixed top-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl glass-popover border border-[color:var(--glass-border)] transition-all duration-300 ${bgColor} ${
         visible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
       }`}
     >

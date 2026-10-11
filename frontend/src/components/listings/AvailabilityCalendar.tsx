@@ -112,7 +112,7 @@ export default function AvailabilityCalendar({ listingId, startDate, endDate, on
       : 0;
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-white/10 p-3 sm:p-4">
+    <div className="glass-section rounded-xl border border-gray-200 dark:border-white/10 p-3 sm:p-4">
       <div className="flex items-center justify-between mb-3">
         <span className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
           {t('listing.availability')}
@@ -216,7 +216,7 @@ export default function AvailabilityCalendar({ listingId, startDate, endDate, on
             type="button"
             onClick={() => onChange('', '')}
             aria-label={t('listing.clearDates')}
-            className="w-6 h-6 rounded-full bg-white dark:bg-white/10 flex items-center justify-center text-gray-500 hover:text-red-500 transition shadow-sm"
+            className="glass-popover w-6 h-6 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 transition"
           >
             <X className="w-3.5 h-3.5" />
           </button>

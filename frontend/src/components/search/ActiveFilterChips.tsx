@@ -122,7 +122,7 @@ export default function ActiveFilterChips({
       {chips.map((chip) => (
         <span
           key={chip.key}
-          className="inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full border border-[rgb(var(--accent-rgb)/0.35)] bg-[rgb(var(--accent-rgb)/0.08)] text-xs font-semibold text-[var(--accent)]"
+          className="glass-popover inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1.5 rounded-full border border-[rgb(var(--accent-rgb)/0.35)] text-xs font-semibold text-[var(--accent)]"
         >
           {chip.label}
           <button
@@ -140,7 +140,7 @@ export default function ActiveFilterChips({
         <button
           type="button"
           onClick={onClearAll}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.45)] transition"
+          className="glass-popover inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-gray-200 dark:border-white/10 text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:border-[rgb(var(--accent-rgb)/0.45)] transition"
         >
           <RotateCcw className="w-3.5 h-3.5" />
           {t('search.clearAll')}

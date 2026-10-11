@@ -234,7 +234,7 @@ export default function LoginPage() {
   const otpCode = otpDigits.join('');
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 transition-colors">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-[#1A1A2E] px-4 transition-colors">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <LogoMark className="w-14 h-14 mx-auto mb-4" />
@@ -242,7 +242,7 @@ export default function LoginPage() {
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">{t('auth.equipmentRentalMgmt')}</p>
         </div>
 
-        <div className="glass-panel border border-gray-100 dark:border-white/10 rounded-2xl shadow-2xl p-8 transition-colors">
+        <div className="glass-card rounded-2xl p-8 transition-colors">
           <div className={step === 'otp' ? 'text-center' : ''}>
             <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
               {step === 'otp'
@@ -266,14 +266,14 @@ export default function LoginPage() {
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]">
                     <Mail className="w-8 h-8 text-white" />
                   </div>
-                  <span className="glass-panel absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full border-2 border-[var(--accent)] flex items-center justify-center shadow-sm">
+                  <span className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white border-2 border-[var(--accent)] flex items-center justify-center shadow-sm">
                     <CheckCircle2 className="w-4 h-4 text-[var(--accent)]" />
                   </span>
                 </div>
               </div>
               <p className="text-sm text-gray-500 dark:text-gray-400">{t('auth.codeSentTo')}</p>
               <div className="flex justify-center mt-1.5">
-                <span className="glass-inset inline-flex items-center gap-1.5 border border-gray-200 dark:border-white/10 rounded-full px-3.5 py-1.5 text-sm font-semibold text-[#1A1A2E] dark:text-white max-w-full">
+                <span className="glass-section inline-flex items-center gap-1.5 border border-gray-200 dark:border-white/10 rounded-full px-3.5 py-1.5 text-sm font-semibold text-[#1A1A2E] dark:text-white max-w-full">
                   <Mail className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
                   <span className="truncate">{email}</span>
                 </span>
@@ -293,7 +293,7 @@ export default function LoginPage() {
                       value={displayName}
                       onChange={(e) => setDisplayName(e.target.value)}
                       placeholder={t('auth.namePlaceholder')}
-                      className="glass-inset w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
+                      className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
                       required
                     />
                   </div>
@@ -309,7 +309,7 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={t('auth.emailPlaceholder')}
-                    className="glass-inset w-full pl-10 pr-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
+                    className="glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
                     autoFocus
                     required
                   />
@@ -326,7 +326,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder={t('auth.passwordPlaceholder')}
-                      className="glass-inset w-full pl-10 pr-10 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
+                      className="glass-input w-full pl-10 pr-10 py-2.5 rounded-xl text-[#1A1A2E] dark:text-white focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)] outline-none text-sm transition"
                       required
                     />
                     <button
@@ -369,11 +369,9 @@ export default function LoginPage() {
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     onPaste={handleOtpPaste}
                     onFocus={(e) => e.target.select()}
-                    className={`w-11 h-14 sm:w-12 sm:h-15 text-center text-2xl font-bold rounded-2xl border-2 outline-none transition-all duration-150 ${
-                      digit
-                        ? 'border-[var(--accent)] bg-white dark:bg-white/10 text-[#1A1A2E] dark:text-white shadow-sm'
-                        : 'border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 text-[#1A1A2E] dark:text-white'
-                    } focus:border-[var(--accent)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)] focus:bg-white dark:focus:bg-white/10`}
+                    className={`glass-input border-2 w-11 h-14 sm:w-12 sm:h-15 text-center text-2xl font-bold rounded-2xl outline-none transition-all duration-150 text-[#1A1A2E] dark:text-white ${
+                      digit ? 'border-[var(--accent)]' : ''
+                    } focus:border-[var(--accent)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)]`}
                   />
                 ))}
               </div>
@@ -413,7 +411,7 @@ export default function LoginPage() {
 
               <div className="flex justify-center">
                 {resendTimer > 0 ? (
-                  <span className="glass-inset inline-flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-white/10 rounded-full px-4 py-1.5">
+                  <span className="glass-section inline-flex items-center gap-2 text-xs text-gray-500 dark:text-slate-400 border border-gray-200 dark:border-white/10 rounded-full px-4 py-1.5">
                     {t('auth.resendIn')}
                     <span className="font-mono font-semibold text-[#1A1A2E] dark:text-white">
                       {String(Math.floor(resendTimer / 60)).padStart(2, '0')}:{String(resendTimer % 60).padStart(2, '0')}
@@ -455,12 +453,12 @@ export default function LoginPage() {
 
           <div className="mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
             <div className="relative flex justify-center text-xs mb-3">
-              <span className="glass-surface px-2 text-gray-400 dark:text-slate-500">{t('auth.orContinueWith')}</span>
+              <span className="glass-popover px-2 text-gray-400 dark:text-slate-500">{t('auth.orContinueWith')}</span>
             </div>
             <button
               onClick={() => googleLogin()}
               type="button"
-              className="glass-inset w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] transition"
+              className="glass-popover w-full flex items-center justify-center px-4 py-2.5 border border-gray-200 dark:border-white/10 rounded-xl text-sm font-medium text-gray-700 dark:text-slate-200 hover:border-[rgb(var(--accent-rgb)/0.4)] hover:text-[var(--accent)] focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.3)] transition"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path

@@ -36,14 +36,14 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
       {/* Mobile overlay */}
       {open && (
         <div
-          className="glass-scrim fixed inset-0 z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
       <aside
-        className={`fixed lg:sticky top-0 lg:top-auto inset-y-0 left-0 z-50 lg:z-auto flex flex-col w-64 shrink-0 h-full lg:h-auto bg-white border-r border-gray-100 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+        className={`fixed lg:sticky top-0 lg:top-auto inset-y-0 left-0 z-50 lg:z-auto flex flex-col w-64 shrink-0 h-full lg:h-auto glass-section border-r border-[color:var(--glass-border)] transition-transform duration-300 ease-in-out lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -51,13 +51,13 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
         <div className="flex items-center justify-between px-5 h-[68px] shrink-0">
           <Link to="/revenlo" className="flex items-center gap-2.5">
             <LogoMark className="w-9 h-9" />
-            <span className="text-lg font-extrabold text-gray-900 tracking-tight">
+            <span className="text-lg font-extrabold text-gray-900 dark:text-white tracking-tight">
               RentHub <span className="text-[var(--accent)]">Admin</span>
             </span>
           </Link>
           <button
             onClick={onClose}
-            className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="lg:hidden p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Close menu"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +65,7 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
             </svg>
           </button>
           <button
-            className="hidden lg:flex p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="hidden lg:flex p-1.5 rounded-lg text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
             aria-label="Collapse sidebar"
             title="Collapse"
           >
@@ -77,16 +77,16 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
 
         {/* Search */}
         <div className="px-4 pb-4 shrink-0">
-          <div className="glass-inset flex items-center gap-2 px-3 py-2.5 rounded-xl border border-gray-100 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
-            <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="glass-input flex items-center gap-2 px-3 py-2.5 rounded-xl transition-all focus-within:border-[var(--accent)] focus-within:ring-2 focus-within:ring-[rgb(var(--accent-rgb)/0.18)]">
+            <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               type="text"
               placeholder="Search"
-              className="bg-transparent border-none outline-none text-sm text-gray-700 placeholder-gray-400 flex-1 min-w-0"
+              className="bg-transparent border-none outline-none text-sm text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder:text-gray-500 flex-1 min-w-0"
             />
-            <svg className="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
             </svg>
           </div>
@@ -96,7 +96,7 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
         <nav className="flex-1 px-3 space-y-6 overflow-y-auto">
           {menuItems.map((group) => (
             <div key={group.group}>
-              <p className="px-3 mb-2 text-xs font-medium text-gray-400">{group.group}</p>
+              <p className="px-3 mb-2 text-xs font-medium text-gray-400 dark:text-gray-500">{group.group}</p>
               <div className="space-y-1">
                 {group.items.map((item) => {
                   const isActive = location.pathname === item.path
@@ -107,12 +107,12 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
                       onClick={onClose}
                       className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                         isActive
-                          ? 'bg-blue-50 text-blue-600'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          ? 'bg-blue-50 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5'
                       }`}
                     >
                       <svg
-                        className={`w-5 h-5 shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-400'}`}
+                        className={`w-5 h-5 shrink-0 ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 dark:text-gray-500'}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -130,15 +130,15 @@ export default function RevenloSidebar({ open = false, onClose }: RevenloSidebar
 
         {/* Plan Card */}
         <div className="p-4 shrink-0">
-          <div className="glass-inset rounded-2xl border border-gray-100 p-4 text-center">
-            <div className="w-9 h-9 mx-auto mb-2.5 rounded-xl bg-blue-50 flex items-center justify-center">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="glass-tile border rounded-2xl p-4 text-center">
+            <div className="w-9 h-9 mx-auto mb-2.5 rounded-xl bg-blue-50 dark:bg-blue-500/15 flex items-center justify-center">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M5 16l2.37-4.74A2 2 0 019.15 10H20l-2.5 8H5.5L5 16zm0 0H3m17 0h2M7.5 10L9 5l3 3 3-5 2.5 7" />
               </svg>
             </div>
-            <p className="text-[15px] font-bold text-gray-900">Current Plan: Basic</p>
-            <p className="text-xs text-gray-500 mt-1 mb-3">1,580 Credits Remaining</p>
-            <button className="glass-panel w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm text-xs font-semibold text-gray-800 transition-all">
+            <p className="text-[15px] font-bold text-gray-900 dark:text-white">Current Plan: Basic</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 mb-3">1,580 Credits Remaining</p>
+            <button className="glass-popover w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-[color:var(--glass-border)] hover:border-gray-300 dark:hover:border-white/25 text-xs font-semibold text-gray-800 dark:text-gray-200 transition-all">
               Upgrade Pro Account
               <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

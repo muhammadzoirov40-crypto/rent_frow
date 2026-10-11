@@ -56,12 +56,12 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
   };
 
   const linkClass = (to: string) =>
-    `w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 ${
+    `w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 backdrop-blur-md ${
       collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
     } ${
       isActive(to)
         ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.35)] border border-[rgb(var(--accent-rgb)/0.35)]'
-        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-transparent hover:bg-white/50 dark:hover:bg-white/[0.06] border border-transparent hover:border-gray-200/50 dark:hover:border-white/10 backdrop-blur-sm'
+        : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white/45 dark:bg-white/[0.06] border border-white/50 dark:border-white/10 hover:bg-white/65 dark:hover:bg-white/[0.1] hover:border-[var(--glass-border)]'
     }`;
 
   // Core navigation items as specified
@@ -89,7 +89,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
     <>
     <aside
       className={`hidden md:flex flex-col shrink-0 sticky top-[var(--header-h)] h-[calc(100vh_-_var(--header-h))] overflow-y-auto
-        bg-white/50 dark:bg-[#0b0f19]/65 backdrop-blur-2xl
+        glass-section
         border-r border-gray-200/60 dark:border-white/10
         transition-[width] duration-300 ease-out ${collapsed ? 'w-[76px]' : 'w-64'}`}
     >
@@ -185,9 +185,9 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
               type="button"
               onClick={() => setFeedbackOpen(true)}
               title={collapsed ? t('feedback.title') : undefined}
-              className={`w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 ${
+              className={`w-full flex items-center rounded-xl text-sm font-semibold transition-all duration-200 backdrop-blur-md ${
                 collapsed ? 'justify-center px-0 py-3' : 'gap-3 px-4 py-3'
-              } text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-transparent hover:bg-white/50 dark:hover:bg-white/[0.06] border border-transparent hover:border-gray-200/50 dark:hover:border-white/10 backdrop-blur-sm`}
+              } text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-white/45 dark:bg-white/[0.06] border border-white/50 dark:border-white/10 hover:bg-white/65 dark:hover:bg-white/[0.1] hover:border-[var(--glass-border)]`}
             >
               <span className="shrink-0">
                 <MessageSquareQuote className="w-5 h-5" />

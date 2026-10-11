@@ -80,7 +80,6 @@ function StatsSection({
       desc: t('home.why1Desc'),
       badge: '01',
       color: 'from-[rgb(var(--accent-rgb)/0.25)] to-[rgb(var(--accent-rgb)/0.05)] text-[var(--accent)] border-[rgb(var(--accent-rgb)/0.3)]',
-      accentGlow: 'hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[rgb(var(--accent-rgb)/0.15)]',
       dotColor: 'bg-[var(--accent)]',
     },
     {
@@ -89,7 +88,6 @@ function StatsSection({
       desc: t('home.why2Desc'),
       badge: '02',
       color: 'from-[rgb(var(--accent-rgb)/0.25)] to-[rgb(var(--accent-rgb)/0.05)] text-[var(--accent)] border-[rgb(var(--accent-rgb)/0.3)]',
-      accentGlow: 'hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[rgb(var(--accent-rgb)/0.15)]',
       dotColor: 'bg-[var(--accent)]',
     },
     {
@@ -98,7 +96,6 @@ function StatsSection({
       desc: t('home.why3Desc'),
       badge: '03',
       color: 'from-[rgb(var(--accent-rgb)/0.25)] to-[rgb(var(--accent-rgb)/0.05)] text-[var(--accent)] border-[rgb(var(--accent-rgb)/0.3)]',
-      accentGlow: 'hover:border-[rgb(var(--accent-rgb)/0.5)] hover:shadow-[rgb(var(--accent-rgb)/0.15)]',
       dotColor: 'bg-[var(--accent)]',
     },
     {
@@ -107,7 +104,6 @@ function StatsSection({
       desc: t('home.why4Desc'),
       badge: '04',
       color: 'from-[rgb(var(--accent-rgb)/0.25)] to-[rgb(var(--accent-rgb)/0.05)] text-[var(--accent)] border-[rgb(var(--accent-rgb)/0.3)]',
-      accentGlow: 'hover:border-[var(--accent)]/50 hover:shadow-[rgb(var(--accent-rgb)/0.15)]',
       dotColor: 'bg-[var(--accent)]',
     },
   ];
@@ -118,7 +114,7 @@ function StatsSection({
         {benefits.map((item) => (
           <div
             key={item.title}
-            className={`glass-panel group relative overflow-hidden rounded-3xl border border-gray-200/80 dark:border-white/10 p-6 flex flex-col justify-between transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl dark:hover:shadow-[0_20px_45px_-12px_rgba(0,0,0,0.7)] ${item.accentGlow}`}
+            className="glass-card glass-card-hover group relative overflow-hidden rounded-3xl p-6 flex flex-col justify-between transition-all duration-300"
           >
             {/* Top gradient accent line on hover */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -173,7 +169,7 @@ function StatsSection({
         ].map((stat) => (
           <div
             key={stat.label}
-            className="glass-panel group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-gray-200/80 dark:border-white/10 p-5 sm:p-6 text-center shadow-sm hover:shadow-lg dark:hover:shadow-[0_15px_30px_-10px_rgba(0,0,0,0.6)] hover:border-[var(--accent)]/40 transition-all duration-300 hover:-translate-y-1"
+            className="glass-card glass-card-hover group relative overflow-hidden rounded-2xl sm:rounded-3xl p-5 sm:p-6 text-center transition-all duration-300"
           >
             <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)] mb-2 group-hover:scale-110 transition-transform">
               <stat.icon className="w-5 h-5" />

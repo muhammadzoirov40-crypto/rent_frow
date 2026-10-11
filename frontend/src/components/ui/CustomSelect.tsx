@@ -20,10 +20,10 @@ interface CustomSelectProps {
   searchPlaceholder?: string;
 }
 
-const DEFAULT_BUTTON_CLS = `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm text-left transition
-          border border-gray-200 dark:border-[rgb(var(--accent-rgb)/0.3)] bg-white dark:bg-[#2A2A3E] text-gray-900 dark:text-white
+const DEFAULT_BUTTON_CLS = `w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm text-left glass-input transition
+          text-gray-900 dark:text-white
           hover:border-[rgb(var(--accent-rgb)/0.6)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.5)]
-          disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-400 dark:disabled:bg-white/5`;
+          disabled:opacity-50 disabled:cursor-not-allowed disabled:text-gray-400`;
 
 export default function CustomSelect({
   options,
@@ -88,14 +88,14 @@ export default function CustomSelect({
       {isOpen && !disabled && (
         <div className="absolute z-50 w-full min-w-[11rem] mt-1.5 p-1.5 glass-popover border border-gray-200/80 dark:border-white/10 rounded-2xl max-h-60 overflow-y-auto">
           {searchable && (
-            <div className="glass-bar sticky top-0 z-10 pb-1.5 mb-1 border-b border-gray-100 dark:border-white/10">
+            <div className="sticky top-0 z-10 glass-popover pb-1.5 mb-1 border-b border-gray-100 dark:border-white/10">
               <input
                 ref={searchRef}
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchPlaceholder}
-                className="glass-inset w-full px-3 py-2 rounded-xl text-sm border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.4)] focus:border-[var(--accent)] outline-none"
+                className="w-full px-3 py-2 rounded-xl text-sm glass-input text-gray-900 dark:text-white placeholder:text-gray-400 focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.4)] focus:border-[var(--accent)] outline-none"
                 data-testid="select-search-input"
               />
             </div>
