@@ -149,7 +149,7 @@ export default function FeedbackDialog({ open, onClose }: FeedbackDialogProps) {
         role="dialog"
         aria-modal="true"
         aria-label={t('feedback.dialogTitle')}
-        className="relative w-full max-w-lg bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-lg glass-popover rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden"
       >
         <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/10">
           <span className="w-9 h-9 rounded-xl bg-[rgb(var(--accent-rgb)/0.12)] text-[var(--accent)] flex items-center justify-center shrink-0">

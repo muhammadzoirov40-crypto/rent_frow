@@ -86,7 +86,7 @@ export default function CustomSelect({
       </button>
 
       {isOpen && !disabled && (
-        <div className="absolute z-50 w-full min-w-[11rem] mt-1.5 p-1.5 bg-white dark:bg-[#1e222b] border border-gray-200/80 dark:border-white/10 rounded-2xl shadow-[0_20px_60px_-15px_rgba(16,24,40,0.4)] max-h-60 overflow-y-auto">
+        <div className="absolute z-50 w-full min-w-[11rem] mt-1.5 p-1.5 glass-popover border border-gray-200/80 dark:border-white/10 rounded-2xl max-h-60 overflow-y-auto">
           {searchable && (
             <div className="sticky top-0 z-10 bg-white dark:bg-[#1e222b] pb-1.5 mb-1 border-b border-gray-100 dark:border-white/10">
               <input

@@ -78,7 +78,7 @@ export default function BuyVipModal({ open, onClose }: BuyVipModalProps) {
         aria-modal="true"
         aria-label={t('vip.title')}
         data-testid="buy-vip-modal"
-        className="relative w-full max-w-md bg-white dark:bg-[#1A1A2E] rounded-2xl border border-gray-200 dark:border-white/10 shadow-2xl overflow-hidden"
+        className="relative w-full max-w-md glass-popover rounded-2xl border border-gray-200 dark:border-white/10 overflow-hidden"
       >
         <div className="flex items-start gap-3 px-5 py-4 border-b border-gray-100 dark:border-white/10">
           <span className="w-9 h-9 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">

@@ -188,7 +188,7 @@ export default function Header() {
                 <span>{currentLang.code.toUpperCase()}</span>
               </button>
               {langOpen && (
-                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-[#1A1A2E] rounded-xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
+                <div className="absolute right-0 mt-2 w-44 glass-popover rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
                   {LANGUAGES.map((lang) => (
                     <button
                       key={lang.code}
@@ -245,7 +245,7 @@ export default function Header() {
                   </button>
 
                   {notifOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
+                    <div className="absolute right-0 mt-2 w-80 glass-popover rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
                       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/10">
                         <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('header.notifications')}</h3>
                         <Link to="/notifications" onClick={() => setNotifOpen(false)} className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] font-medium">
@@ -324,7 +324,7 @@ export default function Header() {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-[#1A1A2E] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
+                    <div className="absolute right-0 mt-2 w-56 glass-popover rounded-2xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
                       <div className="px-4 py-3 border-b border-gray-100 dark:border-white/10">
                         <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{user.display_name || user.email}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
