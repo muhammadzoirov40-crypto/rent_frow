@@ -9,6 +9,7 @@ from app.core.enums import UserRole, ListingStatus, PostStatus
 from app.schemas.statistics import StatisticsResponse, AuditLogResponse
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.schemas.post import PostResponse
+from app.schemas.wallet import AdminTopupResponse
 from app.services.statistics import StatisticsService
 from app.services.audit_log import AuditLogService
 from app.services.notification import NotificationService
@@ -29,6 +30,7 @@ from app.models.equipment import Equipment
 from app.models.review import Review
 from app.models.post import Post
 from app.models.penalty import Penalty
+from app.models.wallet import TopupIntent
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -606,6 +608,60 @@ async def get_entity_audit_logs(
     service = AuditLogService(db)
     items = await service.get_by_entity(entity_type, entity_id)
     return APIResponse(data=items)
+
+
+@router.get("/topups", response_model=PaginatedResponse[AdminTopupResponse])
+async def admin_list_topups(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    status_filter: str | None = Query(None, alias="status"),
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Every top-up across all users — who paid, how much, and when.
+
+    The waiting room (``topup_intents``) already records ``user_id`` and the
+    unique ``reference`` on each attempt; this simply joins the person on so
+    the admin can see *who* transferred money. Filterable by status, newest
+    first.
+    """
+    conditions = [TopupIntent.status == status_filter] if status_filter else []
+
+    total = (
+        await db.execute(
+            select(func.count()).select_from(TopupIntent).where(*conditions)
+        )
+    ).scalar_one()
+
+    rows = (
+        await db.execute(
+            select(TopupIntent, User)
+            .join(User, TopupIntent.user_id == User.id)
+            .where(*conditions)
+            .order_by(TopupIntent.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+    ).all()
+
+    items = [
+        AdminTopupResponse(
+            id=t.id,
+            user_id=t.user_id,
+            user_name=(u.display_name or u.email),
+            user_email=u.email,
+            amount=float(t.amount),
+            reference=t.reference,
+            status=t.status,
+            provider=t.provider,
+            created_at=t.created_at,
+            paid_at=t.paid_at,
+        )
+        for t, u in rows
+    ]
+    return PaginatedResponse(
+        data=items, total=total, page=(skip // limit) + 1, page_size=limit
+    )
 
 
 async def _get_post_or_404(db: AsyncSession, post_id: int) -> Post:

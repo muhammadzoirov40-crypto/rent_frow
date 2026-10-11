@@ -59,3 +59,19 @@ class TopupIntentResponse(BaseModel):
     provider: str
     created_at: datetime
     paid_at: Optional[datetime] = None
+
+
+class AdminTopupResponse(BaseModel):
+    """One row of the admin's \"who topped up\" list — every intent across all
+    users, joined with the person who created it."""
+
+    id: int
+    user_id: int
+    user_name: str
+    user_email: str
+    amount: float
+    reference: str
+    status: str
+    provider: str
+    created_at: datetime
+    paid_at: Optional[datetime] = None
