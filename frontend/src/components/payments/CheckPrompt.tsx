@@ -21,13 +21,19 @@ const MAX_BYTES = 10 * 1024 * 1024;
 /** How long the receipt may still be sent, counted from the moment the
  *  prompt opens.
  *
- *  A receipt proves money that has already moved, and it is worth exactly
- *  while it is fresh: the picture belongs to the payment that was just
- *  opened, so the window takes it for 30 seconds and then closes for good.
- *  Long enough to pick the screenshot that is already in the gallery, and
- *  not one second more — after that the row can only be settled the way it
+ *  A receipt proves money that has already moved. The window the customer
+ *  gets is thirty minutes — enough to leave the page, find the screenshot
+ *  in the gallery and come back without watching a counter race to zero —
+ *  and after it closes for good the row can only be settled the way it
  *  always was, by the operator matching the statement. */
-const DEADLINE_SECONDS = 30;
+const DEADLINE_SECONDS = 30 * 60;
+
+/** 1800 → "30:00" — a clock the eye reads at a glance, in every language. */
+function formatCountdown(total: number): string {
+  const minutes = Math.floor(total / 60);
+  const seconds = total % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
 
 /** Everything a sent receipt can be waiting behind, so the row it belongs to
  *  redraws the moment the upload lands. */
@@ -78,8 +84,8 @@ export default function CheckPrompt() {
     return () => window.removeEventListener(CHECK_PROMPT_EVENT, consume);
   }, [isAuthenticated]);
 
-  // The same 30 seconds for every opening (see DEADLINE_SECONDS): a new
-  // row asks, the clock starts again, and it runs down to zero — after
+  // The same thirty minutes for every opening (see DEADLINE_SECONDS): a
+  // new row asks, the clock starts again, and it runs down to zero — after
   // which this window sends nothing, however fresh the file still looks.
   useEffect(() => {
     if (!target) return;
@@ -205,7 +211,7 @@ export default function CheckPrompt() {
         >
           <Clock className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           {secondsLeft > 0
-            ? t('check.deadline', { seconds: secondsLeft })
+            ? t('check.deadline', { time: formatCountdown(secondsLeft) })
             : t('check.expired')}
         </p>
 
