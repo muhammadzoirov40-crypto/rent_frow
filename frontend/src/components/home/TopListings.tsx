@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { listings } from '../../api/index';
-import ListingCard from '../listings/ListingCard';
+import ListingCarousel from '../listings/ListingCarousel';
 import Section from './Section';
 
 /**
@@ -35,21 +35,14 @@ export default function TopListings() {
       actionLabel={t('common.viewAll')}
       onAction={() => navigate('/search')}
     >
-      <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-        {isLoading
-          ? [0, 1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="glass-tile shrink-0 w-[270px] sm:w-[300px] h-[320px] rounded-2xl animate-pulse"
-                aria-hidden="true"
-              />
-            ))
-          : items.map((item) => (
-              <div key={item.id} className="shrink-0 w-[270px] sm:w-[300px]">
-                <ListingCard listing={item} />
-              </div>
-            ))}
-      </div>
+      {/* The same shelf the showcase below uses — cut card at the right
+          edge, arrows left and right — only narrower cards, so four paid
+          windows stay in view instead of three. */}
+      <ListingCarousel
+        listings={items}
+        loading={isLoading}
+        cardClass="w-[270px] sm:w-[300px]"
+      />
     </Section>
   );
 }

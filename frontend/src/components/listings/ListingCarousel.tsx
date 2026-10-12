@@ -10,7 +10,15 @@ type CarouselItem = Listing | ListingListItem;
 interface ListingCarouselProps {
   listings: CarouselItem[];
   loading: boolean;
+  /**
+   * Width of one card. The default is the showcase's shelf (three and a
+   * bit across on a desktop); a row that has to fit four - the paid TOP
+   * windows, where every extra slot is what was bought - passes its own.
+   */
+  cardClass?: string;
 }
+
+const DEFAULT_CARD_CLASS = 'w-[80%] sm:w-[46%] lg:w-[31%]';
 
 /**
  * The home page's shelf: cards side by side, swiped or scrolled left and
@@ -19,18 +27,35 @@ interface ListingCarouselProps {
  * which is what tells people to swipe. The search page keeps ListingGrid: a
  * wall is right there, a shelf is right here.
  */
-export default function ListingCarousel({ listings, loading }: ListingCarouselProps) {
+export default function ListingCarousel({
+  listings,
+  loading,
+  cardClass = DEFAULT_CARD_CLASS,
+}: ListingCarouselProps) {
   const { t } = useTranslation();
   const stripRef = useRef<HTMLDivElement>(null);
   // Arrows only earn their place when there is something off-screen to reach;
   // with three listings on a wide monitor there is nothing to scroll.
   const [canScroll, setCanScroll] = useState(false);
 
+  // Measured again whenever the shelf or the window changes: the cut card at
+  // the right edge *is* the invitation to swipe, and an arrow that stays
+  // hidden after a resize (or after the cards finally land) would leave that
+  // invitation with nothing to point at.
   useEffect(() => {
     const el = stripRef.current;
     if (!el) return;
-    setCanScroll(el.scrollWidth > el.clientWidth + 8);
-  }, [listings]);
+    const measure = () => setCanScroll(el.scrollWidth > el.clientWidth + 8);
+    measure();
+    const observer =
+      typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measure) : null;
+    observer?.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+    };
+  }, [listings, loading]);
 
   const nudge = (dir: 1 | -1) => {
     const el = stripRef.current;
@@ -42,7 +67,7 @@ export default function ListingCarousel({ listings, loading }: ListingCarouselPr
     return (
       <div className="flex gap-4 lg:gap-6 overflow-hidden">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="shrink-0 w-[80%] sm:w-[46%] lg:w-[31%]">
+          <div key={i} className={`shrink-0 ${cardClass}`}>
             <SkeletonCard />
           </div>
         ))}
@@ -60,7 +85,7 @@ export default function ListingCarousel({ listings, loading }: ListingCarouselPr
         {listings.map((listing) => (
           <div
             key={listing.id}
-            className="snap-start shrink-0 w-[80%] sm:w-[46%] lg:w-[31%]"
+            className={`snap-start shrink-0 ${cardClass}`}
           >
             <ListingCard listing={listing} />
           </div>
