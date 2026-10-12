@@ -36,6 +36,7 @@ export function RequestCard({
   onReject,
   onMessage,
   isMutating,
+  deadlineNote,
   t,
 }: {
   req: RentalRequest;
@@ -45,7 +46,11 @@ export function RequestCard({
   onReject?: (id: number) => void;
   onMessage?: (req: RentalRequest) => void;
   isMutating?: boolean;
-  t: (key: string) => string;
+  /** "Ends 18.10.2026 00:30" — the real hand-back moment, with the
+   *  30-minute grace counted in. Shown by the rentals-taken page, where
+   *  "until when do I have it" is the question the card answers. */
+  deadlineNote?: string | null;
+  t: (key: string, options?: Record<string, unknown>) => string;
 }) {
   const { data: listingInfo } = useQuery({
     queryKey: ['listing-mini', req.listing_id],
@@ -184,6 +189,12 @@ export function RequestCard({
               <Calendar className="w-3.5 h-3.5" />
               {formatDate(req.start_date)} — {formatDate(req.end_date)}
             </span>
+            {deadlineNote && (
+              <span className="flex items-center gap-1.5 font-semibold text-[var(--accent)]">
+                <Clock className="w-3.5 h-3.5" />
+                {deadlineNote}
+              </span>
+            )}
             {req.total_price > 0 && (
               <span className="font-bold text-[var(--accent)]">
                 {formatAmount(req.total_price)} {t('common.somoni')}

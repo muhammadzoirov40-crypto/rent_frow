@@ -4,6 +4,7 @@ import Logo from '../Logo';
 import { useTranslation } from 'react-i18next';
 import {
   Bell,
+  CalendarCheck,
   ClipboardList,
   Crown,
   Heart,
@@ -94,6 +95,9 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     { to: '/messages', label: t('nav.messages'), icon: MessageSquare },
     { to: '/notifications', label: t('nav.notifications'), icon: Bell },
     { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList },
+    // Rentals in hand, one tap away from the request feed — a done deal
+    // must not get lost among the pending offers.
+    { to: '/my-rentals', label: t('nav.myRentals'), icon: CalendarCheck, show: isAuthenticated },
   ];
 
   const userItems = [
@@ -176,7 +180,9 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           <p className="px-2 mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-gray-500">
             {t('dashboard.menu')}
           </p>
-          {coreItems.map((item) => (
+          {coreItems
+            .filter((item) => !('show' in item) || item.show)
+            .map((item) => (
             <Link key={item.to} to={item.to} onClick={onClose} className={linkClass(item.to)}>
               <span className={iconClass(item.to)}>
                 <item.icon className="w-5 h-5" />

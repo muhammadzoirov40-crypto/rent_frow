@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Bell,
+  CalendarCheck,
   ClipboardList,
   Crown,
   Heart,
@@ -75,6 +76,9 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
     { to: '/messages', label: t('nav.messages'), icon: MessageSquare },
     { to: '/notifications', label: t('nav.notifications'), icon: Bell, badge: unreadNotifs },
     { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList },
+    // Rentals in hand live one tap away from the request feed: once a deal
+    // is done it must not get lost among the pending offers.
+    { to: '/my-rentals', label: t('nav.myRentals'), icon: CalendarCheck, show: isAuthenticated },
   ];
 
   const userItems = [
@@ -116,7 +120,9 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
           )}
 
           {/* Core items */}
-          {coreNavItems.map((item) => (
+          {coreNavItems
+            .filter((item) => !('show' in item) || item.show)
+            .map((item) => (
             <Link
               key={item.to}
               to={item.to}

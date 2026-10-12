@@ -11,6 +11,7 @@ export default function Footer() {
     { label: t('nav.favorites'), to: '/favorites' },
     { label: t('nav.messages'), to: '/messages' },
     { label: t('nav.rentalRequests'), to: '/rental-requests' },
+    { label: t('nav.myRentals'), to: '/my-rentals' },
     { label: t('nav.settings'), to: '/settings' },
   ]
 

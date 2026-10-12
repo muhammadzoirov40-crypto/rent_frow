@@ -22,6 +22,7 @@ import {
   PlusCircle,
   MessageSquareQuote,
   History,
+  CalendarCheck,
 } from 'lucide-react'
 import MobileSidebar from './MobileSidebar'
 import FeedbackDialog from '../FeedbackDialog'
@@ -341,6 +342,10 @@ export default function Header() {
                         <Link to="/rental-requests" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
                           <Send className="w-4 h-4 text-gray-400" />
                           {t('header.rentalRequests')}
+                        </Link>
+                        <Link to="/my-rentals" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
+                          <CalendarCheck className="w-4 h-4 text-gray-400" />
+                          {t('nav.myRentals')}
                         </Link>
                         <Link to="/history" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 transition">
                           <History className="w-4 h-4 text-gray-400" />

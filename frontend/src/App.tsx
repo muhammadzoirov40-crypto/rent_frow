@@ -10,6 +10,7 @@ import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import FavoritesPage from './pages/FavoritesPage';
 import RentalRequestsPage from './pages/RentalRequestsPage';
+import MyRentalsPage from './pages/MyRentalsPage';
 import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
 import NotFoundPage from './pages/NotFoundPage';
@@ -164,6 +165,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <RentalRequestsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-rentals"
+            element={
+              <ProtectedRoute>
+                <MyRentalsPage />
               </ProtectedRoute>
             }
           />

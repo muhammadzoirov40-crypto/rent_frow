@@ -704,6 +704,17 @@
     "confirmRejectTitle": "Reject the request?",
     "confirmRejectText": "The renter will be notified that the request was declined."
   },
+  "myRentals": {
+    "title": "My rentals",
+    "subtitle": "The rentals you have taken — deadline, payment and chat in one place",
+    "active": "Active",
+    "history": "History",
+    "pendingNote": "{{count}} request(s) are still awaiting an answer — in «Rental requests»",
+    "emptyActive": "No active rentals yet",
+    "emptyHistory": "No completed rentals yet",
+    "browse": "Find a rental",
+    "endsAt": "Until: {{date}}"
+  },
   "settings": {
     "title": "Settings",
     "subtitle": "Customize your application experience",
