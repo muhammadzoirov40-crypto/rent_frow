@@ -185,23 +185,32 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         <BackButton className="mb-4" />
-        <div className="glass-card rounded-2xl p-6 sm:p-8 mb-6">
-          <div className="flex flex-col sm:flex-row items-center gap-6">
-            <div className="relative group" onClick={() => avatarInputRef.current?.click()}>
+        <div className="glass-card rounded-2xl overflow-hidden mb-6">
+          {/* A band of the platform colour across the top: the card gets
+              a shape of its own, and the avatar sits on the seam. */}
+          <div className="relative h-24 sm:h-28 bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] overflow-hidden">
+            <div className="absolute -top-16 -right-8 w-48 h-48 rounded-full bg-white/10" />
+            <div className="absolute -bottom-24 right-40 w-40 h-40 rounded-full bg-white/10" />
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-5 px-6 sm:px-8 pb-6">
+            <div
+              className="relative group shrink-0 cursor-pointer -mt-14 sm:self-start z-10"
+              onClick={() => avatarInputRef.current?.click()}
+            >
               {meUser?.avatar_url ? (
                 <img
                   src={meUser.avatar_url}
                   alt={meUser.display_name ?? ''}
-                  className="w-24 h-24 rounded-2xl object-cover border-4 border-white dark:border-white/10 shadow-lg"
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-4 border-white dark:border-white/20 shadow-xl"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center shadow-lg">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] flex items-center justify-center border-4 border-white dark:border-white/20 shadow-xl">
                   <span className="text-white text-3xl font-bold">
                     {(meUser?.display_name || meUser?.email || 'U')[0].toUpperCase()}
                   </span>
                 </div>
               )}
-              <div className="absolute inset-0 rounded-2xl bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition cursor-pointer">
+              <div className="absolute inset-0 rounded-2xl bg-black/45 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
                 <Camera className="w-6 h-6 text-white" />
               </div>
               <input
@@ -213,7 +222,7 @@ export default function ProfilePage() {
               />
             </div>
 
-            <div className="flex-1 text-center sm:text-left">
+            <div className="flex-1 min-w-0 text-center sm:text-left sm:pt-2">
               {isEditing ? (
                 <input
                   type="text"
@@ -223,39 +232,76 @@ export default function ProfilePage() {
                   placeholder={t('profile.fullName')}
                 />
               ) : (
-                <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white">
-                  {meUser?.display_name || 'Без имени'}
-                </h1>
-              )}
-              <p className="text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1.5 justify-center sm:justify-start">
-                <Mail className="w-3.5 h-3.5" />
-                {meUser?.email}
-              </p>
-              {isEditing && (
-                <div className="mt-2 flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gray-400" />
-                  <input
-                    type="tel"
-                    value={editPhone}
-                    onChange={(e) => setEditPhone(e.target.value)}
-                    placeholder={t('profile.phonePlaceholder')}
-                    className="text-sm border-b border-gray-300 dark:border-white/20 outline-none bg-transparent dark:text-white"
-                  />
+                <div className="flex items-center justify-center sm:justify-start gap-2 min-w-0">
+                  <h1 className="text-2xl font-bold text-[#1A1A2E] dark:text-white truncate">
+                    {meUser?.display_name || 'Без имени'}
+                  </h1>
+                  {meUser?.is_verified && (
+                    <span
+                      title={t('profile.confirmed')}
+                      className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-sm"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </span>
+                  )}
                 </div>
               )}
-              {!isEditing && meUser?.phone && (
-                <p className="text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-1.5 justify-center sm:justify-start text-sm">
-                  <Phone className="w-3.5 h-3.5" />
-                  {meUser.phone}
-                </p>
-              )}
-              <div className="flex items-center gap-4 mt-3 justify-center sm:justify-start text-sm text-gray-500 dark:text-gray-400">
-                <span className="flex items-center gap-1">
-                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  {t('profile.reviews', { count: 0 })}
+
+              {/* Contacts as chips: a tinted icon square, then the value —
+                  rows instead of loose lines drifting under the name. */}
+              <div className="mt-2.5 flex flex-col items-center sm:items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+                <span className="inline-flex max-w-full items-center gap-2 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-3 py-1.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)]">
+                    <Mail className="w-3 h-3" />
+                  </span>
+                  <span className="truncate">{meUser?.email}</span>
                 </span>
-                <span className="flex items-center gap-1">
-                  <Calendar className="w-3.5 h-3.5" />
+                {isEditing ? (
+                  <span className="inline-flex items-center gap-2 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-3 py-1.5">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)]">
+                      <Phone className="w-3 h-3" />
+                    </span>
+                    <input
+                      type="tel"
+                      value={editPhone}
+                      onChange={(e) => setEditPhone(e.target.value)}
+                      placeholder={t('profile.phonePlaceholder')}
+                      className="bg-transparent outline-none text-sm text-gray-700 dark:text-gray-200 w-40"
+                    />
+                  </span>
+                ) : (
+                  meUser?.phone && (
+                    <span className="inline-flex items-center gap-2 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-3 py-1.5">
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)]">
+                        <Phone className="w-3 h-3" />
+                      </span>
+                      {meUser.phone}
+                    </span>
+                  )
+                )}
+              </div>
+
+              {/* Three facts the header answers with: how the person is
+                  rated, how much they post, when they joined. */}
+              <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-100 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1">
+                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                  {meUser && meUser.rating_count > 0 && (
+                    <>
+                      <span className="font-semibold text-gray-800 dark:text-white">
+                        {(meUser.rating_sum / meUser.rating_count).toFixed(1)}
+                      </span>
+                      <span className="text-gray-300 dark:text-gray-600">·</span>
+                    </>
+                  )}
+                  {meUser?.rating_count ?? 0} {t('profile.reviews')}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-100 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1">
+                  <Package className="w-3.5 h-3.5 text-[var(--accent)]" />
+                  {meUser?.listing_count ?? 0} {t('profile.tabs.myListings')}
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-100 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1">
+                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
                   {meUser?.created_at
                     ? formatDate(meUser.created_at)
                     : 'Недавно'}
@@ -263,13 +309,13 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex flex-wrap justify-center sm:justify-end gap-2 sm:pt-2">
               {isEditing ? (
                 <>
                   <button
                     onClick={handleSaveProfile}
                     disabled={updateProfileMutation.isPending}
-                    className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] transition disabled:opacity-50"
+                    className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] shadow-md shadow-[rgb(var(--accent-rgb)/0.3)] transition disabled:opacity-50"
                   >
                     {updateProfileMutation.isPending ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
@@ -292,7 +338,7 @@ export default function ProfilePage() {
                     setEditPhone(meUser?.phone || '');
                     setIsEditing(true);
                   }}
-                  className="flex items-center gap-1.5 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-50 dark:hover:bg-white/5 transition"
+                  className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] shadow-md shadow-[rgb(var(--accent-rgb)/0.3)] transition"
                 >
                   <Edit2 className="w-4 h-4" />
                   {t('profile.editProfile')}
