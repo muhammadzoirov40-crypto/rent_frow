@@ -316,6 +316,7 @@
     "from": "С",
     "to": "По",
     "days": "дн.",
+    "grace": "+30 минут",
     "totalCost": "Итого",
     "requestRental": "Запросить аренду",
     "sendingRequest": "Отправка...",

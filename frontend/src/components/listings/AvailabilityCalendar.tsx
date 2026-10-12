@@ -209,7 +209,7 @@ export default function AvailabilityCalendar({ listingId, startDate, endDate, on
           <span className="text-sm font-semibold text-[var(--accent)]">
             {startDate ? fmt(startDate) : '—'} → {endDate ? fmt(endDate) : '…'}
             {selDays > 0 && (
-              <span className="text-gray-500 dark:text-gray-400 font-normal"> · {selDays} {t('listing.days')}</span>
+              <span className="text-gray-500 dark:text-gray-400 font-normal"> · {selDays} {t('listing.days')} {t('listing.grace')}</span>
             )}
           </span>
           <button

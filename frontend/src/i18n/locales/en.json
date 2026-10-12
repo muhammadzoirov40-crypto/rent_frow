@@ -316,6 +316,7 @@
     "from": "From",
     "to": "To",
     "days": "days",
+    "grace": "+30 min",
     "totalCost": "Total",
     "requestRental": "Request rental",
     "sendingRequest": "Sending...",

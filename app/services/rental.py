@@ -10,6 +10,7 @@ from app.models.rental import Rental
 from app.core.enums import (
     BookingStatus, RentalStatus, EquipmentStatus,
 )
+from app.services.rental_expiry import GRACE_MINUTES
 
 
 class RentalService:
@@ -36,7 +37,9 @@ class RentalService:
             raise HTTPException(status_code=409, detail="Rental already exists for this booking")
 
         number_of_days = (booking.end_date - booking.start_date).days
-        expected_return_at = datetime.utcnow() + timedelta(days=number_of_days)
+        expected_return_at = datetime.utcnow() + timedelta(
+            days=number_of_days, minutes=GRACE_MINUTES
+        )
 
         rental = await self.rental_repo.create(
             booking_id=booking_id,

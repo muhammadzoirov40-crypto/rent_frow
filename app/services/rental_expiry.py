@@ -6,11 +6,12 @@ proves a plain async loop survives in this service.
 
 `rental_requests.end_date` is a DATE, so the deadlines are pinned to Dushanbe
 wall-clock time (Asia/Dushanbe = UTC+5, fixed, no DST): a rental runs through
-24:00 of its last day. The codebase's convention is naive `datetime.utcnow()`,
-so in those terms:
+24:00 of its last day **plus a 30-minute grace** — one day is really a day and
+a half hour, so the automatic clock strikes at 00:30 of the following day.
+The codebase's convention is naive `datetime.utcnow()`, so in those terms:
 
-  * reminder — 23:00 Dushanbe = 18:00 UTC on `end_date`  ("1 hour left")
-  * expiry   — 24:00 Dushanbe = 19:00 UTC on `end_date`  ("period over")
+  * reminder — 23:30 Dushanbe = 18:30 UTC on `end_date`  ("1 hour left")
+  * expiry   — 00:30 Dushanbe = 19:30 UTC on `end_date`  ("period over")
 
 Deduplication without a schema change: the in-app notification row IS the
 marker — at most one `rental_ending_soon` and one `rental_ended` row per
@@ -40,13 +41,27 @@ FRESH_DAYS = 1  # only rentals ending today/yesterday qualify
 
 DUSHANBE_OFFSET = timedelta(hours=5)  # Asia/Dushanbe — fixed, no DST
 
+# One day of rent is a day and a half hour: the automatic clock lets go of
+# the item 30 minutes past midnight of the day after the last rental day,
+# so a renter carrying it back at 00:15 is not "late" by the system.
+GRACE_MINUTES = 30
+
 ENDING_TYPE = "rental_ending_soon"
 ENDED_TYPE = "rental_ended"
 
 
 def deadlines(end_date: date) -> tuple[datetime, datetime]:
-    """(reminder_at, expiry_at) as naive UTC datetimes for `end_date`."""
-    expiry = datetime.combine(end_date + timedelta(days=1), time(0, 0)) - DUSHANBE_OFFSET
+    """(reminder_at, expiry_at) as naive UTC datetimes for `end_date`.
+
+    A rental runs through 24:00 of its last day plus the 30-minute grace:
+    "one day" is really a day and a half hour, and this is the moment the
+    automatic clock lets go of the item (00:30 Dushanbe of the next day).
+    """
+    expiry = (
+        datetime.combine(end_date + timedelta(days=1), time(0, 0))
+        - DUSHANBE_OFFSET
+        + timedelta(minutes=GRACE_MINUTES)
+    )
     return expiry - timedelta(hours=1), expiry
 
 
@@ -114,7 +129,7 @@ async def check_rental_deadlines(session_factory=None) -> int:
                 f'The rental of "{listing_title}" has ended. '
                 "Reach out in the chat if the item was not returned."
                 if is_ended
-                else f'The rental of "{listing_title}" ends today at 23:59 (Dushanbe time).'
+                else f'The rental of "{listing_title}" ends at 00:30 (Dushanbe time).'
             )
 
             # In-app rows first — they double as the "already sent" markers.

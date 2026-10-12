@@ -188,7 +188,7 @@ export function RequestCard({
               <span className="font-bold text-[var(--accent)]">
                 {formatAmount(req.total_price)} {t('common.somoni')}
                 <span className="font-normal text-gray-400 dark:text-gray-500">
-                  {' '}· {req.total_days} {t('listing.days')}
+                  {' '}· {req.total_days} {t('listing.days')} {t('listing.grace')}
                 </span>
               </span>
             )}

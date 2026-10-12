@@ -719,7 +719,7 @@ export default function ListingPage() {
                     <div className="flex items-center justify-between text-gray-500 dark:text-gray-400">
                       <span>{t('booking.duration')}</span>
                       <span className="font-semibold text-[#1A1A2E] dark:text-white">
-                        {days} {t('listing.days')}
+                        {days} {t('listing.days')} {t('listing.grace')}
                       </span>
                     </div>
                     <div className="flex items-center justify-between gap-3 text-gray-500 dark:text-gray-400">
@@ -1159,7 +1159,7 @@ export default function ListingPage() {
               <div className="flex justify-between gap-4">
                 <span className="text-gray-500 dark:text-gray-400">{t('booking.duration')}</span>
                 <span className="font-semibold text-[#1A1A2E] dark:text-white">
-                  {days} {t('listing.days')}
+                  {days} {t('listing.days')} {t('listing.grace')}
                 </span>
               </div>
               <div className="flex justify-between gap-4 pt-1.5 border-t border-gray-200 dark:border-white/10">

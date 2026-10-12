@@ -875,7 +875,7 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {formatDate(req.start_date)} — {formatDate(req.end_date)}
             {' · '}
-            {req.total_days} {t('listing.days')}
+            {req.total_days} {t('listing.days')} {t('listing.grace')}
           </p>
         </div>
         <div className="text-right shrink-0">

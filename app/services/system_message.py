@@ -34,7 +34,7 @@ def money(value) -> str:
 def request_created(*, listing_title: str, start_date, end_date, days: int, total, note: str | None = None) -> str:
     line = (
         f'Rental request for "{listing_title}": {start_date} — {end_date} '
-        f"· {days} days · {money(total)} сомони · awaiting owner confirmation."
+        f"· {days} days + 30 min · {money(total)} сомони · awaiting owner confirmation."
     )
     if note and note.strip():
         # The renter's own words (the "place of rent" note typed in the booking
@@ -49,7 +49,7 @@ def request_created(*, listing_title: str, start_date, end_date, days: int, tota
 def request_accepted(*, listing_title: str, start_date, end_date, days: int, total) -> str:
     return wrap(
         f'Rental confirmed for "{listing_title}": {start_date} — {end_date} '
-        f"· {days} days · {money(total)} сомони."
+        f"· {days} days + 30 min · {money(total)} сомони."
     )
 
 
