@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Crown, Tag, Image as ImageIcon } from 'lucide-react';
-import { listings, type Listing, type ListingListItem } from '../../api/index';
+import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Crown, Tag, LayoutGrid, Image as ImageIcon } from 'lucide-react';
+import { listings, categories, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { formatAmount } from '../../utils/format';
+import { localizeCategoryName } from '../../utils/categoryName';
+import { iconFor } from '../../utils/categoryIcons';
 
 type ListingCardData = (Listing | ListingListItem) & {
   images?: { id: number; image_url: string }[];
@@ -54,9 +56,17 @@ function getRating(listing: ListingCardData): string | null {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isFavorited, setIsFavorited] = useState(listing.is_favorited ?? false);
   const queryClient = useQueryClient();
+
+  // Same cache the homepage and search page already fill — one fetch for the
+  // whole shelf, and the chip follows the site language.
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () => categories.getAll(),
+    staleTime: 5 * 60 * 1000,
+  });
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -84,6 +94,14 @@ export default function ListingCard({ listing }: ListingCardProps) {
     'purpose' in listing && typeof listing.purpose === 'string' && listing.purpose === 'SALE';
   const imageCount =
     'images' in listing && Array.isArray(listing.images) ? listing.images.length : 0;
+  // The shelf this listing sits on: resolved from the shared cache so the
+  // chip speaks the site language; the raw name carries the first moment
+  // before that cache is filled.
+  const category = categoriesData?.items.find((c) => c.id === listing.category_id);
+  const categoryLabel = category
+    ? localizeCategoryName(category, i18n.language)
+    : listing.category_name || null;
+  const CategoryIcon = category ? iconFor(category, i18n.language) : LayoutGrid;
 
   const status = 'status' in listing ? listing.status : undefined;
   const available =
@@ -182,18 +200,31 @@ export default function ListingCard({ listing }: ListingCardProps) {
           />
         </button>
 
-        {availability && (
-          <span
-            className={`absolute bottom-3 left-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm ring-1 ring-inset ${availability.cls}`}
-          >
-            <span
-              className={`w-1.5 h-1.5 rounded-full ${
-                available === true && status !== 'RENTED' ? 'bg-emerald-500' : 'bg-red-500'
-              }`}
-              aria-hidden="true"
-            />
-            {availability.label}
-          </span>
+        {(availability || categoryLabel) && (
+          <div className="absolute bottom-3 left-3 z-10 flex flex-col items-start gap-1.5">
+            {categoryLabel && (
+              <span
+                title={categoryLabel}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm max-w-[72%]"
+              >
+                <CategoryIcon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                <span className="truncate">{categoryLabel}</span>
+              </span>
+            )}
+            {availability && (
+              <span
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm ring-1 ring-inset ${availability.cls}`}
+              >
+                <span
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    available === true && status !== 'RENTED' ? 'bg-emerald-500' : 'bg-red-500'
+                  }`}
+                  aria-hidden="true"
+                />
+                {availability.label}
+              </span>
+            )}
+          </div>
         )}
 
         {imageCount > 1 && (

@@ -160,6 +160,9 @@ def _listing_to_list_response(
             else None
         ),
         city_id=listing.city_id,
+        # selectin on the relationship, so the label costs no extra query.
+        category_id=listing.category_id,
+        category_name=listing.category.name if listing.category else None,
     )
 
 

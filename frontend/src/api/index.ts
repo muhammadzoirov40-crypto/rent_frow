@@ -112,6 +112,9 @@ export interface ListingListItem {
   distance_km?: number | null;
   /** Live paid TOP window — the badge and the homepage section read this. */
   is_top?: boolean;
+  /** Shelf the listing sits on — the card resolves the localised label. */
+  category_id?: number | null;
+  category_name?: string | null;
 }
 
 export interface SubCategory {

@@ -192,6 +192,11 @@ class ListingListResponse(BaseModel):
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     city_id: Optional[int] = None
+    # Which shelf the listing sits on. The id lets the client resolve the
+    # localised label from its category cache; the name is the fallback for
+    # a client whose cache is still empty.
+    category_id: Optional[int] = None
+    category_name: Optional[str] = None
 
 
 class NearbyListingResponse(ListingListResponse):
