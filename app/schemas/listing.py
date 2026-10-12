@@ -9,6 +9,15 @@ from app.core.enums import (
     VerificationStatus,
 )
 
+# The ceiling the form already puts on a price (CreateListingPage's
+# MAX_PRICE): a million somoni. It used to live only in the browser, so a
+# caller who skipped the form could post a deposit of 10**21 — SQLite
+# stores whatever it is given, since it does not enforce the Numeric(10, 2)
+# the column declares — and the figure then travelled listing -> rental
+# request -> payment, where it became the revenue the admin dashboard
+# reads. The rule belongs on the server, where it cannot be walked past.
+MAX_LISTING_PRICE = 1_000_000
+
 
 class ListingImageResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -42,9 +51,9 @@ class ListingCreate(BaseModel):
     # rule field as it was; SALE is the seller's own path, and the service
     # below strips what only ever belonged to the rental one.
     purpose: ListingPurpose = ListingPurpose.RENT
-    price: float = Field(..., gt=0)
+    price: float = Field(..., gt=0, le=MAX_LISTING_PRICE)
     price_unit: PriceUnit = PriceUnit.PER_DAY
-    deposit: float = Field(default=0, ge=0)
+    deposit: float = Field(default=0, ge=0, le=MAX_LISTING_PRICE)
     property_type: PropertyType = PropertyType.APARTMENT
     rooms: Optional[int] = Field(None, ge=0)
     bathrooms: Optional[int] = Field(None, ge=0)
@@ -79,9 +88,9 @@ class ListingUpdate(BaseModel):
     title: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = None
     purpose: Optional[ListingPurpose] = None
-    price: Optional[float] = Field(None, gt=0)
+    price: Optional[float] = Field(None, gt=0, le=MAX_LISTING_PRICE)
     price_unit: Optional[PriceUnit] = None
-    deposit: Optional[float] = Field(None, ge=0)
+    deposit: Optional[float] = Field(None, ge=0, le=MAX_LISTING_PRICE)
     property_type: Optional[PropertyType] = None
     rooms: Optional[int] = Field(None, ge=0)
     bathrooms: Optional[int] = Field(None, ge=0)

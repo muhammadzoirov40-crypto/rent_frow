@@ -18,7 +18,12 @@ class PaymentCreate(BaseModel):
     booking_id: Optional[int] = None
     rental_request_id: Optional[int] = None
     listing_id: Optional[int] = None
-    amount: Optional[float] = Field(None, gt=0)
+    # Only the booking road reads this — the other two take their figure
+    # from the request or the listing. The ceiling is what Numeric(10, 2),
+    # the column the amount is written into, can hold: SQLite lets anything
+    # through untouched, so without it a caller could pin 10**21 on a row
+    # that the revenue sums are built from.
+    amount: Optional[float] = Field(None, gt=0, le=99_999_999.99)
     payment_type: PaymentType
     transaction_id: Optional[str] = None
 
