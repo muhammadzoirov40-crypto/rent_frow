@@ -15,65 +15,79 @@ const SIZES = {
   xl: { img: 'h-16 sm:h-18 w-auto', word: 'text-4xl sm:text-5xl' },
 };
 
+/** Four-point sparkle: the star tapers to a point on every arm. */
+const SPARKLE =
+  'M 0 -1 C 0.09 -0.33 0.33 -0.09 1 0 C 0.33 0.09 0.09 0.33 0 1 C -0.09 0.33 -0.33 0.09 -1 0 C -0.33 -0.09 -0.09 -0.33 0 -1 Z';
+
+function Sparkle({ x, y, r, fill = '#A3E635' }: { x: number; y: number; r: number; fill?: string }) {
+  return <path d={SPARKLE} transform={`translate(${x} ${y}) scale(${r})`} fill={fill} />;
+}
+
 /**
- * 100% Transparent Vector LogoMark (Шаффоф / Бе ягон замина ё доғи сафед).
- * Uses true SVG compound path cutout (evenodd rule) so the inner house portal
- * is genuinely transparent and reveals whatever background is behind it (Dark or Light).
+ * RH emblem: a dark-green badge carrying the white RH monogram, lime
+ * sparkles above it, and an orbit that runs behind the badge at the crown
+ * and crosses in front of it as a white crescent at the bottom — the same
+ * mark as the favicon, so the tab and the header never disagree.
  */
 export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 100 100" className={`${className} shrink-0 bg-transparent`} fill="none" aria-hidden="true">
+    <svg viewBox="0 0 120 120" className={`${className} shrink-0 bg-transparent`} fill="none" aria-hidden="true">
       <defs>
-        <linearGradient id="rhUnifiedMark" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'var(--accent-light)' }} />
-          <stop offset="55%" style={{ stopColor: 'var(--accent)' }} />
-          <stop offset="100%" style={{ stopColor: 'var(--accent-dark)' }} />
+        <linearGradient id="rhBadgeGrad" x1="12%" y1="0%" x2="88%" y2="100%">
+          <stop offset="0%" stopColor="#1C6B3B" />
+          <stop offset="45%" stopColor="#11502B" />
+          <stop offset="100%" stopColor="#06301A" />
         </linearGradient>
-        <linearGradient id="rhUnifiedNode" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" style={{ stopColor: 'var(--accent-light)' }} />
-          <stop offset="100%" style={{ stopColor: 'var(--accent)' }} />
+        {/* One gradient in user space for the whole orbit, so the half drawn
+            in front of the badge matches the half drawn behind it exactly. */}
+        <linearGradient id="rhOrbitGrad" gradientUnits="userSpaceOnUse" x1="60" y1="24" x2="60" y2="104">
+          <stop offset="0%" stopColor="#A3E635" />
+          <stop offset="45%" stopColor="#D9F99D" />
+          <stop offset="78%" stopColor="#F7FEE7" />
+          <stop offset="100%" stopColor="#FFFFFF" />
         </linearGradient>
       </defs>
 
-      {/* 
-        Single compound path with fillRule="evenodd":
-        Outer: Pin + Roof + Rental Loop
-        Inner: House portal cutout (100% transparent through-hole)
-      */}
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M 46 6
-           C 50 6, 53 8, 56 11
-           L 76 30
-           C 83 37, 86 46, 83 55
-           C 79 66, 68 72, 56 74
-           L 78 88
-           C 81 90, 79 94, 74 94
-           L 59 94
-           C 55 94, 51 91, 48 87
-           L 32 67
-           L 32 88
-           C 32 92, 29 94, 25 94
-           L 17 94
-           C 13 94, 11 92, 11 88
-           L 11 12
-           C 11 8, 14 6, 18 6
-           Z
-           M 27 20
-           L 48 8
-           C 50 7, 52 7, 54 8
-           L 71 23
-           C 76 28, 76 37, 71 43
-           C 67 48, 60 50, 52 50
-           L 27 50
-           Z"
-        fill="url(#rhUnifiedMark)"
+      {/* Sparkles above the badge */}
+      <Sparkle x={30} y={16} r={7.5} />
+      <Sparkle x={63} y={7} r={4.5} />
+      <Sparkle x={95} y={19} r={3.5} />
+
+      {/* Orbit: behind the badge… */}
+      <ellipse
+        cx="60"
+        cy="64"
+        rx="57"
+        ry="37"
+        transform="rotate(-16 60 64)"
+        stroke="url(#rhOrbitGrad)"
+        strokeWidth="5"
       />
 
-      {/* Central Hub Node (Connection Core) */}
-      <circle cx="50" cy="30" r="7" fill="url(#rhUnifiedNode)" />
-      <path d="M 50 37 V 45" stroke="url(#rhUnifiedNode)" strokeWidth="3" strokeLinecap="round" />
+      {/* Badge with the RH monogram */}
+      <circle cx="60" cy="64" r="38" fill="url(#rhBadgeGrad)" />
+
+      {/* …and in front of it: the white crescent at the bottom */}
+      <path
+        d="M 3 64 A 57 37 0 0 0 117 64"
+        transform="rotate(-16 60 64)"
+        stroke="url(#rhOrbitGrad)"
+        strokeWidth="5"
+        fill="none"
+      />
+
+      <text
+        x="60"
+        y="80"
+        textAnchor="middle"
+        fontFamily="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
+        fontWeight="800"
+        fontSize="44"
+        letterSpacing="-1.5"
+        fill="#FFFFFF"
+      >
+        RH
+      </text>
     </svg>
   );
 }
@@ -95,7 +109,7 @@ export default function Logo({
       className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-150 active:scale-95 shrink-0 bg-transparent"
       data-testid="logo"
     >
-      {/* 1. 100% Transparent Emblem */}
+      {/* 1. RH emblem */}
       <LogoMark className={s.img} />
 
       {/* 2. Wordmark: Rent (Navy/White) + Hub (Royal Blue) */}

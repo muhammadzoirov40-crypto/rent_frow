@@ -210,6 +210,9 @@ class MessageService:
     async def get_unread_count(self, conversation_id: int, user_id: int) -> int:
         return await self.repo.get_unread_count(conversation_id, user_id)
 
+    async def get_total_unread_count(self, user_id: int) -> int:
+        return await self.repo.get_total_unread_count(user_id)
+
     async def delete(self, message_id: int, user_id: int, is_admin: bool = False) -> None:
         message = await self.repo.get_by_id(message_id)
         if not message:

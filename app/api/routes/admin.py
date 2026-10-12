@@ -6,7 +6,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import require_admin, CurrentUser
-from app.core.enums import UserRole, ListingStatus, PostStatus
+from app.core.enums import UserRole, ListingStatus, PostStatus, PaymentStatus, RentalRequestStatus, TopPromotionStatus
 from app.schemas.statistics import StatisticsResponse, AuditLogResponse
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.schemas.post import PostResponse
@@ -32,6 +32,7 @@ from app.models.equipment import Equipment
 from app.models.review import Review
 from app.models.post import Post
 from app.models.penalty import Penalty
+from app.models.promotion import TopPromotion
 from app.models.wallet import TopupIntent
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
@@ -67,6 +68,27 @@ async def get_stats(
         "activeListings": active_listings_count,
         "rentalRequests": total_requests_count,
         "completedRentals": completed_count,
+    })
+
+
+@router.get("/pending-counts", response_model=APIResponse[dict])
+async def get_pending_counts(
+    current_user: CurrentUser = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Red badges for the admin panel's left menu: one query per queue so
+    the operator sees the outstanding work without opening each tab."""
+    async def _count(model, column, value) -> int:
+        res = await db.execute(
+            select(func.count()).select_from(model).where(column == value)
+        )
+        return int(res.scalar_one())
+
+    return APIResponse(data={
+        "payments": await _count(Payment, Payment.status, PaymentStatus.PENDING),
+        "requests": await _count(RentalRequest, RentalRequest.status, RentalRequestStatus.PENDING),
+        "posts": await _count(Post, Post.status, PostStatus.PENDING),
+        "top": await _count(TopPromotion, TopPromotion.status, TopPromotionStatus.PENDING),
     })
 
 

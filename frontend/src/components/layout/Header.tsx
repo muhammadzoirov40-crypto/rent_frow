@@ -30,7 +30,7 @@ import SubNavbar from './SubNavbar'
 import useAuthStore from '../../store/authStore'
 import { useTheme } from '../../contexts/ThemeContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { notifications as notificationsApi } from '../../api/index'
+import { notifications as notificationsApi, messages as messagesApi } from '../../api/index'
 import {
   formatNotification,
   getNotificationRoute,
@@ -84,6 +84,15 @@ export default function Header() {
   })
 
   const unreadCount = unreadData?.count || 0
+  // Same rhythm as the bell: the messages icon carries its own red count
+  // so an unread reply is never mistaken for a read one.
+  const { data: unreadMsgData } = useQuery({
+    queryKey: ['unread-messages'],
+    queryFn: () => messagesApi.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  })
+  const unreadMessages = unreadMsgData?.count || 0
   const queryClient = useQueryClient()
 
   const { data: notifList = [] } = useQuery({
@@ -230,6 +239,11 @@ export default function Header() {
                   className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <MessageSquare className="w-5 h-5" />
+                  {unreadMessages > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {unreadMessages > 99 ? '99+' : unreadMessages}
+                    </span>
+                  )}
                 </Link>
 
                 <div className="relative" ref={notifRef}>

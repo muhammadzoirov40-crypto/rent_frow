@@ -1,50 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="100%" height="100%">
   <defs>
-    <!-- Royal Sapphire Gradient -->
-    <linearGradient id="favRhGradT" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#6C9BFF"/>
-      <stop offset="55%" stop-color="#2E63F5"/>
-      <stop offset="100%" stop-color="#143DB8"/>
+    <linearGradient id="favBadgeGrad" x1="12%" y1="0%" x2="88%" y2="100%">
+      <stop offset="0%" stop-color="#1C6B3B"/>
+      <stop offset="45%" stop-color="#11502B"/>
+      <stop offset="100%" stop-color="#06301A"/>
     </linearGradient>
-    <linearGradient id="favNodeT" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#5C93FF"/>
-      <stop offset="100%" stop-color="#2E63F5"/>
+    <linearGradient id="favOrbitGrad" gradientUnits="userSpaceOnUse" x1="60" y1="24" x2="60" y2="104">
+      <stop offset="0%" stop-color="#A3E635"/>
+      <stop offset="45%" stop-color="#D9F99D"/>
+      <stop offset="78%" stop-color="#F7FEE7"/>
+      <stop offset="100%" stop-color="#FFFFFF"/>
     </linearGradient>
   </defs>
 
-  <!-- 100% Transparent Favicon Emblem with Compound Cutout -->
-  <path
-    fill-rule="evenodd"
-    clip-rule="evenodd"
-    d="M 46 6
-       C 50 6, 53 8, 56 11
-       L 76 30
-       C 83 37, 86 46, 83 55
-       C 79 66, 68 72, 56 74
-       L 78 88
-       C 81 90, 79 94, 74 94
-       L 59 94
-       C 55 94, 51 91, 48 87
-       L 32 67
-       L 32 88
-       C 32 92, 29 94, 25 94
-       L 17 94
-       C 13 94, 11 92, 11 88
-       L 11 12
-       C 11 8, 14 6, 18 6
-       Z
-       M 27 20
-       L 48 8
-       C 50 7, 52 7, 54 8
-       L 71 23
-       C 76 28, 76 37, 71 43
-       C 67 48, 60 50, 52 50
-       L 27 50
-       Z"
-    fill="url(#favRhGradT)"
-  />
+  <!-- sparkles above the badge -->
+  <path d="M 0 -1 C 0.09 -0.33 0.33 -0.09 1 0 C 0.33 0.09 0.09 0.33 0 1 C -0.09 0.33 -0.33 0.09 -1 0 C -0.33 -0.09 -0.09 -0.33 0 -1 Z" transform="translate(30 16) scale(7.5)" fill="#A3E635"/>
+  <path d="M 0 -1 C 0.09 -0.33 0.33 -0.09 1 0 C 0.33 0.09 0.09 0.33 0 1 C -0.09 0.33 -0.33 0.09 -1 0 C -0.33 -0.09 -0.09 -0.33 0 -1 Z" transform="translate(63 7) scale(4.5)" fill="#A3E635"/>
+  <path d="M 0 -1 C 0.09 -0.33 0.33 -0.09 1 0 C 0.33 0.09 0.09 0.33 0 1 C -0.09 0.33 -0.33 0.09 -1 0 C -0.33 -0.09 -0.09 -0.33 0 -1 Z" transform="translate(95 19) scale(3.5)" fill="#A3E635"/>
 
-  <!-- Central Hub Node -->
-  <circle cx="50" cy="30" r="7" fill="url(#favNodeT)"/>
-  <path d="M 50 37 V 45" stroke="url(#favNodeT)" stroke-width="3" stroke-linecap="round"/>
+  <!-- orbit: behind the badge -->
+  <ellipse cx="60" cy="64" rx="57" ry="37" transform="rotate(-16 60 64)" stroke="url(#favOrbitGrad)" stroke-width="5" fill="none"/>
+
+  <!-- dark-green badge with the white RH monogram -->
+  <circle cx="60" cy="64" r="38" fill="url(#favBadgeGrad)"/>
+  <text x="60" y="80" text-anchor="middle" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-weight="800" font-size="44" letter-spacing="-1.5" fill="#FFFFFF">RH</text>
+
+  <!-- orbit: in front of the badge at the bottom (white crescent) -->
+  <path d="M 3 64 A 57 37 0 0 0 117 64" transform="rotate(-16 60 64)" stroke="url(#favOrbitGrad)" stroke-width="5" fill="none"/>
 </svg>

@@ -451,6 +451,10 @@ export const messages = {
   getConversations: () =>
     client.get<APIResponse<Conversation[]>>('/messages/conversations').then(unwrap),
 
+  /** Total unread across every conversation — feeds the red badges. */
+  getUnreadCount: () =>
+    client.get<APIResponse<{ count: number }>>('/messages/unread-count').then(unwrap),
+
   createConversation: (data: { user_id: number; listing_id?: number }) =>
     client.post<APIResponse<Conversation>>('/messages/conversations', data).then(unwrap),
 

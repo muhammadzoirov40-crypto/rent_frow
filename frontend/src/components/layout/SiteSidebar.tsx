@@ -25,7 +25,7 @@ import useAuthStore from '../../store/authStore';
 import FeedbackDialog from '../FeedbackDialog';
 import BuyVipModal from '../dashboard/BuyVipModal';
 import { useQuery } from '@tanstack/react-query';
-import { notifications as notificationsApi } from '../../api/index';
+import { notifications as notificationsApi, messages as messagesApi } from '../../api/index';
 
 interface SiteSidebarProps {
   collapsed: boolean;
@@ -46,6 +46,14 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
     refetchInterval: 30000,
   });
   const unreadNotifs = unreadNotifData?.count || 0;
+
+  const { data: unreadMsgData } = useQuery({
+    queryKey: ['unread-messages'],
+    queryFn: () => messagesApi.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
+  const unreadMessages = unreadMsgData?.count || 0;
 
   const isActive = (to: string) => {
     const [path, query] = to.split('?');
@@ -73,7 +81,7 @@ export default function SiteSidebar({ collapsed, onToggle }: SiteSidebarProps) {
     // History is kept in this browser only, so unlike the neighbours below it
     // needs no account and is listed for guests too.
     { to: '/history', label: t('home.recentlyViewed'), icon: History },
-    { to: '/messages', label: t('nav.messages'), icon: MessageSquare },
+    { to: '/messages', label: t('nav.messages'), icon: MessageSquare, badge: unreadMessages },
     { to: '/notifications', label: t('nav.notifications'), icon: Bell, badge: unreadNotifs },
     { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList },
     // Rentals in hand live one tap away from the request feed: once a deal

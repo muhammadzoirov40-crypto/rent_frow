@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import useAuthStore from '../../store/authStore';
 import { useTheme } from '../../contexts/ThemeContext';
+import { useQuery } from '@tanstack/react-query';
+import { notifications as notificationsApi, messages as messagesApi } from '../../api/index';
 import FeedbackDialog from '../FeedbackDialog';
 import BuyVipModal from '../dashboard/BuyVipModal';
 
@@ -46,6 +48,24 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
   const { theme, toggleTheme } = useTheme();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [vipOpen, setVipOpen] = useState(false);
+
+  // The desktop menus already carry these counts; the mobile drawer must not
+  // be the one place where a new reply or notice stays invisible.
+  const { data: unreadNotifData } = useQuery({
+    queryKey: ['unread-count'],
+    queryFn: () => notificationsApi.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
+  const unreadNotifs = unreadNotifData?.count || 0;
+
+  const { data: unreadMsgData } = useQuery({
+    queryKey: ['unread-messages'],
+    queryFn: () => messagesApi.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  });
+  const unreadMessages = unreadMsgData?.count || 0;
 
   useEffect(() => {
     onClose();
@@ -92,8 +112,8 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     // History is kept in this browser only, so unlike the neighbours below it
     // needs no account and is listed for guests too.
     { to: '/history', label: t('home.recentlyViewed'), icon: History },
-    { to: '/messages', label: t('nav.messages'), icon: MessageSquare },
-    { to: '/notifications', label: t('nav.notifications'), icon: Bell },
+    { to: '/messages', label: t('nav.messages'), icon: MessageSquare, badge: unreadMessages },
+    { to: '/notifications', label: t('nav.notifications'), icon: Bell, badge: unreadNotifs },
     { to: '/rental-requests', label: t('nav.rentalRequests'), icon: ClipboardList },
     // Rentals in hand, one tap away from the request feed — a done deal
     // must not get lost among the pending offers.
@@ -184,8 +204,13 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             .filter((item) => !('show' in item) || item.show)
             .map((item) => (
             <Link key={item.to} to={item.to} onClick={onClose} className={linkClass(item.to)}>
-              <span className={iconClass(item.to)}>
+              <span className={`${iconClass(item.to)} relative shrink-0`}>
                 <item.icon className="w-5 h-5" />
+                {item.badge && item.badge > 0 ? (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center shadow">
+                    {item.badge > 99 ? '99+' : item.badge}
+                  </span>
+                ) : null}
               </span>
               <span className="truncate">{item.label}</span>
             </Link>

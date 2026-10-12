@@ -149,6 +149,7 @@ export default function MessagesPage() {
     mutationFn: (convId: number) => messages.markRead(convId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['unread-messages'] });
     },
   });
 
@@ -175,6 +176,7 @@ export default function MessagesPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['messages'] });
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['unread-messages'] });
       toast.success(t('messages.cleared'));
     },
     onError: () => {
@@ -227,6 +229,7 @@ export default function MessagesPage() {
         });
       }
       queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['unread-messages'] });
       return;
     }
     if (event.event === 'message_updated' && event.message) {

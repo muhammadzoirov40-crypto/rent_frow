@@ -1,6 +1,8 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Home, Search, PlusCircle, MessageSquare, User } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { messages as messagesApi } from '../../api/index'
 
 interface MobileBottomNavProps {
   isAuthenticated: boolean
@@ -9,6 +11,16 @@ interface MobileBottomNavProps {
 export default function MobileBottomNav({ isAuthenticated }: MobileBottomNavProps) {
   const { t } = useTranslation()
   const location = useLocation()
+
+  // The bar sits on every mobile screen, so it is where an unread reply
+  // has the best chance of being noticed.
+  const { data: unreadMsgData } = useQuery({
+    queryKey: ['unread-messages'],
+    queryFn: () => messagesApi.getUnreadCount(),
+    enabled: isAuthenticated,
+    refetchInterval: 30000,
+  })
+  const unreadMessages = unreadMsgData?.count || 0
 
   const NAV_ITEMS = [
     { icon: Home, label: t('nav.home'), to: '/' },
@@ -47,6 +59,8 @@ export default function MobileBottomNav({ isAuthenticated }: MobileBottomNavProp
             )
           }
 
+          const showBadge = item.to === '/messages' && unreadMessages > 0
+
           return (
             <Link
               key={item.to}
@@ -55,7 +69,14 @@ export default function MobileBottomNav({ isAuthenticated }: MobileBottomNavProp
                 active ? 'text-[var(--accent)]' : 'text-gray-400 dark:text-gray-500'
               }`}
             >
-              <Icon className="w-5 h-5" />
+              <span className="relative">
+                <Icon className="w-5 h-5" />
+                {showBadge && (
+                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center shadow">
+                    {unreadMessages > 99 ? '99+' : unreadMessages}
+                  </span>
+                )}
+              </span>
               <span className="text-[10px] font-medium">{item.label}</span>
             </Link>
           )

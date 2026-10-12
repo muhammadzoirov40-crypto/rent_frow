@@ -27,6 +27,14 @@ interface AdminStats {
   completedRentals: number;
 }
 
+/** Outstanding work per admin queue — feeds the red badges on the menu. */
+interface PendingCounts {
+  payments: number;
+  requests: number;
+  posts: number;
+  top: number;
+}
+
 interface ChartPoint {
   date: string;
   count: number;
@@ -158,6 +166,7 @@ interface AdminUserProfile {
 
 const adminApi = {
   getStats: () => client.get<{ data: AdminStats }>('/admin/stats').then((r) => r.data.data),
+  getPendingCounts: () => client.get<{ data: PendingCounts }>('/admin/pending-counts').then((r) => r.data.data),
   getChartData: () => client.get<{ data: AdminChartData }>('/admin/chart-data').then((r) => r.data.data),
   getUsers: () => client.get<{ data: User[] }>('/admin/users').then((r) => r.data.data),
   getUser: (id: number) => client.get(`/admin/users/${id}`).then((r) => r.data.data) as Promise<AdminUserProfile>,
@@ -258,6 +267,14 @@ export default function AdminPage() {
     queryFn: adminApi.getStats,
   });
 
+  // The menu keeps its own live counts: a queue the operator has not opened
+  // yet still shows how much is waiting in it.
+  const { data: pending } = useQuery<PendingCounts>({
+    queryKey: ['admin-pending-counts'],
+    queryFn: adminApi.getPendingCounts,
+    refetchInterval: 60000,
+  });
+
   const { data: chartData } = useQuery({
     queryKey: ['admin-chart'],
     queryFn: adminApi.getChartData,
@@ -335,6 +352,7 @@ export default function AdminPage() {
     onSuccess: () => {
       toast.success(t('payment.confirmed'));
       queryClient.invalidateQueries({ queryKey: ['admin-payments'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-pending-counts'] });
     },
     onError: () => toast.error(t('admin.failedAction')),
   });
@@ -377,19 +395,19 @@ export default function AdminPage() {
 
   const approvePostMutation = useMutation({
     mutationFn: adminApi.approvePost,
-    onSuccess: () => { toast.success(t('admin.approvedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); },
+    onSuccess: () => { toast.success(t('admin.approvedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); queryClient.invalidateQueries({ queryKey: ['admin-pending-counts'] }); },
     onError: () => toast.error(t('admin.failedAction')),
   });
 
   const rejectPostMutation = useMutation({
     mutationFn: adminApi.rejectPost,
-    onSuccess: () => { toast.success(t('admin.rejectedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); },
+    onSuccess: () => { toast.success(t('admin.rejectedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); queryClient.invalidateQueries({ queryKey: ['admin-pending-counts'] }); },
     onError: () => toast.error(t('admin.failedAction')),
   });
 
   const deletePostMutation = useMutation({
     mutationFn: adminApi.deletePost,
-    onSuccess: () => { toast.success(t('admin.deletedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); },
+    onSuccess: () => { toast.success(t('admin.deletedSuccess')); queryClient.invalidateQueries({ queryKey: ['admin-posts'] }); queryClient.invalidateQueries({ queryKey: ['admin-pending-counts'] }); },
     onError: () => toast.error(t('admin.failedAction')),
   });
 
@@ -442,6 +460,7 @@ export default function AdminPage() {
     queryClient.invalidateQueries({ queryKey: ['topListings'] });
     queryClient.invalidateQueries({ queryKey: ['top-mine'] });
     queryClient.invalidateQueries({ queryKey: ['admin-listings'] });
+    queryClient.invalidateQueries({ queryKey: ['admin-pending-counts'] });
   };
 
   const topApproveMutation = useMutation({
@@ -584,16 +603,16 @@ export default function AdminPage() {
     return listing?.title.toLowerCase().includes(searchQuery.toLowerCase()) || false;
   });
 
-  const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
+  const tabs: { key: TabKey; label: string; icon: React.ReactNode; badge?: number }[] = [
     { key: 'dashboard', label: t('admin.overview'), icon: <LayoutDashboard className="w-5 h-5" /> },
     { key: 'crm', label: t('admin.crm'), icon: <BarChart3 className="w-5 h-5" /> },
     { key: 'users', label: t('admin.users'), icon: <Users className="w-5 h-5" /> },
     { key: 'listings', label: t('admin.listings'), icon: <FileText className="w-5 h-5" /> },
-    { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" /> },
-    { key: 'payments', label: t('admin.payments'), icon: <Banknote className="w-5 h-5" /> },
-    { key: 'top', label: t('admin.topTab'), icon: <Crown className="w-5 h-5" /> },
+    { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" />, badge: pending?.requests },
+    { key: 'payments', label: t('admin.payments'), icon: <Banknote className="w-5 h-5" />, badge: pending?.payments },
+    { key: 'top', label: t('admin.topTab'), icon: <Crown className="w-5 h-5" />, badge: pending?.top },
     { key: 'categories', label: t('admin.categories'), icon: <FolderTree className="w-5 h-5" /> },
-    { key: 'posts', label: t('admin.posts'), icon: <MessageSquare className="w-5 h-5" /> },
+    { key: 'posts', label: t('admin.posts'), icon: <MessageSquare className="w-5 h-5" />, badge: pending?.posts },
   ];
 
   const statCards = [
@@ -657,7 +676,14 @@ export default function AdminPage() {
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
-                  <span className="shrink-0">{tab.icon}</span>
+                  <span className="relative shrink-0">
+                    {tab.icon}
+                    {tab.badge && tab.badge > 0 ? (
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center shadow">
+                        {tab.badge > 99 ? '99+' : tab.badge}
+                      </span>
+                    ) : null}
+                  </span>
                   {!adminSidebarCollapsed && <span>{tab.label}</span>}
                 </button>
               ))}

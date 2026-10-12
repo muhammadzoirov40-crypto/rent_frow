@@ -101,6 +101,18 @@ async def get_conversations(
     return APIResponse(data=items)
 
 
+@router.get("/unread-count", response_model=APIResponse[dict])
+async def get_total_unread_count(
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """One number for the badges in the header and both menus: how many
+    messages across all of my conversations are still unread."""
+    msg_service = MessageService(db)
+    count = await msg_service.get_total_unread_count(current_user.user_id)
+    return APIResponse(data={"count": count})
+
+
 @router.post("/conversations", response_model=APIResponse[ConversationResponse])
 async def create_or_get_conversation(
     data: ConversationCreateRequest,
