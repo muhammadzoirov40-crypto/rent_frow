@@ -18,14 +18,16 @@ import {
 const ACCEPTED = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 const MAX_BYTES = 10 * 1024 * 1024;
 
-/** How long the send button holds out once the prompt opens.
+/** How long the receipt may still be sent, counted from the moment the
+ *  prompt opens.
  *
- *  A receipt proves money that has already moved, and the window opens the
- *  moment the checkout does — so the wait is what stands between "the link
- *  was opened" and "here is a picture of a payment": long enough that a
- *  script cannot fire one off instantly, short enough that a customer who
- *  has just paid at DC Wallet never feels it. */
-const WAIT_SECONDS = 30;
+ *  A receipt proves money that has already moved, and it is worth exactly
+ *  while it is fresh: the picture belongs to the payment that was just
+ *  opened, so the window takes it for 30 seconds and then closes for good.
+ *  Long enough to pick the screenshot that is already in the gallery, and
+ *  not one second more — after that the row can only be settled the way it
+ *  always was, by the operator matching the statement. */
+const DEADLINE_SECONDS = 30;
 
 /** Everything a sent receipt can be waiting behind, so the row it belongs to
  *  redraws the moment the upload lands. */
@@ -59,7 +61,7 @@ export default function CheckPrompt() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [target, setTarget] = useState<CheckPromptTarget | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [secondsLeft, setSecondsLeft] = useState(WAIT_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState(DEADLINE_SECONDS);
 
   // Read on mount (the return from the checkout is a fresh page load) and
   // on the queue event (the top-up flow never leaves this page). Nobody is
@@ -76,13 +78,12 @@ export default function CheckPrompt() {
     return () => window.removeEventListener(CHECK_PROMPT_EVENT, consume);
   }, [isAuthenticated]);
 
-  // Every opening of the prompt waits the same 30 seconds out (see
-  // WAIT_SECONDS): restarted when a new row asks, ticking while the
-  // customer picks the picture — by the time they have found the screenshot
-  // in their gallery the button has usually already woken up.
+  // The same 30 seconds for every opening (see DEADLINE_SECONDS): a new
+  // row asks, the clock starts again, and it runs down to zero — after
+  // which this window sends nothing, however fresh the file still looks.
   useEffect(() => {
     if (!target) return;
-    setSecondsLeft(WAIT_SECONDS);
+    setSecondsLeft(DEADLINE_SECONDS);
     const timer = window.setInterval(
       () => setSecondsLeft((left) => Math.max(0, left - 1)),
       1000,
@@ -194,15 +195,19 @@ export default function CheckPrompt() {
           />
         </label>
 
-        {secondsLeft > 0 && (
-          <p
-            className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 tabular-nums"
-            data-testid="check-wait"
-          >
-            <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-            {t('check.wait', { seconds: secondsLeft })}
-          </p>
-        )}
+        <p
+          className={`mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold tabular-nums ${
+            secondsLeft > 0
+              ? 'text-amber-600 dark:text-amber-400'
+              : 'text-red-500 dark:text-red-400'
+          }`}
+          data-testid="check-wait"
+        >
+          <Clock className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          {secondsLeft > 0
+            ? t('check.deadline', { seconds: secondsLeft })
+            : t('check.expired')}
+        </p>
 
         <div className="flex flex-wrap items-center justify-end gap-2 mt-5">
           <button
@@ -217,7 +222,7 @@ export default function CheckPrompt() {
           <button
             type="button"
             onClick={() => file && sendMutation.mutate(file)}
-            disabled={!file || sendMutation.isPending || secondsLeft > 0}
+            disabled={!file || sendMutation.isPending || secondsLeft === 0}
             data-testid="check-send"
             className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 disabled:opacity-60 transition inline-flex items-center gap-2"
           >

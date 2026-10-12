@@ -1244,7 +1244,8 @@
     "failed": "The check could not be sent",
     "invalidType": "Wrong format: JPG, PNG or WebP",
     "tooBig": "File too large - 10 MB maximum",
-    "wait": "Sending available in {{seconds}}s"
+    "deadline": "Send the check within {{seconds}}s",
+    "expired": "Time's up — the check can no longer be sent from here"
   },
   "payment": {
     "pay": "Pay",
