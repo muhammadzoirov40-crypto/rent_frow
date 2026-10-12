@@ -5,6 +5,7 @@ import { invalidateListingQueries } from '../utils/invalidateListings';
 import { listings, categories, cities, upload } from '../api';
 import { compressImage } from '../utils/compressImage';
 import { previousPath } from '../utils/navHistory';
+import { asDc, dcDestination, dcIsWrongLength, DC_DIGITS } from '../utils/dcAccount';
 import CustomSelect from '../components/ui/CustomSelect';
 import LocationPicker from '../components/search/LocationPicker';
 import toast from 'react-hot-toast';
@@ -37,7 +38,6 @@ const digitsOf = (v: string) => (v.match(/\d/g) || []).length;
 // A Tajik phone number is nine digits after the country code; seven is the
 // shortest string that could still be one once a typo is taken out.
 const MIN_PHONE_DIGITS = 9;
-const MIN_DC_DIGITS = 7;
 
 // The price is what the owner decides, free included, and the guarantee is
 // money held against that same price - so it can never be worth more than
@@ -83,10 +83,9 @@ const initialFormData: FormData = {
   dc_account: '',
 };
 
-// A number typed for reading is not a number a payment rail can use: people
-// write phones the way they say them. Strip the spacing and punctuation, keep
-// the sign that says "country code".
-const asDcDestination = (raw: string) => raw.replace(/[\s\-().]/g, '');
+// A number typed for reading is not number a payment rail can use: the
+// grouping is for the eye, the digits are what leave. See utils/dcAccount
+// for why the wallet is a card and not a phone.
 
 export default function CreateListingPage() {
   const navigate = useNavigate();
@@ -96,9 +95,6 @@ export default function CreateListingPage() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const prefilledRef = useRef(false);
-  // Whether the owner has taken the wallet field over from the phone number
-  // it started as. Once they have, the form stops writing into it.
-  const [dcTouched, setDcTouched] = useState(false);
   const { t } = useTranslation();
 
   const [step, setStep] = useState(0);
@@ -174,19 +170,12 @@ export default function CreateListingPage() {
     });
   }, [editListing]);
 
-  // For most owners the wallet and the phone are the same number, so on a new
-  // listing they start in step and nobody has to type it twice. The moment the
-  // owner edits the wallet they are telling us this one is different, so it
-  // stops following. On an edit it never follows at all: a wallet already on
-  // file must not be overwritten by a phone field nobody meant to change.
-  useEffect(() => {
-    if (editId || dcTouched) return;
-    setForm((current) =>
-      current.dc_account === current.contact_phone
-        ? current
-        : { ...current, dc_account: current.contact_phone },
-    );
-  }, [form.contact_phone, editId, dcTouched]);
+  // Nothing fills the wallet in any more. It used to follow the contact
+  // phone, back when a DC account *was* a phone number; now that the
+  // checkout pays by a sixteen-digit card the two are different numbers,
+  // and copying one into the other only ever produced a payment that could
+  // not be made. The owner types it, or leaves it blank and the wallet on
+  // their profile is used.
 
   const createMutation = useMutation({
     mutationFn: (formData: FormData) => {
@@ -211,7 +200,7 @@ export default function CreateListingPage() {
         image_urls: formData.image_urls,
         // Blank is omitted, not sent as empty: posting without touching the
         // field must not clear the wallet already on the owner's profile.
-        dc_account: asDcDestination(formData.dc_account) || undefined,
+        dc_account: dcDestination(formData.dc_account) || undefined,
       };
       return editId ? listings.update(editId, payload) : listings.create(payload);
     },
@@ -338,8 +327,10 @@ export default function CreateListingPage() {
   // What each field is willing to say, whether or not anyone has asked yet.
   const phoneTooShort =
     form.contact_phone.trim() !== '' && digitsOf(form.contact_phone) < MIN_PHONE_DIGITS;
-  const dcTooShort =
-    form.dc_account.trim() !== '' && digitsOf(form.dc_account) < MIN_DC_DIGITS;
+  // A wallet only ever pays to a whole card: half of one is a number no
+  // checkout can route money down, so it holds the step back rather than
+  // the whole listing - the same weight the too-short phone gets.
+  const dcWrongLength = dcIsWrongLength(form.dc_account);
   const priceValue = form.price === '' ? null : Number(form.price);
   const priceTooHigh = priceValue !== null && priceValue > MAX_PRICE;
   const depositTooHigh =
@@ -352,7 +343,7 @@ export default function CreateListingPage() {
         // A listing nobody can call is a listing nobody can rent. The phone
         // is how the renter reaches the owner, so a number too short to be
         // one holds the step back rather than the whole listing.
-        return form.title.trim().length > 0 && !phoneTooShort && !dcTooShort;
+        return form.title.trim().length > 0 && !phoneTooShort && !dcWrongLength;
       case 2: return form.image_urls.length > 0;
       case 3:
         // Free is a price - zero goes through. Over the ceiling, or a
@@ -486,23 +477,21 @@ export default function CreateListingPage() {
                   {t('createListing.dcAccount')}
                 </label>
                 <input
-                  type="tel"
-                  inputMode="tel"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
                   value={form.dc_account}
-                  onChange={(e) => {
-                    setDcTouched(true);
-                    updateForm({ dc_account: asPhone(e.target.value) });
-                  }}
+                  onChange={(e) => updateForm({ dc_account: asDc(e.target.value) })}
                   placeholder={t('createListing.dcAccountPlaceholder')}
-                  className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
-                    dcTooShort
+                  className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm tracking-wider text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
+                    dcWrongLength
                       ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
                       : 'focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
                   }`}
                 />
-                {dcTooShort && (
+                {dcWrongLength && (
                   <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-1.5">
-                    {t('createListing.dcTooShort', { count: MIN_DC_DIGITS })}
+                    {t('createListing.dcLength', { count: DC_DIGITS })}
                   </p>
                 )}
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1.5 leading-relaxed">{t('createListing.dcAccountHint')}</p>

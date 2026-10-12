@@ -15,6 +15,7 @@ import BackButton from '../components/ui/BackButton';
 import type { Listing, ListingListItem, RentalRequest } from '../api';
 import { formatDate } from '../utils/dates';
 import { formatPrice, formatPriceUnit, formatAmount } from '../utils/format';
+import { asDc, dcIsWrongLength, dcDestination, DC_DIGITS } from '../utils/dcAccount';
 
 type Tab = 'listings' | 'favorites' | 'my-requests' | 'owner-requests' | 'settings';
 
@@ -46,10 +47,20 @@ export default function ProfilePage() {
   const meUser = meData || user;
 
   // keep the DC account input in step with whatever the server last had,
-  // so opening settings never shows a stale number.
+  // so opening settings never shows a stale number. A wallet that is already
+  // a full card is shown grouped the way a card is read out; a legacy nine
+  // digit one is left exactly as saved, because decorating it would only
+  // make a number that has to be replaced look deliberate.
   useEffect(() => {
-    setEditDcAccount(meUser?.dc_account || '');
+    const stored = meUser?.dc_account || '';
+    setEditDcAccount(
+      dcDestination(stored).length === DC_DIGITS ? asDc(stored) : stored,
+    );
   }, [meUser?.dc_account]);
+
+  // Empty means "leave the wallet on file alone"; anything else has to be a
+  // whole card, and a half one is refused here rather than at the till.
+  const dcWrongLength = dcIsWrongLength(editDcAccount);
 
   const { data: userListings = [] } = useQuery<Listing[]>({
     queryKey: ['owner-listings'],
@@ -609,20 +620,33 @@ export default function ProfilePage() {
                 <div className="mt-2 flex items-center gap-2 flex-wrap">
                   <input
                     type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
                     value={editDcAccount}
-                    onChange={(e) => setEditDcAccount(e.target.value)}
+                    onChange={(e) => setEditDcAccount(asDc(e.target.value))}
                     placeholder={t('profile.dcAccountPlaceholder')}
-                    className="glass-input flex-1 min-w-[180px] text-sm rounded-lg px-3 py-2 outline-none focus:border-[var(--accent)] dark:text-white"
+                    className={`glass-input flex-1 min-w-[180px] text-sm tracking-wider rounded-lg px-3 py-2 outline-none focus:border-[var(--accent)] dark:text-white ${
+                      dcWrongLength ? 'border-red-400 focus:border-red-500' : ''
+                    }`}
                   />
                   <button
-                    onClick={() => updateProfileMutation.mutate({ dc_account: editDcAccount })}
-                    disabled={updateProfileMutation.isPending}
+                    onClick={() =>
+                      updateProfileMutation.mutate({
+                        dc_account: dcDestination(editDcAccount),
+                      })
+                    }
+                    disabled={updateProfileMutation.isPending || dcWrongLength}
                     className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[var(--accent-hover)] transition disabled:opacity-50"
                   >
                     {updateProfileMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     {t('profile.save')}
                   </button>
                 </div>
+                {dcWrongLength && (
+                  <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-2">
+                    {t('profile.dcLength', { count: DC_DIGITS })}
+                  </p>
+                )}
               </div>
             </div>
             <button

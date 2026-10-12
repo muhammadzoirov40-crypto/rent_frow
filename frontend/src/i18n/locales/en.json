@@ -367,11 +367,10 @@
     "contactNamePlaceholder": "Your name",
     "contactPhone": "Phone",
     "contactPhonePlaceholder": "+992 (002) 119-831",
-    "dcAccount": "DC account (usually the phone number) to receive the rent",
-    "dcAccountHint": "The rent goes straight to this number. We filled it in from your phone number — replace it if you use a different DC account.",
+    "dcAccount": "DC account (16-digit card) to receive the money",
+    "dcAccountHint": "The money goes straight to this card. Type the sixteen digits of your DC Wallet card — a phone number will not do, the checkout pays to the card number.",
     "dcAccountWarning": "Without a DC account payments are blocked: the renter cannot pay and you will not get the money. Leave it blank to use the account already on your profile.",
-    "dcAccountPlaceholder": "+992 (000) 000 000",
-    "dcTooShort": "A DC account needs at least {{count}} digits — enter a real one.",
+    "dcAccountPlaceholder": "0000 0000 0000 0000",
     "phoneTooShort": "A phone number needs at least {{count}} digits — enter a real one.",
     "photos": "Photos ({{count}}/8)",
     "uploadHint": "PNG, JPG up to 10MB. Max 8 photos.",
@@ -414,7 +413,8 @@
     "failedToPublish": "Failed to publish",
     "maxPhotos": "Maximum 8 photos",
     "uploadError": "Image upload error",
-    "uploadFormatHint": "PNG, JPG, WebP · up to 10MB per file"
+    "uploadFormatHint": "PNG, JPG, WebP · up to 10MB per file",
+    "dcLength": "A DC account is {{count}} digits — enter the whole card number."
   },
   "favorites": {
     "title": "Favorites",
@@ -629,8 +629,8 @@
     "confirmed": "Confirmed",
     "roleLabel": "Role",
     "dcAccount": "DC account for payments",
-    "dcAccountHint": "The rent goes to this account. If you leave it blank, payments on all your listings are blocked.",
-    "dcAccountPlaceholder": "DC account number",
+    "dcAccountHint": "The money goes to this card. Leave it blank and payments on all your listings stay blocked.",
+    "dcAccountPlaceholder": "0000 0000 0000 0000",
     "phonePlaceholder": "+992 (000) 000 000",
     "admin": "Admin",
     "user": "User",
@@ -654,7 +654,8 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled",
       "completed": "Completed"
-    }
+    },
+    "dcLength": "A DC account is {{count}} digits — enter the whole card number."
   },
   "rentalRequests": {
     "title": "Rental Requests",

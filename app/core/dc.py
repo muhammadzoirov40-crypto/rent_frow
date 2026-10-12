@@ -1,11 +1,13 @@
 """Where a DC payment is told to land.
 
-DC Wallet recognises a wallet by its nine-digit national number — the form a
-Tajik phone number takes once the country code is dropped. Owners, though,
-write their number the way they say it: with ``+992``, with spaces, with
-dashes. Sending that through unchanged asks the payment app to route money by
-a string it has never seen, so the number is reduced to the form DC actually
-recognises — and reduced the same way at every point it can enter the system.
+The provider answers on the card route (articul 133), and that route
+recognises a wallet by its sixteen-digit card number — the shape the
+platform's own merchant account takes. Owners, though, write numbers the
+way they read them out: in groups of four, with dashes, sometimes with the
+``+992`` of a phone still in front. Sending that through unchanged asks the
+payment app to route money by a string it has never seen, so the number is
+reduced to the form DC actually recognises — and reduced the same way at
+every point it can enter the system.
 """
 
 import re
@@ -14,21 +16,26 @@ import re
 _SEPARATORS = re.compile(r"[\s\-().]")
 
 # The country code carries nothing DC needs: the nine digits after it already
-# identify the wallet inside Tajikistan.
+# identify the older, wallet-shaped account inside Tajikistan.
 _COUNTRY_CODE = "992"
 
-# Nine is the length of a national number. Anything else — a sixteen-digit
-# card, a merchant account, a short code — is left exactly as it came.
+# Nine is the length of that national number.
 _NATIONAL_LENGTH = 9
+
+# Sixteen is a card, and the card is what the route set up for this merchant
+# pays to. Not a prefix and not a grouping: the digits themselves.
+_CARD_LENGTH = 16
 
 
 def normalize_dc_account(raw: str | None) -> str | None:
     """Reduce an owner's wallet to the form DC routes a transfer by.
 
     ``None`` stays ``None`` so callers keep their "not sent" / "cleared"
-    distinction intact. A value that is not ``+992`` followed by nine digits
-    is returned unchanged: guessing at a card number or a merchant account
-    would be worse than passing it through.
+    distinction intact. Sixteen digits is a card and is sent as the digits
+    alone, however they were grouped; ``+992`` and nine digits is the older
+    wallet form and is reduced to those nine. Anything else is returned
+    unchanged: guessing at a merchant account or a short code would be worse
+    than passing it through.
     """
     if raw is None:
         return None
@@ -37,6 +44,8 @@ def normalize_dc_account(raw: str | None) -> str | None:
         return None
 
     digits = value[1:] if value.startswith("+") else value
+    if digits.isdigit() and len(digits) == _CARD_LENGTH:
+        return digits
     if (
         len(digits) == len(_COUNTRY_CODE) + _NATIONAL_LENGTH
         and digits.startswith(_COUNTRY_CODE)
