@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.rental_request import RentalRequest, RentalRequestStatus
 from app.models.listing import Listing, PriceUnit
+from app.core.enums import ListingPurpose
 from app.repositories.rental_request import RentalRequestRepository
 from app.repositories.listing import ListingRepository
 from app.repositories.user import UserRepository
@@ -99,6 +100,12 @@ class RentalRequestService:
             raise HTTPException(status_code=404, detail="Listing not found")
         if listing.owner_id == renter_id:
             raise HTTPException(status_code=400, detail="Cannot rent your own listing")
+        if listing.purpose == ListingPurpose.SALE:
+            # The other road: one price, one handover, no dates to argue
+            # about. A request here would hold money against a thing that is
+            # not let out, so it is refused before anything is written — the
+            # buyer's own path is the purchase payment.
+            raise HTTPException(status_code=400, detail="LISTING_FOR_SALE")
         if data.start_date >= data.end_date:
             raise HTTPException(status_code=400, detail="End date must be after start date")
 

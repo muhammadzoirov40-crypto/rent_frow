@@ -172,6 +172,54 @@ async def _owner_payment_note(db: AsyncSession, payment: Payment) -> dict | None
     }
 
 
+async def _sale_notes(db: AsyncSession, payment: Payment) -> list[dict]:
+    """What a paid purchase does beyond settling: the listing leaves the
+    market, and both ends of the sale are told.
+
+    One price, one handover — so the moment the money is in, the thing
+    cannot be bought or rented again by somebody who has not seen it.
+    Idempotent through the shared helper, so a re-delivered event finds it
+    already down and says nothing new.
+    """
+    if payment.listing_id is None:
+        return []
+    from app.services.listing import mark_listing_sold
+
+    listing = await mark_listing_sold(db, payment.listing_id)
+    if listing is None:
+        return []
+    amount = _amount(payment)
+    return [
+        {
+            "user_id": listing.owner_id,
+            "title": "Эълон фурӯхта шуд",
+            "message": f"«{listing.title}» фурӯхта шуд: {amount} сомонӣ пардохт шуд.",
+            "type": "listing_sold",
+            "reference_id": listing.id,
+            "reference_type": "listing",
+            "data": {
+                "listing_id": listing.id,
+                "listing_title": listing.title,
+                "payment_id": payment.id,
+                "buyer_id": payment.customer_id,
+            },
+        },
+        {
+            "user_id": payment.customer_id,
+            "title": "Харид тасдиқ шуд",
+            "message": f"Пардохти {amount} сомонӣ қабул шуд — «{listing.title}» аз они шумост.",
+            "type": "purchase_confirmed",
+            "reference_id": listing.id,
+            "reference_type": "listing",
+            "data": {
+                "listing_id": listing.id,
+                "listing_title": listing.title,
+                "payment_id": payment.id,
+            },
+        },
+    ]
+
+
 async def _handle_payment(db: AsyncSession, action: str, data: dict) -> dict:
     payment = await _find_payment(db, data)
     if payment is None:
@@ -202,6 +250,7 @@ async def _handle_payment(db: AsyncSession, action: str, data: dict) -> dict:
         owner_note = await _owner_payment_note(db, payment)
         if owner_note:
             notify.append(owner_note)
+        notify.extend(await _sale_notes(db, payment))
         return {
             "ok": True, "handled": True, "changed": True,
             "payment_id": payment.id, "status": "PAID", "notify": notify,

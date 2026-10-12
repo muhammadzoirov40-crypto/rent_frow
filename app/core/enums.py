@@ -44,6 +44,25 @@ class PriceUnit(str, enum.Enum):
     PER_MONTH = "per_month"
 
 
+class ListingPurpose(str, enum.Enum):
+    """Which of the two markets a listing belongs to.
+
+    RENT is what the platform was built for: dates, a deposit, rules the
+    renter agrees to, a request the owner accepts. SALE is the other road —
+    one price, one handover, no dates and nothing held back — and the two
+    deliberately share as little of the flow as a single form can: the
+    fields a seller fills in are the fields a buyer acts on, and the rest
+    is only ever in the way.
+
+    Stored as a plain string in the column (see ``Listing.purpose``), so a
+    third road can be added without rebuilding the table; the value is
+    checked on the way in by this enum, not by the database.
+    """
+
+    RENT = "RENT"
+    SALE = "SALE"
+
+
 class RentalRequestStatus(str, enum.Enum):
     PENDING = "PENDING"
     ACCEPTED = "ACCEPTED"
@@ -91,6 +110,10 @@ class PaymentType(str, enum.Enum):
     DAMAGE = "DAMAGE"
     LATE_FEE = "LATE_FEE"
     REFUND = "REFUND"
+    # The other road: one price, one handover, nothing held back. Settled
+    # against the listing itself (see Payment.listing_id) rather than a
+    # request, because a sale has no request to hang off.
+    PURCHASE = "PURCHASE"
 
 
 class PaymentStatus(str, enum.Enum):

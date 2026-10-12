@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { invalidateListingQueries } from '../utils/invalidateListings';
 import { useTranslation } from 'react-i18next';
-import { listings, reviews, rentalRequests, messages } from '../api';
+import { listings, reviews, rentalRequests, messages, payments } from '../api';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 import {
@@ -28,6 +28,7 @@ import {
   X,
   Check,
   Crown,
+  ShoppingCart,
 } from 'lucide-react';
 import { formatDate } from '../utils/dates';
 import { previousPath } from '../utils/navHistory';
@@ -132,6 +133,12 @@ export default function ListingPage() {
     enabled: !!id,
   });
 
+  // The other road. A SALE listing is bought outright — one price, one
+  // handover — so the calendar, the dates and the deposit below are the
+  // rental road's questions and are not put to a buyer at all.
+  const isSale = listing?.purpose === 'SALE';
+  const isSold = isSale && listing?.available === false;
+
   useEffect(() => {
     if (listing) {
       setIsFavorited(listing.is_favorited);
@@ -233,6 +240,40 @@ export default function ListingPage() {
         toast.error(detail.map((e: any) => e.msg).join(', '));
       } else {
         toast.error(t('listing.failedToSend'));
+      }
+    },
+  });
+
+  // Buying a thing rather than renting it: same checkout the rental
+  // payment uses, same hand-off — the amount is the listing's own, the
+  // money lands with the seller, and which row owes a receipt is
+  // remembered before the browser leaves so the buyer is asked for the
+  // picture the moment they are back.
+  const buyMutation = useMutation({
+    mutationFn: () => payments.purchaseDc(Number(id)),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['listing', id] });
+      if (data?.payment?.id != null) {
+        queueCheckPrompt({ kind: 'payment', paymentId: data.payment.id });
+      }
+      if (data?.url) window.location.href = data.url;
+    },
+    onError: (error: any) => {
+      const detail = error?.response?.data?.detail;
+      const messages: Record<string, string> = {
+        LISTING_NOT_FOR_SALE: t('listing.notForSale'),
+        LISTING_SOLD: t('listing.alreadySold'),
+        CANNOT_BUY_OWN_LISTING: t('listing.ownListing'),
+        'This listing is already being purchased': t('listing.alreadyBeingPurchased'),
+        'This listing is already sold': t('listing.alreadySold'),
+        OWNER_HAS_NO_DC_ACCOUNT: t('payment.ownerHasNoDcAccount'),
+      };
+      if (typeof detail === 'string' && messages[detail]) {
+        toast.error(messages[detail]);
+      } else if (typeof detail === 'string') {
+        toast.error(detail);
+      } else {
+        toast.error(t('listing.failedToBuy'));
       }
     },
   });
@@ -555,11 +596,22 @@ export default function ListingPage() {
                   </div>
                 )}
 
-                <div className="mb-4">
+                <div className="mb-4 flex flex-wrap items-baseline gap-2">
                   <span className="text-3xl font-extrabold text-[var(--accent)]">{formatAmount(listing.price)}</span>
-                  <span className="text-gray-500 dark:text-gray-400 text-sm ml-1">
-                    {t('common.somoni')} / {t('listing.' + listing.price_unit)}
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
+                    {/* A sale has no period: the price is what the thing
+                        costs, once, and a "/ per day" next to it would
+                        turn one payment into a rate nobody would pay. */}
+                    {isSale
+                      ? t('common.somoni')
+                      : `${t('common.somoni')} / ${t('listing.' + listing.price_unit)}`}
                   </span>
+                  {isSale && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md ring-1 ring-violet-300/60">
+                      <Tag className="w-3.5 h-3.5" aria-hidden="true" />
+                      {t('listing.forSale')}
+                    </span>
+                  )}
                 </div>
 
                 {/* TOP/VIP purchase lives inside the listing too - visible to
@@ -616,19 +668,24 @@ export default function ListingPage() {
                   </div>
                 ) : (
                   <>
-                <div className="mb-4">
-                  <AvailabilityCalendar
-                    listingId={Number(id)}
-                    startDate={startDate}
-                    endDate={endDate}
-                    onChange={(s, e) => {
-                      setStartDate(s);
-                      setEndDate(e);
-                    }}
-                  />
-                </div>
+                {/* Only the rental road picks dates: a buyer takes the thing
+                    as it is, on one price, so there is nothing to choose
+                    between and the calendar is not shown at all. */}
+                {!isSale && (
+                  <div className="mb-4">
+                    <AvailabilityCalendar
+                      listingId={Number(id)}
+                      startDate={startDate}
+                      endDate={endDate}
+                      onChange={(s, e) => {
+                        setStartDate(s);
+                        setEndDate(e);
+                      }}
+                    />
+                  </div>
+                )}
 
-                {startDate && endDate && (
+                {!isSale && startDate && endDate && (
                   <div className="glass-section rounded-xl border border-gray-200 dark:border-white/10 p-4 mb-4 space-y-2 text-sm" data-testid="booking-summary">
                     <div className="flex items-center justify-between gap-3 pb-2 border-b border-gray-100 dark:border-white/10">
                       <span className="font-bold text-[#1A1A2E] dark:text-white truncate">{listing.title}</span>
@@ -725,7 +782,7 @@ export default function ListingPage() {
 
                 {/* Renting is for everyone who is not the owner — an admin who
                     does not own this listing is a renter like anyone else. */}
-                {!isOwner && (
+                {!isOwner && !isSale && (
                   <>
                     <button
                       onClick={requestRental}
@@ -735,6 +792,48 @@ export default function ListingPage() {
                       {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.sendRequest')}
                     </button>
 
+                    <button
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          toast.error(t('listing.loginRequired'));
+                          navigate('/login');
+                          return;
+                        }
+                        messageMutation.mutate();
+                      }}
+                      disabled={messageMutation.isPending}
+                      className="w-full mt-2 border-2 border-[#1A1A2E] dark:border-white/10 text-[#1A1A2E] dark:text-white hover:bg-[#1A1A2E] hover:text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2"
+                    >
+                      <MessageSquare size={18} />
+                      {t('listing.sendMessage')}
+                    </button>
+                  </>
+                )}
+
+                {/* The buyer's path: one price, one button. The money goes
+                    through the same checkout the rental payment uses and is
+                    collected under the seller's own wallet, and the moment
+                    it lands the listing comes down — so a thing already sold
+                    keeps the button but loses the way to press it. */}
+                {!isOwner && isSale && (
+                  <>
+                    <button
+                      onClick={() => buyMutation.mutate()}
+                      disabled={buyMutation.isPending || isSold || listing.status !== 'ACTIVE'}
+                      className="w-full bg-violet-600 hover:bg-violet-700 disabled:bg-gray-300 text-white font-semibold uppercase tracking-wide py-3 px-4 rounded-xl transition-all duration-200 shadow-lg shadow-purple-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                    >
+                      <ShoppingCart size={18} />
+                      {isSold
+                        ? t('listing.sold')
+                        : buyMutation.isPending
+                          ? t('listing.openingCheckout')
+                          : t('listing.buyNow')}
+                    </button>
+                    {isSold && (
+                      <div className="rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 p-3 text-sm text-gray-600 dark:text-gray-300 text-center">
+                        {t('listing.soldNote')}
+                      </div>
+                    )}
                     <button
                       onClick={() => {
                         if (!isAuthenticated) {
@@ -1240,15 +1339,31 @@ export default function ListingPage() {
                 {formatAmount(listing.price, i18n.language)}
               </div>
               <div className="text-[11px] text-gray-500 dark:text-gray-400 truncate">
-                {t('common.somoni')} {formatPriceUnit(t, listing.price_unit)}
+                {/* One price, once, for a thing being sold — no period under
+                    it, the same as on the card and on the price above. */}
+                {isSale
+                  ? t('common.somoni')
+                  : `${t('common.somoni')} ${formatPriceUnit(t, listing.price_unit)}`}
               </div>
             </div>
             <button
-              onClick={requestRental}
-              disabled={rentalMutation.isPending || shortOnBalance}
+              onClick={isSale ? () => buyMutation.mutate() : requestRental}
+              disabled={
+                isSale
+                  ? buyMutation.isPending || isSold
+                  : rentalMutation.isPending || shortOnBalance
+              }
               className="flex-1 bg-[var(--accent)] hover:bg-[var(--accent-hover)] disabled:bg-gray-300 text-white text-sm font-semibold uppercase tracking-wide py-3 rounded-xl transition active:scale-[0.98]"
             >
-              {rentalMutation.isPending ? t('listing.sendingRequest') : t('booking.sendRequest')}
+              {isSale
+                ? isSold
+                  ? t('listing.sold')
+                  : buyMutation.isPending
+                    ? t('listing.openingCheckout')
+                    : t('listing.buyNow')
+                : rentalMutation.isPending
+                  ? t('listing.sendingRequest')
+                  : t('booking.sendRequest')}
             </button>
             <button
               onClick={() => {

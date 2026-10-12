@@ -89,11 +89,13 @@ def store_check(file_bytes: bytes, folder: str, filename: str) -> str:
 SOURCE_TOP = "TOP"
 SOURCE_WALLET = "WALLET"
 SOURCE_RENTAL = "RENTAL"
+SOURCE_PURCHASE = "PURCHASE"
 
 _SOURCE_PHRASE = {
     SOURCE_TOP: "TOP promotion",
     SOURCE_WALLET: "balance top-up",
     SOURCE_RENTAL: "rental payment",
+    SOURCE_PURCHASE: "purchase payment",
 }
 
 

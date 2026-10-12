@@ -60,6 +60,9 @@ export interface Listing {
   description: string | null;
   price: number;
   price_unit: string;
+  /** Which road the listing takes: RENT (the default) or SALE. Drives the
+   *  card badge, the price unit, and whether it is bought or rented. */
+  purpose: string;
   deposit: number;
   address: string | null;
   latitude?: number | null;
@@ -91,6 +94,8 @@ export interface ListingListItem {
   title: string;
   price: number;
   price_unit: string;
+  /** RENT or SALE — the card badge and the search filter read this. */
+  purpose: string;
   city_name: string | null;
   district_name?: string | null;
   primary_image: string | null;
@@ -230,9 +235,12 @@ export interface PaymentRecord {
   id: number;
   booking_id: number | null;
   rental_request_id?: number | null;
+  /** Set when this payment buys a SALE listing outright — the third target,
+   *  beside a booking and a rental request. */
+  listing_id?: number | null;
   customer_id: number;
   amount: number;
-  payment_type: 'BOOKING' | 'DEPOSIT' | 'DAMAGE' | 'LATE_FEE' | 'REFUND';
+  payment_type: 'BOOKING' | 'DEPOSIT' | 'DAMAGE' | 'LATE_FEE' | 'REFUND' | 'PURCHASE';
   status: 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
   transaction_id: string | null;
   created_at: string;
@@ -349,6 +357,9 @@ export interface ListingCreateData {
   description?: string;
   price: number;
   price_unit?: string;
+  /** RENT (default) or SALE. A SALE listing drops the rental-only fields
+   *  server-side, so the buyer's path is the purchase payment below. */
+  purpose?: string;
   deposit?: number;
   category_id: number;
   subcategory_id?: number;
@@ -753,6 +764,20 @@ export const payments = {
         {
           rental_request_id: rentalRequestId,
           payment_type: paymentType,
+        },
+      )
+      .then(unwrap),
+  /** Buy a SALE listing outright. Same checkout the rental payment uses, and
+   *  the same rule: the amount is never sent — the server reads the listing's
+   *  own price — and the money is collected under the *seller's* wallet, so
+   *  the sale lands with the person selling the thing. */
+  purchaseDc: (listingId: number) =>
+    client
+      .post<APIResponse<{ url: string; reference: string; payment: PaymentRecord }>>(
+        '/payments/pay-dc',
+        {
+          listing_id: listingId,
+          payment_type: 'PURCHASE',
         },
       )
       .then(unwrap),

@@ -24,6 +24,20 @@ class PaymentRepository(BaseRepository[Payment]):
         )
         return list(result.scalars().all())
 
+    async def get_by_listing_id(self, listing_id: int) -> list[Payment]:
+        """Payments against one listing bought outright.
+
+        The purchase road has no request to hang off, so this is how a
+        second buyer is refused while the first is still paying — and how
+        a sold listing proves it.
+        """
+        result = await self.db.execute(
+            select(Payment)
+            .where(Payment.listing_id == listing_id)
+            .order_by(Payment.created_at.desc())
+        )
+        return list(result.scalars().all())
+
     async def get_customer_payments(
         self, customer_id: int, status: Optional[PaymentStatus] = None, skip: int = 0, limit: int = 20
     ) -> list[Payment]:

@@ -87,7 +87,7 @@ async def pay_request_with_dc(
     which is how the callback finds this exact payment and how the operator
     matches it in the statement. A checkout left half-finished re-opens its
     own link instead of dead-ending the renter."""
-    if data.rental_request_id is None:
+    if data.rental_request_id is None and data.listing_id is None:
         raise HTTPException(
             status_code=400, detail="DC payment is for rental requests"
         )
@@ -244,13 +244,18 @@ async def send_payment_check(
     # reference and for which listing, so the picture can be matched
     # against the statement without opening the panel first.
     request = payment.rental_request
+    listing = request.listing if request else payment.listing
     await receipt_service.notify_admins(
         db,
-        source=receipt_service.SOURCE_RENTAL,
+        source=(
+            receipt_service.SOURCE_PURCHASE
+            if payment.listing_id is not None
+            else receipt_service.SOURCE_RENTAL
+        ),
         payer_id=payment.customer_id,
         amount=float(payment.amount),
         reference=payment.__dict__.get("payment_reference"),
-        listing_title=(request.listing.title if request and request.listing else None),
+        listing_title=(listing.title if listing else None),
         reference_id=payment.id,
     )
     return APIResponse(message="Check attached", data=payment)

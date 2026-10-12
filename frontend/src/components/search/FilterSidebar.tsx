@@ -14,6 +14,15 @@ export const PRICE_UNITS = [
   { value: 'per_month', labelKey: 'search.perMonth' },
 ];
 
+/** The two roads a listing takes, mirroring `ListingPurpose` in
+ *  `app/core/enums.py`. Empty means both, which is what a plain search
+ *  wants: the filter is for somebody who knows which they are after. */
+export const PURPOSES = [
+  { value: '', labelKey: 'search.anyPurpose' },
+  { value: 'RENT', labelKey: 'search.forRent' },
+  { value: 'SALE', labelKey: 'search.forSale' },
+];
+
 /** Mirrors `PropertyType` in `app/core/enums.py`. */
 export const PROPERTY_TYPES = [
   { value: 'apartment', labelKey: 'search.ptApartment' },
@@ -195,6 +204,24 @@ export default function FilterSidebar({
 
   return (
     <div>
+      <FilterGroup title={t('search.purpose')} count={countOf(['purpose'])}>
+        <div className="flex flex-wrap gap-1.5">
+          {PURPOSES.map((option) => {
+            const active = (filters.purpose || '') === option.value;
+            return (
+              <button
+                key={option.value || 'any'}
+                type="button"
+                onClick={() => onFilterChange('purpose', option.value)}
+                className={pillCls(active)}
+              >
+                {t(option.labelKey)}
+              </button>
+            );
+          })}
+        </div>
+      </FilterGroup>
+
       <FilterGroup title={t('search.location')} count={countOf(['city_id', 'district_id'])}>
         <CustomSelect
           options={cityOptions}

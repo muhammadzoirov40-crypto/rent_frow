@@ -35,6 +35,7 @@ class ListingRepository(BaseRepository[Listing]):
         price_min: Optional[float] = None,
         price_max: Optional[float] = None,
         price_unit: Optional[str] = None,
+        purpose: Optional[str] = None,
         status: Optional[ListingStatus] = None,
         is_verified: Optional[bool] = None,
         verification_status: Optional[VerificationStatus] = None,
@@ -78,6 +79,11 @@ class ListingRepository(BaseRepository[Listing]):
             query = query.where(Listing.price <= price_max)
         if price_unit is not None:
             query = query.where(Listing.price_unit == price_unit)
+        if purpose is not None:
+            # Which road the listing takes. Omitted, both roads are listed
+            # together, which is what the homepage and a plain text search
+            # want; the search page passes one or the other.
+            query = query.where(Listing.purpose == purpose)
         if is_verified is not None:
             query = query.where(Listing.is_verified == is_verified)
         if verification_status is not None:
@@ -144,6 +150,7 @@ class ListingRepository(BaseRepository[Listing]):
         price_min: Optional[float] = None,
         price_max: Optional[float] = None,
         price_unit: Optional[str] = None,
+        purpose: Optional[str] = None,
         status: Optional[ListingStatus] = None,
         is_verified: Optional[bool] = None,
         verification_status: Optional[VerificationStatus] = None,
@@ -172,6 +179,7 @@ class ListingRepository(BaseRepository[Listing]):
             price_min,
             price_max,
             price_unit,
+            purpose,
             status,
             is_verified,
             verification_status,
@@ -202,6 +210,7 @@ class ListingRepository(BaseRepository[Listing]):
         price_min: Optional[float] = None,
         price_max: Optional[float] = None,
         price_unit: Optional[str] = None,
+        purpose: Optional[str] = None,
         status: Optional[ListingStatus] = None,
         is_verified: Optional[bool] = None,
         verification_status: Optional[VerificationStatus] = None,
@@ -227,6 +236,7 @@ class ListingRepository(BaseRepository[Listing]):
             price_min,
             price_max,
             price_unit,
+            purpose,
             status,
             is_verified,
             verification_status,
@@ -258,6 +268,7 @@ class ListingRepository(BaseRepository[Listing]):
         price_min: Optional[float] = None,
         price_max: Optional[float] = None,
         price_unit: Optional[str] = None,
+        purpose: Optional[str] = None,
         status: Optional[ListingStatus] = None,
         is_verified: Optional[bool] = None,
         verification_status: Optional[VerificationStatus] = None,
@@ -291,6 +302,7 @@ class ListingRepository(BaseRepository[Listing]):
             price_min,
             price_max,
             price_unit,
+            purpose,
             status,
             is_verified,
             verification_status,

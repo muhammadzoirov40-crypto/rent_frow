@@ -1,7 +1,13 @@
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict
-from app.core.enums import ListingStatus, PriceUnit, PropertyType, VerificationStatus
+from app.core.enums import (
+    ListingStatus,
+    ListingPurpose,
+    PriceUnit,
+    PropertyType,
+    VerificationStatus,
+)
 
 
 class ListingImageResponse(BaseModel):
@@ -32,6 +38,10 @@ class ListingCreate(BaseModel):
     district_id: Optional[int] = None
     title: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = None
+    # Which road the owner is taking. RENT keeps every date, deposit and
+    # rule field as it was; SALE is the seller's own path, and the service
+    # below strips what only ever belonged to the rental one.
+    purpose: ListingPurpose = ListingPurpose.RENT
     price: float = Field(..., gt=0)
     price_unit: PriceUnit = PriceUnit.PER_DAY
     deposit: float = Field(default=0, ge=0)
@@ -68,6 +78,7 @@ class ListingUpdate(BaseModel):
     district_id: Optional[int] = None
     title: Optional[str] = Field(None, min_length=1, max_length=255)
     description: Optional[str] = None
+    purpose: Optional[ListingPurpose] = None
     price: Optional[float] = Field(None, gt=0)
     price_unit: Optional[PriceUnit] = None
     deposit: Optional[float] = Field(None, ge=0)
@@ -106,6 +117,7 @@ class ListingResponse(BaseModel):
     description: Optional[str] = None
     price: float
     price_unit: PriceUnit
+    purpose: ListingPurpose = ListingPurpose.RENT
     deposit: float
     property_type: PropertyType
     rooms: Optional[int] = None
@@ -148,6 +160,9 @@ class ListingListResponse(BaseModel):
     title: str
     price: float
     price_unit: PriceUnit
+    # RENT or SALE, the same value the card shows as a badge and the
+    # search page filters by.
+    purpose: ListingPurpose = ListingPurpose.RENT
     property_type: Optional[PropertyType] = None
     rooms: Optional[int] = None
     city_name: Optional[str] = None
@@ -183,6 +198,7 @@ class ListingSearchParams(BaseModel):
     price_min: Optional[float] = None
     price_max: Optional[float] = None
     price_unit: Optional[PriceUnit] = None
+    purpose: Optional[ListingPurpose] = None
     status: Optional[ListingStatus] = None
     is_verified: Optional[bool] = None
     verification_status: Optional[VerificationStatus] = None

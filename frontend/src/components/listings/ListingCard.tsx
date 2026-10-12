@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Crown, Image as ImageIcon } from 'lucide-react';
+import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Crown, Tag, Image as ImageIcon } from 'lucide-react';
 import { listings, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -77,6 +77,11 @@ export default function ListingCard({ listing }: ListingCardProps) {
   // The server says a paid TOP window is live for this listing (expires_at > now
   // was checked server-side) - the badge never appears on its own initiative.
   const isTop = 'is_top' in listing && listing.is_top === true;
+  // The other road wears a badge. A card that is sold rather than let out
+  // says so, because the number under it is one price and not a rate — and
+  // without this, nothing on the homepage would tell the two apart.
+  const isSale =
+    'purpose' in listing && typeof listing.purpose === 'string' && listing.purpose === 'SALE';
   const imageCount =
     'images' in listing && Array.isArray(listing.images) ? listing.images.length : 0;
 
@@ -103,9 +108,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
   }
 
   const hasPrice = typeof listing.price === 'number';
-  const unitKey = /^per_(hour|day|week|month)$/.test(listing.price_unit)
-    ? `listing.${listing.price_unit}`
-    : null;
+  // A sale has no period: the price is what the thing costs, once. The
+  // unit is suppressed rather than shown as a rate nobody would pay.
+  const unitKey =
+    !isSale && /^per_(hour|day|week|month)$/.test(listing.price_unit)
+      ? `listing.${listing.price_unit}`
+      : null;
 
   return (
     <Link
@@ -137,6 +145,15 @@ export default function ListingCard({ listing }: ListingCardProps) {
             >
               <Crown className="w-3.5 h-3.5" aria-hidden="true" />
               TOP
+            </span>
+          )}
+          {isSale && (
+            <span
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-md ring-1 ring-violet-300/60"
+              aria-label={t('listing.forSale')}
+            >
+              <Tag className="w-3.5 h-3.5" aria-hidden="true" />
+              {t('listing.forSale')}
             </span>
           )}
 

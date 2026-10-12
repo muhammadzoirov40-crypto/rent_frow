@@ -105,6 +105,7 @@ export default function SearchPage() {
       page: currentPage,
       page_size: ITEMS_PER_PAGE,
     };
+    if (filters.purpose) p.purpose = filters.purpose;
     if (filters.q) p.q = filters.q;
     if (filters.city_id) p.city_id = filters.city_id;
     if (filters.district_id) p.district_id = filters.district_id;

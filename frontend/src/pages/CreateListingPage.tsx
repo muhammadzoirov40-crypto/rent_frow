@@ -18,6 +18,7 @@ import {
   MapPin,
   FileText,
   Tag,
+  KeyRound,
   Camera,
   DollarSign,
   Gavel,
@@ -45,7 +46,28 @@ const MIN_PHONE_DIGITS = 9;
 const MAX_PRICE = 1_000_000;
 const MIN_PRICE = 0;
 
+// The first question the form asks: which of the two markets this listing
+// is for. Everything below it — the steps, the fields, the price, what the
+// buyer does instead of the renter — hangs off this one answer, so it is
+// asked before anything else rather than assumed.
+const PURPOSE_CHOICES = [
+  {
+    value: 'RENT',
+    labelKey: 'createListing.purposeRent',
+    blurbKey: 'createListing.purposeRentBlurb',
+  },
+  {
+    value: 'SALE',
+    labelKey: 'createListing.purposeSale',
+    blurbKey: 'createListing.purposeSaleBlurb',
+  },
+];
+
 interface FormData {
+  /** The road the owner is taking: RENT (the whole rental flow as it was)
+   *  or SALE (a price and a handover, nothing else). Empty until the first
+   *  step has been answered — the form asks before it assumes. */
+  purpose: string;
   category_id: number | null;
   title: string;
   description: string;
@@ -65,6 +87,7 @@ interface FormData {
 }
 
 const initialFormData: FormData = {
+  purpose: '',
   category_id: null,
   title: '',
   description: '',
@@ -105,13 +128,26 @@ export default function CreateListingPage() {
   const [dragOver, setDragOver] = useState(false);
 
   const STEPS = [
+    t('createListing.stepPurpose'),
     t('createListing.stepCategory'),
     t('createListing.stepInfo'),
     t('createListing.stepPhotos'),
     t('createListing.stepPrice'),
     t('createListing.stepLocation'),
-    t('createListing.stepRules'),
+    // The rules a renter agrees to are the last question the rental flow
+    // asks, and asking a seller for them would put a sentence on a listing
+    // that is sold by one price instead. The step is skipped, not shown and
+    // ticked — the list on screen is the list that will be answered.
+    ...(form.purpose === 'RENT' ? [t('createListing.stepRules')] : []),
   ];
+
+  // Changing the road can shorten the form — the seller never reaches the
+  // rules step — so a step number left over from the longer road is pulled
+  // back to the last one that still exists rather than pointed at a card
+  // that is no longer there.
+  useEffect(() => {
+    if (step > STEPS.length - 1) setStep(STEPS.length - 1);
+  }, [STEPS.length, step]);
 
   const PRICE_UNITS = [
     { value: 'per_hour', label: t('createListing.perHour') },
@@ -148,6 +184,10 @@ export default function CreateListingPage() {
     if (!editListing || prefilledRef.current) return;
     prefilledRef.current = true;
     setForm({
+      // Which road the listing already takes: an edited listing keeps it,
+      // and the form never lets the owner drift onto the other one by
+      // accident, because the steps below are a different set for each.
+      purpose: editListing.purpose || 'RENT',
       category_id: editListing.category_id ?? null,
       title: editListing.title || '',
       description: editListing.description || '',
@@ -182,19 +222,24 @@ export default function CreateListingPage() {
       const payload = {
         title: formData.title,
         description: formData.description || undefined,
+        purpose: formData.purpose,
         category_id: formData.category_id!,
         city_id: formData.city_id!,
         district_id: formData.district_id || undefined,
         price: Number(formData.price),
         price_unit: formData.price_unit as any,
-        deposit: formData.deposit ? Number(formData.deposit) : 0,
+        // A sale is paid in one go, so nothing is held back and no rule a
+        // renter would agree to belongs to it. The server strips the two
+        // again on the way in — this is only the client not sending what
+        // the road it chose has no place for.
+        deposit: formData.purpose === 'SALE' || !formData.deposit ? 0 : Number(formData.deposit),
         address: formData.address || undefined,
         // Sent even when null: on edit that is how an owner clears a pin
         // they placed by mistake (the API treats an explicit null as "set
         // to nothing", not as "leave it alone").
         latitude: formData.latitude,
         longitude: formData.longitude,
-        rental_rules: formData.rules || undefined,
+        rental_rules: formData.purpose === 'SALE' ? undefined : formData.rules || undefined,
         contact_name: formData.contact_name || undefined,
         contact_phone: formData.contact_phone || undefined,
         image_urls: formData.image_urls,
@@ -338,14 +383,18 @@ export default function CreateListingPage() {
 
   const canProceed = () => {
     switch (step) {
-      case 0: return form.category_id !== null;
-      case 1:
+      case 0:
+        // Nothing below this step is the same question on the two roads, so
+        // neither road may start until the owner has said which one it is.
+        return form.purpose === 'RENT' || form.purpose === 'SALE';
+      case 1: return form.category_id !== null;
+      case 2:
         // A listing nobody can call is a listing nobody can rent. The phone
         // is how the renter reaches the owner, so a number too short to be
         // one holds the step back rather than the whole listing.
         return form.title.trim().length > 0 && !phoneTooShort && !dcWrongLength;
-      case 2: return form.image_urls.length > 0;
-      case 3:
+      case 3: return form.image_urls.length > 0;
+      case 4:
         // Free is a price - zero goes through. Over the ceiling, or a
         // guarantee held against an item it is worth more than, is not.
         return (
@@ -354,8 +403,8 @@ export default function CreateListingPage() {
           priceValue <= MAX_PRICE &&
           !depositTooHigh
         );
-      case 4: return form.city_id !== null;
-      case 5: return true;
+      case 5: return form.city_id !== null;
+      case 6: return true;
       default: return true;
     }
   };
@@ -388,6 +437,44 @@ export default function CreateListingPage() {
         <div className="glass-card rounded-2xl p-6">
           {step === 0 && (
             <div>
+              <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-2">
+                <Tag size={20} className="text-[var(--accent)]" />
+                {t('createListing.selectPurpose')}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+                {t('createListing.purposeLead')}
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {PURPOSE_CHOICES.map((choice) => {
+                  const active = form.purpose === choice.value;
+                  return (
+                    <button
+                      key={choice.value}
+                      type="button"
+                      onClick={() => updateForm({ purpose: choice.value })}
+                      className={`p-5 rounded-xl border-2 text-left transition-all ${
+                        active
+                          ? 'border-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.05)] shadow-md shadow-[rgb(var(--accent-rgb)/0.1)]'
+                          : 'border-gray-200 dark:border-white/10 hover:border-gray-300 dark:hover:border-white/20 hover:bg-gray-50 dark:hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="flex items-center gap-2 text-base font-bold text-[#1A1A2E] dark:text-white">
+                        {choice.value === 'RENT' ? <KeyRound size={18} className="text-[var(--accent)]" /> : <Tag size={18} className="text-[var(--accent)]" />}
+                        {t(choice.labelKey)}
+                      </span>
+                      <span className="block text-sm leading-relaxed text-gray-500 dark:text-gray-400 mt-2">
+                        {t(choice.blurbKey)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-4">{t('createListing.purposeHint')}</p>
+            </div>
+          )}
+
+          {step === 1 && (
+            <div>
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <Tag size={20} className="text-[var(--accent)]" />
                 {t('createListing.selectCategory')}
@@ -411,7 +498,7 @@ export default function CreateListingPage() {
             </div>
           )}
 
-          {step === 1 && (
+          {step === 2 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <FileText size={20} className="text-[var(--accent)]" />
@@ -503,7 +590,7 @@ export default function CreateListingPage() {
             </div>
           )}
 
-          {step === 2 && (
+          {step === 3 && (
             <div>
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <Camera size={20} className="text-[var(--accent)]" />
@@ -577,13 +664,17 @@ export default function CreateListingPage() {
             </div>
           )}
 
-          {step === 3 && (
+          {step === 4 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <DollarSign size={20} className="text-[var(--accent)]" />
                 {t('createListing.priceLabel')}
               </h2>
-              <div className="grid grid-cols-2 gap-4">
+              {/* A sold thing has no period and nothing held back: one
+                  price, one handover. The two fields the rental road asks
+                  for are not shown at all rather than shown and ignored —
+                  a seller has nothing to answer about them. */}
+              <div className={`grid gap-4 ${form.purpose === 'SALE' ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <div>
                   <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.priceLabel')} *</label>
                   <input
@@ -605,40 +696,48 @@ export default function CreateListingPage() {
                     </p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.period')}</label>
-                  <CustomSelect
-                    options={PRICE_UNITS}
-                    value={form.price_unit}
-                    onChange={(val) => updateForm({ price_unit: val })}
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.depositLabel')}</label>
-                <input
-                  type="number"
-                  value={form.deposit}
-                  onChange={(e) => updateForm({ deposit: e.target.value })}
-                  placeholder={t('createListing.depositPlaceholder')}
-                  min="0"
-                  className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
-                    depositTooHigh
-                      ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
-                      : 'focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
-                  }`}
-                />
-                {depositTooHigh && (
-                  <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-1.5">
-                    {t('createListing.depositTooHigh')}
-                  </p>
+                {form.purpose !== 'SALE' && (
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.period')}</label>
+                    <CustomSelect
+                      options={PRICE_UNITS}
+                      value={form.price_unit}
+                      onChange={(val) => updateForm({ price_unit: val })}
+                    />
+                  </div>
                 )}
               </div>
+              {form.purpose === 'SALE' ? (
+                <p className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                  {t('createListing.salePriceNote')}
+                </p>
+              ) : (
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">{t('createListing.depositLabel')}</label>
+                  <input
+                    type="number"
+                    value={form.deposit}
+                    onChange={(e) => updateForm({ deposit: e.target.value })}
+                    placeholder={t('createListing.depositPlaceholder')}
+                    min="0"
+                    className={`glass-input w-full rounded-xl px-4 py-2.5 text-sm text-[#1A1A2E] dark:text-white focus:ring-2 outline-none transition ${
+                      depositTooHigh
+                        ? 'border-red-400 focus:ring-red-200 focus:border-red-500'
+                        : 'focus:ring-[rgb(var(--accent-rgb)/0.3)] focus:border-[var(--accent)]'
+                    }`}
+                  />
+                  {depositTooHigh && (
+                    <p className="text-xs leading-relaxed text-red-600 dark:text-red-400 mt-1.5">
+                      {t('createListing.depositTooHigh')}
+                    </p>
+                  )}
+                </div>
+              )}
               <p className="text-xs text-gray-400">{t('createListing.currencyNote')}</p>
             </div>
           )}
 
-          {step === 4 && (
+          {step === 5 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <MapPin size={20} className="text-[var(--accent)]" />
@@ -697,7 +796,7 @@ export default function CreateListingPage() {
             </div>
           )}
 
-          {step === 5 && (
+          {step === 6 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white flex items-center gap-2 mb-4">
                 <Gavel size={20} className="text-[var(--accent)]" />

@@ -2,7 +2,7 @@ from datetime import datetime
 from sqlalchemy import Integer, String, DateTime, Text, Numeric, Boolean, ForeignKey, Index, Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
-from app.core.enums import PriceUnit, ListingStatus, PropertyType, VerificationStatus
+from app.core.enums import PriceUnit, ListingStatus, ListingPurpose, PropertyType, VerificationStatus
 
 
 class Listing(Base):
@@ -14,6 +14,18 @@ class Listing(Base):
     subcategory_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("subcategories.id"), nullable=True)
     city_id: Mapped[int] = mapped_column(Integer, ForeignKey("cities.id"), nullable=False, index=True)
     district_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("districts.id"), nullable=True)
+
+    # Which road this listing takes: rented or sold. A plain string rather
+    # than an enum type, so the column could be added to a table already
+    # full of rows without rebuilding it, and so a third road later is a
+    # value and not a migration. Checked on the way in by ListingPurpose.
+    purpose: Mapped[str] = mapped_column(
+        String(8),
+        nullable=False,
+        default=ListingPurpose.RENT.value,
+        server_default=ListingPurpose.RENT.value,
+        index=True,
+    )
 
     title: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)

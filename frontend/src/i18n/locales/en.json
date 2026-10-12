@@ -269,7 +269,11 @@
     "clearRecent": "Clear",
     "anyPrice": "Any price",
     "scrollLeft": "Show previous categories",
-    "scrollRight": "Show more categories"
+    "scrollRight": "Show more categories",
+    "purpose": "Rent or sale",
+    "anyPurpose": "All",
+    "forRent": "Rent",
+    "forSale": "Sale"
   },
   "listing": {
     "description": "Description",
@@ -346,7 +350,17 @@
     "location": "Location",
     "locationApprox": "No exact coordinates — showing the city centre.",
     "locationUnknown": "No exact coordinates — showing the map of Tajikistan.",
-    "openMap": "Open in OpenStreetMap"
+    "openMap": "Open in OpenStreetMap",
+    "forSale": "For sale",
+    "buyNow": "Buy now",
+    "sold": "Sold",
+    "soldNote": "This listing has been sold and taken off the market.",
+    "openingCheckout": "Opening checkout…",
+    "notForSale": "This listing is not for sale",
+    "alreadySold": "This listing has already been sold",
+    "ownListingSale": "You cannot buy your own listing",
+    "alreadyBeingPurchased": "This listing is being purchased right now",
+    "failedToBuy": "The purchase did not go through. Please try again."
   },
   "createListing": {
     "title": "New listing",
@@ -414,7 +428,16 @@
     "maxPhotos": "Maximum 8 photos",
     "uploadError": "Image upload error",
     "uploadFormatHint": "PNG, JPG, WebP · up to 10MB per file",
-    "dcLength": "A DC account is {{count}} digits — enter the whole card number."
+    "dcLength": "A DC account is {{count}} digits — enter the whole card number.",
+    "stepPurpose": "Rent or sell",
+    "selectPurpose": "What is this listing for?",
+    "purposeLead": "First, the road: are you letting this out, or selling it? Each path asks its own questions.",
+    "purposeHint": "This answer decides the steps, the price, and what the next person does instead of the renter.",
+    "purposeRent": "I'm renting it out",
+    "purposeRentBlurb": "Let it for a period: dates, terms and a deposit still apply.",
+    "purposeSale": "I'm selling it",
+    "purposeSaleBlurb": "One price, one handover — no dates, no deposit, nothing held back.",
+    "salePriceNote": "The price is a one-off payment: paid once, with nothing held against it."
   },
   "favorites": {
     "title": "Favorites",
@@ -593,7 +616,8 @@
     "sources": {
       "TOP": "TOP promotion",
       "WALLET": "Balance top-up",
-      "RENTAL": "Rental payment"
+      "RENTAL": "Rental payment",
+      "PURCHASE": "purchase"
     }
   },
   "profile": {

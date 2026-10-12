@@ -10,15 +10,19 @@ class Payment(Base):
     __tablename__ = "payments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    # Either the equipment booking or the rental request the money is for —
-    # exactly one of the two is set (PaymentCreate enforces it). booking_id
-    # used to be NOT NULL, which made a payment impossible for the flow the
-    # site actually runs on: an echo listing -> rental request.
+    # The thing the money is for. Exactly one of the three is set
+    # (PaymentCreate enforces it): an equipment booking, a rental request,
+    # or — the third road — a SALE listing bought outright. booking_id used
+    # to be NOT NULL, which made a payment impossible for the flow the site
+    # actually runs on: an echo listing -> rental request.
     booking_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("bookings.id"), nullable=True, index=True
     )
     rental_request_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("rental_requests.id"), nullable=True, index=True
+    )
+    listing_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("listings.id"), nullable=True, index=True
     )
     customer_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     amount: Mapped[float] = mapped_column(Numeric(10, 2), nullable=False)
@@ -37,6 +41,7 @@ class Payment(Base):
 
     booking = relationship("Booking", back_populates="payments", lazy="selectin")
     rental_request = relationship("RentalRequest", lazy="selectin")
+    listing = relationship("Listing", lazy="selectin")
     customer = relationship("User", back_populates="payments", lazy="selectin")
 
     __table_args__ = (

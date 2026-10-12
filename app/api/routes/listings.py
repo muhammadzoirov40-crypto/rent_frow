@@ -3,7 +3,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import get_current_user, require_auth, CurrentUser
-from app.core.enums import PriceUnit, PropertyType, VerificationStatus
+from app.core.enums import ListingPurpose, PriceUnit, PropertyType, VerificationStatus
 from app.schemas.listing import (
     ListingCreate, ListingUpdate, ListingResponse,
     ListingListResponse, NearbyListingResponse, ListingImageResponse, ListingOwnerResponse,
@@ -84,6 +84,7 @@ def _listing_to_response(
         description=listing.description,
         price=float(listing.price),
         price_unit=listing.price_unit,
+        purpose=listing.purpose,
         deposit=float(listing.deposit),
         property_type=listing.property_type,
         rooms=listing.rooms,
@@ -134,6 +135,7 @@ def _listing_to_list_response(
         title=listing.title,
         price=float(listing.price),
         price_unit=listing.price_unit,
+        purpose=listing.purpose,
         property_type=listing.property_type,
         rooms=listing.rooms,
         city_name=listing.city_rel.name if listing.city_rel else None,
@@ -180,6 +182,7 @@ async def search_listings(
     price_min: float = Query(None),
     price_max: float = Query(None),
     price_unit: PriceUnit = Query(None),
+    purpose: ListingPurpose = Query(None),
     is_verified: bool = Query(None),
     verification_status: VerificationStatus = Query(None),
     property_type: PropertyType = Query(None),
@@ -211,6 +214,7 @@ async def search_listings(
         price_min=price_min,
         price_max=price_max,
         price_unit=price_unit,
+        purpose=purpose,
         is_verified=is_verified,
         verification_status=verification_status,
         property_type=property_type,

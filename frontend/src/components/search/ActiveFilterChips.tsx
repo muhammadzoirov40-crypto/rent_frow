@@ -4,10 +4,11 @@ import { type Category, type City, type District } from '../../api/index';
 import { localizeCategoryName } from '../../utils/categoryName';
 import { formatAmount } from '../../utils/format';
 import { formatDate } from '../../utils/dates';
-import { PRICE_UNITS, PROPERTY_TYPES } from './FilterSidebar';
+import { PRICE_UNITS, PROPERTY_TYPES, PURPOSES } from './FilterSidebar';
 
 /** URL params that describe a filter (`page` / `sort_by` are not filters). */
 const FILTER_KEYS = [
+  'purpose',
   'city_id',
   'district_id',
   'category_id',
@@ -66,7 +67,10 @@ export default function ActiveFilterChips({
 
     let label = raw;
 
-    if (key === 'city_id') {
+    if (key === 'purpose') {
+      const purpose = PURPOSES.find((p) => p.value === raw);
+      label = purpose ? t(purpose.labelKey) : raw;
+    } else if (key === 'city_id') {
       const city = citiesList.find((c) => String(c.id) === raw);
       label = city
         ? i18n.language === 'tj' && city.name_tj

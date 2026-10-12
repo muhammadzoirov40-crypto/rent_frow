@@ -12,7 +12,7 @@ from app.repositories.favorite import FavoriteRepository
 from app.schemas.listing import ListingCreate, ListingUpdate
 from app.services.notification import NotificationService
 from app.core.dc import normalize_dc_account
-from app.core.enums import VerificationStatus
+from app.core.enums import ListingPurpose, VerificationStatus
 
 LISTING_TTL_DAYS = 30
 
@@ -23,6 +23,26 @@ async def detach_listing_conversations(db: AsyncSession, listing_id: int) -> Non
         .where(Conversation.listing_id == listing_id)
         .values(listing_id=None)
     )
+
+
+async def mark_listing_sold(db: AsyncSession, listing_id: int) -> Listing | None:
+    """Take a bought listing off the market, once.
+
+    A sale has no dates and nothing held back, so the money arriving *is*
+    the handover: the listing stops being buyable and rentable the moment
+    it is paid for, before anybody is told about it. Both roads that end up
+    here — the provider callback, and an owner or operator confirming a
+    receipt by hand — call this, so a thing can be sold only once however
+    the payment was settled. Returns the listing so the caller can name it
+    in the note, or None when there is nothing to take down.
+    """
+    listing = await ListingRepository(db).get_by_id(listing_id)
+    if listing is None:
+        return None
+    if listing.available:
+        listing.available = False
+        await db.flush()
+    return listing
 
 
 class ListingService:
@@ -51,6 +71,15 @@ class ListingService:
     async def create(self, owner_id: int, data: ListingCreate) -> Listing:
         image_urls = data.image_urls
         data_dict = data.model_dump(exclude={"image_urls", "dc_account"})
+        # The column holds the plain value, not the enum member.
+        data_dict["purpose"] = data.purpose.value
+        if data.purpose == ListingPurpose.SALE:
+            # A sold thing is not let out: the deposit and the rules a
+            # renter would agree to belong to the rental road alone, and a
+            # seller who sends them anyway ends up with a listing that
+            # reads as the wrong thing.
+            data_dict["deposit"] = 0
+            data_dict["rental_rules"] = None
         listing = await self.repo.create(
             owner_id=owner_id,
             status=ListingStatus.ACTIVE,
@@ -93,6 +122,15 @@ class ListingService:
         # not a listing column: the wallet belongs to the owner, so it is
         # handled apart from the rest of the row below
         dc_account = update_data.pop("dc_account", None)
+        # The column holds the plain value, not the enum member — and the
+        # rental-only fields go with a road change the same way they go with
+        # a SALE listing on the way in: a deposit and a rule a renter would
+        # agree to mean nothing once the thing is for sale.
+        if "purpose" in update_data:
+            update_data["purpose"] = update_data["purpose"].value
+            if update_data["purpose"] == ListingPurpose.SALE.value:
+                update_data["deposit"] = 0
+                update_data["rental_rules"] = None
 
         new_status = update_data.get("status")
         new_available = update_data.get("available")

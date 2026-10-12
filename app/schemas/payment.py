@@ -10,20 +10,25 @@ class PaymentCreate(BaseModel):
     The equipment-booking flow passes ``booking_id``; the flow the site
     actually runs on — listing -> rental request -> owner accepts — passes
     ``rental_request_id`` and may omit the amount, which is then taken from
-    the request itself so a client cannot underpay.
+    the request itself so a client cannot underpay. The third road passes
+    ``listing_id``: a SALE listing bought outright, at the listing's own
+    price — a buyer names no amount either, for the same reason.
     """
 
     booking_id: Optional[int] = None
     rental_request_id: Optional[int] = None
+    listing_id: Optional[int] = None
     amount: Optional[float] = Field(None, gt=0)
     payment_type: PaymentType
     transaction_id: Optional[str] = None
 
     @model_validator(mode="after")
     def _exactly_one_target(self) -> "PaymentCreate":
-        if (self.booking_id is None) == (self.rental_request_id is None):
+        targets = (self.booking_id, self.rental_request_id, self.listing_id)
+        if sum(target is None for target in targets) != 2:
             raise ValueError(
-                "exactly one of booking_id or rental_request_id is required"
+                "exactly one of booking_id, rental_request_id or listing_id "
+                "is required"
             )
         if self.booking_id is not None and self.amount is None:
             raise ValueError("amount is required when paying for a booking")
@@ -36,6 +41,7 @@ class PaymentResponse(BaseModel):
     id: int
     booking_id: Optional[int] = None
     rental_request_id: Optional[int] = None
+    listing_id: Optional[int] = None
     customer_id: int
     amount: float
     payment_type: PaymentType
