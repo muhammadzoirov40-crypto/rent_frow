@@ -15,6 +15,7 @@ import Lightbox from '../components/chat/Lightbox';
 import CallOverlay, { type CallType } from '../components/chat/CallOverlay';
 import useChatSocket from '../components/chat/useChatSocket';
 import { parseContent, isSystemMessage, stripSystemPrefix } from '../components/chat/messageContent';
+import { queueCheckPrompt } from '../utils/checkPrompt';
 import { timeAgo } from '../utils/timeAgo';
 import { formatDate } from '../utils/dates';
 
@@ -784,9 +785,27 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
       // Same as the requests page: out to DC Wallet for the money, the row
       // stays PENDING here until the callback (or an operator) settles it.
       queryClient.invalidateQueries({ queryKey: ['payment-for-request', requestId] });
+      // The receipt this payment is waiting for is queued before the browser
+      // leaves — asked for on the way back, in this very tab.
+      if (data?.payment?.id != null) {
+        queueCheckPrompt({ kind: 'payment', paymentId: data.payment.id });
+      }
       if (data?.url) window.location.href = data.url;
     },
     onError: (error: any) => toast.error(paymentError(error)),
+  });
+
+  // The receipt for a payment still waiting — the same upload the requests
+  // page takes, against this row's id, so a customer who skipped the prompt
+  // can still send the picture from the bar they pay in.
+  const checkMutation = useMutation({
+    mutationFn: ({ paymentId, file }: { paymentId: number; file: File }) =>
+      payments.sendCheck(paymentId, file),
+    onSuccess: () => {
+      toast.success(t('check.sent'));
+      queryClient.invalidateQueries({ queryKey: ['payment-for-request', requestId] });
+    },
+    onError: () => toast.error(t('check.failed')),
   });
 
   const confirmPayMutation = useMutation({
@@ -886,9 +905,13 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
                 amount={line.amount}
                 payment={linePayment(line.kind)}
                 role={isOwner ? 'owner' : 'renter'}
-                busy={payMutation.isPending || confirmPayMutation.isPending}
+                busy={payMutation.isPending || confirmPayMutation.isPending || checkMutation.isPending}
                 onPay={() => payMutation.mutate(line.kind)}
                 onConfirm={(paymentId) => confirmPayMutation.mutate(paymentId)}
+                onSendCheck={(file) => {
+                  const pending = linePayment(line.kind);
+                  if (pending) checkMutation.mutate({ paymentId: pending.id, file });
+                }}
                 t={t}
               />
             ))

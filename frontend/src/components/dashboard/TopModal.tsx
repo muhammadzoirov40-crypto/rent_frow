@@ -5,6 +5,7 @@ import { Crown, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { topPromotions } from '../../api';
 import type { Listing, TopPlan } from '../../api';
+import { queueCheckPrompt } from '../../utils/checkPrompt';
 import { formatAmount } from '../../utils/format';
 
 /**
@@ -81,6 +82,12 @@ export function TopModal({
     onSuccess: (data) => {
       onDone();
       queryClient.invalidateQueries({ queryKey: ['topListings'] });
+      // The receipt this request will be waiting for: queued *before* the
+      // browser leaves for DC Wallet, so the question is asked the moment
+      // the customer is back on this site — same tab, same session.
+      if (data.promotion?.id != null) {
+        queueCheckPrompt({ kind: 'promotion', promoId: data.promotion.id });
+      }
       window.location.href = data.url;
     },
     onError: (error: unknown) => toast.error(mapError(error)),

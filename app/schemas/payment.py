@@ -46,6 +46,10 @@ class PaymentResponse(BaseModel):
     # the operator matches this row in the statement and the renter shows
     # which payment they mean. Pinned by the routes that read payments.
     payment_reference: Optional[str] = None
+    # A fresh link to the receipt the customer attached after paying. The row
+    # stores the storage key; this is the expiring link built from it, so the
+    # key itself never travels to the browser. None until one is attached.
+    check_image_url: Optional[str] = None
 
 
 class PaymentPayDc(BaseModel):

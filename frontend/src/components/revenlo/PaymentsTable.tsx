@@ -5,6 +5,12 @@ import client from '../../api/client'
  * Every top-up across all users, straight from `GET /api/v1/admin/topups`.
  * The backend joins the person on each `topup_intents` row, so this is the
  * admin's "who transferred money" view — replacing the old hardcoded sample.
+ *
+ * `amount` is what the checkout link asked for, not what arrived. The proof
+ * of money is `status === 'PAID'` plus `settled_via` — which says whether the
+ * provider's callback closed it or an operator did by hand — and the raw
+ * callback payload kept verbatim in `raw_response`, viewable per row so the
+ * admin can check it against DC City's own statement.
  */
 interface AdminTopup {
   id: number
@@ -17,6 +23,23 @@ interface AdminTopup {
   provider: string
   created_at: string
   paid_at: string | null
+  settled_via: 'webhook' | 'admin' | null
+  raw_response: string | null
+  promotion_id: number | null
+  payment_id: number | null
+}
+
+/**
+ * Sums the backend computes over the *whole* table — deliberately not the
+ * page in view, so a small page can never understate what was actually paid.
+ */
+interface AdminTopupTotals {
+  paid_total: number
+  paid_count: number
+  pending_total: number
+  pending_count: number
+  failed_total: number
+  failed_count: number
 }
 
 const STATUS_LABEL: Record<AdminTopup['status'], string> = {
@@ -31,29 +54,85 @@ const statusColors: Record<AdminTopup['status'], string> = {
   FAILED: 'bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border-red-200/70 dark:border-red-500/30',
 }
 
+/**
+ * Who vouched for the money. "Admin" is not a lesser kind of paid — the
+ * operator checked it against the statement by hand — but it is a different
+ * kind, and the admin should be able to see at a glance which settlements
+ * were automatic and which someone is personally accountable for.
+ */
+const VIA_LABEL: Record<NonNullable<AdminTopup['settled_via']>, string> = {
+  webhook: 'Webhook',
+  admin: 'Admin',
+}
+
+const viaColors: Record<NonNullable<AdminTopup['settled_via']>, string> = {
+  webhook: 'bg-sky-50 dark:bg-sky-500/15 text-sky-600 dark:text-sky-400 border-sky-200/70 dark:border-sky-500/30',
+  admin: 'bg-violet-50 dark:bg-violet-500/15 text-violet-600 dark:text-violet-400 border-violet-200/70 dark:border-violet-500/30',
+}
+
+/**
+ * Where the money landed, so "100 TJS" is never ambiguous about whose
+ * 100 TJS it became. NULL with NULL means a plain balance top-up.
+ */
+function destination(p: AdminTopup): string {
+  if (p.promotion_id != null) return `TOP promo #${p.promotion_id}`
+  if (p.payment_id != null) return `Rental payment #${p.payment_id}`
+  return 'Wallet balance'
+}
+
 const checkboxClass =
   'w-4 h-4 rounded border-gray-300 dark:border-white/20 bg-white dark:bg-white/10 text-blue-600 focus:ring-blue-500/30 focus:ring-2 cursor-pointer accent-blue-600'
 
-function formatDate(value: string | null): string {
+/**
+ * Both dates, both labelled. Before this the table showed one date that
+ * silently swapped meaning — `paid_at` if settled, `created_at` otherwise —
+ * so a Pending row read as though it had been paid on the day the link was
+ * opened. Showing them apart is the point: opened and settled are different
+ * facts and a top-up that never settled should never look settled.
+ */
+function formatDateTime(value: string | null): string {
   if (!value) return '—'
   const d = new Date(value)
-  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString()
+  if (Number.isNaN(d.getTime())) return '—'
+  return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  })}`
+}
+
+/** Money as the admin reads it — TJS, two decimals, grouped thousands. */
+function money(value: number): string {
+  return value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 }
 
 export default function PaymentsTable() {
   const [rows, setRows] = useState<AdminTopup[]>([])
+  const [totals, setTotals] = useState<AdminTopupTotals | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('All')
   const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [inspect, setInspect] = useState<AdminTopup | null>(null)
 
   useEffect(() => {
     let alive = true
     client
       .get('/admin/topups', { params: { limit: 200 } })
       .then((r) => {
-        if (alive) setRows(r.data?.data ?? [])
+        if (!alive) return
+        setRows(r.data?.data ?? [])
+        setTotals({
+          paid_total: r.data?.paid_total ?? 0,
+          paid_count: r.data?.paid_count ?? 0,
+          pending_total: r.data?.pending_total ?? 0,
+          pending_count: r.data?.pending_count ?? 0,
+          failed_total: r.data?.failed_total ?? 0,
+          failed_count: r.data?.failed_count ?? 0,
+        })
       })
       .catch(() => {
         if (alive) setError('Failed to load payments')
@@ -65,6 +144,18 @@ export default function PaymentsTable() {
       alive = false
     }
   }, [])
+
+  // Escape closes the raw-payload dialog — the natural exit for something
+  // opened by a click, and the only one available without a visible close
+  // control.
+  useEffect(() => {
+    if (!inspect) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setInspect(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [inspect])
 
   const filtered = useMemo(
     () =>
@@ -145,13 +236,53 @@ export default function PaymentsTable() {
           </div>
         </div>
 
+        {/*
+          The three numbers that make the amount column honest. Pending money is
+          shown *separately* and never folded into Paid: it is a request the
+          provider has not confirmed, and summing the two would present intent as
+          revenue. Totals come from the backend over the whole table, so they do
+          not shrink when a page or a filter does.
+        */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          <div className="glass-card rounded-xl p-4">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Paid</p>
+            <p className="mt-1.5 text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              {money(totals?.paid_total ?? 0)}
+              <span className="ml-1 text-xs font-normal text-gray-400 dark:text-gray-500">TJS</span>
+            </p>
+            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+              {totals?.paid_count ?? 0} settled
+            </p>
+          </div>
+          <div className="glass-card rounded-xl p-4">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Pending</p>
+            <p className="mt-1.5 text-lg font-bold text-amber-600 dark:text-amber-400">
+              {money(totals?.pending_total ?? 0)}
+              <span className="ml-1 text-xs font-normal text-gray-400 dark:text-gray-500">TJS</span>
+            </p>
+            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+              {totals?.pending_count ?? 0} awaiting provider
+            </p>
+          </div>
+          <div className="glass-card rounded-xl p-4">
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Failed</p>
+            <p className="mt-1.5 text-lg font-bold text-red-600 dark:text-red-400">
+              {money(totals?.failed_total ?? 0)}
+              <span className="ml-1 text-xs font-normal text-gray-400 dark:text-gray-500">TJS</span>
+            </p>
+            <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+              {totals?.failed_count ?? 0} declined
+            </p>
+          </div>
+        </div>
+
         {error && (
           <div className="py-8 text-center text-sm text-red-500 dark:text-red-400">{error}</div>
         )}
 
         {!error && (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[820px]">
+            <table className="w-full min-w-[1000px]">
               <thead>
                 <tr className="border-b border-[color:var(--glass-border)]">
                   <th className="text-left px-4 py-3.5 w-12">
@@ -170,15 +301,18 @@ export default function PaymentsTable() {
                   <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Email</th>
                   <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Reference</th>
                   <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Amount</th>
-                  <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Date</th>
+                  <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Opened</th>
+                  <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Paid at</th>
                   <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Status</th>
+                  <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Via</th>
+                  <th className="text-left px-4 py-3.5 text-sm font-medium text-gray-500 dark:text-gray-400">Callback</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 dark:divide-white/5">
                 {loading &&
                   Array.from({ length: 5 }).map((_, i) => (
                     <tr key={`sk-${i}`}>
-                      <td colSpan={7} className="px-4 py-4">
+                      <td colSpan={10} className="px-4 py-4">
                         <div className="h-4 w-full rounded bg-gray-100 dark:bg-white/10 animate-pulse" />
                       </td>
                     </tr>
@@ -215,14 +349,67 @@ export default function PaymentsTable() {
                           {payment.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           <span className="ml-1 text-xs font-normal text-gray-400">TJS</span>
                         </span>
+                        {/*
+                          Where the money goes is only ever knowable from the ids,
+                          and a 100 TJS that buys a TOP window is not the same
+                          100 TJS as one that lands in a balance. Saying so under
+                          the amount stops the column being read as one kind of
+                          money when it is three.
+                        */}
+                        <span className="block mt-0.5 text-[11px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                          → {destination(payment)}
+                        </span>
                       </td>
                       <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                        {formatDate(payment.paid_at ?? payment.created_at)}
+                        {formatDateTime(payment.created_at)}
+                      </td>
+                      <td className="px-4 py-4 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                        {/*
+                          Paid at is its own column now. Previously one cell
+                          showed paid_at falling back to created_at, which made
+                          an unsettled row read as though it had been paid on the
+                          day the link was opened — the dash is the honest answer.
+                        */}
+                        {formatDateTime(payment.paid_at)}
                       </td>
                       <td className="px-4 py-4">
                         <span className={`inline-flex px-3 py-1 rounded-lg text-xs font-semibold border ${statusColors[payment.status]}`}>
                           {STATUS_LABEL[payment.status] ?? payment.status}
                         </span>
+                      </td>
+                      <td className="px-4 py-4">
+                        {payment.settled_via ? (
+                          <span
+                            className={`inline-flex px-2.5 py-1 rounded-lg text-xs font-semibold border ${viaColors[payment.settled_via]}`}
+                            title={
+                              payment.settled_via === 'admin'
+                                ? 'Confirmed by an operator against the statement'
+                                : 'Settled by the provider callback'
+                            }
+                          >
+                            {VIA_LABEL[payment.settled_via]}
+                          </span>
+                        ) : (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-4">
+                        {payment.raw_response ? (
+                          <button
+                            type="button"
+                            onClick={() => setInspect(payment)}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-blue-600 dark:text-blue-400 border border-blue-200/70 dark:border-blue-500/30 bg-blue-50/60 dark:bg-blue-500/10 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors cursor-pointer"
+                            aria-label={`View callback payload for reference ${payment.reference}`}
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            View
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">—</span>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -237,6 +424,96 @@ export default function PaymentsTable() {
           </div>
         )}
       </div>
+
+      {/*
+        The callback payload, shown verbatim. It is the one artefact the admin
+        can hold against DC City's own statement, so it is deliberately not
+        summarised or reformatted — the point is that it is the record, not a
+        reading of the record.
+      */}
+      {inspect && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Callback payload for ${inspect.reference}`}
+          onClick={() => setInspect(null)}
+        >
+          <div
+            className="glass-section rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 p-5 border-b border-[color:var(--glass-border)]">
+              <div>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white">Callback payload</h4>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 font-mono break-all">
+                  {inspect.reference}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setInspect(null)}
+                className="shrink-0 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                aria-label="Close"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-5 overflow-y-auto">
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-3 mb-4">
+                <div>
+                  <dt className="text-xs text-gray-500 dark:text-gray-400">Amount requested</dt>
+                  <dd className="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">
+                    {money(inspect.amount)} TJS
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-gray-500 dark:text-gray-400">Status</dt>
+                  <dd className="mt-0.5">
+                    <span className={`inline-flex px-2.5 py-0.5 rounded-lg text-xs font-semibold border ${statusColors[inspect.status]}`}>
+                      {STATUS_LABEL[inspect.status] ?? inspect.status}
+                    </span>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-gray-500 dark:text-gray-400">Opened</dt>
+                  <dd className="mt-0.5 text-sm text-gray-700 dark:text-gray-300">
+                    {formatDateTime(inspect.created_at)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-gray-500 dark:text-gray-400">Paid at</dt>
+                  <dd className="mt-0.5 text-sm text-gray-700 dark:text-gray-300">
+                    {formatDateTime(inspect.paid_at)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-gray-500 dark:text-gray-400">Settled via</dt>
+                  <dd className="mt-0.5 text-sm text-gray-700 dark:text-gray-300">
+                    {inspect.settled_via ? VIA_LABEL[inspect.settled_via] : 'Not settled'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-gray-500 dark:text-gray-400">Destination</dt>
+                  <dd className="mt-0.5 text-sm text-gray-700 dark:text-gray-300">
+                    {destination(inspect)}
+                  </dd>
+                </div>
+              </dl>
+
+              <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                Raw response (verbatim)
+              </p>
+              <pre className="text-xs font-mono leading-relaxed text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-[color:var(--glass-border)] rounded-xl p-4 overflow-x-auto whitespace-pre-wrap break-words">
+                {inspect.raw_response}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

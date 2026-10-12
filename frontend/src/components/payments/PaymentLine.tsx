@@ -1,4 +1,4 @@
-import { Check, Clock, CreditCard } from 'lucide-react';
+import { Check, Clock, CreditCard, Receipt } from 'lucide-react';
 import type { PaymentRecord } from '../../api';
 import { formatAmount } from '../../utils/format';
 
@@ -22,6 +22,7 @@ export default function PaymentLine({
   busy,
   onPay,
   onConfirm,
+  onSendCheck,
   t,
 }: {
   label: string;
@@ -31,6 +32,10 @@ export default function PaymentLine({
   busy: boolean;
   onPay: () => void;
   onConfirm: (paymentId: number) => void;
+  /** Hand the receipt (screenshot) for this very payment to the caller —
+   *  the same upload the post-payment prompt takes, offered here as well so
+   *  a customer who dismissed the prompt can still send it from this bar. */
+  onSendCheck?: (file: File) => void;
   t: (key: string) => string;
 }) {
   const name = <span className="opacity-80">· {label}</span>;
@@ -59,6 +64,41 @@ export default function PaymentLine({
           >
             {payment.payment_reference}
           </span>
+        )}
+        {/* The payer proves the transfer with a picture: the receipt taken
+            after DC Wallet, re-sendable until the owner confirms the money. */}
+        {role === 'renter' && onSendCheck && (
+          <label
+            className={`flex items-center gap-1.5 text-sm font-semibold text-sky-600 dark:text-sky-400 bg-sky-50 hover:bg-sky-100 dark:bg-sky-500/10 dark:hover:bg-sky-500/20 px-4 py-2 rounded-xl transition cursor-pointer ${
+              busy ? 'opacity-50 pointer-events-none' : ''
+            }`}
+            data-testid="chat-payment-send-check"
+          >
+            <Receipt className="w-4 h-4" />
+            {t('check.send')}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = '';
+                if (file) onSendCheck(file);
+              }}
+            />
+          </label>
+        )}
+        {payment.check_image_url && (
+          <a
+            href={payment.check_image_url}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-1.5 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] transition"
+            data-testid="chat-payment-view-check"
+          >
+            <Receipt className="w-4 h-4" />
+            {t('top.check.view')}
+          </a>
         )}
         {role === 'owner' && (
           <button

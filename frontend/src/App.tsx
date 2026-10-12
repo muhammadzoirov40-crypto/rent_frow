@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import useAuthStore from './store/authStore';
 import { useEffect, Suspense } from 'react';
 import LoadingSpinner from './components/ui/LoadingSpinner';
+import CheckPrompt from './components/payments/CheckPrompt';
 import { recordPath } from './utils/navHistory';
 import Layout from './components/layout/Layout';
 import LoginPage from './pages/LoginPage';
@@ -98,6 +99,9 @@ export default function App() {
   return (
     <>
       <NavRecorder />
+      {/* Asked once money has moved: which receipt is owed is remembered by
+          the flow that opened the checkout, across the redirect and back. */}
+      <CheckPrompt />
       <Routes>
         {/* Revenlo admin dashboard — full-screen, outside site Layout */}
         <Route

@@ -34,6 +34,7 @@ import { previousPath } from '../utils/navHistory';
 import { rememberViewed } from '../utils/recentlyViewed';
 import { formatAmount, formatPriceUnit } from '../utils/format';
 import { wallet, canAfford, openTopUp, topUpFor } from '../utils/wallet';
+import { queueCheckPrompt } from '../utils/checkPrompt';
 import { WALLET_ENABLED } from '../config/features';
 import AvailabilityCalendar from '../components/listings/AvailabilityCalendar';
 import LocationMap from '../components/search/LocationMap';
@@ -115,9 +116,12 @@ export default function ListingPage() {
     // and the browser only opens it. The balance changes when the provider
     // calls back, never because we clicked.
     mutationFn: () => openTopUp(topUpFor(total)),
-    onSuccess: () => {
+    onSuccess: (reference) => {
       queryClient.invalidateQueries({ queryKey: ['wallet-topups'] });
       toast.success(t('dashboard.wallet.paymentOpened'));
+      // The receipt this top-up will be waiting for — asked for here, while
+      // the checkout sits in the other tab and this page is still mounted.
+      queueCheckPrompt({ kind: 'topup', reference });
     },
     onError: () => toast.error(t('common.error')),
   });

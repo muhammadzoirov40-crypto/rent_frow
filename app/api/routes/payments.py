@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.dependencies import require_admin, require_auth, CurrentUser
@@ -10,8 +10,10 @@ from app.schemas.payment import (
 )
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.services.payment import PaymentService
+from app.services import receipt as receipt_service
 from app.services import topup as topup_service
 from app.core.enums import PaymentStatus
+from app.utils.s3 import get_presigned_url
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
 
@@ -30,6 +32,27 @@ async def _pin_reference(db: AsyncSession, payments) -> None:
     for payment in rows:
         intent = intents.get(payment.id)
         payment.__dict__["payment_reference"] = intent.reference if intent else None
+
+
+async def _with_check_url(db: AsyncSession, payments) -> list:
+    """Give each payment a *fresh* link to its receipt, when it has one.
+
+    The row holds the storage key — permanent — and this is the only place it
+    becomes a URL, expiring like every other image link the platform hands
+    out. Doing it in the route rather than the schema keeps the schema free
+    of I/O and keeps the key itself out of every response body.
+    """
+    rows = list(payments)
+    for payment in rows:
+        key = payment.__dict__.get("check_image_key")
+        if not key:
+            payment.__dict__["check_image_url"] = None
+            continue
+        try:
+            payment.__dict__["check_image_url"] = get_presigned_url(key, expires_in=86400)
+        except Exception:
+            payment.__dict__["check_image_url"] = None
+    return rows
 
 # Who may act on a payment is decided by the payment itself - is this caller
 # the renter who paid, the owner who confirms, the customer of this booking - 
@@ -95,6 +118,7 @@ async def list_my_payments(
         current_user.user_id, status, skip, limit
     )
     await _pin_reference(db, items)
+    await _with_check_url(db, items)
     return PaginatedResponse(
         data=items, total=total, page=(skip // limit) + 1, page_size=limit
     )
@@ -111,6 +135,7 @@ async def list_all_payments(
     service = PaymentService(db)
     items, total = await service.get_all_payments(status, skip, limit)
     await _pin_reference(db, items)
+    await _with_check_url(db, items)
     return PaginatedResponse(
         data=items, total=total, page=(skip // limit) + 1, page_size=limit
     )
@@ -145,6 +170,7 @@ async def get_rental_request_payments(
         current_user.user_id, current_user.is_admin, rental_request_id
     )
     await _pin_reference(db, payments)
+    await _with_check_url(db, payments)
     return APIResponse(data=payments)
 
 
@@ -159,6 +185,7 @@ async def get_payment(
     if not current_user.is_admin and payment.customer_id != current_user.user_id:
         raise HTTPException(status_code=403, detail="Access denied")
     await _pin_reference(db, [payment])
+    await _with_check_url(db, [payment])
     return APIResponse(data=payment)
 
 
@@ -175,3 +202,41 @@ async def confirm_payment(
         current_user.user_id, current_user.is_admin, payment_id
     )
     return APIResponse(message="Payment confirmed successfully", data=payment)
+
+
+@router.post("/{payment_id}/check", response_model=APIResponse[PaymentResponse])
+async def send_payment_check(
+    payment_id: int,
+    file: UploadFile = File(...),
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Attach the receipt (screenshot) for a rental payment still unpaid.
+
+    The same receipt the TOP flow and the wallet top-up already take: the
+    customer paid at DC Wallet, the callback has not landed, and the owner —
+    or an operator — wants the proof next to the reference. Payer or admin
+    only, and only while the payment is still PENDING: once confirmed there
+    is nothing left to prove.
+
+    Authorization runs *before* the upload, so a stranger's 403 costs no
+    storage.
+    """
+    service = PaymentService(db)
+    payment = await service.get_by_id(payment_id)
+    if payment.customer_id != current_user.user_id and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Access denied")
+    if payment.status != PaymentStatus.PENDING:
+        raise HTTPException(status_code=400, detail="PAYMENT_CLOSED")
+
+    file_bytes, filename = await receipt_service.read_check(file)
+    image_key = receipt_service.store_check(
+        file_bytes, receipt_service.FOLDER_PAYMENT, filename
+    )
+    # one receipt at a time: re-sending replaces the previous key
+    payment.check_image_key = image_key
+    await db.flush()
+
+    await _pin_reference(db, [payment])
+    await _with_check_url(db, [payment])
+    return APIResponse(message="Check attached", data=payment)

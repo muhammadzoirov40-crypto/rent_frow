@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ArrowRight, Check, ExternalLink, Info, Loader2, Lock, Plus, RotateCcw, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, ExternalLink, Info, Loader2, Lock, Plus, Receipt, RotateCcw, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { wallet, type TopupIntent, type WalletTransactionRecord } from '../../api';
+import { queueCheckPrompt } from '../../utils/checkPrompt';
 import { formatAmount } from '../../utils/format';
 import { DEFAULT_TOPUP, openTopUp } from '../../utils/wallet';
 import useAuthStore from '../../store/authStore';
@@ -50,12 +51,27 @@ export default function WalletSection() {
 
   const topUp = useMutation({
     mutationFn: (value: number) => openTopUp(value),
-    onSuccess: () => {
+    onSuccess: (reference) => {
       setShowTopUp(false);
       queryClient.invalidateQueries({ queryKey: ['wallet-topups'] });
       toast.success(t('dashboard.wallet.paymentOpened'));
+      // The checkout opened in another tab and this page stayed mounted, so
+      // the receipt prompt is asked for right now, not on the way back.
+      queueCheckPrompt({ kind: 'topup', reference });
     },
     onError: () => toast.error(t('common.error')),
+  });
+
+  // The receipt for a top-up still waiting on DC City — the same picture the
+  // post-payment prompt takes, offered per row for the one who dismissed it.
+  const checkMutation = useMutation({
+    mutationFn: ({ reference, file }: { reference: string; file: File }) =>
+      wallet.sendCheck(reference, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wallet-topups'] });
+      toast.success(t('check.sent'));
+    },
+    onError: () => toast.error(t('check.failed')),
   });
 
   const refresh = () => {
@@ -199,6 +215,39 @@ export default function WalletSection() {
                   <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {new Date(row.created_at).toLocaleString(i18n.language)}
                   </span>
+                  {/* The receipt taken after paying at DC Wallet: sent from
+                      the row itself, so a dismissed prompt costs nothing. */}
+                  <label
+                    className={`shrink-0 inline-flex items-center gap-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-500/10 dark:hover:bg-sky-500/20 px-2.5 py-1.5 text-xs font-semibold text-sky-600 dark:text-sky-400 transition cursor-pointer ${
+                      checkMutation.isPending ? 'opacity-50 pointer-events-none' : ''
+                    }`}
+                    data-testid={`wallet-topup-send-check-${row.id}`}
+                  >
+                    <Receipt className="w-3.5 h-3.5" />
+                    {t('check.send')}
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        event.target.value = '';
+                        if (file) checkMutation.mutate({ reference: row.reference, file });
+                      }}
+                    />
+                  </label>
+                  {row.check_image_url && (
+                    <a
+                      href={row.check_image_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="shrink-0 inline-flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] transition"
+                      data-testid={`wallet-topup-view-check-${row.id}`}
+                    >
+                      <Receipt className="w-3.5 h-3.5" />
+                      {t('top.check.view')}
+                    </a>
+                  )}
                   {isAdmin && (
                     <button
                       type="button"

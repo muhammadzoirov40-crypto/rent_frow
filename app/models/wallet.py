@@ -124,6 +124,13 @@ class TopupIntent(Base):
     )
     # whatever the callback sent, kept verbatim for the audit trail
     raw_response: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # The receipt (screenshot) the customer attaches after paying at DC
+    # Wallet - the same storage key as a post image (S3, or the local
+    # fallback), never a signed URL: keys do not expire, the links built from
+    # them do. Top-promotion requests already carried one of these; a balance
+    # top-up and a rental payment are the same act of paying at the same
+    # provider, so the operator should see the same proof next to them.
+    check_image_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow, nullable=False
     )

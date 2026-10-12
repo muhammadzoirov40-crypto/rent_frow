@@ -11,6 +11,7 @@ import { rentalRequests, listings, messages, payments } from '../api';
 import type { RentalRequest, PaymentRecord } from '../api';
 import BackButton from '../components/ui/BackButton';
 import PaymentLine from '../components/payments/PaymentLine';
+import { queueCheckPrompt } from '../utils/checkPrompt';
 import { formatDate } from '../utils/dates';
 
 import { formatAmount } from '../utils/format';
@@ -110,9 +111,26 @@ export function RequestCard({
       // the server built for this request's own amount, and the payment row
       // it left behind is what the callback will settle.
       queryClient.invalidateQueries({ queryKey: ['payment-for-request', req.id] });
+      // Which row owes a receipt is remembered before the browser leaves, so
+      // the customer is asked for the picture the moment they are back.
+      if (data?.payment?.id != null) {
+        queueCheckPrompt({ kind: 'payment', paymentId: data.payment.id });
+      }
       if (data?.url) window.location.href = data.url;
     },
     onError: (error: any) => toast.error(paymentError(error)),
+  });
+
+  // The receipt for a payment still waiting: one upload against that row,
+  // re-sendable, shown to the owner next to the reference they confirm by.
+  const checkMutation = useMutation({
+    mutationFn: ({ paymentId, file }: { paymentId: number; file: File }) =>
+      payments.sendCheck(paymentId, file),
+    onSuccess: () => {
+      toast.success(t('check.sent'));
+      queryClient.invalidateQueries({ queryKey: ['payment-for-request', req.id] });
+    },
+    onError: () => toast.error(t('check.failed')),
   });
 
   const confirmMutation = useMutation({
@@ -124,7 +142,7 @@ export function RequestCard({
     onError: (error: any) => toast.error(paymentError(error)),
   });
 
-  const busy = isMutating || payMutation.isPending || confirmMutation.isPending;
+  const busy = isMutating || payMutation.isPending || confirmMutation.isPending || checkMutation.isPending;
 
   return (
     <div className="glass-section rounded-2xl border border-gray-100 dark:border-white/10 p-4 sm:p-5 transition">
@@ -208,6 +226,10 @@ export function RequestCard({
                       busy={busy}
                       onPay={() => payMutation.mutate(line.kind)}
                       onConfirm={(paymentId) => confirmMutation.mutate(paymentId)}
+                      onSendCheck={(file) => {
+                        const pending = linePayment(line.kind);
+                        if (pending) checkMutation.mutate({ paymentId: pending.id, file });
+                      }}
                       t={t}
                     />
                   ))

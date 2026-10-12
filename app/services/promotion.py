@@ -699,15 +699,32 @@ async def confirm_dc_payment(
     callback turning up later - answers ``ALREADY_PAID`` and activates
     nothing twice.
 
-    Refuses with ``NOT_DC_PAYMENT`` when this request never opened a DC
-    checkout (there is no reference to match, and stamping it "paid" would
-    be a fiction).
+    Two refusals live here, and they are different in kind:
+
+    * ``NOT_DC_PAYMENT`` - this request never opened a DC checkout, so there
+      is no reference to match and stamping it "paid" would be a fiction.
+    * ``CHECK_REQUIRED`` - the checkout was opened, but the customer's
+      receipt is not attached. This is the one place a human vouches for
+      money the platform cannot otherwise see, so the vouching is gated on
+      the proof being in front of them: without it this endpoint would let an
+      operator activate a paid window on nothing more than a matching row.
+      The webhook path needs no such gate - the provider's own callback *is*
+      the proof, and it carries the amount.
+
+    Both are raised before any state moves, so a refusal never leaves a
+    half-activated window behind.
     """
     promo = await _get_promotion(db, promo_id)
     intents = await topup_service.latest_promotion_intents(db, [promo.id])
     intent = intents.get(promo.id)
     if intent is None:
         raise HTTPException(status_code=400, detail="NOT_DC_PAYMENT")
+
+    if not promo.__dict__.get("check_image_key"):
+        # Read through __dict__ for the same reason _check_url does: a column
+        # that was never loaded reads as None rather than touching the
+        # database from a sync context.
+        raise HTTPException(status_code=400, detail="CHECK_REQUIRED")
 
     credited, reason = await topup_service.settle(
         db,

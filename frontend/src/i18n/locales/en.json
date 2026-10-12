@@ -1222,6 +1222,18 @@
     "forDays": "for",
     "sendRequest": "Send request"
   },
+  "check": {
+    "title": "Send your payment receipt",
+    "hint": "After paying at DC Wallet (Dushanbe City), take a screenshot of the receipt and upload it here - the payment is confirmed against this picture.",
+    "choose": "Choose a picture",
+    "chooseHint": "JPG, PNG or WebP - up to 10 MB",
+    "send": "Send check",
+    "skip": "Not now",
+    "sent": "Check sent",
+    "failed": "The check could not be sent",
+    "invalidType": "Wrong format: JPG, PNG or WebP",
+    "tooBig": "File too large - 10 MB maximum"
+  },
   "payment": {
     "pay": "Pay",
     "rent": "Rent",

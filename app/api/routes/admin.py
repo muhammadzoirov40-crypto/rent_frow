@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
+import json
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 from sqlalchemy import select, func
@@ -9,7 +10,8 @@ from app.core.enums import UserRole, ListingStatus, PostStatus
 from app.schemas.statistics import StatisticsResponse, AuditLogResponse
 from app.schemas.base import APIResponse, PaginatedResponse
 from app.schemas.post import PostResponse
-from app.schemas.wallet import AdminTopupResponse
+from app.schemas.wallet import AdminTopupResponse, AdminTopupListResponse
+from app.utils.s3 import get_presigned_url
 from app.services.statistics import StatisticsService
 from app.services.audit_log import AuditLogService
 from app.services.notification import NotificationService
@@ -610,7 +612,49 @@ async def get_entity_audit_logs(
     return APIResponse(data=items)
 
 
-@router.get("/topups", response_model=PaginatedResponse[AdminTopupResponse])
+def _check_url(key: str | None) -> str | None:
+    """A fresh link to an attached receipt, or None when there is none.
+
+    The row stores the storage key — permanent — and this is the only place
+    it becomes a URL, expiring like every other image link the platform hands
+    out. A presign that fails falls back to no link rather than to the raw
+    key: the operator loses the picture, never the storage path.
+    """
+    if not key:
+        return None
+    try:
+        return get_presigned_url(key, expires_in=86400)
+    except Exception:
+        return None
+
+
+def _settled_via(raw_response: str | None) -> str | None:
+    """Who stamped a top-up PAID: the provider's callback, or an operator's hand.
+
+    ``settle`` writes the caller's own marker into ``raw_response`` — the webhook
+    passes the provider payload through untouched, while the manual
+    confirm-from-statement path stamps ``{"by": admin_id, "via": "admin_promo"}``.
+    So the answer is read back out of that record rather than inferred from
+    status alone: "PAID" says the money is in, this says who vouched for it,
+    which is the difference between an automated settlement and one an
+    operator is personally accountable for.
+
+    Anything else — a payload with no ``via`` marker — is the provider's own
+    callback, so it reports as ``webhook``. A row that is still waiting has
+    ``raw_response`` unset and reports ``None``, never a guess.
+    """
+    if not raw_response:
+        return None
+    try:
+        parsed = json.loads(raw_response)
+    except ValueError:
+        return "webhook"
+    if isinstance(parsed, dict) and parsed.get("via"):
+        return "admin"
+    return "webhook"
+
+
+@router.get("/topups", response_model=AdminTopupListResponse)
 async def admin_list_topups(
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=200),
@@ -624,6 +668,15 @@ async def admin_list_topups(
     unique ``reference`` on each attempt; this simply joins the person on so
     the admin can see *who* transferred money. Filterable by status, newest
     first.
+
+    Two things this deliberately does *not* do:
+
+    * It does not treat ``amount`` as money that arrived. That column is what
+      we asked for in the checkout link; a row still PENDING is a request, not
+      a receipt. ``settled_via`` and ``raw_response`` carry the proof instead,
+      so the list cannot be read as revenue when it is only intent.
+    * It does not total only the page in view. The sums come from the whole
+      table, so a 50-row page can never quietly understate what was paid.
     """
     conditions = [TopupIntent.status == status_filter] if status_filter else []
 
@@ -632,6 +685,19 @@ async def admin_list_topups(
             select(func.count()).select_from(TopupIntent).where(*conditions)
         )
     ).scalar_one()
+
+    # Money sums are computed over every intent, ignoring both the status
+    # filter and the page window — a page is a view, the totals are the fact.
+    sums = (
+        await db.execute(
+            select(
+                TopupIntent.status,
+                func.count(TopupIntent.id),
+                func.coalesce(func.sum(TopupIntent.amount), 0.0),
+            ).group_by(TopupIntent.status)
+        )
+    ).all()
+    totals_by_status = {status: (count, float(amount)) for status, count, amount in sums}
 
     rows = (
         await db.execute(
@@ -656,11 +722,30 @@ async def admin_list_topups(
             provider=t.provider,
             created_at=t.created_at,
             paid_at=t.paid_at,
+            settled_via=_settled_via(t.raw_response),
+            raw_response=t.raw_response,
+            check_image_url=_check_url(t.__dict__.get("check_image_key")),
+            promotion_id=t.promotion_id,
+            payment_id=t.payment_id,
         )
         for t, u in rows
     ]
-    return PaginatedResponse(
-        data=items, total=total, page=(skip // limit) + 1, page_size=limit
+
+    paid_count, paid_total = totals_by_status.get("PAID", (0, 0.0))
+    pending_count, pending_total = totals_by_status.get("PENDING", (0, 0.0))
+    failed_count, failed_total = totals_by_status.get("FAILED", (0, 0.0))
+
+    return AdminTopupListResponse(
+        data=items,
+        total=total,
+        page=(skip // limit) + 1,
+        page_size=limit,
+        paid_total=round(paid_total, 2),
+        paid_count=paid_count,
+        pending_total=round(pending_total, 2),
+        pending_count=pending_count,
+        failed_total=round(failed_total, 2),
+        failed_count=failed_count,
     )
 
 

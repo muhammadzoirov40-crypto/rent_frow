@@ -27,6 +27,12 @@ class Payment(Base):
         SAEnum(PaymentStatus), default=PaymentStatus.PENDING, nullable=False
     )
     transaction_id: Mapped[str | None] = mapped_column(String(255), nullable=True, index=True)
+    # The receipt (screenshot) the customer attaches after paying at DC
+    # Wallet - a storage key like a post image, never a signed URL. Same
+    # column, same reason and same shape as TopupIntent.check_image_key and
+    # TopPromotion.check_image_key: one kind of proof for every payment the
+    # platform takes, so an operator never has to ask which table holds it.
+    check_image_key: Mapped[str | None] = mapped_column(String(512), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     booking = relationship("Booking", back_populates="payments", lazy="selectin")

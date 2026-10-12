@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,8 +14,10 @@ from app.schemas.wallet import (
     WalletTopUpRequest,
     WalletTransactionResponse,
 )
+from app.services import receipt as receipt_service
 from app.services import topup as topup_service
 from app.services.wallet import WalletService
+from app.utils.s3 import get_presigned_url
 from app.models.rental_request import RentalRequest
 
 router = APIRouter(prefix="/wallet", tags=["Wallet"])
@@ -23,6 +25,24 @@ router = APIRouter(prefix="/wallet", tags=["Wallet"])
 
 def _summary(payload: dict) -> WalletSummary:
     return WalletSummary(**payload)
+
+
+def _intent_response(row) -> TopupIntentResponse:
+    """An intent plus a *fresh* link to its receipt, if one was attached.
+
+    The row stores the storage key — permanent — and this is the only place
+    it becomes a URL, expiring like every other image link the platform
+    hands out. Building it here rather than in the schema keeps the schema
+    free of I/O, and keeps the key from ever reaching a response body.
+    """
+    payload = TopupIntentResponse.model_validate(row)
+    key = row.__dict__.get("check_image_key")
+    if key:
+        try:
+            payload.check_image_url = get_presigned_url(key, expires_in=86400)
+        except Exception:
+            payload.check_image_url = None
+    return payload
 
 
 async def _with_listing_titles(db: AsyncSession, items) -> dict[int, str]:
@@ -129,11 +149,48 @@ async def list_top_ups(
         raise HTTPException(status_code=403, detail="WALLET_DISABLED")
     rows = await topup_service.intents(db, current_user.user_id, page_size)
     return PaginatedResponse(
-        data=[TopupIntentResponse.model_validate(r) for r in rows],
+        data=[_intent_response(r) for r in rows],
         total=len(rows),
         page=page,
         page_size=page_size,
     )
+
+
+@router.post("/topups/{reference}/check", response_model=APIResponse[TopupIntentResponse])
+async def send_topup_check(
+    reference: str,
+    file: UploadFile = File(...),
+    current_user: CurrentUser = Depends(require_auth),
+    db: AsyncSession = Depends(get_db),
+):
+    """Attach the receipt (screenshot) for a top-up still waiting on DC City.
+
+    Same act as the TOP receipt: the customer paid at DC Wallet, the callback
+    has not landed, and an operator wants the proof next to the reference
+    instead of hunting for it in a chat. Owner or admin only, and only while
+    the top-up is still open — once settled there is nothing left to prove.
+
+    The authorization runs *before* the upload, so a stranger's 403 costs no
+    storage.
+    """
+    row = await topup_service.find(db, reference)
+    if row is None:
+        raise HTTPException(status_code=404, detail="TOPUP_NOT_FOUND")
+    if row.user_id != current_user.user_id and not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Not your top-up")
+    if row.status != "PENDING":
+        # already settled or already declined: the receipt would answer a
+        # question nobody is asking any more
+        raise HTTPException(status_code=400, detail="TOPUP_CLOSED")
+
+    file_bytes, filename = await receipt_service.read_check(file)
+    image_key = receipt_service.store_check(
+        file_bytes, receipt_service.FOLDER_TOPUP, filename
+    )
+    # one receipt at a time: re-sending replaces the previous key
+    row.check_image_key = image_key
+    await db.flush()
+    return APIResponse(message="Check attached", data=_intent_response(row))
 
 
 @router.post("/topups/{reference}/confirm", response_model=APIResponse[TopupIntentResponse])

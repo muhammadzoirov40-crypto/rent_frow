@@ -239,6 +239,9 @@ export interface PaymentRecord {
   /** The DC checkout reference this payment was opened under, when there is
    *  one — what the operator matches in the statement. Pinned by the API. */
   payment_reference?: string | null;
+  /** A fresh link to the receipt (screenshot) the renter attached after
+   *  paying, until the owner confirms the money. None until one is sent. */
+  check_image_url?: string | null;
 }
 
 const unwrap = <T>(response: { data: APIResponse<T> }): T => response.data.data;
@@ -518,6 +521,9 @@ export interface TopupIntent {
   provider: string;
   created_at: string;
   paid_at: string | null;
+  /** A fresh link to the receipt (screenshot) the customer attached after
+   *  paying, while the top-up is still waiting on DC City. */
+  check_image_url?: string | null;
 }
 
 export const wallet = {
@@ -554,6 +560,22 @@ export const wallet = {
    *  real payment. Kept for seeding and for the admin panel. */
   topUp: (amount: number, description?: string) =>
     client.post<APIResponse<WalletSummary>>('/wallet/topup', { amount, description }).then(unwrap),
+
+  /** The receipt (screenshot) for a top-up still waiting on DC City — the
+   *  picture the customer holds after paying at DC Wallet. The file goes to
+   *  storage, only the key is stored, and the response carries a fresh link
+   *  back. Owner-only while the intent is still PENDING. */
+  sendCheck: (reference: string, file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return client
+      .post<APIResponse<TopupIntent>>(
+        `/wallet/topups/${encodeURIComponent(reference)}/check`,
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } },
+      )
+      .then(unwrap);
+  },
 };
 
 // ---------------------------------------------------------------- TOP promo
@@ -737,6 +759,19 @@ export const payments = {
   /** The owner of the listing (or an admin) marks the money as received. */
   confirm: (paymentId: number) =>
     client.post<APIResponse<PaymentRecord>>(`/payments/${paymentId}/confirm`).then(unwrap),
+  /** The receipt (screenshot) for a rental payment still PENDING: the renter
+   *  paid at DC Wallet, the callback has not landed, and the proof goes to
+   *  storage next to this row's reference. Payer (or admin) only, and only
+   *  while the payment is still open. */
+  sendCheck: (paymentId: number, file: File) => {
+    const form = new FormData();
+    form.append('file', file);
+    return client
+      .post<APIResponse<PaymentRecord>>(`/payments/${paymentId}/check`, form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(unwrap);
+  },
   /** Admin: every payment on the platform, newest first — the panel's
    *  confirmation list, with each row's DC reference for the statement. */
   adminAll: (skip = 0, limit = 100) =>
