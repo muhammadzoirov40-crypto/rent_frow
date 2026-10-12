@@ -1,7 +1,7 @@
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { ImagePlus, Loader2, Receipt, X } from 'lucide-react';
+import { ImagePlus, Loader2, Receipt, Clock, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { payments, topPromotions, wallet } from '../../api';
@@ -17,6 +17,15 @@ import {
  *  checked before a byte is read so a refusal costs no upload at all. */
 const ACCEPTED = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 const MAX_BYTES = 10 * 1024 * 1024;
+
+/** How long the send button holds out once the prompt opens.
+ *
+ *  A receipt proves money that has already moved, and the window opens the
+ *  moment the checkout does — so the wait is what stands between "the link
+ *  was opened" and "here is a picture of a payment": long enough that a
+ *  script cannot fire one off instantly, short enough that a customer who
+ *  has just paid at DC Wallet never feels it. */
+const WAIT_SECONDS = 30;
 
 /** Everything a sent receipt can be waiting behind, so the row it belongs to
  *  redraws the moment the upload lands. */
@@ -50,6 +59,7 @@ export default function CheckPrompt() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [target, setTarget] = useState<CheckPromptTarget | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState(WAIT_SECONDS);
 
   // Read on mount (the return from the checkout is a fresh page load) and
   // on the queue event (the top-up flow never leaves this page). Nobody is
@@ -65,6 +75,20 @@ export default function CheckPrompt() {
     window.addEventListener(CHECK_PROMPT_EVENT, consume);
     return () => window.removeEventListener(CHECK_PROMPT_EVENT, consume);
   }, [isAuthenticated]);
+
+  // Every opening of the prompt waits the same 30 seconds out (see
+  // WAIT_SECONDS): restarted when a new row asks, ticking while the
+  // customer picks the picture — by the time they have found the screenshot
+  // in their gallery the button has usually already woken up.
+  useEffect(() => {
+    if (!target) return;
+    setSecondsLeft(WAIT_SECONDS);
+    const timer = window.setInterval(
+      () => setSecondsLeft((left) => Math.max(0, left - 1)),
+      1000,
+    );
+    return () => window.clearInterval(timer);
+  }, [target]);
 
   const sendMutation = useMutation({
     mutationFn: (image: File): Promise<unknown> => {
@@ -170,6 +194,16 @@ export default function CheckPrompt() {
           />
         </label>
 
+        {secondsLeft > 0 && (
+          <p
+            className="mt-3 flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 tabular-nums"
+            data-testid="check-wait"
+          >
+            <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+            {t('check.wait', { seconds: secondsLeft })}
+          </p>
+        )}
+
         <div className="flex flex-wrap items-center justify-end gap-2 mt-5">
           <button
             type="button"
@@ -183,7 +217,7 @@ export default function CheckPrompt() {
           <button
             type="button"
             onClick={() => file && sendMutation.mutate(file)}
-            disabled={!file || sendMutation.isPending}
+            disabled={!file || sendMutation.isPending || secondsLeft > 0}
             data-testid="check-send"
             className="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 disabled:opacity-60 transition inline-flex items-center gap-2"
           >

@@ -239,4 +239,18 @@ async def send_payment_check(
 
     await _pin_reference(db, [payment])
     await _with_check_url(db, [payment])
+
+    # Every operator hears it at once — who paid, how much, under which
+    # reference and for which listing, so the picture can be matched
+    # against the statement without opening the panel first.
+    request = payment.rental_request
+    await receipt_service.notify_admins(
+        db,
+        source=receipt_service.SOURCE_RENTAL,
+        payer_id=payment.customer_id,
+        amount=float(payment.amount),
+        reference=payment.__dict__.get("payment_reference"),
+        listing_title=(request.listing.title if request and request.listing else None),
+        reference_id=payment.id,
+    )
     return APIResponse(message="Check attached", data=payment)

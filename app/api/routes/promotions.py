@@ -32,6 +32,7 @@ from app.schemas.promotion import (
     TopStatsResponse,
 )
 from app.services import promotion as promo_service
+from app.services import receipt as receipt_service
 from app.utils.s3 import upload_file
 
 router = APIRouter(prefix="/promotions", tags=["TOP promotions"])
@@ -300,4 +301,17 @@ async def send_payment_check(
         content_type=file.content_type,
     )
     promo = await promo_service.attach_check(db, promo, image_key)
+
+    # Every operator hears it at once — who paid, how much, under which
+    # reference and for which listing, which is exactly the four columns
+    # the DC City statement is matched against.
+    await receipt_service.notify_admins(
+        db,
+        source=receipt_service.SOURCE_TOP,
+        payer_id=promo.user_id,
+        amount=float(promo.price),
+        reference=promo.__dict__.get("payment_reference"),
+        listing_title=(promo.listing.title if promo.listing else None),
+        reference_id=promo.id,
+    )
     return APIResponse(message="Check attached", data=promo_service.to_response(promo))

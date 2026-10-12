@@ -190,6 +190,17 @@ async def send_topup_check(
     # one receipt at a time: re-sending replaces the previous key
     row.check_image_key = image_key
     await db.flush()
+
+    # Every operator hears it at once — who filled the balance, how much,
+    # under which reference: the four things the statement is matched by.
+    await receipt_service.notify_admins(
+        db,
+        source=receipt_service.SOURCE_WALLET,
+        payer_id=row.user_id,
+        amount=float(row.amount),
+        reference=row.reference,
+        reference_id=row.id,
+    )
     return APIResponse(message="Check attached", data=_intent_response(row))
 
 

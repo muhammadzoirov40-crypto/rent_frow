@@ -566,6 +566,9 @@
       "top_cancelled": {
         "title": "TOP cancelled",
         "body": "The promotion of «{{listing}}» was cancelled"
+      },
+      "check_received": {
+        "title": "Payment receipt received"
       }
     },
     "markAllReadSuccess": "All notifications marked as read",
@@ -577,12 +580,20 @@
       "comment": "Comment",
       "rating": "Rating",
       "reason": "Reason",
-      "plan": "Plan"
+      "plan": "Plan",
+      "source": "Source",
+      "amount": "Amount",
+      "reference": "Reference"
     },
     "reasons": {
       "deleted_by_owner": "deleted by owner",
       "removed_by_admin": "removed by admin",
       "deactivated_by_owner": "deactivated by owner"
+    },
+    "sources": {
+      "TOP": "TOP promotion",
+      "WALLET": "Balance top-up",
+      "RENTAL": "Rental payment"
     }
   },
   "profile": {
@@ -1232,7 +1243,8 @@
     "sent": "Check sent",
     "failed": "The check could not be sent",
     "invalidType": "Wrong format: JPG, PNG or WebP",
-    "tooBig": "File too large - 10 MB maximum"
+    "tooBig": "File too large - 10 MB maximum",
+    "wait": "Sending available in {{seconds}}s"
   },
   "payment": {
     "pay": "Pay",

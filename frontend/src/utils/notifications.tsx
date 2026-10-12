@@ -10,6 +10,7 @@ import {
   Heart,
   MessageCircle,
   MessageSquare,
+  Receipt,
   Star,
   Crown,
   XCircle,
@@ -163,6 +164,19 @@ const TYPE_META: Record<string, TypeMeta> = {
     titleKey: 'notifications.types.top_cancelled.title',
     bodyKey: 'notifications.types.top_cancelled.body',
   },
+  // A receipt just arrived — the operator's copy of "somebody paid": which
+  // flow it belongs to, who sent it, how much, for what and under which
+  // reference, the four columns the statement is matched against.
+  check_received: {
+    titleKey: 'notifications.types.check_received.title',
+    detailKeys: [
+      ['source', 'notifications.labels.source'],
+      ['user_name', 'notifications.labels.user'],
+      ['amount', 'notifications.labels.amount'],
+      ['listing_title', 'notifications.labels.listing'],
+      ['reference', 'notifications.labels.reference'],
+    ],
+  },
 };
 
 interface TypeStyle {
@@ -277,6 +291,11 @@ export const NOTIFICATION_TYPE_STYLE: Record<string, TypeStyle> = {
     color: 'text-gray-600',
     bgColor: 'bg-gray-100',
   },
+  check_received: {
+    icon: <Receipt className="w-5 h-5" />,
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-100',
+  },
   default: {
     icon: <Bell className="w-5 h-5" />,
     color: 'text-[var(--accent)]',
@@ -327,6 +346,15 @@ export function formatNotification(
         details.push({
           label,
           value: t(`notifications.reasons.${raw}`, { defaultValue: raw }),
+        });
+        continue;
+      }
+      // Which of the three flows the receipt came from: the backend sends a
+      // code, the reader sees a phrase in their own language.
+      if (dataKey === 'source') {
+        details.push({
+          label,
+          value: t(`notifications.sources.${raw}`, { defaultValue: raw }),
         });
         continue;
       }
@@ -402,6 +430,10 @@ export function getNotificationRoute(notification: NotificationLike): string | n
     case 'top_rejected':
     case 'top_cancelled':
       return '/dashboard';
+    case 'check_received':
+      // Only an admin ever receives one, and the payments panel is where
+      // the receipt is matched against the statement.
+      return '/admin';
     default:
       return null;
   }
