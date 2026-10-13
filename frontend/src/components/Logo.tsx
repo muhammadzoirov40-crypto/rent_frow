@@ -135,12 +135,19 @@ export default function Logo({ size = 'md', to = '/', onClick }: LogoProps) {
       to={to}
       onClick={onClick}
       aria-label="RentHub"
-      className="flex items-center gap-2.5 sm:gap-3 group select-none transition-transform duration-150 active:scale-95 shrink-0 bg-transparent"
+      className="flex items-center gap-2 sm:gap-2.5 group select-none transition-transform duration-150 active:scale-95 shrink-0 bg-transparent"
       data-testid="logo"
     >
-      {/* The emblem carries the wordmark, the tagline and the smile — the
-          whole brand in one circle, so no separate word is needed beside it. */}
+      {/* The emblem carries the whole brand mark; the word beside it is what
+          makes the name readable at a glance on a busy header. */}
       <LogoMark className={s} />
+      <span
+        className="block leading-none tracking-tight whitespace-nowrap"
+        style={{ fontFamily: FONT }}
+      >
+        <span className="font-extrabold text-[15px] sm:text-[19px] text-gray-900 dark:text-white">Rent</span>
+        <span className="font-extrabold text-[15px] sm:text-[19px] text-[var(--accent)]">Hub</span>
+      </span>
     </Link>
   );
 }
