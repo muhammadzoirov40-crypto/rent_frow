@@ -340,10 +340,11 @@ export default function AdminPage() {
 
   // Payments: only fetched while the tab is open. Each row carries the DC
   // reference when a checkout was opened for it - what the operator matches
-  // in the statement before pressing confirm.
+  // in the statement before pressing confirm. The API caps a page at 100
+  // (Query le=100): asking for more returns 422 and an empty table.
   const { data: paymentRows = [], isLoading: paymentsLoading } = useQuery({
     queryKey: ['admin-payments'],
-    queryFn: () => payments.adminAll(0, 200).then((page) => page.items),
+    queryFn: () => payments.adminAll(0, 100).then((page) => page.items),
     enabled: activeTab === 'payments',
   });
 
