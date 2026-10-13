@@ -438,7 +438,9 @@ export default function MessagesPage() {
 
   return (
     <div className="flex h-[calc(100vh_-_var(--header-h)_-_7rem)] md:h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto glass-section rounded-3xl overflow-hidden border border-[color:var(--glass-border)] my-4">
-      <div className={`w-80 flex-shrink-0 border-r border-[color:var(--glass-border)] flex flex-col ${selectedId ? 'hidden md:flex' : 'flex'}`}>
+      {/* Full width on a phone (nothing else is on screen there), a fixed
+          320px rail on desktop where the conversation sits beside it. */}
+      <div className={`w-full md:w-80 flex-shrink-0 border-r border-[color:var(--glass-border)] flex flex-col ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center gap-2 mb-3">
             <button
