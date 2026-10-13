@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import Logo from '../Logo';
 import { useTranslation } from 'react-i18next';
@@ -128,7 +129,11 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     { to: '/admin', label: t('nav.adminDashboard'), icon: Shield, show: user?.role === 'ADMIN' },
   ];
 
-  return (
+  // Portalled to <body>: the header this component is rendered inside carries
+  // `glass-section`, and an ancestor with backdrop-filter becomes the
+  // containing block for position:fixed — the drawer would size itself to the
+  // header (~163px) instead of the whole screen, hiding every menu item.
+  return createPortal(
     <>
       <div
         className={`fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
@@ -312,6 +317,7 @@ export default function MobileSidebar({ open, onClose }: MobileSidebarProps) {
       </aside>
       <FeedbackDialog open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
       <BuyVipModal open={vipOpen} onClose={() => setVipOpen(false)} />
-    </>
+    </>,
+    document.body,
   );
 }
