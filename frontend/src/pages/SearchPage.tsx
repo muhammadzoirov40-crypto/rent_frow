@@ -244,8 +244,11 @@ export default function SearchPage() {
           </h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="w-44">
+        {/* Wraps on a phone: the sort dropdown takes its own line, and the
+            view toggles share the second one with the filter button instead
+            of the row silently widening the whole page sideways. */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-full sm:w-44">
             <CustomSelect
               options={SORT_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))}
               value={currentSort}
