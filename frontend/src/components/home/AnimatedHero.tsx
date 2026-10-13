@@ -191,12 +191,12 @@ export default function AnimatedHero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-start-1 lg:col-span-6 lg:row-start-1 space-y-6"
+            className="lg:col-start-1 lg:col-span-6 lg:row-start-1 space-y-6 min-w-0"
           >
             {/* Title with Gradient Accent */}
-            <h1 className="text-5xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
+            <h1 className="text-4xl sm:text-6xl xl:text-7xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white">
               {t('home.heroTitle')}{' '}
-              <span className="whitespace-nowrap">
+              <span className="sm:whitespace-nowrap">
                 <span className="bg-gradient-to-r from-[var(--hero-rent-from)] via-[var(--hero-rent-via)] to-[var(--hero-rent-to)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_var(--hero-rent-shadow)]">
                   Rent
                 </span>

@@ -189,7 +189,9 @@ export default function Header() {
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
-            <div className="relative" ref={langRef}>
+            {/* Languages live in the mobile menu, so the header keeps only
+                the theme, the account and the burger on small screens. */}
+            <div className="relative hidden sm:block" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
                 className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition text-sm font-medium"
