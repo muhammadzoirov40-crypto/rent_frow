@@ -81,7 +81,9 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <Mail className="w-4 h-4 text-brand-500 shrink-0" />
-                muhammadzoirov40@gmail.com
+                {/* min-w-0 + break-all: a long unbroken address must wrap
+                    inside its column instead of widening the whole footer */}
+                <span className="min-w-0 break-all">muhammadzoirov40@gmail.com</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-500 dark:text-gray-400">
                 <MapPin className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
