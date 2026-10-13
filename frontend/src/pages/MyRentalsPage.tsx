@@ -87,10 +87,10 @@ export default function MyRentalsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0a0a1a] py-5 sm:py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <BackButton className="mb-4" />
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <h1 className="text-3xl font-bold text-[#1A1A2E] dark:text-white">{t('myRentals.title')}</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">{t('myRentals.subtitle')}</p>
         </div>

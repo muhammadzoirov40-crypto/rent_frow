@@ -113,7 +113,7 @@ export default function DashboardLayout({ children, active, onNavigate }: Dashbo
           ${mobileOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}
       >
         <div className={`flex items-center gap-3 h-16 px-4 border-b border-gray-200 dark:border-white/10 shrink-0 ${collapsed ? 'md:justify-center md:px-2' : ''}`}>
-          <Logo size="md" to="/dashboard" showWord={!collapsed} />
+          <Logo size="md" to="/dashboard" />
           <button
             type="button"
             onClick={() => setMobileOpen(false)}

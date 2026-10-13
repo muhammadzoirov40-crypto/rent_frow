@@ -628,7 +628,7 @@ export default function AdminPage() {
         <aside
           className={`${
             adminSidebarCollapsed ? 'w-[76px]' : 'w-64'
-          } flex-shrink-0 glass-section border-r border-[color:var(--glass-border)] min-h-[calc(100vh_-_var(--header-h))] sticky top-[var(--header-h)] transition-[width] duration-300 ease-out overflow-hidden`}
+          } hidden md:block flex-shrink-0 glass-section border-r border-[color:var(--glass-border)] min-h-[calc(100vh_-_var(--header-h))] sticky top-[var(--header-h)] transition-[width] duration-300 ease-out overflow-hidden`}
         >
           <div className={adminSidebarCollapsed ? 'p-3' : 'p-4'}>
             <div
@@ -691,7 +691,35 @@ export default function AdminPage() {
           </div>
         </aside>
 
-        <main className="flex-1 min-w-0 p-6">
+        <main className="flex-1 min-w-0 p-4 md:p-6">
+          {/* On a phone the desktop menu is gone, so the same tabs (with the
+              same red badges) become a strip you swipe sideways. */}
+          <div className="md:hidden -mx-4 px-4 mb-5 overflow-x-auto">
+            <div className="flex gap-2 w-max pb-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => { setActiveTab(tab.key); setSearchQuery(''); }}
+                  className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition ${
+                    activeTab === tab.key
+                      ? 'bg-gradient-to-r from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)]'
+                      : 'bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  <span className="relative shrink-0">
+                    {tab.icon}
+                    {tab.badge && tab.badge > 0 ? (
+                      <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-1 rounded-full bg-red-500 text-[10px] font-bold text-white flex items-center justify-center shadow">
+                        {tab.badge > 99 ? '99+' : tab.badge}
+                      </span>
+                    ) : null}
+                  </span>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {activeTab === 'dashboard' && (
             <div>
               <div className="mb-6">
