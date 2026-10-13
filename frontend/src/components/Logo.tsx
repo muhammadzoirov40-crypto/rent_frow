@@ -145,8 +145,8 @@ export default function Logo({ size = 'md', to = '/', onClick }: LogoProps) {
         className="block leading-none tracking-tight whitespace-nowrap"
         style={{ fontFamily: FONT }}
       >
-        <span className="font-extrabold text-[15px] sm:text-[19px] text-gray-900 dark:text-white">Rent</span>
-        <span className="font-extrabold text-[15px] sm:text-[19px] text-[var(--accent)]">Hub</span>
+        <span className="font-extrabold text-[17px] sm:text-[22px] text-gray-900 dark:text-white">Rent</span>
+        <span className="font-extrabold text-[17px] sm:text-[22px] text-[var(--accent)]">Hub</span>
       </span>
     </Link>
   );
