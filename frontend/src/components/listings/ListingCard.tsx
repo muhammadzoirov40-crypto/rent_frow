@@ -201,11 +201,11 @@ export default function ListingCard({ listing }: ListingCardProps) {
         </button>
 
         {(availability || categoryLabel) && (
-          <div className="absolute bottom-3 left-3 z-10 flex flex-col items-start gap-1.5">
+          <div className="absolute bottom-3 left-3 z-10 flex flex-col items-start gap-1.5 max-w-[calc(100%-1.5rem)]">
             {categoryLabel && (
               <span
                 title={categoryLabel}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm max-w-[72%]"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm"
               >
                 <CategoryIcon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span className="truncate">{categoryLabel}</span>
