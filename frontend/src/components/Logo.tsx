@@ -99,14 +99,14 @@ export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) 
       {/* Orbit swoosh: crosses the R's foot in white and turns green on the
           right, exactly as it wraps the letters in the brand mark */}
       <path
-        d="M 32 86 Q 100 162 168 82"
+        d="M 34 90 Q 100 168 166 80"
         stroke="url(#rhSwooshGrad)"
-        strokeWidth="11"
+        strokeWidth="10"
         fill="none"
         strokeLinecap="round"
       />
       {/* Leaf growing off the swoosh's green end */}
-      <path d="M 150 104 Q 172 104 178 124 Q 154 124 150 104 Z" fill="url(#rhGreenGrad)" />
+      <path d="M 143 106 Q 166 100 175 119 Q 150 126 143 106 Z" fill="url(#rhGreenGrad)" />
 
       {/* Wordmark, inside the disc */}
       <text x="100" y="152" textAnchor="middle" fontFamily={FONT} fontWeight="800" fontSize="32" letterSpacing="-0.5">
