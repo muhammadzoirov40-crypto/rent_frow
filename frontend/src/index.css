@@ -416,7 +416,7 @@ body::before {
   background:
     radial-gradient(60rem 40rem at 8% -10%, rgba(var(--accent-rgb), 0.14), transparent 62%),
     radial-gradient(52rem 36rem at 96% -6%, rgba(0, 200, 235, 0.13), transparent 60%),
-    radial-gradient(64rem 46rem at 50% 112%, rgba(139, 92, 246, 0.11), transparent 65%),
+    radial-gradient(80rem 55rem at 50% 118%, rgba(16, 185, 129, 0.12), transparent 70%),
     var(--bg-page);
 }
 
@@ -430,9 +430,29 @@ body::before {
   background:
     radial-gradient(60rem 40rem at 8% -10%, rgba(var(--accent-rgb), 0.16), transparent 62%),
     radial-gradient(52rem 36rem at 96% -6%, rgba(0, 240, 255, 0.10), transparent 60%),
-    radial-gradient(64rem 46rem at 50% 112%, rgba(139, 92, 246, 0.12), transparent 65%),
+    radial-gradient(70rem 48rem at 30% 10%, rgba(16, 185, 129, 0.11), transparent 62%),
     #0b0f19 url('/geo-bg.svg') center / cover no-repeat;
   pointer-events: none;
+}
+
+/* ===== Category icon field =====
+   The scattered category glyphs and the two wave lines live in one file
+   (public/bg-icons.svg) and are painted through a mask, so a single asset
+   serves both themes — only the tint below changes. Sits above the ambient
+   wash (::before) and below every piece of content. */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(16, 185, 129, 0.20);
+  -webkit-mask: url('/bg-icons.svg') center / cover no-repeat;
+  mask: url('/bg-icons.svg') center / cover no-repeat;
+}
+
+.dark body::after {
+  background: rgba(52, 211, 153, 0.14);
 }
 
 /* Separate from .glass-card on purpose: that one pins an opaque dark rgba() in
