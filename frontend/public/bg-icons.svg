@@ -10,7 +10,7 @@
     <path stroke-width="2" d="M-20 470 C 220 448, 400 492, 640 469 S 1020 434, 1240 464 S 1500 490, 1620 467" />
 
     <!-- House (Молият) -->
-    <g transform="translate(210 265) scale(2.3)">
+    <g transform="translate(345 262) scale(2.3)">
       <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
       <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
     </g>
@@ -32,7 +32,7 @@
     </g>
 
     <!-- Smartphone (Электроника) -->
-    <g transform="translate(205 555) scale(2.3)">
+    <g transform="translate(350 552) scale(2.3)">
       <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
       <path d="M12 18h.01" />
     </g>

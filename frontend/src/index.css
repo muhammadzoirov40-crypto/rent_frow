@@ -452,7 +452,7 @@ body::after {
 }
 
 .dark body::after {
-  background: rgba(52, 211, 153, 0.14);
+  background: rgba(52, 211, 153, 0.19);
 }
 
 /* Separate from .glass-card on purpose: that one pins an opaque dark rgba() in
