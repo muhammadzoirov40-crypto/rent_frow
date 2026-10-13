@@ -608,11 +608,15 @@ export default function AdminPage() {
     { key: 'crm', label: t('admin.crm'), icon: <BarChart3 className="w-5 h-5" /> },
     { key: 'users', label: t('admin.users'), icon: <Users className="w-5 h-5" /> },
     { key: 'listings', label: t('admin.listings'), icon: <FileText className="w-5 h-5" /> },
-    { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" />, badge: pending?.requests },
-    { key: 'payments', label: t('admin.payments'), icon: <Banknote className="w-5 h-5" />, badge: pending?.payments },
-    { key: 'top', label: t('admin.topTab'), icon: <Crown className="w-5 h-5" />, badge: pending?.top },
+    // A queue you are already sitting in is being looked at — its badge goes
+    // quiet until you leave the tab, then comes back if the work is still
+    // outstanding. One place to set it, and both the desktop rail and the
+    // phone strip read the same value.
+    { key: 'requests', label: t('admin.requests'), icon: <ClipboardList className="w-5 h-5" />, badge: activeTab === 'requests' ? undefined : pending?.requests },
+    { key: 'payments', label: t('admin.payments'), icon: <Banknote className="w-5 h-5" />, badge: activeTab === 'payments' ? undefined : pending?.payments },
+    { key: 'top', label: t('admin.topTab'), icon: <Crown className="w-5 h-5" />, badge: activeTab === 'top' ? undefined : pending?.top },
     { key: 'categories', label: t('admin.categories'), icon: <FolderTree className="w-5 h-5" /> },
-    { key: 'posts', label: t('admin.posts'), icon: <MessageSquare className="w-5 h-5" />, badge: pending?.posts },
+    { key: 'posts', label: t('admin.posts'), icon: <MessageSquare className="w-5 h-5" />, badge: activeTab === 'posts' ? undefined : pending?.posts },
   ];
 
   const statCards = [
