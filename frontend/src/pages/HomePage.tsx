@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import {
   ArrowRight,
+  KeyRound,
   MapPin,
   ShieldCheck,
   Zap,
@@ -111,6 +112,27 @@ function StatsSection({
   return (
     <Section title={t('home.whyTitle')} hint={t('home.whySubtitle')}>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* Handover moment: keys above the model house — the picture the four
+            promises below put into words. Spans two rows so it keeps its
+            height next to the stacked cards. */}
+        <div className="sm:col-span-2 lg:col-span-2 lg:row-span-2 relative overflow-hidden rounded-3xl glass-card min-h-[260px] sm:min-h-[300px] group">
+          <img
+            src="/handover.jpg"
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent" />
+          <div className="absolute left-4 right-4 bottom-4 flex items-center gap-2.5 w-fit max-w-full rounded-2xl bg-black/35 backdrop-blur-md border border-white/20 px-3.5 py-2.5">
+            <span className="w-8 h-8 shrink-0 rounded-xl bg-[var(--accent)] text-white flex items-center justify-center shadow-sm">
+              <KeyRound className="w-4 h-4" />
+            </span>
+            <span className="text-[13px] font-semibold text-white truncate">
+              {t('home.whyPhotoCaption')}
+            </span>
+          </div>
+        </div>
         {benefits.map((item) => (
           <div
             key={item.title}
