@@ -1125,7 +1125,7 @@ export default function ListingPage() {
                   to={`/listing/${item.id}`}
                   className="flex-shrink-0 w-64 glass-card glass-card-hover rounded-xl overflow-hidden transition-all duration-300 group"
                 >
-                  <div className="h-40 bg-gray-100 dark:bg-white/5 overflow-hidden">
+                  <div className="relative h-40 bg-gray-100 dark:bg-white/5 overflow-hidden">
                     {item.primary_image ? (
                       <img src={item.primary_image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : null}
@@ -1133,6 +1133,12 @@ export default function ListingPage() {
                       <div className="w-full h-full flex items-center justify-center">
                         <Home size={32} className="text-gray-300" />
                       </div>
+                    )}
+                    {/* The category chip every other card carries. */}
+                    {item.category_name && (
+                      <span className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm truncate">
+                        {item.category_name}
+                      </span>
                     )}
                   </div>
                   <div className="p-3">

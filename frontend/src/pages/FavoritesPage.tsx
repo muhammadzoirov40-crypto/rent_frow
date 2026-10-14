@@ -1,27 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Heart, MapPin, Package, Loader2, Star } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { Heart, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { favorites, listings, type ListingListItem } from '../api';
+import { favorites, type ListingListItem } from '../api';
 import BackButton from '../components/ui/BackButton';
-import { formatPrice, formatPriceUnit } from '../utils/format';
+import ListingGrid from '../components/listings/ListingGrid';
 
 export default function FavoritesPage() {
-  const { t, i18n } = useTranslation();
-  const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const { data: favs = [], isLoading } = useQuery<ListingListItem[]>({
     queryKey: ['favorites'],
     queryFn: () => favorites.getFavorites(),
-  });
-
-  const toggleFavMutation = useMutation({
-    mutationFn: listings.toggleFavorite,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] });
-      toast.success(t('favorites.removed'));
-    },
   });
 
   if (isLoading) {
@@ -56,72 +46,10 @@ export default function FavoritesPage() {
             </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
-            {favs.map((listing) => (
-              <div key={listing.id} className="glass-card glass-card-hover rounded-2xl overflow-hidden transition-all duration-200 group">
-                <div className="relative h-48 bg-gray-100">
-                  {listing.primary_image ? (
-                    <img
-                      src={listing.primary_image}
-                      alt={listing.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                      <Package className="w-12 h-12" />
-                    </div>
-                  )}
-                  <button
-                    onClick={() => toggleFavMutation.mutate(listing.id)}
-                    disabled={toggleFavMutation.isPending}
-                    className="absolute top-3 right-3 bg-white/90 dark:bg-white/10 backdrop-blur-sm p-2.5 rounded-xl hover:bg-white dark:hover:bg-white/20 transition shadow-md disabled:opacity-50"
-                  >
-                    <Heart className="w-5 h-5 text-red-500 fill-red-500" />
-                  </button>
-                </div>
-                <div className="p-5">
-                  <Link
-                    to={`/listing/${listing.id}`}
-                    className="font-bold text-[#1A1A2E] dark:text-white hover:text-[var(--accent)] transition text-lg block truncate"
-                  >
-                    {listing.title}
-                  </Link>
-                  <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    {(listing.city_name || listing.district_name) && (
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {listing.city_name}
-                        {listing.district_name ? `, ${listing.district_name}` : ''}
-                      </span>
-                    )}
-                  </div>
-                  {/* The rating and the review count sit on the card the same
-                      way they do on the detail page — no need to open the
-                      listing just to read them. */}
-                  <div className="flex items-center gap-1.5 mt-2 text-sm">
-                    <Star
-                      className={`w-4 h-4 ${(listing.average_rating ?? 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
-                    />
-                    <span className="font-bold text-[#1A1A2E] dark:text-white">
-                      {(listing.average_rating ?? 0) > 0 ? listing.average_rating.toFixed(1) : '—'}
-                    </span>
-                    <span className="text-gray-400 dark:text-slate-500">
-                      ({listing.rating_count ?? 0} {t('listing.reviews')})
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
-                    <span className="text-xl font-bold text-[var(--accent)]">
-                      {formatPrice(listing.price, t, i18n.language)}{' '}
-                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                        {formatPriceUnit(t, listing.price_unit)}
-                      </span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          // The same card the search grid uses: the photo with its chip and
+          // the heart, city, rating and the review count — nothing waits
+          // for the listing to be opened.
+          <ListingGrid listings={favs} loading={false} twoOnPhone />
         )}
       </div>
     </div>

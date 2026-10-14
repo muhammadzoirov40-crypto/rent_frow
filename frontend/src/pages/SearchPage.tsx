@@ -1,7 +1,7 @@
-import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   SlidersHorizontal,
   X,
@@ -17,6 +17,7 @@ import {
   Building2,
   Car,
   Wrench,
+  Heart,
 } from 'lucide-react';
 import SearchBar from '../components/search/SearchBar';
 import FilterSidebar from '../components/search/FilterSidebar';
@@ -28,6 +29,8 @@ import ListingGrid from '../components/listings/ListingGrid';
 import CustomSelect from '../components/ui/CustomSelect';
 import BackButton from '../components/ui/BackButton';
 import { rememberSearch } from '../utils/recentSearches';
+import { localizeCategoryName } from '../utils/categoryName';
+import { iconFor } from '../utils/categoryIcons';
 
 // Leaflet (~140 kB) is only needed once the user switches to the map view,
 // so it must not sit in the entry bundle.
@@ -176,6 +179,23 @@ export default function SearchPage() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentPage]);
+
+  const queryClient = useQueryClient();
+  // The heart on a list row mirrors the grid card: same endpoint, and the
+  // row flips immediately so the tap feels instant before the refetch.
+  const [favOverride, setFavOverride] = useState<Record<number, boolean>>({});
+  const toggleFav = async (e: MouseEvent, listing: ListingListItem) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const prev = favOverride[listing.id] ?? listing.is_favorited;
+    setFavOverride((p) => ({ ...p, [listing.id]: !prev }));
+    try {
+      await listings.toggleFavorite(listing.id);
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    } catch {
+      setFavOverride((p) => ({ ...p, [listing.id]: prev }));
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dark:bg-[#0a0a1a] min-h-screen">
@@ -380,7 +400,16 @@ export default function SearchPage() {
               />
             ) : (
             <div className="flex flex-col gap-4">
-              {listingsList.map((listing) => (
+              {listingsList.map((listing) => {
+                // The same category chip the grid card carries, resolved
+                // from the shared cache so it speaks the site language.
+                const category = categoriesData?.items.find((c) => c.id === listing.category_id);
+                const categoryLabel = category
+                  ? localizeCategoryName(category, i18n.language)
+                  : listing.category_name || null;
+                const CategoryIcon = category ? iconFor(category, i18n.language) : Package;
+                const faved = favOverride[listing.id] ?? listing.is_favorited;
+                return (
                 <div key={listing.id} className="w-full">
                   <Link to={`/listing/${listing.id}`} className="block">
                     <div className="glass-card glass-card-hover rounded-xl overflow-hidden flex transition-all">
@@ -403,6 +432,27 @@ export default function SearchPage() {
                             <span className="text-gray-300">{t('search.noPhoto')}</span>
                           </div>
                         )}
+                        {/* The chip and the heart sit on the photo exactly as
+                            they do on the grid card — a row is a listing card
+                            too. */}
+                        {categoryLabel && (
+                          <span className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm">
+                            <CategoryIcon className="w-3 h-3 shrink-0" aria-hidden="true" />
+                            <span className="truncate">{categoryLabel}</span>
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => toggleFav(e, listing)}
+                          aria-label={faved ? t('listing.inFavorites') : t('listing.addToFavorites')}
+                          aria-pressed={faved}
+                          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/85 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md border border-white/40 dark:border-white/10 hover:scale-110 active:scale-95 transition-all"
+                        >
+                          <Heart
+                            className={`w-3.5 h-3.5 ${faved ? 'fill-[var(--accent)] text-[var(--accent)]' : 'text-gray-500 dark:text-slate-300'}`}
+                            aria-hidden="true"
+                          />
+                        </button>
                       </div>
                       <div className="flex-1 min-w-0 p-3 sm:p-4">
                         <h3 className="font-bold text-[#1A1A2E] dark:text-white text-sm sm:text-base leading-snug line-clamp-2 hover:text-[var(--accent)] transition-colors">
@@ -442,7 +492,8 @@ export default function SearchPage() {
                     </div>
                   </Link>
                 </div>
-              ))}
+                );
+              })}
             </div>
             )
           ) : view === 'map' ? (

@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { auth, listings, favorites, rentalRequests } from '../api';
 import useAuthStore from '../store/authStore';
 import BackButton from '../components/ui/BackButton';
+import ListingGrid from '../components/listings/ListingGrid';
 import type { Listing, ListingListItem, RentalRequest } from '../api';
 import { formatDate } from '../utils/dates';
 import { formatPrice, formatPriceUnit, formatAmount } from '../utils/format';
@@ -115,13 +116,6 @@ export default function ProfilePage() {
       toast.success(t('profile.deleted'));
     },
     onError: () => toast.error(t('profile.failedToDelete')),
-  });
-
-  const toggleFavMutation = useMutation({
-    mutationFn: listings.toggleFavorite,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['favorites'] });
-    },
   });
 
   const cancelRequestMutation = useMutation({
@@ -435,6 +429,19 @@ export default function ProfilePage() {
                           {formatPrice(listing.price, t, i18n.language)} {formatPriceUnit(t, listing.price_unit)}
                         </span>
                       </div>
+                      {/* Rating and review count on the owner's own card too —
+                          the same line every other listing card carries. */}
+                      <div className="flex items-center gap-1.5 mt-2 text-sm">
+                        <Star
+                          className={`w-4 h-4 ${listing.rating_count > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
+                        />
+                        <span className="font-bold text-[#1A1A2E] dark:text-white">
+                          {listing.rating_count > 0 ? (listing.rating_sum / listing.rating_count).toFixed(1) : '—'}
+                        </span>
+                        <span className="text-gray-400 dark:text-slate-500">
+                          ({listing.rating_count} {t('listing.reviews')})
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2 mt-3">
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           listing.available ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-500'
@@ -465,61 +472,9 @@ export default function ProfilePage() {
                 </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {favs.map((listing) => (
-                  <div key={listing.id} className="glass-card glass-card-hover rounded-2xl overflow-hidden transition">
-                    <div className="relative h-40 bg-gray-100 dark:bg-white/5">
-                      {listing.primary_image ? (
-                        <img
-                          src={listing.primary_image}
-                          alt={listing.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-gray-300">
-                          <Package className="w-10 h-10" />
-                        </div>
-                      )}
-                      <button
-                        onClick={() => toggleFavMutation.mutate(listing.id)}
-                        className="absolute top-3 right-3 bg-white/90 dark:bg-white/10 backdrop-blur-sm p-2 rounded-lg hover:bg-white dark:hover:bg-white/20 transition shadow-sm"
-                      >
-                        <Heart className="w-4 h-4 text-red-500 fill-red-500" />
-                      </button>
-                    </div>
-                    <div className="p-4">
-                      <Link to={`/listing/${listing.id}`} className="font-semibold text-[#1A1A2E] dark:text-white hover:text-[var(--accent)] transition truncate block">
-                        {listing.title}
-                      </Link>
-                      <div className="flex items-center gap-3 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        {listing.city_name && (
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3.5 h-3.5" />
-                            {listing.city_name}
-                          </span>
-                        )}
-                        <span className="font-bold text-[var(--accent)]">
-                          {formatPrice(listing.price, t, i18n.language)} {formatPriceUnit(t, listing.price_unit)}
-                        </span>
-                      </div>
-                      {/* Rating and review count — the same line the detail
-                          page shows, so it reads without opening the listing. */}
-                      <div className="flex items-center gap-1.5 mt-2 text-sm">
-                        <Star
-                          className={`w-4 h-4 ${(listing.average_rating ?? 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
-                        />
-                        <span className="font-bold text-[#1A1A2E] dark:text-white">
-                          {(listing.average_rating ?? 0) > 0 ? listing.average_rating.toFixed(1) : '—'}
-                        </span>
-                        <span className="text-gray-400 dark:text-slate-500">
-                          ({listing.rating_count ?? 0} {t('listing.reviews')})
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              // The same card the search grid uses — photo with its chip and
+              // the heart, city, rating and the review count on the card.
+              <ListingGrid listings={favs} loading={false} />
             )}
           </div>
         )}
