@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Star, Heart, BadgeCheck, ArrowRight, Camera, Crown, Tag, LayoutGrid, Image as ImageIcon } from 'lucide-react';
+import { MapPin, Star, Heart, BadgeCheck, Camera, Crown, Tag, LayoutGrid, Image as ImageIcon } from 'lucide-react';
 import { listings, categories, type Listing, type ListingListItem } from '../../api/index';
 import { useState } from 'react';
 import { useQueryClient, useQuery } from '@tanstack/react-query';
@@ -274,13 +274,6 @@ export default function ListingCard({ listing }: ListingCardProps) {
             </span>
           </div>
         )}
-
-        <div className="mt-1 pt-3 border-t border-gray-100 dark:border-white/10">
-          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--accent)]">
-            {t('common.viewDetails')}
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
-          </span>
-        </div>
       </div>
     </Link>
   );
