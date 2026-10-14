@@ -210,9 +210,11 @@ export default function AnimatedHero() {
               {t('home.heroSubtitle')}
             </p>
 
-            {/* Category Shortcuts */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-2">
-              <span className="text-xs font-semibold text-slate-400">{t('home.heroQuickJump')}</span>
+            {/* Category Shortcuts — centred: the label takes its own line on
+                narrow screens so the three chips sit together, centred, on
+                the next one instead of ragged left-aligned wraps. */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+              <span className="w-full sm:w-auto text-center text-xs font-semibold text-slate-400">{t('home.heroQuickJump')}</span>
               <a
                 href="#categories"
                 className="glass-card glass-card-hover inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all"

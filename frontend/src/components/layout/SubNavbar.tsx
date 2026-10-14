@@ -191,7 +191,7 @@ export default function SubNavbar() {
   return (
     <div
       ref={barRef}
-      className="glass-section border-t border-gray-100 dark:border-white/[0.07]"
+      className="glass-section border-t border-gray-100 dark:border-white/[0.07] hidden md:block"
     >
       {/* Same full-bleed rule as the top row so the categories button lines
           up with the logo above it. */}
