@@ -147,7 +147,10 @@ function InfiniteCard({ item }: RealCardProps) {
           <span className="text-xs font-black text-[var(--accent)]">
             {item.price} <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">{t('home.heroPerDay')}</span>
           </span>
-          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex items-center gap-0.5">
+          {/* Same rule as the grid cards: the phone hides the redundant
+              "view details" cue (the card itself is the tap target), the
+              desktop keeps it. */}
+          <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors hidden md:flex items-center gap-0.5">
             {t('common.viewDetails')} &rarr;
           </span>
         </div>
