@@ -430,16 +430,19 @@ export default function MessagesPage() {
 
   if (convLoading) {
     return (
-      <div className="flex items-center justify-center h-[calc(100vh_-_var(--header-h)_-_5rem)] md:h-[calc(100vh_-_var(--header-h))]">
+      <div className="flex items-center justify-center h-[calc(100vh_-_var(--header-h))]">
         <div className="w-10 h-10 border-4 border-[var(--accent)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="flex h-[calc(100vh_-_var(--header-h)_-_7rem)] md:h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto glass-section rounded-3xl overflow-hidden border border-[color:var(--glass-border)] my-4">
+    <div className="flex h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto glass-section rounded-3xl overflow-hidden border border-[color:var(--glass-border)] my-4">
       {/* Full width on a phone (nothing else is on screen there), a fixed
-          320px rail on desktop where the conversation sits beside it. */}
+          320px rail on desktop where the conversation sits beside it.
+          The phone now gets the same height as the desktop: the fixed
+          bottom nav that used to eat ~5rem of its canvas no longer
+          renders on this page, so the typing bar sits above the fold. */}
       <div className={`w-full md:w-80 flex-shrink-0 border-r border-[color:var(--glass-border)] flex flex-col ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
           <div className="flex items-center gap-2 mb-3">

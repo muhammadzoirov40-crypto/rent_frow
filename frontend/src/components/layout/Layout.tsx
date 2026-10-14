@@ -27,6 +27,11 @@ export default function Layout({ children }: LayoutProps) {
   // signing in), the messages chat (a workspace that needs the width), and
   // the full-screen control panels /admin and /settings, where their own
   // menus are the only navigation that matters.
+  // The chat and the two control panels have their own way out (the back
+  // arrow, the hamburger in the header), and on a phone the fixed bottom
+  // nav was eating the last 60-odd px of their canvas — the chat's typing
+  // bar among them. So the nav follows exactly the same rule as the rail:
+  // it lives where the site chrome lives, and steps aside where it doesn't.
   const showChrome =
     !isAuthPage &&
     !pathname.startsWith('/messages') &&
@@ -62,13 +67,13 @@ export default function Layout({ children }: LayoutProps) {
       <div className="flex flex-1 min-h-0">
         {showChrome && <SiteSidebar collapsed={sidebarCollapsed} onToggle={toggleSidebar} />}
         <div className="flex-1 min-w-0 flex flex-col">
-          <main className={`flex-1 pt-[var(--header-h)] ${isAuthPage ? '' : 'pb-20'} md:pb-0`}>
+          <main className={`flex-1 pt-[var(--header-h)] ${showChrome ? 'pb-20' : ''} md:pb-0`}>
             {children}
           </main>
           {pathname === '/' && <Footer />}
         </div>
       </div>
-      {!isAuthPage && <MobileBottomNav isAuthenticated={isAuthenticated} />}
+      {showChrome && <MobileBottomNav isAuthenticated={isAuthenticated} />}
       {/* The chat owns the bottom-right corner, and the admin/settings
           panels asked for a clean canvas — the assistant stays off them. */}
       {showChrome && <AssistantWidget />}
