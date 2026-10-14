@@ -3,6 +3,14 @@ import Logo from '../Logo'
 import { useTranslation } from 'react-i18next'
 import { Mail, Phone, MapPin, Globe, MessageCircle, Send } from 'lucide-react'
 
+// The mockup puts the social row at the very foot of the page, under the
+// copyright line — not tucked inside the first column. Same three links.
+const SOCIALS = [
+  { key: 'globe', Icon: Globe },
+  { key: 'chat', Icon: MessageCircle },
+  { key: 'send', Icon: Send },
+] as const
+
 export default function Footer() {
   const { t } = useTranslation()
 
@@ -31,23 +39,16 @@ export default function Footer() {
           sit underneath it where a thumb can never reach them. Desktop has
           no bottom nav, so the pad goes away at md. */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-7">
-          <div>
+        {/* Two columns on a phone (the mockup's rhythm), four on a laptop:
+            the menu and the cities read as a pair, and the wide blocks —
+            the blurb and the contact list — span the full row above and
+            below them so nothing gets squeezed into a half-width strip. */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 lg:gap-x-8 gap-y-7">
+          <div className="col-span-2 lg:col-span-1">
             <div className="mb-3 inline-block"><Logo size="sm" /></div>
             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
               {t('footer.aboutText')}
             </p>
-            <div className="flex items-center gap-2.5 mt-4">
-              <a href="#" className="w-8 h-8 rounded-lg glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition">
-                <Globe className="w-4 h-4" />
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition">
-                <MessageCircle className="w-4 h-4" />
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition">
-                <Send className="w-4 h-4" />
-              </a>
-            </div>
           </div>
 
           <div>
@@ -76,7 +77,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <h4 className="text-[#1A1A2E] dark:text-white font-semibold text-sm uppercase tracking-wide mb-3">{t('footer.contact')}</h4>
             <ul className="space-y-2.5">
               <li className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
@@ -94,7 +95,6 @@ export default function Footer() {
                 <span>г. Душанбе, район Сино, мкр. Арбобхутун-3</span>
               </li>
             </ul>
-
           </div>
         </div>
       </div>
@@ -108,6 +108,20 @@ export default function Footer() {
             <Link to="/terms" className="hover:text-gray-300 transition">{t('footer.terms')}</Link>
             <Link to="/privacy" className="hover:text-gray-300 transition">{t('footer.privacy')}</Link>
           </div>
+        </div>
+        {/* The social row sits on the last line, as in the mockup: a thumb
+            scrolling to the foot of the page finds the ways to reach us
+            right there, beside the copyright. */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-5 flex items-center justify-center gap-3">
+          {SOCIALS.map(({ key, Icon }) => (
+            <a
+              key={key}
+              href="#"
+              className="w-9 h-9 rounded-xl glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition"
+            >
+              <Icon className="w-4 h-4" />
+            </a>
+          ))}
         </div>
       </div>
     </footer>
