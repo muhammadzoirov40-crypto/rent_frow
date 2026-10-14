@@ -179,10 +179,16 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
             </span>
           )}
 
+          {/* A plain green tick instead of the old wide text chip: the photo
+              stays the hero of the card, and the tick still reads "verified"
+              at a glance — the label is on the tooltip for anyone who asks. */}
           {isVerified && (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-black/65 text-white ring-1 ring-white/20 backdrop-blur-sm">
-              <BadgeCheck className="w-3.5 h-3.5 text-[var(--accent-light)]" aria-hidden="true" />
-              {t('listing.verified')}
+            <span
+              title={t('listing.verified')}
+              aria-label={t('listing.verified')}
+              className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 shadow-md ring-1 ring-white/40 backdrop-blur-sm"
+            >
+              <BadgeCheck className="w-4 h-4 text-white" aria-hidden="true" />
             </span>
           )}
         </div>
