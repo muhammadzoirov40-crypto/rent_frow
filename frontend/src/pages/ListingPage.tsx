@@ -131,6 +131,11 @@ export default function ListingPage() {
     queryKey: ['listing', id],
     queryFn: () => listings.getOne(Number(id)),
     enabled: !!id,
+    // A 404 is an answer, not a hiccup — retrying it only delays the
+    // "listing not found" page by the whole backoff ladder (seconds on
+    // a phone) for a reply that will never change.
+    retry: (failureCount, error: any) =>
+      error?.response?.status !== 404 && failureCount < 2,
   });
 
   // The other road. A SALE listing is bought outright — one price, one
@@ -384,14 +389,44 @@ export default function ListingPage() {
     );
   }
 
+  // A dead or mistyped id — a deleted listing, a stale link in an old chat
+  // or in this browser's kept history. This screen *is* the destination of
+  // real links, so it gets a real page: what happened and the three ways
+  // out (back where you came from, browse listings, home) — not a bare
+  // error line on an empty white field.
   if (!listing) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 dark:bg-[#0a0a1a]">
-        <AlertTriangle size={48} className="text-gray-400" />
-        <h2 className="text-xl font-bold text-[#1A1A2E] dark:text-white">{t('common.error')}</h2>
-        <Link to="/" className="text-[var(--accent)] hover:underline font-medium">
-          {t('common.back')}
-        </Link>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-6 text-center dark:bg-[#0a0a1a]">
+        <div className="w-20 h-20 rounded-full bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
+          <AlertTriangle size={36} className="text-amber-500" />
+        </div>
+        <h2 className="text-xl font-bold text-[#1A1A2E] dark:text-white">
+          {t('listing.listingNotFound')}
+        </h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm leading-relaxed">
+          {t('listing.listingNotFoundDesc')}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-2">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="px-5 py-2.5 rounded-xl bg-[var(--accent)] text-white text-sm font-semibold hover:bg-[var(--accent-hover)] transition"
+          >
+            {t('common.back')}
+          </button>
+          <Link
+            to="/search"
+            className="px-5 py-2.5 rounded-xl glass-card text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-[var(--accent)] transition"
+          >
+            {t('notFound.search')}
+          </Link>
+          <Link
+            to="/"
+            className="px-5 py-2.5 rounded-xl glass-card text-sm font-semibold text-gray-700 dark:text-gray-200 hover:text-[var(--accent)] transition"
+          >
+            {t('notFound.home')}
+          </Link>
+        </div>
       </div>
     );
   }

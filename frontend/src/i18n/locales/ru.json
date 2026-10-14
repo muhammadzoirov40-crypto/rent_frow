@@ -333,6 +333,7 @@
     "datesTaken": "Выбранные даты уже заняты",
     "endAfterStart": "Дата окончания должна быть позже даты начала",
     "listingNotFound": "Объявление не найдено",
+    "listingNotFoundDesc": "Объявление удалено или адрес неверный.",
     "reviewPublished": "Отзыв опубликован",
     "failedToPublish": "Не удалось опубликовать",
     "conversationCreated": "Диалог создан",

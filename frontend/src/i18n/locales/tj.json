@@ -333,6 +333,7 @@
     "datesTaken": "Санаҳои интихобшуда аллакай банданд",
     "endAfterStart": "Санаи анҷом бояд аз санаи оғоз дертар бошад",
     "listingNotFound": "Эълон ёфт нашуд",
+    "listingNotFoundDesc": "Эълон нест карда шуда ё суроға нодуруст аст.",
     "reviewPublished": "Шарҳ нашр шуд",
     "failedToPublish": "Нашр кардан ноком шуд",
     "conversationCreated": "Пайвастагӣ эҷод шуд",
