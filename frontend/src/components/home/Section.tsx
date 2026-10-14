@@ -27,7 +27,7 @@ export default function Section({
     <section id={id} className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${className}`}>
       <div className="flex items-end justify-between gap-4 mb-6">
         <div className="min-w-0">
-          <Heading className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-white">
+          <Heading className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-white">
             {title}
           </Heading>
           {hint && (
