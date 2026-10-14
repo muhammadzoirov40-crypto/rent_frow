@@ -25,7 +25,11 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="glass-section text-gray-600 dark:text-gray-300 border-t border-gray-200/70 dark:border-white/10">
+    <footer className="glass-section text-gray-600 dark:text-gray-300 border-t border-gray-200/70 dark:border-white/10 pb-20 md:pb-0">
+      {/* pb-20 on mobile: the fixed bottom nav floats over the last ~62px,
+          and without this pad the copyright row and its Terms/Privacy links
+          sit underneath it where a thumb can never reach them. Desktop has
+          no bottom nav, so the pad goes away at md. */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-7">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-7">
           <div>
