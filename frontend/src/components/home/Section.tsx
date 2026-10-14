@@ -25,7 +25,11 @@ export default function Section({
 }: SectionProps) {
   return (
     <section id={id} className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${className}`}>
-      <div className="flex items-end justify-between gap-4 mb-6">
+      {/* On a phone the action button drops onto its own line under the
+          heading instead of squeezing it into half the screen — the title
+          keeps the full width and stays on one line. sm and up keeps the
+          original title-left / action-right row. */}
+      <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-4 mb-6">
         <div className="min-w-0">
           <Heading className="text-xl sm:text-3xl font-extrabold tracking-tight text-[#0f172a] dark:text-white">
             {title}
