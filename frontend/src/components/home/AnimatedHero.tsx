@@ -42,27 +42,27 @@ export default function AnimatedHero() {
             {/* Category Shortcuts — centred: the label takes its own line on
                 narrow screens so the three chips sit together, centred, on
                 the next one instead of ragged left-aligned wraps. */}
-            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 pt-2">
               <span className="w-full sm:w-auto text-center text-xs font-semibold text-slate-400">{t('home.heroQuickJump')}</span>
               <a
                 href="#categories"
-                className="glass-card glass-card-hover inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all"
+                className="glass-card glass-card-hover inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all"
               >
-                <Building2 className="w-3.5 h-3.5 text-[var(--accent,#FF6B35)]" />
+                <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--accent,#FF6B35)]" />
                 {t('home.heroPillProperty')}
               </a>
               <a
                 href="#categories"
-                className="glass-card glass-card-hover inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all"
+                className="glass-card glass-card-hover inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all"
               >
-                <Car className="w-3.5 h-3.5 text-[var(--accent)]" />
+                <Car className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--accent)]" />
                 {t('home.heroPillTransport')}
               </a>
               <a
                 href="#categories"
-                className="glass-card glass-card-hover inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all"
+                className="glass-card glass-card-hover inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold hover:text-[var(--accent)] text-slate-700 dark:text-slate-300 transition-all"
               >
-                <Wrench className="w-3.5 h-3.5 text-[var(--accent)]" />
+                <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--accent)]" />
                 {t('home.heroPillEquipment')}
               </a>
             </div>
