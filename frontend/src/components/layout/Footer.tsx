@@ -49,6 +49,19 @@ export default function Footer() {
             <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
               {t('footer.aboutText')}
             </p>
+            {/* Desktop keeps the socials inline in this column — the phone
+                moves them to the last line below, per the mockup. */}
+            <div className="hidden lg:flex items-center gap-2.5 mt-4">
+              {SOCIALS.map(({ key, Icon }) => (
+                <a
+                  key={key}
+                  href="#"
+                  className="w-8 h-8 rounded-lg glass-section flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-brand-500 hover:text-white transition"
+                >
+                  <Icon className="w-4 h-4" />
+                </a>
+              ))}
+            </div>
           </div>
 
           <div>
@@ -109,10 +122,10 @@ export default function Footer() {
             <Link to="/privacy" className="hover:text-gray-300 transition">{t('footer.privacy')}</Link>
           </div>
         </div>
-        {/* The social row sits on the last line, as in the mockup: a thumb
-            scrolling to the foot of the page finds the ways to reach us
-            right there, beside the copyright. */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-5 flex items-center justify-center gap-3">
+        {/* The social row sits on the last line, as in the mockup — phone
+            only; on desktop the same links live inline in the first
+            column, and this row would duplicate them. */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 pb-5 flex lg:hidden items-center justify-center gap-3">
           {SOCIALS.map(({ key, Icon }) => (
             <a
               key={key}
