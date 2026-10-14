@@ -10,13 +10,19 @@ type ListingGridItem = Listing | ListingListItem;
 interface ListingGridProps {
   listings: ListingGridItem[];
   loading: boolean;
+  /** The search page on a phone: two cards per row instead of one big
+      card, with the tighter gap that goes with it. */
+  twoOnPhone?: boolean;
 }
 
-export default function ListingGrid({ listings, loading }: ListingGridProps) {
+export default function ListingGrid({ listings, loading, twoOnPhone = false }: ListingGridProps) {
   const { t } = useTranslation();
+  const gridCls = twoOnPhone
+    ? 'grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6'
+    : 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6';
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+      <div className={gridCls}>
         {Array.from({ length: 6 }).map((_, i) => (
           <SkeletonCard key={i} />
         ))}
@@ -37,9 +43,9 @@ export default function ListingGrid({ listings, loading }: ListingGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+    <div className={gridCls}>
       {listings.map((listing) => (
-        <ListingCard key={listing.id} listing={listing} />
+        <ListingCard key={listing.id} listing={listing} compact={twoOnPhone} />
       ))}
     </div>
   );

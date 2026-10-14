@@ -472,7 +472,7 @@ export default function SearchPage() {
               </Suspense>
             )
           ) : (
-            <ListingGrid listings={listingsList} loading={isLoading} />
+            <ListingGrid listings={listingsList} loading={isLoading} twoOnPhone />
           )}
 
           {totalPages > 1 && (

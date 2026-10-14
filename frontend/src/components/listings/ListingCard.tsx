@@ -22,6 +22,10 @@ type ListingCardData = (Listing | ListingListItem) & {
 
 interface ListingCardProps {
   listing: ListingCardData;
+  /** Search page on a phone: two of these sit side by side, so the card
+      runs with a denser scale below sm — and looks exactly as before
+      above it, where the grid is back to full-size cards. */
+  compact?: boolean;
 }
 
 function getImageUrl(listing: ListingCardData): string | null {
@@ -55,7 +59,7 @@ function getRating(listing: ListingCardData): string | null {
   return null;
 }
 
-export default function ListingCard({ listing }: ListingCardProps) {
+export default function ListingCard({ listing, compact = false }: ListingCardProps) {
   const { t, i18n } = useTranslation();
   const [isFavorited, setIsFavorited] = useState(listing.is_favorited ?? false);
   const queryClient = useQueryClient();
@@ -213,7 +217,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
             )}
             {availability && (
               <span
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm ring-1 ring-inset ${availability.cls}`}
+                className={`${compact ? 'hidden sm:inline-flex' : 'inline-flex'} items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold shadow-sm ring-1 ring-inset ${availability.cls}`}
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
@@ -235,14 +239,14 @@ export default function ListingCard({ listing }: ListingCardProps) {
         )}
       </div>
 
-      <div className="p-4 flex flex-col gap-2">
-        <h3 className="font-bold text-[#1A1A2E] dark:text-white text-[15px] leading-snug line-clamp-2 min-h-[2.5rem] group-hover:text-[var(--accent)] transition-colors">
+      <div className={`${compact ? 'p-3 sm:p-4' : 'p-4'} flex flex-col gap-1.5 sm:gap-2`}>
+        <h3 className={`font-bold text-[#1A1A2E] dark:text-white leading-snug line-clamp-2 group-hover:text-[var(--accent)] transition-colors ${compact ? 'text-[13px] min-h-[2rem] sm:text-[15px] sm:min-h-[2.5rem]' : 'text-[15px] min-h-[2.5rem]'}`}>
           {listing.title}
         </h3>
 
         {(cityName || districtName) && (
-          <div className="flex items-center gap-1.5 text-[13px] font-medium text-gray-500 dark:text-slate-400 min-w-0">
-            <MapPin className="w-3.5 h-3.5 shrink-0 text-[var(--accent)]" aria-hidden="true" />
+          <div className={`flex items-center gap-1.5 font-medium text-gray-500 dark:text-slate-400 min-w-0 ${compact ? 'text-[11px] sm:text-[13px]' : 'text-[13px]'}`}>
+            <MapPin className={`${compact ? 'w-3 h-3 sm:w-3.5 sm:h-3.5' : 'w-3.5 h-3.5'} shrink-0 text-[var(--accent)]`} aria-hidden="true" />
             <span className="truncate">
               {cityName}
               {districtName ? `, ${districtName}` : ''}
@@ -250,9 +254,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 text-[13px]">
+        <div className={`flex items-center gap-1.5 ${compact ? 'text-[11px] sm:text-[13px]' : 'text-[13px]'}`}>
           <Star
-            className={`w-4 h-4 ${rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
+            className={`${compact ? 'w-3 h-3 sm:w-4 sm:h-4' : 'w-4 h-4'} ${rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
             aria-hidden="true"
           />
           <span className="font-bold text-gray-800 dark:text-white">{rating ?? '—'}</span>
@@ -265,10 +269,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
         {hasPrice && (
           <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className="text-[22px] font-extrabold leading-none text-[var(--accent)] tracking-tight">
+            <span className={`${compact ? 'text-[15px] sm:text-[22px]' : 'text-[22px]'} font-extrabold leading-none text-[var(--accent)] tracking-tight`}>
               {formatAmount(listing.price)}
             </span>
-            <span className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500">
+            <span className={`${compact ? 'text-[10px] sm:text-xs' : 'text-xs'} font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500`}>
               {t('common.somoni')}
               {unitKey ? ` / ${t(unitKey)}` : ''}
             </span>
