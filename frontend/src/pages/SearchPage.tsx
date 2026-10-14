@@ -384,7 +384,11 @@ export default function SearchPage() {
                 <div key={listing.id} className="w-full">
                   <Link to={`/listing/${listing.id}`} className="block">
                     <div className="glass-card glass-card-hover rounded-xl overflow-hidden flex transition-all">
-                      <div className="w-56 flex-shrink-0 relative bg-gray-100">
+                      {/* The phone can't spare a fifth of its width for the
+                          photo: a slimmer thumb leaves the text column room
+                          to wrap instead of running off the right edge, and
+                          min-w-0 is what lets that column actually shrink. */}
+                      <div className="w-28 sm:w-56 flex-shrink-0 relative bg-gray-100">
                         {listing.primary_image ? (
                           <img
                             src={listing.primary_image}
@@ -400,8 +404,8 @@ export default function SearchPage() {
                           </div>
                         )}
                       </div>
-                      <div className="flex-1 p-4">
-                        <h3 className="font-bold text-[#1A1A2E] dark:text-white hover:text-[var(--accent)] transition-colors">
+                      <div className="flex-1 min-w-0 p-3 sm:p-4">
+                        <h3 className="font-bold text-[#1A1A2E] dark:text-white text-sm sm:text-base leading-snug line-clamp-2 hover:text-[var(--accent)] transition-colors">
                           {listing.title}
                         </h3>
                         <div className="mt-1 flex items-baseline gap-1">
@@ -410,17 +414,29 @@ export default function SearchPage() {
                           </span>
                           <span className="text-sm text-gray-500 dark:text-gray-400">{t('common.somoni')}</span>
                         </div>
-                        <div className="mt-2 flex items-center gap-3 text-xs text-gray-500">
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            {listing.city_name}
-                          </span>
-                          {listing.average_rating > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Star className="w-3 h-3" />
-                              {listing.average_rating.toFixed(1)}
+                        {/* City, district and the review count live on the card
+                            itself here, the same as in the grid: before, the
+                            text column was squeezed off the edge and the only
+                            place to read any of it was the detail page. */}
+                        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
+                          {(listing.city_name || listing.district_name) && (
+                            <span className="flex items-center gap-1 min-w-0">
+                              <MapPin className="w-3 h-3 shrink-0" />
+                              <span className="truncate">
+                                {listing.city_name}
+                                {listing.district_name ? `, ${listing.district_name}` : ''}
+                              </span>
                             </span>
                           )}
+                          <span className="flex items-center gap-1">
+                            <Star
+                              className={`w-3 h-3 ${listing.average_rating > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
+                            />
+                            {listing.average_rating > 0 ? listing.average_rating.toFixed(1) : '—'}
+                            <span className="text-gray-400 dark:text-slate-500">
+                              ({listing.rating_count ?? 0} {t('listing.reviews')})
+                            </span>
+                          </span>
                         </div>
                       </div>
                     </div>
