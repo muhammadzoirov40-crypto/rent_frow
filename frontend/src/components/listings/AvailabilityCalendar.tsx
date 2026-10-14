@@ -113,7 +113,10 @@ export default function AvailabilityCalendar({ listingId, startDate, endDate, on
 
   return (
     <div className="glass-section rounded-xl border border-gray-200 dark:border-white/10 p-3 sm:p-4">
-      <div className="flex items-center justify-between mb-3">
+      {/* On a phone the sidebar column is ~214px wide inside this card, and
+          the label + month arrows need more than that on one line — let the
+          nav row wrap instead of pushing the whole page sideways. */}
+      <div className="flex flex-wrap items-center justify-between gap-y-1 mb-3">
         <span className="text-xs font-bold uppercase tracking-wide text-gray-500 dark:text-gray-400">
           {t('listing.availability')}
         </span>
