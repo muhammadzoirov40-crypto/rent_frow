@@ -503,6 +503,19 @@ export default function ProfilePage() {
                           {formatPrice(listing.price, t, i18n.language)} {formatPriceUnit(t, listing.price_unit)}
                         </span>
                       </div>
+                      {/* Rating and review count — the same line the detail
+                          page shows, so it reads without opening the listing. */}
+                      <div className="flex items-center gap-1.5 mt-2 text-sm">
+                        <Star
+                          className={`w-4 h-4 ${(listing.average_rating ?? 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
+                        />
+                        <span className="font-bold text-[#1A1A2E] dark:text-white">
+                          {(listing.average_rating ?? 0) > 0 ? listing.average_rating.toFixed(1) : '—'}
+                        </span>
+                        <span className="text-gray-400 dark:text-slate-500">
+                          ({listing.rating_count ?? 0} {t('listing.reviews')})
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}

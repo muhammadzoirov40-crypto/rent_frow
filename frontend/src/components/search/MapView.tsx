@@ -106,7 +106,10 @@ export default function MapView({ items, focus, className = '', height = '28rem'
            <div style="font-size:13px;color:var(--accent);font-weight:700">${price}</div>
            <div style="font-size:12px;color:#6b7280;margin-top:2px">${
              item.city_name || ''
-           }</div>
+           }${item.district_name ? `, ${item.district_name}` : ''}</div>
+           <div style="font-size:12px;color:#6b7280;margin-top:2px">★ ${
+             item.average_rating > 0 ? item.average_rating.toFixed(1) : '—'
+           } (${item.rating_count ?? 0} ${t('listing.reviews')})</div>
            <a href="/listing/${item.id}" data-listing-id="${
              item.id
            }" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);text-decoration:none">${

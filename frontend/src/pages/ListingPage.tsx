@@ -1141,7 +1141,21 @@ export default function ListingPage() {
                     </h3>
                     <div className="flex items-center gap-1 mt-1">
                       <MapPin size={12} className="text-gray-400" />
-                      <span className="text-xs text-gray-500 dark:text-gray-400">{item.city_name}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {item.city_name}
+                        {item.district_name ? `, ${item.district_name}` : ''}
+                      </span>
+                    </div>
+                    {/* The same rating line every other card carries — the
+                        similar shelf is no exception. */}
+                    <div className="flex items-center gap-1 mt-1">
+                      <Star size={12} className={(item.average_rating ?? 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300'} />
+                      <span className="text-xs font-bold text-[#1A1A2E] dark:text-white">
+                        {(item.average_rating ?? 0) > 0 ? item.average_rating.toFixed(1) : '—'}
+                      </span>
+                      <span className="text-xs text-gray-400 dark:text-slate-500">
+                        ({item.rating_count ?? 0} {t('listing.reviews')})
+                      </span>
                     </div>
                     <span className="block mt-2 text-lg font-bold text-[var(--accent)]">
                       {formatAmount(item.price, i18n.language)} {t('common.somoni')}

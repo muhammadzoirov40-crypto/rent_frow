@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Heart, MapPin, Package, Loader2 } from 'lucide-react';
+import { Heart, MapPin, Package, Loader2, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { favorites, listings, type ListingListItem } from '../api';
@@ -87,13 +87,28 @@ export default function FavoritesPage() {
                   >
                     {listing.title}
                   </Link>
-                  <div className="flex items-center gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    {listing.city_name && (
+                  <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
+                    {(listing.city_name || listing.district_name) && (
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5" />
                         {listing.city_name}
+                        {listing.district_name ? `, ${listing.district_name}` : ''}
                       </span>
                     )}
+                  </div>
+                  {/* The rating and the review count sit on the card the same
+                      way they do on the detail page — no need to open the
+                      listing just to read them. */}
+                  <div className="flex items-center gap-1.5 mt-2 text-sm">
+                    <Star
+                      className={`w-4 h-4 ${(listing.average_rating ?? 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
+                    />
+                    <span className="font-bold text-[#1A1A2E] dark:text-white">
+                      {(listing.average_rating ?? 0) > 0 ? listing.average_rating.toFixed(1) : '—'}
+                    </span>
+                    <span className="text-gray-400 dark:text-slate-500">
+                      ({listing.rating_count ?? 0} {t('listing.reviews')})
+                    </span>
                   </div>
                   <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-white/10">
                     <span className="text-xl font-bold text-[var(--accent)]">
