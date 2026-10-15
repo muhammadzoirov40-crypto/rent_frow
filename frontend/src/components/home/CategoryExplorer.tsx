@@ -65,9 +65,9 @@ export default function CategoryExplorer() {
   if (isLoading) {
     return (
       <Section id="categories" title={t('home.popularCategories')} hint={t('home.categoriesHint')}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
           {Array.from({ length: 10 }).map((_, i) => (
-            <div key={i} className="glass-tile h-36 rounded-2xl border animate-skeleton" />
+            <div key={i} className="glass-tile h-28 sm:h-36 rounded-2xl border animate-skeleton" />
           ))}
         </div>
       </Section>
@@ -116,7 +116,9 @@ export default function CategoryExplorer() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+      {/* Three tiles in a row on the phone — the wide card scale waits for
+          sm and up, exactly as the grid above it does. */}
+      <div className="grid grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
         {shown.map((cat) => {
           const Icon = iconFor(cat, i18n.language);
           const count = categoryCounts[cat.id];
@@ -124,19 +126,19 @@ export default function CategoryExplorer() {
             <button
               key={cat.id}
               onClick={() => navigate(`/search?category_id=${cat.id}`)}
-              className="glass-card glass-card-hover group h-full flex flex-col items-center justify-center text-center rounded-2xl p-5 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+              className="glass-card glass-card-hover group h-full flex flex-col items-center justify-center text-center rounded-2xl p-3 sm:p-5 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
-              <div className="w-12 h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.08)] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-200">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.08)] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-200">
                 {cat.image_url ? (
-                  <img src={cat.image_url} alt="" className="w-6 h-6 object-contain" loading="lazy" />
+                  <img src={cat.image_url} alt="" className="w-5 h-5 sm:w-6 sm:h-6 object-contain" loading="lazy" />
                 ) : (
-                  <Icon className="w-6 h-6 text-[var(--accent)] group-hover:text-white transition-colors duration-200" />
+                  <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent)] group-hover:text-white transition-colors duration-200" />
                 )}
               </div>
-              <h3 className="font-bold text-sm text-[#0f172a] dark:text-white group-hover:text-[var(--accent)] transition-colors leading-snug line-clamp-1">
+              <h3 className="font-bold text-[11px] sm:text-sm text-[#0f172a] dark:text-white group-hover:text-[var(--accent)] transition-colors leading-snug line-clamp-1">
                 {localizeCategoryName(cat, i18n.language)}
               </h3>
-              <p className="mt-1 text-xs font-medium text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-[10px] sm:text-xs font-medium text-gray-500 dark:text-gray-400">
                 {t('home.listingsCount', { count: count ?? 0 })}
               </p>
             </button>
