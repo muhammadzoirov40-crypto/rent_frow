@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, ExternalLink } from 'lucide-react';
+import { listings } from '../../api';
 import type { ListingListItem } from '../../api/index';
 import { formatPrice } from '../../utils/format';
 
@@ -40,6 +42,7 @@ interface MapViewProps {
 export default function MapView({ items, focus, className = '', height = '28rem' }: MapViewProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.LayerGroup | null>(null);
@@ -100,6 +103,11 @@ export default function MapView({ items, focus, className = '', height = '28rem'
 
       marker.bindPopup(
         `<div style="min-width:180px;font-family:inherit">
+           ${
+             item.category_name
+               ? `<span style="display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;font-weight:700;background:var(--accent);color:#fff;margin-bottom:4px">${item.category_name}</span>`
+               : ''
+           }
            <div style="font-weight:700;font-size:14px;margin-bottom:4px">${
              item.title.length > 60 ? `${item.title.slice(0, 60)}…` : item.title
            }</div>
@@ -110,11 +118,16 @@ export default function MapView({ items, focus, className = '', height = '28rem'
            <div style="font-size:12px;color:#6b7280;margin-top:2px">★ ${
              item.average_rating > 0 ? item.average_rating.toFixed(1) : '—'
            } (${item.rating_count ?? 0} ${t('listing.reviews')})</div>
-           <a href="/listing/${item.id}" data-listing-id="${
-             item.id
-           }" style="display:inline-block;margin-top:8px;font-size:12px;font-weight:700;color:var(--accent);text-decoration:none">${
-             t('common.viewDetails')
-           } →</a>
+           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+             <a href="/listing/${item.id}" data-listing-id="${
+               item.id
+             }" style="font-size:12px;font-weight:700;color:var(--accent);text-decoration:none">${
+               t('common.viewDetails')
+             } →</a>
+             <button type="button" data-fav-id="${item.id}" aria-label="favorite" style="border:0;background:transparent;padding:0;cursor:pointer;font-size:18px;line-height:1;color:${
+               item.is_favorited ? 'var(--accent)' : '#9ca3af'
+             }">${item.is_favorited ? '❤' : '♡'}</button>
+           </div>
          </div>`,
       );
 
@@ -126,14 +139,35 @@ export default function MapView({ items, focus, className = '', height = '28rem'
     map.off('popupopen');
     map.on('popupopen', (e) => {
       const el = (e.popup as L.Popup).getElement()?.querySelector('a[data-listing-id]');
-      if (!el) return;
-      const handler = (ev: Event) => {
-        ev.preventDefault();
-        const id = el.getAttribute('data-listing-id');
-        map.closePopup();
-        navigate(`/listing/${id}`);
-      };
-      el.addEventListener('click', handler);
+      if (el) {
+        const handler = (ev: Event) => {
+          ev.preventDefault();
+          const id = el.getAttribute('data-listing-id');
+          map.closePopup();
+          navigate(`/listing/${id}`);
+        };
+        el.addEventListener('click', handler);
+      }
+      // The heart in the popup toggles the favourite right there — the same
+      // call every card heart makes, and the popup repaints its own glyph.
+      const favBtn = (e.popup as L.Popup).getElement()?.querySelector('button[data-fav-id]');
+      if (favBtn) {
+        const onFav = async (ev: Event) => {
+          ev.preventDefault();
+          ev.stopPropagation();
+          const id = Number(favBtn.getAttribute('data-fav-id'));
+          if (!id) return;
+          try {
+            const res = await listings.toggleFavorite(id);
+            favBtn.textContent = res.is_favorited ? '❤' : '♡';
+            favBtn.style.color = res.is_favorited ? 'var(--accent)' : '#9ca3af';
+            queryClient.invalidateQueries({ queryKey: ['favorites'] });
+          } catch {
+            /* not signed in — the button simply does nothing */
+          }
+        };
+        favBtn.addEventListener('click', onFav);
+      }
     });
 
     if (placed.length > 0 && !focus) {

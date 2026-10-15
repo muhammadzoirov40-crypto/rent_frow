@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type MouseEvent } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { invalidateListingQueries } from '../utils/invalidateListings';
 import { useTranslation } from 'react-i18next';
 import { listings, reviews, rentalRequests, messages, payments } from '../api';
+import type { ListingListItem } from '../api';
 import useAuthStore from '../store/authStore';
 import toast from 'react-hot-toast';
 import {
@@ -67,6 +68,85 @@ function StarRating({ rating, size = 16 }: { rating: number; size?: number }) {
         />
       ))}
     </div>
+  );
+}
+
+/** One card on the "similar listings" shelf — the same marks every other
+ *  card carries: the category chip, the favourite heart on the photo, the
+ *  city line and the review count, all readable without opening the listing. */
+function SimilarCard({ item }: { item: ListingListItem }) {
+  const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
+  const [isFavorited, setIsFavorited] = useState(item.is_favorited ?? false);
+
+  const toggleFav = async (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const res = await listings.toggleFavorite(item.id);
+      setIsFavorited(res.is_favorited);
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    } catch {}
+  };
+
+  return (
+    <Link
+      to={`/listing/${item.id}`}
+      className="flex-shrink-0 w-64 glass-card glass-card-hover rounded-xl overflow-hidden transition-all duration-300 group"
+    >
+      <div className="relative h-40 bg-gray-100 dark:bg-white/5 overflow-hidden">
+        {item.primary_image ? (
+          <img src={item.primary_image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        ) : null}
+        {!item.primary_image && (
+          <div className="w-full h-full flex items-center justify-center">
+            <Home size={32} className="text-gray-300" />
+          </div>
+        )}
+        {/* The heart sits on the photo exactly where it sits on every card. */}
+        <button
+          type="button"
+          onClick={toggleFav}
+          aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
+          aria-pressed={isFavorited}
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/85 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md ring-1 ring-white/30 dark:ring-white/10 hover:scale-110 active:scale-95 transition"
+        >
+          <Heart size={15} className={isFavorited ? 'fill-[var(--accent)] text-[var(--accent)]' : 'text-gray-500 dark:text-slate-300'} />
+        </button>
+        {/* The category chip every other card carries. */}
+        {item.category_name && (
+          <span className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm truncate">
+            {item.category_name}
+          </span>
+        )}
+      </div>
+      <div className="p-3">
+        <h3 className="font-semibold text-sm text-[#1A1A2E] dark:text-white truncate group-hover:text-[var(--accent)] transition-colors">
+          {item.title}
+        </h3>
+        <div className="flex items-center gap-1 mt-1">
+          <MapPin size={12} className="text-gray-400" />
+          <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
+            {item.city_name}
+            {item.district_name ? `, ${item.district_name}` : ''}
+          </span>
+        </div>
+        {/* The same rating line every other card carries — the
+            similar shelf is no exception. */}
+        <div className="flex items-center gap-1 mt-1">
+          <Star size={12} className={(item.average_rating ?? 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300'} />
+          <span className="text-xs font-bold text-[#1A1A2E] dark:text-white">
+            {(item.average_rating ?? 0) > 0 ? item.average_rating.toFixed(1) : '—'}
+          </span>
+          <span className="text-xs text-gray-400 dark:text-slate-500">
+            ({item.rating_count ?? 0} {t('listing.reviews')})
+          </span>
+        </div>
+        <span className="block mt-2 text-lg font-bold text-[var(--accent)]">
+          {formatAmount(item.price, i18n.language)} {t('common.somoni')}
+        </span>
+      </div>
+    </Link>
   );
 }
 
@@ -481,6 +561,23 @@ export default function ListingPage() {
                     alt={listing.title}
                     className="w-full h-full object-cover"
                   />
+                  {/* The card marks live on the photo itself: the category
+                      chip bottom-left, the favourite heart top-left — the
+                      image stays the hero and nothing covers it. */}
+                  {listing.category_name && (
+                    <span className="absolute bottom-4 left-4 max-w-[calc(100%-2rem)] inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm truncate">
+                      {listing.category_name}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => favoriteMutation.mutate()}
+                    aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
+                    aria-pressed={isFavorited}
+                    className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/85 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md ring-1 ring-white/30 dark:ring-white/10 hover:scale-110 active:scale-95 transition"
+                  >
+                    <Heart size={18} className={isFavorited ? 'fill-[var(--accent)] text-[var(--accent)]' : 'text-gray-500 dark:text-slate-300'} />
+                  </button>
                   <div className="absolute top-4 right-4 flex items-center gap-2">
                     <div className="bg-black/65 text-white text-xs font-semibold px-3 py-1.5 rounded-full backdrop-blur-sm">
                       {currentImageIndex + 1}/{images.length}
@@ -1120,54 +1217,7 @@ export default function ListingPage() {
             <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-4">{t('listing.similarListings')}</h2>
             <div className="flex flex-wrap gap-4 pb-4">
               {similarData.items.map((item) => (
-                <Link
-                  key={item.id}
-                  to={`/listing/${item.id}`}
-                  className="flex-shrink-0 w-64 glass-card glass-card-hover rounded-xl overflow-hidden transition-all duration-300 group"
-                >
-                  <div className="relative h-40 bg-gray-100 dark:bg-white/5 overflow-hidden">
-                    {item.primary_image ? (
-                      <img src={item.primary_image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                    ) : null}
-                    {!item.primary_image && (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Home size={32} className="text-gray-300" />
-                      </div>
-                    )}
-                    {/* The category chip every other card carries. */}
-                    {item.category_name && (
-                      <span className="absolute bottom-2 left-2 max-w-[calc(100%-1rem)] inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm truncate">
-                        {item.category_name}
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-semibold text-sm text-[#1A1A2E] dark:text-white truncate group-hover:text-[var(--accent)] transition-colors">
-                      {item.title}
-                    </h3>
-                    <div className="flex items-center gap-1 mt-1">
-                      <MapPin size={12} className="text-gray-400" />
-                      <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {item.city_name}
-                        {item.district_name ? `, ${item.district_name}` : ''}
-                      </span>
-                    </div>
-                    {/* The same rating line every other card carries — the
-                        similar shelf is no exception. */}
-                    <div className="flex items-center gap-1 mt-1">
-                      <Star size={12} className={(item.average_rating ?? 0) > 0 ? 'fill-amber-400 text-amber-400' : 'text-gray-300'} />
-                      <span className="text-xs font-bold text-[#1A1A2E] dark:text-white">
-                        {(item.average_rating ?? 0) > 0 ? item.average_rating.toFixed(1) : '—'}
-                      </span>
-                      <span className="text-xs text-gray-400 dark:text-slate-500">
-                        ({item.rating_count ?? 0} {t('listing.reviews')})
-                      </span>
-                    </div>
-                    <span className="block mt-2 text-lg font-bold text-[var(--accent)]">
-                      {formatAmount(item.price, i18n.language)} {t('common.somoni')}
-                    </span>
-                  </div>
-                </Link>
+                <SimilarCard key={item.id} item={item} />
               ))}
             </div>
           </div>

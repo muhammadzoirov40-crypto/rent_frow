@@ -397,6 +397,13 @@ export default function ProfilePage() {
                           <Package className="w-10 h-10" />
                         </div>
                       )}
+                      {/* The category chip every other card carries — the
+                          owner's own card shows it on the photo too. */}
+                      {listing.category_name && (
+                        <span className="absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm truncate">
+                          {listing.category_name}
+                        </span>
+                      )}
                       <div className="absolute top-3 right-3 flex gap-1.5">
                         <Link
                           to={`/create-listing?edit=${listing.id}`}
