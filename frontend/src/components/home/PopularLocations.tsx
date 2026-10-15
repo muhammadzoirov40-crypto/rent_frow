@@ -48,6 +48,10 @@ export default function PopularLocations({ limit = 8 }: { limit?: number }) {
 
   return (
     <Section
+      // The city tiles earn their space only where they can be read: on a
+      // phone the name, the count and the arrow fought over 140px and the
+      // name came out as "Д.." — the whole block waits for sm and up.
+      className="hidden sm:block"
       title={t('home.popularLocations')}
       hint={t('home.popularLocationsHint')}
       actionLabel={t('common.viewAll')}
