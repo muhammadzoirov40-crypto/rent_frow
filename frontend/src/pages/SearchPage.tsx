@@ -14,9 +14,6 @@ import {
   Star,
   AlertTriangle,
   Package,
-  Building2,
-  Car,
-  Wrench,
   Heart,
 } from 'lucide-react';
 import SearchBar from '../components/search/SearchBar';
@@ -200,49 +197,6 @@ export default function SearchPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 dark:bg-[#0a0a1a] min-h-screen">
       <BackButton className="mb-4" />
-      {/* The phone lands on the bare form with nothing above it — give it the
-          same intro the home hero has (slogan, subtitle, quick jumps); md and
-          up keep the plain layout they have always had. */}
-      <div className="md:hidden mb-6">
-        <h1 className="text-4xl font-black tracking-tight leading-[1.08] text-slate-900 dark:text-white mb-3">
-          {t('home.heroTitle')}{' '}
-          <span className="sm:whitespace-nowrap">
-            <span className="bg-gradient-to-r from-[var(--hero-rent-from)] via-[var(--hero-rent-via)] to-[var(--hero-rent-to)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_var(--hero-rent-shadow)]">
-              Rent
-            </span>
-            <span className="bg-gradient-to-r from-[var(--accent)] via-[var(--accent-light)] to-[var(--accent-hover)] bg-clip-text text-transparent bg-[length:200%_200%] animate-[renthubShine_6s_ease-in-out_infinite] drop-shadow-[0_2px_16px_rgb(var(--accent-rgb)/0.4)]">
-              Hub
-            </span>
-          </span>
-        </h1>
-        <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-xl leading-relaxed mb-4">
-          {t('home.heroSubtitle')}
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 pt-2">
-          <span className="w-full sm:w-auto text-center text-xs font-semibold text-slate-400">{t('home.heroQuickJump')}</span>
-          <a
-            href="/#categories"
-            className="glass-card glass-card-hover inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all"
-          >
-            <Building2 className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {t('home.heroPillProperty')}
-          </a>
-          <a
-            href="/#categories"
-            className="glass-card glass-card-hover inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all"
-          >
-            <Car className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {t('home.heroPillTransport')}
-          </a>
-          <a
-            href="/#categories"
-            className="glass-card glass-card-hover inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg text-[11px] sm:text-xs font-semibold hover:text-[var(--accent,#FF6B35)] text-slate-700 dark:text-slate-300 transition-all"
-          >
-            <Wrench className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            {t('home.heroPillEquipment')}
-          </a>
-        </div>
-      </div>
       <div className="mb-6">
         <SearchBar
           key={[
