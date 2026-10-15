@@ -298,14 +298,17 @@ export default function ChatInput({
           </button>
         </div>
       ) : (
-        <div className="flex items-end gap-1.5 sm:gap-2">
+        {/* Phone: one attachment entry (photos) + emoji + voice + send —
+            the document paperclip and the wider paddings return at ≥640,
+            where there is room for the full row. */}
+        <div className="flex items-end gap-1 sm:gap-2">
           <button
             type="button"
             onClick={() => pickFile('file')}
             disabled={disabled}
             aria-label={t('messages.attachFile')}
             title={t('messages.attachFile')}
-            className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
+            className="hidden sm:block p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
             <Paperclip className="w-5 h-5" />
           </button>
@@ -315,7 +318,7 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.attachImage')}
             title={t('messages.attachImage')}
-            className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
+            className="p-2 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
             <ImageIcon className="w-5 h-5" />
           </button>
@@ -325,7 +328,7 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.emoji')}
             title={t('messages.emoji')}
-            className={`p-2.5 rounded-full transition disabled:opacity-40 ${
+            className={`p-2 sm:p-2.5 rounded-full transition disabled:opacity-40 ${
               emojiOpen
                 ? 'text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.15)]'
                 : 'text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)]'

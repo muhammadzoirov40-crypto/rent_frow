@@ -200,8 +200,9 @@ export default function Header() {
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
-            {/* Languages live in the mobile menu, so the header keeps only
-                the theme, the account and the burger on small screens. */}
+            {/* Languages live in the mobile menu and the account menu lives
+                in the burger sheet, so the phone header keeps only the
+                theme, the bell and the burger. */}
             <div className="relative hidden sm:block" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
@@ -337,7 +338,7 @@ export default function Header() {
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false) }}
-                    className="flex items-center gap-2 p-1.5 pr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition"
+                    className="hidden sm:flex items-center gap-2 p-1.5 pr-2 rounded-xl hover:bg-gray-100 dark:hover:bg-white/5 transition"
                   >
                     {user.avatar_url ? (
                       <img src={user.avatar_url} alt="" className="w-8 h-8 rounded-lg object-cover" />
