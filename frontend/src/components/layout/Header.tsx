@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import Logo from '../Logo'
 import { useTranslation } from 'react-i18next'
 import {
@@ -48,6 +48,7 @@ const LANGUAGES = [
 export default function Header() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, isAuthenticated, logout } = useAuthStore()
   const { theme, toggleTheme } = useTheme()
   const [searchQuery, setSearchQuery] = useState('')
@@ -426,18 +427,23 @@ export default function Header() {
           </div>
         </div>
 
-        <form onSubmit={handleSearch} className="md:hidden pb-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('header.searchPlaceholder')}
-              className="w-full pl-10 pr-4 py-2.5 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
-            />
-          </div>
-        </form>
+        {/* The search page carries its own full search bar right under the
+            back button — the header's duplicate input is dropped there, and
+            only there: every other page on the phone keeps it. */}
+        {!location.pathname.startsWith('/search') && (
+          <form onSubmit={handleSearch} className="md:hidden pb-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('header.searchPlaceholder')}
+                className="w-full pl-10 pr-4 py-2.5 glass-input rounded-xl text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-rgb)/0.2)] focus:border-[var(--accent)] transition"
+              />
+            </div>
+          </form>
+        )}
       </div>
 
       <SubNavbar />
