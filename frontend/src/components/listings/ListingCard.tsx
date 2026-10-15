@@ -200,7 +200,7 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
           onClick={toggleFavorite}
           aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
           aria-pressed={isFavorited}
-          className="absolute top-3 right-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 hover:border-[var(--accent)] hover:scale-110 active:scale-95 transition-all group/fav focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="absolute top-3 right-3 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md hidden sm:flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 hover:border-[var(--accent)] hover:scale-110 active:scale-95 transition-all group/fav focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Heart
             className={`w-3 h-3 sm:w-4 sm:h-4 transition-colors ${
@@ -278,17 +278,41 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
           )}
         </div>
 
-        {hasPrice && (
-          <div className="flex items-baseline gap-1.5 flex-wrap">
-            <span className={`${compact ? 'text-[15px] sm:text-[22px]' : 'text-[22px]'} font-extrabold leading-none text-[var(--accent)] tracking-tight`}>
-              {formatAmount(listing.price)}
-            </span>
-            <span className={`${compact ? 'text-[10px] sm:text-xs' : 'text-xs'} font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500`}>
-              {t('common.somoni')}
-              {unitKey ? ` / ${t(unitKey)}` : ''}
-            </span>
+        {/* The card's bottom line: the price on the left, and on the phone
+            the heart beside it — the photo carries no overlays there (TOP is
+            all it keeps), while sm and up keeps the heart on the photo
+            exactly where it has always been. */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-baseline gap-1.5 flex-wrap min-w-0">
+            {hasPrice && (
+              <>
+                <span className={`${compact ? 'text-[15px] sm:text-[22px]' : 'text-[22px]'} font-extrabold leading-none text-[var(--accent)] tracking-tight`}>
+                  {formatAmount(listing.price)}
+                </span>
+                <span className={`${compact ? 'text-[10px] sm:text-xs' : 'text-xs'} font-semibold uppercase tracking-wide text-gray-400 dark:text-slate-500`}>
+                  {t('common.somoni')}
+                  {unitKey ? ` / ${t(unitKey)}` : ''}
+                </span>
+              </>
+            )}
           </div>
-        )}
+          <button
+            type="button"
+            onClick={toggleFavorite}
+            aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
+            aria-pressed={isFavorited}
+            className="sm:hidden shrink-0 w-8 h-8 rounded-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          >
+            <Heart
+              className={`w-3.5 h-3.5 transition-colors ${
+                isFavorited
+                  ? 'fill-[var(--accent)] text-[var(--accent)]'
+                  : 'text-gray-400 dark:text-slate-400'
+              }`}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
 
         {/* Phone only hides this: the card itself is the tap target there,
             and the extra row just pushed the grid taller for nothing.
