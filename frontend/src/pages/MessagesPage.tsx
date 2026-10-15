@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Search, MessageSquare, Pin, X, Package, ChevronRight, Check, Loader2, MapPin } from 'lucide-react';
+import { ArrowLeft, Search, MessageSquare, Pin, X, Package, ChevronRight, ChevronDown, Check, Loader2, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -748,6 +748,9 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const [decision, setDecision] = useState<'accept' | 'reject' | null>(null);
+  // Phone only: the details below the summary row are folded by default so the
+  // bar never eats the whole chat screen. ≥640 shows them as they always did.
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const { data: req } = useQuery<RentalRequest>({
     queryKey: ['chat-rental-request', requestId],
@@ -904,8 +907,21 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
               {t('booking.deposit')}: {formatAmount(req.deposit_amount)}
             </div>
           )}
+          {/* Phone: fold/unfold the details (payments, decision, quote). */}
+          <button
+            type="button"
+            onClick={() => setDetailsOpen((v) => !v)}
+            aria-expanded={detailsOpen}
+            aria-label={detailsOpen ? t('messages.hideDetails', 'Пинҳор кардан') : t('messages.showDetails', 'Тафсилот')}
+            className="sm:hidden p-1.5 mt-1 -mr-1.5 text-gray-400 hover:text-[var(--accent)] transition"
+          >
+            <ChevronDown className={`w-4 h-4 transition-transform ${detailsOpen ? 'rotate-180' : ''}`} />
+          </button>
         </div>
       </div>
+
+      {/* Details: folded on phone unless opened, always visible at ≥640. */}
+      <div className={detailsOpen ? '' : 'hidden sm:block'}>
 
       {statusKey === 'ACCEPTED' && (
         <span className="flex flex-wrap items-center gap-2 mt-2.5" data-testid="chat-payment-strip">
@@ -970,6 +986,7 @@ function RentalRequestBar({ requestId }: { requestId: number }) {
           “{req.owner_response}”
         </p>
       )}
+      </div>
 
       {decision && (
         <div

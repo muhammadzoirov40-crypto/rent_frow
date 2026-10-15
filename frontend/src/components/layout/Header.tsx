@@ -175,9 +175,7 @@ export default function Header() {
       <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-1 shrink-0">
-            {/* Tight phones: emblem only — the wordmark gives its space to
-                the heart/messages/bell row, and comes back at ≥640. */}
-            <Logo size="md" className="[&>span]:hidden sm:[&>span]:block" />
+            <Logo size="md" />
           </div>
 
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-8">
@@ -244,14 +242,14 @@ export default function Header() {
 
                 <Link
                   to="/favorites"
-                  className="relative p-1.5 sm:p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <Heart className="w-5 h-5" />
                 </Link>
 
                 <Link
                   to="/messages"
-                  className="relative p-1.5 sm:p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition flex"
+                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
                 >
                   <MessageSquare className="w-5 h-5" />
                   {unreadMessages > 0 && (
