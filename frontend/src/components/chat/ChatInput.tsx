@@ -298,10 +298,10 @@ export default function ChatInput({
           </button>
         </div>
       ) : (
-        {/* Phone: one attachment entry (photos) + emoji + voice + send —
-            the document paperclip and the wider paddings return at ≥640,
-            where there is room for the full row. */}
         <div className="flex items-end gap-1 sm:gap-2">
+          {/* Phone: one attachment entry (photos) + emoji + voice + send —
+              the document paperclip and the wider paddings return at ≥640,
+              where there is room for the full row. */}
           <button
             type="button"
             onClick={() => pickFile('file')}
