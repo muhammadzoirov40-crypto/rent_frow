@@ -162,10 +162,10 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
         <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5 z-10">
           {isTop && (
             <span
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 shadow-md ring-1 ring-amber-200/70"
+              className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-wider bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-900 shadow-md ring-1 ring-amber-200/70"
               aria-label={t('top.badge')}
             >
-              <Crown className="w-3.5 h-3.5" aria-hidden="true" />
+              <Crown className="w-3 h-3 sm:w-3.5 sm:h-3.5" aria-hidden="true" />
               TOP
             </span>
           )}
@@ -200,10 +200,10 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
           onClick={toggleFavorite}
           aria-label={isFavorited ? t('listing.inFavorites') : t('listing.addToFavorites')}
           aria-pressed={isFavorited}
-          className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 hover:border-[var(--accent)] hover:scale-110 active:scale-95 transition-all group/fav focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+          className="absolute top-3 right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/80 dark:bg-slate-900/70 backdrop-blur-md flex items-center justify-center shadow-md border border-white/20 dark:border-white/10 hover:border-[var(--accent)] hover:scale-110 active:scale-95 transition-all group/fav focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
         >
           <Heart
-            className={`w-4 h-4 transition-colors ${
+            className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${
               isFavorited
                 ? 'fill-[var(--accent)] text-[var(--accent)]'
                 : 'text-gray-400 dark:text-slate-400 group-hover/fav:text-[var(--accent)]'
