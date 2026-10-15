@@ -165,7 +165,9 @@ export default function Header() {
       <div className="px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-1 shrink-0">
-            <Logo size="md" />
+            {/* Tight phones: emblem only — the wordmark gives its space to
+                the heart/messages/bell row, and comes back at ≥640. */}
+            <Logo size="md" className="[&>span]:hidden sm:[&>span]:block" />
           </div>
 
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-8">
@@ -184,7 +186,7 @@ export default function Header() {
           <div className="flex items-center gap-1 sm:gap-2">
             <button
               onClick={toggleTheme}
-              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition"
+              className="p-1.5 sm:p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition"
               aria-label={theme === 'dark' ? t('theme.light') : t('theme.dark')}
             >
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -232,14 +234,14 @@ export default function Header() {
 
                 <Link
                   to="/favorites"
-                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
+                  className="relative p-1.5 sm:p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition flex"
                 >
                   <Heart className="w-5 h-5" />
                 </Link>
 
                 <Link
                   to="/messages"
-                  className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
+                  className="relative p-1.5 sm:p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition flex"
                 >
                   <MessageSquare className="w-5 h-5" />
                   {unreadMessages > 0 && (
@@ -252,7 +254,7 @@ export default function Header() {
                 <div className="relative" ref={notifRef}>
                   <button
                     onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false) }}
-                    className="relative p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition hidden sm:flex"
+                    className="relative p-1.5 sm:p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition flex"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadCount > 0 && (
@@ -420,7 +422,7 @@ export default function Header() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={t('nav.main')}
-              className="p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition md:hidden"
+              className="p-1.5 sm:p-2.5 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition md:hidden"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>

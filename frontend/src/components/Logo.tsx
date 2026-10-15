@@ -4,6 +4,9 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   to?: string;
   onClick?: () => void;
+  /** Extra classes merged into the link — lets a tight phone header reshape
+      the logo (drop the wordmark) without touching every other Logo use. */
+  className?: string;
 }
 
 const SIZES = {
@@ -127,7 +130,7 @@ export function LogoMark({ className = 'h-10 w-auto' }: { className?: string }) 
   );
 }
 
-export default function Logo({ size = 'md', to = '/', onClick }: LogoProps) {
+export default function Logo({ size = 'md', to = '/', onClick, className = '' }: LogoProps) {
   const s = SIZES[size];
 
   return (
@@ -135,7 +138,7 @@ export default function Logo({ size = 'md', to = '/', onClick }: LogoProps) {
       to={to}
       onClick={onClick}
       aria-label="RentHub"
-      className="flex items-center gap-2 sm:gap-2.5 group select-none transition-transform duration-150 active:scale-95 shrink-0 bg-transparent"
+      className={`flex items-center gap-2 sm:gap-2.5 group select-none transition-transform duration-150 active:scale-95 shrink-0 bg-transparent ${className}`}
       data-testid="logo"
     >
       {/* The emblem carries the whole brand mark; the word beside it is what
