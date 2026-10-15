@@ -66,6 +66,8 @@ export default function Header() {
   // The header is `fixed`, so the rest of the page must know how tall it is.
   // The sub-navbar changes that height per breakpoint, so measure it live
   // instead of hardcoding a padding value in Layout/SiteSidebar.
+  // Re-measure on every route too: on /messages the bar hides itself on the
+  // phone (max-sm:hidden below), and that must collapse --header-h to 0.
   useEffect(() => {
     const el = headerRef.current
     if (!el) return
@@ -75,7 +77,7 @@ export default function Header() {
     const ro = new ResizeObserver(sync)
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
+  }, [location.pathname])
 
   const { data: unreadData } = useQuery({
     queryKey: ['unread-count'],
@@ -157,7 +159,15 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className="site-header fixed top-0 left-0 right-0 z-50 glass-section border-b border-gray-200/60 dark:border-white/10 transition-colors"
+      className={`site-header fixed top-0 left-0 right-0 z-50 glass-section border-b border-gray-200/60 dark:border-white/10 transition-colors${
+        // Messages runs on its own top bar (title + its own search) and
+        // Profile carries its own card header — neither wants the site bar,
+        // and the chat/profile want the whole phone screen. Phones only:
+        // ≥640 keeps the header exactly as it was.
+        location.pathname.startsWith('/messages') || location.pathname.startsWith('/profile')
+          ? ' max-sm:hidden'
+          : ''
+      }`}
     >
       {/* Full-bleed bar: logo pinned left, actions pinned right — true
           space-between across the viewport instead of a centred 1280px
