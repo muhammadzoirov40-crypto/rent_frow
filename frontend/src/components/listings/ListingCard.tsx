@@ -215,7 +215,7 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
             {categoryLabel && (
               <span
                 title={categoryLabel}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm"
+                className={`${compact ? 'hidden sm:inline-flex' : 'inline-flex'} items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-[var(--accent)] text-white shadow-md ring-1 ring-white/25 backdrop-blur-sm`}
               >
                 <CategoryIcon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span className="truncate">{categoryLabel}</span>
@@ -260,7 +260,10 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
           </div>
         )}
 
-        <div className={`flex items-center gap-1.5 ${compact ? 'text-[11px] sm:text-[13px]' : 'text-[13px]'}`}>
+        {/* On the phone's two-across grid the card keeps only what the eye
+            reads first — TOP, the title, the city and the price — so the
+            rating line steps aside below sm and returns at sm and up. */}
+        <div className={`${compact ? 'hidden sm:flex' : 'flex'} items-center gap-1.5 ${compact ? 'text-[11px] sm:text-[13px]' : 'text-[13px]'}`}>
           <Star
             className={`${compact ? 'w-3 h-3 sm:w-4 sm:h-4' : 'w-4 h-4'} ${rating ? 'fill-amber-400 text-amber-400' : 'text-gray-300 dark:text-slate-600'}`}
             aria-hidden="true"
