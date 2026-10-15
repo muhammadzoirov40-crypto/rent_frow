@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Search, MessageSquare, Pin, X, Package, ChevronRight, Check, Loader2 } from 'lucide-react';
+import { ArrowLeft, Search, MessageSquare, Pin, X, Package, ChevronRight, Check, Loader2, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -716,6 +716,15 @@ function ListingContextBar({ listingId }: { listingId: number }) {
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[#1A1A2E] dark:text-white truncate">{listing.title}</p>
+        {/* City on the phone card — no more opening the listing just to see
+            where it is. Hidden ≥640 so the desktop bar stays exactly as it was. */}
+        {listing.city_name && (
+          <p className="flex sm:hidden items-center gap-1 text-xs text-gray-500 dark:text-gray-400 truncate">
+            <MapPin className="w-3 h-3 shrink-0 text-[var(--accent)]" aria-hidden="true" />
+            {listing.city_name}
+            {listing.district_name ? `, ${listing.district_name}` : ''}
+          </p>
+        )}
         <p className="text-xs font-bold text-[var(--accent)]">
           {formatAmount(listing.price)} {t('common.somoni')} / {t(`listing.${listing.price_unit}`)}
         </p>

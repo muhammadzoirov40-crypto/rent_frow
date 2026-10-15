@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Calendar, Clock, Check, X, Loader2, ListChecks,
-  ChevronRight, MessageSquare, Package, User, AlertCircle, Eye, CreditCard
+  ChevronRight, MessageSquare, Package, User, AlertCircle, Eye, CreditCard, MapPin
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { rentalRequests, listings, messages, payments } from '../api';
@@ -177,6 +177,16 @@ export function RequestCard({
                 <User className="w-3.5 h-3.5 shrink-0" />
                 {type === 'owner' ? req.renter_name : req.owner_name}
               </p>
+              {/* On the phone the city goes right on the card — before this,
+                  you had to open the listing to find out where it even is.
+                  The desktop card keeps its old shape (untouched ≥640). */}
+              {listingInfo?.city_name && (
+                <p className="flex sm:hidden items-center gap-1.5 mt-0.5 text-sm text-gray-500 dark:text-gray-400 truncate">
+                  <MapPin className="w-3.5 h-3.5 shrink-0 text-[var(--accent)]" aria-hidden="true" />
+                  {listingInfo.city_name}
+                  {listingInfo.district_name ? `, ${listingInfo.district_name}` : ''}
+                </p>
+              )}
             </div>
             <span className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-semibold flex-shrink-0 ${status.bg} ${status.text}`}>
               <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
