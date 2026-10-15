@@ -181,12 +181,14 @@ export default function ListingCard({ listing, compact = false }: ListingCardPro
 
           {/* A plain green tick instead of the old wide text chip: the photo
               stays the hero of the card, and the tick still reads "verified"
-              at a glance — the label is on the tooltip for anyone who asks. */}
+              at a glance — the label is on the tooltip for anyone who asks.
+              On the phone's two-across grid even this steps aside below sm:
+              the photo, TOP and the heart are what that card carries there. */}
           {isVerified && (
             <span
               title={t('listing.verified')}
               aria-label={t('listing.verified')}
-              className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 shadow-md ring-1 ring-white/40 backdrop-blur-sm"
+              className={`${compact ? 'hidden sm:inline-flex' : 'inline-flex'} items-center justify-center w-6 h-6 rounded-full bg-emerald-500 shadow-md ring-1 ring-white/40 backdrop-blur-sm`}
             >
               <BadgeCheck className="w-4 h-4 text-white" aria-hidden="true" />
             </span>
