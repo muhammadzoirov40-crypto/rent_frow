@@ -150,7 +150,7 @@ export default function MapView({ items, focus, className = '', height = '28rem'
       }
       // The heart in the popup toggles the favourite right there — the same
       // call every card heart makes, and the popup repaints its own glyph.
-      const favBtn = (e.popup as L.Popup).getElement()?.querySelector('button[data-fav-id]');
+      const favBtn = (e.popup as L.Popup).getElement()?.querySelector<HTMLButtonElement>('button[data-fav-id]');
       if (favBtn) {
         const onFav = async (ev: Event) => {
           ev.preventDefault();
