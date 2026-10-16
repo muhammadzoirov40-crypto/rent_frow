@@ -215,8 +215,11 @@ export default function AnimatedHero() {
 
             {/* Category Shortcuts — centred: the label takes its own line on
                 narrow screens so the three chips sit together, centred, on
-                the next one instead of ragged left-aligned wraps. */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 pt-2">
+                the next one instead of ragged left-aligned wraps.
+                Phones drop the whole row: the hero there is title + subtitle
+                only (the search panel and these chips are both gone), while
+                ≥640 keeps it exactly as before. */}
+            <div className="hidden sm:flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 pt-2">
               <span className="w-full sm:w-auto text-center text-xs font-semibold text-slate-400">{t('home.heroQuickJump')}</span>
               <a
                 href="#categories"
