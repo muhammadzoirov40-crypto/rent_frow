@@ -89,7 +89,11 @@ export default function CategoryExplorer() {
       onAction={() => navigate('/search')}
     >
       {hasGroups && (
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar py-1 px-1 sm:justify-center">
+        // Group chips («Ҳама / Моликият / Нақлиёт») — phones hide the whole
+        // row: the section there is title + hint + the category tiles, and
+        // the chips only duplicated the browse path the burger sheet
+        // already owns. >=640 keeps them exactly as before.
+        <div className="hidden sm:flex items-center gap-2 mb-6 overflow-x-auto no-scrollbar py-1 px-1 sm:justify-center">
           <button
             onClick={() => setActiveGroup('')}
             className={`shrink-0 px-4 py-2 rounded-xl text-sm font-semibold border transition-all duration-200 cursor-pointer ${
