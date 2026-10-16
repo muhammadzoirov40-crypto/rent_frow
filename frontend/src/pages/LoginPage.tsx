@@ -374,7 +374,7 @@ export default function LoginPage() {
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     onPaste={handleOtpPaste}
                     onFocus={(e) => e.target.select()}
-                    className={`glass-input border-2 w-9 h-12 text-xl sm:w-12 sm:h-15 sm:text-2xl text-center font-bold rounded-2xl outline-none transition-all duration-150 text-[#1A1A2E] dark:text-white ${
+                    className={`glass-input border-2 w-11 h-14 sm:w-12 sm:h-15 text-center text-2xl font-bold rounded-2xl outline-none transition-all duration-150 text-[#1A1A2E] dark:text-white max-sm:w-9 max-sm:h-12 max-sm:text-xl ${
                       digit ? 'border-[var(--accent)]' : ''
                     } focus:border-[var(--accent)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)]`}
                   />
