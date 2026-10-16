@@ -10,6 +10,9 @@ interface SectionProps {
   children: ReactNode;
   className?: string;
   headingAs?: 'h2' | 'h3';
+  /** Phones show the heading alone: the hint line and the "view all" action
+   *  are dropped below 640, and >=640 keeps both exactly as before. */
+  minimalOnPhone?: boolean;
 }
 
 /** Shared page section: title + optional hint + optional "view all" action. */
@@ -22,6 +25,7 @@ export default function Section({
   children,
   className = '',
   headingAs: Heading = 'h2',
+  minimalOnPhone = false,
 }: SectionProps) {
   return (
     <section id={id} className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 ${className}`}>
@@ -35,7 +39,11 @@ export default function Section({
             {title}
           </Heading>
           {hint && (
-            <p className="mt-1.5 text-sm sm:text-base text-gray-500 dark:text-gray-400 leading-relaxed max-w-2xl">
+            <p
+              className={`${
+                minimalOnPhone ? 'hidden sm:block ' : ''
+              }mt-1.5 text-sm sm:text-base text-gray-500 dark:text-gray-400 leading-relaxed max-w-2xl`}
+            >
               {hint}
             </p>
           )}
@@ -43,7 +51,9 @@ export default function Section({
         {actionLabel && onAction && (
           <button
             onClick={onAction}
-            className="group inline-flex shrink-0 items-center gap-1.5 text-sm sm:text-[15px] font-bold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-all cursor-pointer"
+            className={`group shrink-0 items-center gap-1.5 text-sm sm:text-[15px] font-bold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-all cursor-pointer ${
+              minimalOnPhone ? 'hidden sm:inline-flex' : 'inline-flex'
+            }`}
           >
             <span>{actionLabel}</span>
             <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />

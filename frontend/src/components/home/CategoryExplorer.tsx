@@ -87,6 +87,7 @@ export default function CategoryExplorer() {
       hint={currentHint ? t(currentHint) : t('home.categoriesHint')}
       actionLabel={t('common.viewAll')}
       onAction={() => navigate('/search')}
+      minimalOnPhone
     >
       {hasGroups && (
         // Group chips («Ҳама / Моликият / Нақлиёт») — phones hide the whole
