@@ -298,66 +298,74 @@ export default function ChatInput({
           </button>
         </div>
       ) : (
-        <div className="flex items-end gap-1 sm:gap-2">
-          {/* Phone: one attachment entry (photos) + emoji + voice + send —
-              the document paperclip and the wider paddings return at ≥640,
-              where there is room for the full row. */}
-          <button
-            type="button"
-            onClick={() => pickFile('file')}
-            disabled={disabled}
-            aria-label={t('messages.attachFile')}
-            title={t('messages.attachFile')}
-            className="hidden sm:block p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
-          >
-            <Paperclip className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => pickFile('image')}
-            disabled={disabled}
-            aria-label={t('messages.attachImage')}
-            title={t('messages.attachImage')}
-            className="p-1.5 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
-          >
-            <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setEmojiOpen((o) => !o)}
-            disabled={disabled}
-            aria-label={t('messages.emoji')}
-            title={t('messages.emoji')}
-            className={`p-1.5 sm:p-2.5 rounded-full transition disabled:opacity-40 ${
-              emojiOpen
-                ? 'text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.15)]'
-                : 'text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)]'
-            }`}
-          >
-            <Smile className="w-4 h-4 sm:w-5 sm:h-5" />
-          </button>
+        <div className="flex items-center gap-1 sm:gap-2 sm:items-end">
+          {/* Phone: one WhatsApp-style pill — emoji inside left, the field in
+              the middle, attach + photo inside right — with a single accent
+              round button beside it that swaps mic↔send as text appears.
+              `sm:contents` dissolves the pill at ≥640 so the flat row
+              (paperclip, photo, emoji, field, mic, send) renders exactly as
+              before: a contents box contributes no box of its own, and the
+              children's `sm:order-*` puts them back in the original sequence. */}
+          <div className="flex items-center flex-1 min-w-0 rounded-full glass-input p-1 sm:contents">
+            <button
+              type="button"
+              onClick={() => setEmojiOpen((o) => !o)}
+              disabled={disabled}
+              aria-label={t('messages.emoji')}
+              title={t('messages.emoji')}
+              className={`order-1 sm:order-3 p-1 rounded-full transition disabled:opacity-40 sm:p-2.5 ${
+                emojiOpen
+                  ? 'text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.15)]'
+                  : 'text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)]'
+              }`}
+            >
+              <Smile className="w-5 h-5" />
+            </button>
 
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-            placeholder={t('messages.typeMessage')}
-            disabled={disabled}
-            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] glass-input px-2.5 sm:px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
-          />
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              placeholder={t('messages.typeMessage')}
+              disabled={disabled}
+              className="order-2 sm:order-4 flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] glass-input px-2.5 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none transition max-sm:rounded-none max-sm:border-0 max-sm:bg-transparent max-sm:px-2 max-sm:py-1.5 max-sm:focus:shadow-none sm:px-4 sm:focus:border-[rgb(var(--accent-rgb)/0.4)] sm:focus:ring-4 sm:focus:ring-[rgb(var(--accent-rgb)/0.1)]"
+            />
 
+            <button
+              type="button"
+              onClick={() => pickFile('file')}
+              disabled={disabled}
+              aria-label={t('messages.attachFile')}
+              title={t('messages.attachFile')}
+              className="order-3 sm:order-1 p-1 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
+            >
+              <Paperclip className="w-5 h-5" />
+            </button>
+            <button
+              type="button"
+              onClick={() => pickFile('image')}
+              disabled={disabled}
+              aria-label={t('messages.attachImage')}
+              title={t('messages.attachImage')}
+              className="order-4 sm:order-2 p-1 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
+            >
+              <ImageIcon className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* ≥640 keeps the two separate buttons exactly as before. */}
           <button
             type="button"
             onClick={startRecording}
             disabled={disabled}
             aria-label={t('messages.recordVoice')}
             title={t('messages.recordVoice')}
-            className="p-1.5 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
+            className="hidden sm:block p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
-            <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Mic className="w-5 h-5" />
           </button>
 
           <button
@@ -366,9 +374,22 @@ export default function ChatInput({
             disabled={!canSend}
             aria-label={t('messages.send')}
             title={t('messages.send')}
-            className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] hover:scale-105 hover:shadow-[rgb(var(--accent-rgb)/0.4)] active:scale-95 transition disabled:opacity-40 disabled:shadow-none disabled:scale-100"
+            className="hidden sm:block p-3 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] hover:scale-105 hover:shadow-[rgb(var(--accent-rgb)/0.4)] active:scale-95 transition disabled:opacity-40 disabled:shadow-none disabled:scale-100"
           >
-            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Send className="w-5 h-5" />
+          </button>
+
+          {/* Phone: a single WhatsApp-style accent circle — mic while the
+              field is empty, send once there is text. */}
+          <button
+            type="button"
+            onClick={value.trim() ? onSend : startRecording}
+            disabled={value.trim() ? !canSend : disabled}
+            aria-label={value.trim() ? t('messages.send') : t('messages.recordVoice')}
+            title={value.trim() ? t('messages.send') : t('messages.recordVoice')}
+            className="sm:hidden p-2 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] active:scale-95 transition disabled:opacity-40 disabled:shadow-none disabled:scale-100"
+          >
+            {value.trim() ? <Send className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
           </button>
         </div>
       )}
