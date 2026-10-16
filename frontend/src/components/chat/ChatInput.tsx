@@ -70,6 +70,11 @@ export default function ChatInput({
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | undefined>(undefined);
   const secondsRef = useRef(0);
+  // Each recording owns its own decision object, created when the mic opens.
+  // stopRecording only mutates that object, so the onstop of a discarded
+  // recording can never read the send flag of the recording after it — the
+  // stale-flag bug that made "delete" send the previous note instead.
+  const decisionRef = useRef<{ send: boolean }>({ send: false });
 
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -162,15 +167,22 @@ export default function ChatInput({
       recorder.ondataavailable = (e) => {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
+      const decision = { send: false };
+      decisionRef.current = decision;
+
       recorder.onstop = () => {
         const duration = secondsRef.current;
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
         stream.getTracks().forEach((track) => track.stop());
         streamRef.current = null;
         secondsRef.current = 0;
-        if (blob.size > 0) onVoice(blob, Math.max(duration, 1));
+        // decision.send is this recording's own flag, set at click time — a
+        // late onstop can never pick up the choice of the next recording.
+        // The trash path relies on this guard: it stops the tracks, which
+        // makes MediaRecorder fire this same callback, and without the guard
+        // "delete" would send the voice note instead of dropping it.
+        if (decision.send && blob.size > 0) onVoice(blob, Math.max(duration, 1));
       };
-
       recorder.start();
       secondsRef.current = 0;
       setSeconds(0);
@@ -189,6 +201,9 @@ export default function ChatInput({
     if (timerRef.current) window.clearInterval(timerRef.current);
     timerRef.current = undefined;
     const recorder = mediaRecorderRef.current;
+    // Mutate this recording's own decision object before stopping, so the
+    // onstop that follows knows whether to hand the audio over or drop it.
+    decisionRef.current.send = send;
     setRecording(false);
     if (!send) {
       chunksRef.current = [];
