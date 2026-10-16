@@ -417,7 +417,7 @@ export default function Header() {
               <>
                 <Link
                   to="/login"
-                  className="px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition whitespace-nowrap"
+                  className="hidden sm:block px-2.5 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 rounded-xl transition whitespace-nowrap"
                 >
                   {t('header.login')}
                 </Link>
