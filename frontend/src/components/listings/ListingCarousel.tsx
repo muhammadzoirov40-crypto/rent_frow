@@ -60,7 +60,18 @@ export default function ListingCarousel({
   const nudge = (dir: 1 | -1) => {
     const el = stripRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir * Math.max(240, el.clientWidth * 0.8), behavior: 'smooth' });
+    // On a phone each press moves exactly one card: the shelf there is half
+    // a screen wide, snap-mandatory would round a big jump to a card edge
+    // anyway, and "one press, one card" is what the two buttons read as.
+    // sm and up keeps the old big jump.
+    const phone =
+      typeof window !== 'undefined' && window.matchMedia('(max-width: 639px)').matches;
+    const first = el.firstElementChild as HTMLElement | null;
+    const step =
+      phone && first
+        ? first.offsetWidth + (parseFloat(getComputedStyle(el).gap) || 0)
+        : Math.max(240, el.clientWidth * 0.8);
+    el.scrollBy({ left: dir * step, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -94,6 +105,33 @@ export default function ListingCarousel({
           </div>
         ))}
       </div>
+
+      {/* Phones: the same two controls, but as a small pair under the shelf
+          instead of circles sitting on the photos — one press slides exactly
+          one card, and there is no gesture to learn. sm and up keeps the
+          overlay arrows below, untouched. */}
+      {canScroll && (
+        <div className="mt-3 flex sm:hidden justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => nudge(-1)}
+            aria-label={t('common.back')}
+            className="glass-popover w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 active:scale-95 transition"
+            data-testid="carousel-prev-phone"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            type="button"
+            onClick={() => nudge(1)}
+            aria-label={t('common.next')}
+            className="glass-popover w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 active:scale-95 transition"
+            data-testid="carousel-next-phone"
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      )}
 
       {canScroll && (
         <>
