@@ -37,11 +37,13 @@ export default function TopListings() {
     >
       {/* The same shelf the showcase below uses — cut card at the right
           edge, arrows left and right — only narrower cards, so four paid
-          windows stay in view instead of three. */}
+          windows stay in view instead of three. On a phone the same rule
+          lands at two cards across: 270px there was one card and a half
+          of empty shelf. */}
       <ListingCarousel
         listings={items}
         loading={isLoading}
-        cardClass="w-[270px] sm:w-[300px]"
+        cardClass="w-[calc(50%-8px)] sm:w-[300px]"
       />
     </Section>
   );

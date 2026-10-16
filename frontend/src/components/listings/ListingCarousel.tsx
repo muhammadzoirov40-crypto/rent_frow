@@ -18,7 +18,7 @@ interface ListingCarouselProps {
   cardClass?: string;
 }
 
-const DEFAULT_CARD_CLASS = 'w-[80%] sm:w-[46%] lg:w-[31%]';
+const DEFAULT_CARD_CLASS = 'w-[calc(50%-8px)] sm:w-[46%] lg:w-[31%]';
 
 /**
  * The home page's shelf: cards side by side, swiped or scrolled left and
@@ -87,7 +87,10 @@ export default function ListingCarousel({
             key={listing.id}
             className={`snap-start shrink-0 ${cardClass}`}
           >
-            <ListingCard listing={listing} />
+            {/* compact only re-dresses the card below sm — two of them now
+                share a phone row, so the title runs 13px and the photo chips
+                stand aside; >=640 is byte-identical to the old card. */}
+            <ListingCard listing={listing} compact />
           </div>
         ))}
       </div>
