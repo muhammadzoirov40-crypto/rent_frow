@@ -200,16 +200,18 @@ export default function Header() {
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
-            {/* Languages live in the mobile menu and the account menu lives
-                in the burger sheet, so the phone header keeps only the
-                theme, the bell and the burger. */}
-            <div className="relative hidden sm:block" ref={langRef}>
+            {/* Phones get the globe alone — the code label costs width the
+                320px bar cannot spare — while ≥640 shows it beside the icon
+                exactly as before. The account menu lives in the burger
+                sheet. */}
+            <div className="relative block" ref={langRef}>
               <button
                 onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition text-sm font-medium"
+                aria-label={t('header.language', 'Забон')}
+                className="flex items-center gap-1.5 p-1.5 sm:px-2.5 sm:py-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.08)] dark:hover:bg-white/5 transition text-sm font-medium"
               >
                 <Globe className="w-4 h-4" />
-                <span>{currentLang.code.toUpperCase()}</span>
+                <span className="hidden sm:inline">{currentLang.code.toUpperCase()}</span>
               </button>
               {langOpen && (
                 <div className="absolute right-0 mt-2 w-44 glass-popover rounded-xl border border-gray-100 dark:border-white/10 overflow-hidden z-50">
