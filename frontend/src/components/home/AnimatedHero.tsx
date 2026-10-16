@@ -243,8 +243,10 @@ export default function AnimatedHero() {
           </motion.div>
           {/* One line or nothing: the bar needs ~710px to keep every field on a
               single row, which is wider than the text column can give it, so it
-              owns a full-width row of its own (mobile order is unchanged). */}
-          <div className="lg:col-start-1 lg:col-span-12 lg:row-start-2 w-full">
+              owns a full-width row of its own (mobile order is unchanged).
+              Phones drop it entirely: search lives in the burger sheet
+              («Ҷустуҷӯ»), and ≥640 keeps the bar exactly as before. */}
+          <div className="hidden sm:block lg:col-start-1 lg:col-span-12 lg:row-start-2 w-full">
             <SearchBar />
           </div>
 
