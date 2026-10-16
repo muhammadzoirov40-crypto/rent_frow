@@ -444,8 +444,8 @@ export default function MessagesPage() {
           bottom nav that used to eat ~5rem of its canvas no longer
           renders on this page, so the typing bar sits above the fold. */}
       <div className={`w-full md:w-80 flex-shrink-0 border-r border-[color:var(--glass-border)] flex flex-col ${selectedId ? 'hidden md:flex' : 'flex'}`}>
-        <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-white/10">
-          <div className="flex items-center gap-2">
+        <div className="p-4 border-b border-gray-200 dark:border-white/10">
+          <div className="flex items-center gap-2 mb-3">
             <button
               type="button"
               onClick={() => navigate(-1)}
@@ -455,22 +455,10 @@ export default function MessagesPage() {
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white shrink-0">{t('messages.title')}</h2>
-            {/* Phone: the search rides in the title bar itself so the list
-                starts right under a single row. ≥640 keeps the stacked
-                title-then-search layout exactly as it was. */}
-            <div className="relative flex-1 min-w-0 sm:hidden">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                placeholder={t('messages.searchPlaceholder')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-1.5 glass-input rounded-full text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)] focus:border-[rgb(var(--accent-rgb)/0.4)] transition"
-              />
-            </div>
+            <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('messages.title')}</h2>
           </div>
-          <div className="relative hidden sm:block mt-3">
+          {/* The search sits right under the title bar on every width. */}
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
