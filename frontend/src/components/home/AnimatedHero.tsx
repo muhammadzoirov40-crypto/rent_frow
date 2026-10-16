@@ -182,7 +182,12 @@ export default function AnimatedHero() {
   const col2Repeated = [...col2, ...col2];
 
   return (
-    <div className="relative overflow-hidden pt-4 pb-10 md:pt-6 md:pb-14">
+    {/* Phone: the hero sits close to the categories below it — pb-10 (40px)
+        plus the section's own py-8 left a dead band a thumb tall between the
+        subtitle and «Категорияҳои мо», and with the search panel and the
+        chips gone there is nothing left to fill it. >=640 keeps the original
+        bottom padding. */}
+    <div className="relative overflow-hidden pt-4 pb-10 max-sm:pb-3 md:pt-6 md:pb-14">
       {/* Background glow effects */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-gradient-to-tr from-[var(--accent,#FF6B35)]/15 via-[rgb(var(--accent-rgb)/0.1)] to-transparent blur-[150px] pointer-events-none rounded-full" />
 
