@@ -440,11 +440,13 @@ export default function Header() {
           </div>
         </div>
 
-        {/* The search page carries its own full search bar right under the
-            back button — the header's duplicate input is dropped there, and
-            only there: every other page on the phone keeps it. */}
+        {/* The home page on a phone already shows the full search panel
+            (query, category, city, dates) right below the header, so the
+            header's single-line duplicate is dropped below 640 only. The
+            640–767 band keeps it exactly as before (it had no `sm:` hiding
+            of its own), and ≥768 hides it as it always did. */}
         {!location.pathname.startsWith('/search') && (
-          <form onSubmit={handleSearch} className="md:hidden pb-3">
+          <form onSubmit={handleSearch} className="hidden sm:block md:hidden pb-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
