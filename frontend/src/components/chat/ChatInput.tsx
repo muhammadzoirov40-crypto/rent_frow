@@ -318,9 +318,9 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.attachImage')}
             title={t('messages.attachImage')}
-            className="p-2 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
+            className="p-1.5 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
-            <ImageIcon className="w-5 h-5" />
+            <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <button
             type="button"
@@ -328,13 +328,13 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.emoji')}
             title={t('messages.emoji')}
-            className={`p-2 sm:p-2.5 rounded-full transition disabled:opacity-40 ${
+            className={`p-1.5 sm:p-2.5 rounded-full transition disabled:opacity-40 ${
               emojiOpen
                 ? 'text-[var(--accent)] bg-[rgb(var(--accent-rgb)/0.15)]'
                 : 'text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)]'
             }`}
           >
-            <Smile className="w-5 h-5" />
+            <Smile className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           <textarea
@@ -346,7 +346,7 @@ export default function ChatInput({
             onPaste={handlePaste}
             placeholder={t('messages.typeMessage')}
             disabled={disabled}
-            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] glass-input px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
+            className="flex-1 min-w-0 resize-none max-h-[150px] rounded-[22px] glass-input px-2.5 sm:px-4 py-3 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:border-[rgb(var(--accent-rgb)/0.4)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.1)] transition"
           />
 
           <button
@@ -355,9 +355,9 @@ export default function ChatInput({
             disabled={disabled}
             aria-label={t('messages.recordVoice')}
             title={t('messages.recordVoice')}
-            className="p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
+            className="p-1.5 sm:p-2.5 rounded-full text-gray-400 hover:text-[var(--accent)] hover:bg-[rgb(var(--accent-rgb)/0.1)] dark:hover:bg-[rgb(var(--accent-rgb)/0.15)] transition disabled:opacity-40"
           >
-            <Mic className="w-5 h-5" />
+            <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
 
           <button
@@ -366,9 +366,9 @@ export default function ChatInput({
             disabled={!canSend}
             aria-label={t('messages.send')}
             title={t('messages.send')}
-            className="p-3 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] hover:scale-105 hover:shadow-[rgb(var(--accent-rgb)/0.4)] active:scale-95 transition disabled:opacity-40 disabled:shadow-none disabled:scale-100"
+            className="p-2 sm:p-3 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] text-white shadow-lg shadow-[rgb(var(--accent-rgb)/0.3)] hover:scale-105 hover:shadow-[rgb(var(--accent-rgb)/0.4)] active:scale-95 transition disabled:opacity-40 disabled:shadow-none disabled:scale-100"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       )}

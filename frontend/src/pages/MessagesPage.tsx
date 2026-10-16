@@ -437,7 +437,7 @@ export default function MessagesPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh_-_var(--header-h)_-_2rem)] max-w-7xl mx-auto glass-section rounded-3xl overflow-hidden border border-[color:var(--glass-border)] my-4">
+    <div className="flex h-[calc(100vh_-_var(--header-h))] max-w-7xl mx-auto glass-section rounded-3xl overflow-hidden border border-[color:var(--glass-border)] max-sm:my-0 max-sm:rounded-none sm:h-[calc(100vh_-_var(--header-h)_-_2rem)] sm:my-4">
       {/* Full width on a phone (nothing else is on screen there), a fixed
           320px rail on desktop where the conversation sits beside it.
           The phone now gets the same height as the desktop: the fixed
