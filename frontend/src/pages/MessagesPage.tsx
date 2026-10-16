@@ -445,7 +445,7 @@ export default function MessagesPage() {
           renders on this page, so the typing bar sits above the fold. */}
       <div className={`w-full md:w-80 flex-shrink-0 border-r border-[color:var(--glass-border)] flex flex-col ${selectedId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-200 dark:border-white/10">
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 sm:mb-3">
             <button
               type="button"
               onClick={() => navigate(-1)}
@@ -457,8 +457,10 @@ export default function MessagesPage() {
             </button>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">{t('messages.title')}</h2>
           </div>
-          {/* The search sits right under the title bar on every width. */}
-          <div className="relative">
+          {/* ≥640: the search stays pinned under the title. On phones it
+              lives inside the list instead, so it scrolls away upward with
+              the dialogs instead of sitting on top of them. */}
+          <div className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
@@ -471,6 +473,18 @@ export default function MessagesPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-2">
+          {/* Phone: the same search, first item of the scroller — scrolling
+              the list carries it up and out of view. */}
+          <div className="relative py-2 sm:hidden">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder={t('messages.searchPlaceholder')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 glass-input rounded-full text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)] focus:border-[rgb(var(--accent-rgb)/0.4)] transition"
+            />
+          </div>
           {filteredConversations.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6 text-center">
               <div className="w-14 h-14 bg-[rgb(var(--accent-rgb)/0.1)] rounded-full flex items-center justify-center mb-3">
