@@ -242,7 +242,7 @@ export default function LoginPage() {
           <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">{t('auth.equipmentRentalMgmt')}</p>
         </div>
 
-        <div className="glass-card rounded-2xl p-8 transition-colors">
+        <div className="glass-card rounded-2xl p-8 max-sm:p-5 transition-colors">
           <div className={step === 'otp' ? 'text-center' : ''}>
             <h2 className="text-lg font-bold text-[#1A1A2E] dark:text-white mb-1">
               {step === 'otp'
@@ -354,7 +354,12 @@ export default function LoginPage() {
             </form>
           ) : (
             <div className="space-y-4">
-              <div className="flex justify-center gap-2 sm:gap-2.5">
+              {/* On a phone the six boxes at 44px + gaps needed ~304px while
+                  the card only had ~224px of content width, so the row spilled
+                  past both card edges. Narrower boxes (36px) with tighter
+                  gaps (4px) fit inside 320 (236px total); >=640 keeps the
+                  original 48x56 boxes and 10px gap. */}
+              <div className="flex justify-center gap-1 sm:gap-2.5">
                 {otpDigits.map((digit, i) => (
                   <input
                     key={i}
@@ -369,7 +374,7 @@ export default function LoginPage() {
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     onPaste={handleOtpPaste}
                     onFocus={(e) => e.target.select()}
-                    className={`glass-input border-2 w-11 h-14 sm:w-12 sm:h-15 text-center text-2xl font-bold rounded-2xl outline-none transition-all duration-150 text-[#1A1A2E] dark:text-white ${
+                    className={`glass-input border-2 w-9 h-12 text-xl sm:w-12 sm:h-15 sm:text-2xl text-center font-bold rounded-2xl outline-none transition-all duration-150 text-[#1A1A2E] dark:text-white ${
                       digit ? 'border-[var(--accent)]' : ''
                     } focus:border-[var(--accent)] focus:ring-4 focus:ring-[rgb(var(--accent-rgb)/0.15)]`}
                   />
