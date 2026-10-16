@@ -97,11 +97,15 @@ export default function ListingCarousel({
 
       {canScroll && (
         <>
+          {/* Phones: the arrows sat on top of the card photos at a third of
+              a screen width and covered the very thing they pointed at —
+              there the shelf is swiped with a thumb, and snap-x does the
+              rest. sm and up keeps them exactly where they were. */}
           <button
             type="button"
             onClick={() => nudge(-1)}
             aria-label={t('common.back')}
-            className="flex glass-popover absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
+            className="hidden sm:flex glass-popover absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
             data-testid="carousel-prev"
           >
             <ChevronLeft size={20} />
@@ -110,7 +114,7 @@ export default function ListingCarousel({
             type="button"
             onClick={() => nudge(1)}
             aria-label={t('common.next')}
-            className="flex glass-popover absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
+            className="hidden sm:flex glass-popover absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 items-center justify-center text-gray-600 dark:text-gray-300 hover:text-[var(--accent)] hover:border-[var(--accent)] transition z-10"
             data-testid="carousel-next"
           >
             <ChevronRight size={20} />
