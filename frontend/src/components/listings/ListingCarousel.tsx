@@ -150,33 +150,6 @@ export default function ListingCarousel({
         ))}
       </div>
 
-      {/* Phones: the same two controls, but as a small pair under the shelf
-          instead of circles sitting on the photos — one press slides exactly
-          one card, and there is no gesture to learn. sm and up keeps the
-          overlay arrows below, untouched. */}
-      {canScroll && (
-        <div className="mt-3 flex sm:hidden justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => nudge(-1)}
-            aria-label={t('common.back')}
-            className="glass-popover w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 active:scale-95 transition"
-            data-testid="carousel-prev-phone"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            type="button"
-            onClick={() => nudge(1)}
-            aria-label={t('common.next')}
-            className="glass-popover w-9 h-9 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-600 dark:text-gray-300 active:scale-95 transition"
-            data-testid="carousel-next-phone"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      )}
-
       {canScroll && (
         <>
           {/* Phones: the arrows sat on top of the card photos at a third of
