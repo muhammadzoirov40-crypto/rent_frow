@@ -217,6 +217,11 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex-1 min-w-0 text-center sm:text-left sm:pt-2">
+              {/* The head line: name, then the numbers under it. On a
+                  phone the three counts read as one row of big figures
+                  over small labels — the shape every social profile
+                  uses — and only step into their own line when there is
+                  room for them to sit side by side. */}
               {isEditing ? (
                 <input
                   type="text"
@@ -241,9 +246,38 @@ export default function ProfilePage() {
                 </div>
               )}
 
+              {/* Counts as plain figures with their words underneath —
+                  the chips that used to live here wrapped badly at 320
+                  and read as badges rather than as a profile summary. */}
+              <div className="mt-3 flex items-start justify-center sm:justify-start gap-6">
+                {[
+                  { n: meUser?.listing_count ?? 0, l: t('profile.tabs.myListings') },
+                  { n: meUser?.rating_count ?? 0, l: t('profile.reviews') },
+                  {
+                    n: meUser && meUser.rating_count > 0
+                      ? (meUser.rating_sum / meUser.rating_count).toFixed(1)
+                      : '—',
+                    l: t('profile.ratingLabel'),
+                    star: true,
+                  },
+                ].map((c, i) => (
+                  <span key={i} className="flex flex-col items-center leading-tight">
+                    <span className="inline-flex items-center gap-1 text-lg font-extrabold text-[#1A1A2E] dark:text-white">
+                      {c.star && (
+                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                      )}
+                      {c.n}
+                    </span>
+                    <span className="mt-0.5 text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                      {c.l}
+                    </span>
+                  </span>
+                ))}
+              </div>
+
               {/* Contacts as chips: a tinted icon square, then the value —
                   rows instead of loose lines drifting under the name. */}
-              <div className="mt-2.5 flex flex-col items-center sm:items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <div className="mt-3 flex flex-col items-center sm:items-start gap-2 text-sm text-gray-500 dark:text-gray-400">
                 <span className="inline-flex max-w-full items-center gap-2 rounded-xl border border-gray-100 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-3 py-1.5">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-[rgb(var(--accent-rgb)/0.1)] text-[var(--accent)]">
                     <Mail className="w-3 h-3" />
@@ -273,71 +307,53 @@ export default function ProfilePage() {
                     </span>
                   )
                 )}
+                {meUser?.created_at && (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-gray-400 dark:text-gray-500">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {formatDate(meUser.created_at)}
+                  </span>
+                )}
               </div>
 
-              {/* Three facts the header answers with: how the person is
-                  rated, how much they post, when they joined. */}
-              <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-100 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1">
-                  <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  {meUser && meUser.rating_count > 0 && (
-                    <>
-                      <span className="font-semibold text-gray-800 dark:text-white">
-                        {(meUser.rating_sum / meUser.rating_count).toFixed(1)}
-                      </span>
-                      <span className="text-gray-300 dark:text-gray-600">·</span>
-                    </>
-                  )}
-                  {meUser?.rating_count ?? 0} {t('profile.reviews')}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-100 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1">
-                  <Package className="w-3.5 h-3.5 text-[var(--accent)]" />
-                  {meUser?.listing_count ?? 0} {t('profile.tabs.myListings')}
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-gray-100 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-1">
-                  <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                  {meUser?.created_at
-                    ? formatDate(meUser.created_at)
-                    : 'Недавно'}
-                </span>
+              {/* The edit pair sits with the head line, not stranded at
+                  the far end of a flex row — at 320 it had to squeeze
+                  under the contact chips and read as an afterthought. */}
+              <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-2">
+                {isEditing ? (
+                  <>
+                    <button
+                      onClick={handleSaveProfile}
+                      disabled={updateProfileMutation.isPending}
+                      className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] shadow-md shadow-[rgb(var(--accent-rgb)/0.3)] transition disabled:opacity-50"
+                    >
+                      {updateProfileMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4" />
+                      )}
+                      {t('profile.saveAvatar')}
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(false)}
+                      className="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition"
+                    >
+                      {t('profile.cancel')}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setEditName(meUser?.display_name || '');
+                      setEditPhone(meUser?.phone || '');
+                      setIsEditing(true);
+                    }}
+                    className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] shadow-md shadow-[rgb(var(--accent-rgb)/0.3)] transition"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    {t('profile.editProfile')}
+                  </button>
+                )}
               </div>
-            </div>
-
-            <div className="flex flex-wrap justify-center sm:justify-end gap-2 sm:pt-2">
-              {isEditing ? (
-                <>
-                  <button
-                    onClick={handleSaveProfile}
-                    disabled={updateProfileMutation.isPending}
-                    className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] shadow-md shadow-[rgb(var(--accent-rgb)/0.3)] transition disabled:opacity-50"
-                  >
-                    {updateProfileMutation.isPending ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Save className="w-4 h-4" />
-                    )}
-                    {t('profile.saveAvatar')}
-                  </button>
-                  <button
-                    onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/5 transition"
-                  >
-                    {t('profile.cancel')}
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => {
-                    setEditName(meUser?.display_name || '');
-                    setEditPhone(meUser?.phone || '');
-                    setIsEditing(true);
-                  }}
-                  className="flex items-center gap-1.5 bg-[var(--accent)] text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--accent-hover)] shadow-md shadow-[rgb(var(--accent-rgb)/0.3)] transition"
-                >
-                  <Edit2 className="w-4 h-4" />
-                  {t('profile.editProfile')}
-                </button>
-              )}
             </div>
           </div>
         </div>
