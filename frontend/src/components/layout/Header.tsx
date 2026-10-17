@@ -45,6 +45,23 @@ const LANGUAGES = [
   { code: 'en', label: 'English', flag: '🇬🇧' },
 ]
 
+// Every page that renders its own BackButton — the back arrow at the top of
+// the content is already the way out of it. /admin is deliberately absent:
+// nothing on that page goes back, the header's hamburger is its only exit.
+const INNER_WITH_BACK = [
+  '/messages',
+  '/profile',
+  '/search',
+  '/favorites',
+  '/notifications',
+  '/rental-requests',
+  '/my-rentals',
+  '/history',
+  '/settings',
+  '/terms',
+  '/privacy',
+]
+
 export default function Header() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -160,11 +177,14 @@ export default function Header() {
     <header
       ref={headerRef}
       className={`site-header fixed top-0 left-0 right-0 z-50 glass-section border-b border-gray-200/60 dark:border-white/10 transition-colors${
-        // Messages runs on its own top bar (title + its own search) and
-        // Profile carries its own card header — neither wants the site bar,
-        // and the chat/profile want the whole phone screen. Phones only:
-        // ≥640 keeps the header exactly as it was.
-        location.pathname.startsWith('/messages') || location.pathname.startsWith('/profile')
+        // Inner pages carry their own «Бозгашт» arrow at the top of the
+        // content, so a second bar above it was pure duplication on a
+        // 320px screen — and it pushed the page's real header (a card
+        // title, a search field) below the fold. So below sm every page
+        // that renders BackButton drops the site bar: the back arrow and
+        // the bottom nav are the way out. /admin keeps it — the
+        // hamburger is the only way off that page. ≥640 is untouched.
+        INNER_WITH_BACK.some((p) => location.pathname.startsWith(p))
           ? ' max-sm:hidden'
           : ''
       }`}
