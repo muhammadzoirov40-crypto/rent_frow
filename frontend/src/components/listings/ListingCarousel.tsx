@@ -74,6 +74,45 @@ export default function ListingCarousel({
     el.scrollBy({ left: dir * step, behavior: 'smooth' });
   };
 
+  // Drag-to-shelf with a mouse, phones and narrow windows only. A finger
+  // already scrolls an overflow-x strip natively, but a mouse has no
+  // gesture at all — in a 320–639px window the cards simply could not be
+  // moved by hand. Press-drag now pulls the shelf; a drag that ends on a
+  // card swallows the click so it does not open the listing you meant to
+  // pull. >=640 keeps its arrows and its wheel, untouched.
+  const dragRef = useRef({ active: false, startX: 0, startLeft: 0, moved: false });
+
+  const onDragStart = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') return;
+    if (typeof window === 'undefined' || !window.matchMedia('(max-width: 639px)').matches) return;
+    const el = stripRef.current;
+    if (!el) return;
+    // Stop the browser from dragging the card photo / selecting the title.
+    e.preventDefault();
+    dragRef.current = { active: true, startX: e.clientX, startLeft: el.scrollLeft, moved: false };
+  };
+
+  const onDragMove = (e: React.PointerEvent) => {
+    const d = dragRef.current;
+    const el = stripRef.current;
+    if (!d.active || !el) return;
+    const dx = e.clientX - d.startX;
+    if (Math.abs(dx) > 3) d.moved = true;
+    el.scrollLeft = d.startLeft - dx;
+  };
+
+  const onDragEnd = () => {
+    dragRef.current.active = false;
+  };
+
+  const onStripClickCapture = (e: React.MouseEvent) => {
+    if (dragRef.current.moved) {
+      e.preventDefault();
+      e.stopPropagation();
+      dragRef.current.moved = false;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex gap-4 lg:gap-6 overflow-hidden">
@@ -90,8 +129,13 @@ export default function ListingCarousel({
     <div className="relative" data-testid="listing-carousel">
       <div
         ref={stripRef}
-        className="no-scrollbar flex gap-4 lg:gap-6 overflow-x-auto snap-x snap-mandatory pb-1"
+        className="no-scrollbar flex gap-4 lg:gap-6 overflow-x-auto snap-x snap-mandatory pb-1 max-sm:cursor-grab max-sm:active:cursor-grabbing"
         data-testid="carousel-strip"
+        onPointerDown={onDragStart}
+        onPointerMove={onDragMove}
+        onPointerUp={onDragEnd}
+        onPointerLeave={onDragEnd}
+        onClickCapture={onStripClickCapture}
       >
         {listings.map((listing) => (
           <div
