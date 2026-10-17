@@ -130,7 +130,20 @@ export default function CategoryExplorer() {
           return (
             <button
               key={cat.id}
-              onClick={() => navigate(`/search?category_id=${cat.id}`)}
+              onClick={() => {
+                // Phones only: a shelf with nothing behind it («Дигар»,
+                // «Либос», «Техникаи хонагӣ» — all 0 right now) dead-ended on
+                // an empty results page, which tells the reader nothing.
+                // Below 640 the tap opens the search with the rest of the
+                // catalogue instead — the "others" they asked for — while a
+                // category that actually holds listings keeps its filter.
+                // >=640 always keeps the exact old URL.
+                const phone =
+                  typeof window !== 'undefined' &&
+                  window.matchMedia('(max-width: 639px)').matches;
+                const empty = categoryCounts[cat.id] === 0;
+                navigate(phone && empty ? '/search' : `/search?category_id=${cat.id}`);
+              }}
               className="glass-card glass-card-hover group h-full flex flex-col items-center justify-center text-center rounded-2xl p-2.5 sm:p-5 transition-all duration-200 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
             >
               <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl bg-[rgb(var(--accent-rgb)/0.08)] border border-[rgb(var(--accent-rgb)/0.15)] flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-[var(--accent)] group-hover:border-[var(--accent)] group-hover:shadow-md group-hover:shadow-[rgb(var(--accent-rgb)/0.3)] transition-all duration-200">
